@@ -21,7 +21,7 @@ pkgver=9.1.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=305
+pkgrel=310
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -221,6 +221,10 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libmudflap \
+    --disable-libitm \
+    --disable-libmpx \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
