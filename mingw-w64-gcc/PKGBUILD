@@ -224,7 +224,6 @@ build() {
     --disable-libmudflap \
     --disable-libitm \
     --disable-libmpx \
-    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
