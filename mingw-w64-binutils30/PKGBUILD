@@ -18,7 +18,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
-source=(${_realname}::"git+https://github.com/bminor/binutils-gdb#commit=${_gitcommit}"
+source=(${_realname}::"git+git://github.com/bminor/binutils-gdb#commit=${_gitcommit}"
         0001-enable-gold-on.mingw32.patch
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -98,7 +98,7 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm

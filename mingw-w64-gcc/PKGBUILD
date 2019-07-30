@@ -68,6 +68,7 @@ source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapsho
         openmp-vectorize-v2.patch
         optimize.patch
         optimize-at-least-some.patch
+        010-documentation.patch
         0150-ada-fix-pr80590.patch)
 sha256sums=('79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0'
             'SKIP'
@@ -114,6 +115,15 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    0001-Fix-stack-protection-issues.patch \
+    zero-regs-gcc8.patch \
+    fortran-vector-v2.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    openmp-vectorize-v2.patch \
+    optimize.patch \
+    optimize-at-least-some.patch \
+    010-documentation.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
