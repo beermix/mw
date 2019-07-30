@@ -79,8 +79,6 @@ build() {
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
-    --without-ppl \
-    --without-cloog \
     --disable-shared
 
   make
