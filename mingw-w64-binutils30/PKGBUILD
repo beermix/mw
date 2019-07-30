@@ -7,7 +7,7 @@ pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _gitcommit=1a4839f89446137089f2b45e17ddb28793262629
 pkgver=2.30
-pkgrel=15
+pkgrel=16
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -103,8 +103,8 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  install -m644 ${srcdir}/${_realname}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
-  install -m644 ${srcdir}/${_realname}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 
