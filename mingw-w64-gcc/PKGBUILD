@@ -21,7 +21,7 @@ pkgver=9.1.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=310
+pkgrel=311
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -202,7 +202,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -224,7 +223,15 @@ build() {
     --disable-libmudflap \
     --disable-libitm \
     --disable-libmpx \
-    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --without-ppl \
+    --without-cloog \
+    --disable-libada \
+    --disable-libquadmath \
+    --disable-libunwind-exceptions \
+    --disable-vtable-verify \
+    --with-default-libstdcxx-abi=gcc4-compatible \
+    --with-isl=no \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
@@ -278,7 +285,7 @@ ENDFILE
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libgomp*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -338,7 +345,7 @@ package_mingw-w64-gcc() {
 
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  # cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -362,7 +369,7 @@ package_mingw-w64-gcc() {
   cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python

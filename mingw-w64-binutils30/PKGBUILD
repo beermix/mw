@@ -7,7 +7,7 @@ pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _gitcommit=1a4839f89446137089f2b45e17ddb28793262629
 pkgver=2.30
-pkgrel=16
+pkgrel=17
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -79,6 +79,8 @@ build() {
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
+    --without-ppl \
+    --without-cloog \
     --disable-shared
 
   make
