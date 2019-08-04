@@ -16,12 +16,12 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-_snapshot=20190727
+_snapshot=20190803
 pkgver=9.1.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=312 
+pkgrel=315
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -117,17 +117,6 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
-    zero-regs-gcc8.patch \
-    0001-Fix-stack-protection-issues.patch \
-    avx512-when-we-ask-for-it.patch \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
-    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    arch-native-override.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -139,7 +128,8 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
+    0150-ada-fix-pr80590.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -200,12 +190,13 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
     --with-tune=haswell \
+    --with-arch=westmere \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -224,10 +215,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libmudflap \
-    --disable-libitm \
-    --disable-libmpx \
-    --disable-libada \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
@@ -241,11 +228,11 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti make all
+  noti make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
-  noti make -j1 DESTDIR=${srcdir} install
+  make -j1 DESTDIR=${srcdir} install
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
@@ -282,7 +269,7 @@ ENDFILE
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libgomp*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -339,6 +326,7 @@ package_mingw-w64-gcc() {
   cp lib/libatomic*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libgcc*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libgcc*            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -357,15 +345,6 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
-  #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
@@ -410,7 +389,6 @@ package_mingw-w64-gcc-fortran() {
   cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  #cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada() {
@@ -430,9 +408,6 @@ package_mingw-w64-gcc-ada() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  #cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc() {
