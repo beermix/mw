@@ -70,8 +70,7 @@ source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapsho
         optimize-at-least-some.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         arch-native-override.patch
-        010-documentation.patch
-        0150-ada-fix-pr80590.patch)
+        010-documentation.patch)
 sha256sums=('79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0'
             'SKIP'
             'dea2bbad4967280910559c6a11b865aeec19cab34647fb5894cb498b24b14462'
@@ -129,7 +128,7 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0150-ada-fix-pr80590.patch
+    010-documentation.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
