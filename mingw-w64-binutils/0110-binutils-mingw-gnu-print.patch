@@ -88,20 +88,19 @@ diff -urN binutils-2.27.orig/binutils/readelf.c binutils-2.27/binutils/readelf.c
  	  /* PR 11128: Use two separate invocations in order to work
               around bugs in the Solaris 8 implementation of printf.  */
  	  printf ("  [%6tx]  ", data - start);
-diff --git a/binutils/strings.c b/binutils/strings.c
-index 648bdc08..fb90e8c4 100644
---- a/binutils/strings.c
-+++ b/binutils/strings.c
-@@ -613,7 +613,7 @@ print_strings (const char *filename, FILE *stream, file_ptr address,
+diff -urN binutils-2.27.orig/binutils/strings.c binutils-2.27/binutils/strings.c
+--- binutils-2.27.orig/binutils/strings.c	2016-08-03 09:36:51.000000000 +0200
++++ binutils-2.27/binutils/strings.c	2016-09-21 21:13:49.251195600 +0200
+@@ -613,7 +613,7 @@
  #ifdef HAVE_LONG_LONG
  	    if (sizeof (start) > sizeof (long))
  	      {
 -# ifndef __MSVCRT__
-+#if !defined(__MSVCRT__) || defined(__USE_MINGW_ANSI_STDIO)
++# if !defined(__MSVCRT__) || defined(__USE_MINGW_ANSI_STDIO)
  		printf ("%7llo ", (unsigned long long) start);
  # else
  		printf ("%7I64o ", (unsigned long long) start);
-@@ -632,7 +632,7 @@ print_strings (const char *filename, FILE *stream, file_ptr address,
+@@ -632,7 +632,7 @@
  #ifdef HAVE_LONG_LONG
  	    if (sizeof (start) > sizeof (long))
  	      {
@@ -110,15 +109,16 @@ index 648bdc08..fb90e8c4 100644
  		printf ("%7lld ", (unsigned long long) start);
  # else
  		printf ("%7I64d ", (unsigned long long) start);
-@@ -651,7 +651,7 @@ print_strings (const char *filename, FILE *stream, file_ptr address,
+@@ -651,7 +651,7 @@
  #ifdef HAVE_LONG_LONG
  	    if (sizeof (start) > sizeof (long))
  	      {
 -# ifndef __MSVCRT__
-+#if !defined(__MSVCRT__) || defined(__USE_MINGW_ANSI_STDIO)
++# if !defined(__MSVCRT__) || defined(__USE_MINGW_ANSI_STDIO)
  		printf ("%7llx ", (unsigned long long) start);
  # else
  		printf ("%7I64x ", (unsigned long long) start);
+diff -urN binutils-2.27.orig/gas/as.h binutils-2.27/gas/as.h
 --- binutils-2.27.orig/gas/as.h	2016-08-03 09:36:51.000000000 +0200
 +++ binutils-2.27/gas/as.h	2016-09-21 21:25:33.955958500 +0200
 @@ -438,10 +438,10 @@

@@ -7,8 +7,8 @@ _external_minizip=yes
 _realname=zlib
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.2.11
-pkgrel=7
+pkgver=1.2.11.1_jtkv6.3
+pkgrel=10
 pkgdesc="Compression library implementing the deflate compression method found in gzip and PKZIP (mingw-w64)"
 arch=('any')
 license=(ZLIB)
@@ -16,7 +16,7 @@ url="https://www.zlib.net/"
 depends=($([[ "$_external_minizip" != "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-bzip2"))
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('staticlibs')
-source=("https://zlib.net/current/${_realname}-${pkgver}.tar.gz"
+source=("https://github.com/jtkukunas/zlib/archive/v${pkgver}.tar.gz"
         01-zlib-1.2.11-1-buildsys.mingw.patch
         03-dont-put-sodir-into-L.mingw.patch
         04-fix-largefile-support.patch
@@ -32,7 +32,7 @@ sha256sums=('c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1'
             '0be98a7e660e7c068856f08b9e92d6c73a6b0d88c3e29a9716140b147f7c23c5')
 
 prepare() {
-  cd ${srcdir}/${_realname}-${pkgver}
+  cd ${srcdir}/${_realname}-*
   grep -A 24 '^  Copyright' zlib.h > LICENSE
 
   patch -p1 -i ${srcdir}/01-zlib-1.2.11-1-buildsys.mingw.patch
@@ -47,7 +47,7 @@ prepare() {
 }
 
 build() {
-  cd ${srcdir}/${_realname}-${pkgver}
+  cd ${srcdir}/${_realname}-*
   CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
   
@@ -68,12 +68,12 @@ build() {
 }
 
 check() {
-  cd ${srcdir}/${_realname}-${pkgver}
+  cd ${srcdir}/${_realname}-*
   make test
 }
 
 package() {
-  cd ${srcdir}/${_realname}-${pkgver}
+  cd ${srcdir}/${_realname}-*
   make DESTDIR="${pkgdir}" install
   install -Dm644 LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 
