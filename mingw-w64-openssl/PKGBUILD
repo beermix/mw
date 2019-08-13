@@ -71,6 +71,7 @@ build() {
     enable-ec2m \
     enable-md2 \
     enable-rc5 \
+    enable-ec_nistp_64_gcc_128 \
     mingw64
 
     noti make depend
