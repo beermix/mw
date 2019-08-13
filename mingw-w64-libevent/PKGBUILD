@@ -40,6 +40,7 @@ build() {
     --sysconfdir=${MINGW_PREFIX}/etc \
     --disable-libevent-regress \
     --disable-debug-mode \
+    --disable-silent-rules \
     --disable-openssl
 
   make
