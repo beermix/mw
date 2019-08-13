@@ -16,12 +16,12 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-#_snapshot=20181214
-pkgver=9.2.0
-#_majorver=${pkgver:0:1}
-#_sourcedir=${_realname}-${_majorver}-${_snapshot}
-_sourcedir=${_realname}-${pkgver}
-pkgrel=10
+_snapshot=20190810
+pkgver=9.1.1
+_majorver=${pkgver:0:1}
+_sourcedir=${_realname}-${_majorver}-${_snapshot}
+#_sourcedir=${_realname}-${pkgver}
+pkgrel=316
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -43,8 +43,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
-        #ftp://ftp.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
+source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
@@ -59,8 +58,20 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
-sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
+        0140-gcc-8.2.0-diagnostic-color.patch
+        zero-regs-gcc8.patch
+        0001-Fix-stack-protection-issues.patch
+        avx512-when-we-ask-for-it.patch
+        fortran-vector-v2.patch
+        gomp-relax.patch
+        ipa-cp.patch
+        openmp-vectorize-v2.patch
+        optimize.patch
+        optimize-at-least-some.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        arch-native-override.patch
+        010-documentation.patch)
+sha256sums=('79a66834e96a6050d8fe78db2c3b32fb285b230b855d0a66288235bc04b327a0'
             'SKIP'
             'dea2bbad4967280910559c6a11b865aeec19cab34647fb5894cb498b24b14462'
             '2dd7498bcb25b41afcc458696386b456ee4ff440bf395519a23d1f945ba15a41'
@@ -76,7 +87,8 @@ sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
             'e427297a118c47d2e71cb05dd9a496e9ada497917721c16918548ee2f13ad709'
             '2321c7dce29a600477e481d16d847f05dc8c6d6461ee1eba7814c5bf62c2ef95'
             'a526cfab91a1499be92c824c7f2185a013a38dbdfbeabe63ecbe84451e07b021'
-            'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376')
+            'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376'
+            'acc5437045005e2aeaca81f6b988c65b319a3ebcd8919218faeca74837f4b12b')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
