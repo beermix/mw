@@ -13,19 +13,22 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
+         $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
+         $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 #_snapshot=20181214
 pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=10
+pkgrel=11
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
 license=('GPL' 'LGPL' 'FDL' 'custom')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
+             $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
              "${MINGW_PACKAGE_PREFIX}-binutils"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
@@ -176,7 +179,7 @@ build() {
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --with-tune=haswell \
-    --with-arch=westmere \
+    --with-arch=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
