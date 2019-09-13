@@ -20,7 +20,7 @@ _snapshot=20190907
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-_sourcedir=${_realname}-${pkgver}
+#_sourcedir=${_realname}-${pkgver}
 pkgrel=12
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -99,7 +99,7 @@ del_file_exists() {
 
 
 prepare() {
-  cd ${srcdir}/${_sourcedir}
+  cd ${srcdir}/gcc-*
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
@@ -219,7 +219,7 @@ build() {
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
-  make -j1 DESTDIR=${srcdir} install
+  noti make -j1 DESTDIR=${srcdir} install
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
