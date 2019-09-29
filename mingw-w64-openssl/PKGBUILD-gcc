@@ -64,12 +64,14 @@ build() {
     no-zlib \
     no-zlib-dynamic \
     enable-camellia \
+    enable-unit-test \
     enable-idea \
     enable-mdc2 \
     enable-rfc3779 \
     enable-ec2m \
     enable-md2 \
     enable-rc5 \
+    enable-ec_nistp_64_gcc_128 \
     mingw64
 
     noti make depend
