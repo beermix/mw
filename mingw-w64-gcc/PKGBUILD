@@ -201,6 +201,8 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --enable-gnu-indirect-function \
+    --disable-libunwind-exceptions \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
