@@ -16,12 +16,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-#_snapshot=20181214
-pkgver=9.2.0
-#_majorver=${pkgver:0:1}
-#_sourcedir=${_realname}-${_majorver}-${_snapshot}
-_sourcedir=${_realname}-${pkgver}
-pkgrel=20
+_snapshot=20190928
+pkgver=9.2.1
+_majorver=${pkgver:0:1}
+_sourcedir=${_realname}-${_majorver}-${_snapshot}
+pkgrel=18
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -43,8 +42,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
-        #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
+source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
@@ -72,7 +70,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0001-Always-use-z-now-when-linking-with-pie.patch
         icelake.patch
         zero-regs-gcc8.patch
-        0018-isl-0.20.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
             'SKIP'
@@ -131,10 +128,6 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     010-documentation.patch \
-    0018-isl-0.20.patch \
-    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
-    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
-    0008-libgcc-disable-split-stack-nothreads.patch \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
     optimize.patch \
@@ -169,13 +162,6 @@ prepare() {
 build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
-
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
-  else
-    extra_config+=("--enable-libstdcxx-debug")
-  fi
 
   case "${CARCH}" in
     i686)
