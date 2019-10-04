@@ -60,6 +60,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         010-documentation.patch
+        gcc-stable-branch.patch
         openmp-vectorize-v2.patch
         fortran-vector-v2.patch
         optimize.patch
@@ -121,6 +122,7 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
