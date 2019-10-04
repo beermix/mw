@@ -203,6 +203,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
+  export CC=/home/User/.bin/gcc
+  export CXX=/home/User/.bin/g++
+
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -260,7 +263,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti make V=1 all
+  noti nice -n 19 make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

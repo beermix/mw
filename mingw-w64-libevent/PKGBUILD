@@ -45,7 +45,7 @@ build() {
     --disable-clock-gettime \
     --disable-openssl
 
-  make
+  noti nice -n 19 make
 }
 
 package() {
