@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _ver=1.0.2t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=72
+pkgrel=80
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -38,6 +38,8 @@ prepare() {
   patch -p1 -i ${srcdir}/000-parallellez.patch
   patch -p1 -i ${srcdir}/openssl-1.0.1-x32.patch
   patch -p1 -i ${srcdir}/openssl-0.9.6-x509.patch
+#  patch -p1 -i ${srcdir}/openssl-1.0.1i-relocation.patch
+
 }
 
 build() {
@@ -46,14 +48,14 @@ build() {
   cp -a ${srcdir}/${_realname}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -O3 -pipe -fomit-frame-pointer/' ${srcdir}/build-${CARCH}/Configure
-  #sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -pipe -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -Wl,--gc-sections/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -pipe -fomit-frame-pointer/' ${srcdir}/build-${CARCH}/Configure
+  #sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -pipe -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -Wl,--gc-sections/' ${srcdir}/build-${CARCH}/Configure
   #sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' ${srcdir}/build-${CARCH}/Configure
 
-#  _mingw=mingw
-#  if $(echo ${CARCH} | grep -q x86_64); then
-#    _mingw=mingw64
-#  fi
+  _mingw=mingw
+  if $(echo ${CARCH} | grep -q x86_64); then
+    _mingw=mingw64
+  fi
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
   ./Configure \
@@ -61,19 +63,20 @@ build() {
     ${_mingw} \
     shared \
     threads \
-    no-zlib \
-    no-zlib-dynamic \
     enable-camellia \
     enable-idea \
     enable-mdc2 \
-    enable-rfc3779 \
     enable-ec2m \
     enable-md2 \
     enable-rc5 \
-    mingw64
+    enable-tlsext \
+    enable-rfc3779 \
+    enable-ec_nistp_64_gcc_128
 
-    noti make depend
-    noti make
+    #noti make depend
+    #noti make
+
+  make  ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
 }
 
 package() {
