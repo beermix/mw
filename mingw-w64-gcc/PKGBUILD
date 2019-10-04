@@ -203,8 +203,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC=/home/User/.bin/gcc
-  export CXX=/home/User/.bin/g++
+#  export CC=/home/User/.bin/gcc
+#  export CXX=/home/User/.bin/g++
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
