@@ -217,7 +217,6 @@ build() {
     --enable-linker-build-id \
     --with-diagnostics-color=always \
     --with-tune=haswell \
-    --enable-default-pie \
     --enable-default-ssp \
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
