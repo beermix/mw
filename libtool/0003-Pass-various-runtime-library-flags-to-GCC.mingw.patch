@@ -1,0 +1,12 @@
+diff --git a/build-aux/ltmain.in b/build-aux/ltmain.in
+index 96b37003..a8940c14 100644
+--- a/build-aux/ltmain.in
++++ b/build-aux/ltmain.in
+@@ -5383,6 +5383,7 @@ func_mode_link ()
+       -64|-mips[0-9]|-r[0-9][0-9]*|-xarch=*|-xtarget=*|+DA*|+DD*|-q*|-m*| \
+       -t[45]*|-txscale*|-p|-pg|--coverage|-fprofile-*|-F*|@*|-tp=*|--sysroot=*| \
+       -O*|-g*|-flto*|-fwhopr*|-fuse-linker-plugin|-fstack-protector*|-stdlib=*| \
++      -shared-libgcc|-static-libgcc|-static-libgfortran|-static-libstdc++| \
+       -specs=*|-fsanitize=*|-fuse-ld=*)
+         func_quote_arg pretty "$arg"
+ 	arg=$func_quote_arg_result
