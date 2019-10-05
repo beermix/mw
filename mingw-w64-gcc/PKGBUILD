@@ -234,7 +234,7 @@ build() {
     --disable-vtable-verify \
     --disable-libmpx \
     --with-diagnostics-color=always \
-    --enable-default-pie \
+    --enable-default-ssp \
     --enable-__cxa_atexit \
     --enable-decimal-float \
     --enable-tls \
