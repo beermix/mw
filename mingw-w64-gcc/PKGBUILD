@@ -20,7 +20,7 @@ _snapshot=20190928
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=19
+pkgrel=21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -67,7 +67,6 @@ source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapsho
         avx512-when-we-ask-for-it.patch
         arch-native-override.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        0001-Always-use-z-now-when-linking-with-pie.patch
         0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
         0003-gcc-plugin-POSIX-include-sys-select-h.patch
         0008-libgcc-disable-split-stack-nothreads.patch
@@ -145,7 +144,6 @@ prepare() {
     avx512-when-we-ask-for-it.patch \
     arch-native-override.patch \
     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    0001-Always-use-z-now-when-linking-with-pie.patch \
     icelake.patch \
     zero-regs-gcc8.patch
 
@@ -235,6 +233,15 @@ build() {
     --disable-vtable-verify \
     --disable-libmpx \
     --with-diagnostics-color=always \
+    --enable-default-pie \
+    --enable-__cxa_atexit \
+    --enable-decimal-float \
+    --enable-tls \
+    --enable-c99 \
+    --enable-long-long \
+    --disable-libstdcxx-pch \
+    --enable-libstdcxx-time \
+    --enable-clocale=gnu \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
