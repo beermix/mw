@@ -63,6 +63,8 @@ build() {
     ${_mingw} \
     shared \
     threads \
+    no-zlib \
+    no-zlib-dynamic \
     enable-camellia \
     enable-idea \
     enable-mdc2 \
@@ -73,8 +75,7 @@ build() {
     enable-rfc3779 \
     enable-ec_nistp_64_gcc_128
 
-    noti nice -n 19 make depend
-    noti nice -n 19 make
+    noti nice -n 19 make depend all
 
 #  make  ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
 }
