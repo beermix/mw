@@ -8,7 +8,7 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=4
+pkgrel=5
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 groups=('msys2-devel')
@@ -43,6 +43,12 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0130-libstdc++-in-out.patch
         0950-9.1.0-configure-msys2.patch
         0951-9.1.0-msys2-spec.patch
+        0001-Always-use-z-now-when-linking-with-pie.patch
+        0000-libtool-leave-framework-alone.patch
+        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+        0003-gcc-plugin-POSIX-include-sys-select-h.patch
+        0006-libgfortran-missing-include.patch
+        0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
         0018-isl-0.20.patch
         0953-9.1.0-testsuite-msys2.patch)
@@ -104,6 +110,12 @@ prepare() {
   apply_patch_with_msg \
      gcc-stable-branch.patch \
      0018-isl-0.20.patch \
+     0001-Always-use-z-now-when-linking-with-pie.patch \
+     0000-libtool-leave-framework-alone.patch \
+     0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+     0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+     0006-libgfortran-missing-include.patch \
+     0008-libgcc-disable-split-stack-nothreads.patch \
      0009-Cygwin-uses-sysv-ABI-on-x86_64-V2.patch \
      0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch \
      0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch \
@@ -204,10 +216,9 @@ build() {
     --with-system-zlib \
     --enable-linker-build-id \
     --with-diagnostics-color=always \
-    --disable-vtable-verify \
-    --disable-libunwind-exceptions \
     --with-tune=haswell \
-    --with-arch=haswell \
+    --enable-default-pie \
+    --enable-default-ssp \
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
