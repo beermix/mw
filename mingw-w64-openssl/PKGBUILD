@@ -75,7 +75,7 @@ build() {
     enable-rfc3779 \
     enable-ec_nistp_64_gcc_128
 
-    noti make depend
+    make depend
     noti make
 
 #  make  ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
