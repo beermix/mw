@@ -190,9 +190,6 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
-
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -229,10 +226,13 @@ build() {
     --with-system-zlib \
     --disable-libmpx \
     --disable-libssp \
+    --enable-gnu-indirect-function \
+    --enable-gnu-unique-object \
+    --disable-vtable-verify \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
-    --with-gnu-as --with-gnu-ld --with-diagnostics-color=always -enable-default-ssp \
+    --with-gnu-as --with-gnu-ld --with-diagnostics-color=always --enable-default-ssp \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
