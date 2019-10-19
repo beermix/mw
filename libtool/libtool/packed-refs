@@ -1,0 +1,135 @@
+# pack-refs with: peeled fully-peeled sorted 
+33e6c12a1eefcfc1537ed42367ec73263284568a refs/heads/binary-branch
+0dc5719b1a8282dbb019a0f93fecc34c5578d7fd refs/heads/branch-1-3
+ca991a01240102ac69ac2736ce152ef0cf3610d9 refs/heads/branch-1-4
+29b48580df75f0c5baa2962548a4c101ec7ed7ec refs/heads/branch-1-5
+d2abb3daaf0fef844e13d009da677d150cd2d873 refs/heads/branch-2-0
+8aec0042b11b5e4f6c069260798fdaa4f0b715b5 refs/heads/gary/redo-test-operand-order
+d2dcd0094901ca961a4690647d17f887eb26208f refs/heads/gary/reredo-test-operand-order
+223aa896c79dd817cc19f4c6d9af7cb2c5fec343 refs/heads/ild-branch
+27b3a20a7e3a0157b5109383ba6ff2cc16287358 refs/heads/libtool-next
+d4bf222845e1fe33ee5bd4c07985280dbfd2aa9c refs/heads/lto
+b9b44533fbf7c7752ffd255c3d09cc360e24183b refs/heads/master
+d7f080d6b89994cb389214847432a65c1794fb6e refs/heads/multi-language-branch
+d6ff024982625586ff6878fe7872f918d0699b1a refs/heads/parallel-tests
+25706f02ed3d02eb86690371dfc23b5ac2340a98 refs/heads/pr-msvc-support
+3ddf7d3f6e84a20f46d5742433b44c3c571645e8 refs/heads/redo-v2.2.6-release
+83f5d15c88589620ba29353e2e7b672f5fc57fc2 refs/heads/sysroot
+a6d6c031d9d35efead3be58389ceffc716816137 refs/tags/autoconf_pre_2-13
+67646eef648c64869164053c006f5efdbd358a6f refs/tags/automake_1-4
+c8d8948b8d5b88c07459b97bef8da9407450375b refs/tags/binary-branchpoint
+ecce97ede0e7114272de8add7136c5f9e11dab63 refs/tags/binary-mlb
+68bac5f496f77b19ca787d55aed6b7752a013b78 refs/tags/help
+5bd624040c3fda26d875e2af399fa09391386396 refs/tags/ild-branchpoint
+4b1b95eabf46e7b994adecb5667f73a2b9fb9d8a refs/tags/multi-language-fork
+0d579bb3f6014bc7f91ea5578ab3aa7792e8bc73 refs/tags/multi-language-merge-point
+075ca9a5396f6701c53ee184953576c432b955d0 refs/tags/release-0-6a
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-6b
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-6c
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-6d
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-6e
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-7
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-7a
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-7b
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-7c
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-8
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-99
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9b
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9c
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9d
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9e
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9f
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9g
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9h
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-0-9i
+545374587e5ee465aeb631fd70abddfef82a88db refs/tags/release-1-0
+10189e82e571419ade5c7a2c8a9a7a28e97e9060 refs/tags/release-1-0a
+9adf7e85ed434e74980cf3b91b33e24083d285ea refs/tags/release-1-0b
+43de71de1106de06aff029398b7063d532cb7d1c refs/tags/release-1-0c
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0d
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0e
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0f
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0g
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0h
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0i
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-0j
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-1
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-1a
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-2
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-2a
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-2b
+9dab6cda9748747d3aae65b0d9c14eca4a3668e5 refs/tags/release-1-2c
+bf8a4660a3a417893ca1879dee42f5b9dfef531e refs/tags/release-1-2d
+d6b6c13f5b8ece8a1bad355637d65fc1a41aa64d refs/tags/release-1-2f
+1340c3dc7b314bb1f90294794d4eb17e3ae66d18 refs/tags/release-1-3
+ce7ae08816fe2c72f95729137469ddb37b72a0a0 refs/tags/release-1-3-1
+97087392045d12b18115a5de72c1ac11de418d73 refs/tags/release-1-3-2
+50fce251543f720c5a1e572654dde8cf9dede76c refs/tags/release-1-3-3
+e7473abf29bfa1c87463c6ada2d0ff9a6a297a3e refs/tags/release-1-3-4
+99c9021d68d2bf33925b60301fe52678efa7c204 refs/tags/release-1-3-5
+d71b404f18ad994e50f0cc60a8871429094311b1 refs/tags/release-1-3b
+6b3f434839264c4ff46d334ac8a3b38fa7076f66 refs/tags/release-1-3d
+c54d9834ab0f195cfdf24564937b52cc0b7f9e99 refs/tags/release-1-4
+a135612405a398db8dee2841a051d075fe056bb5 refs/tags/release-1-4-1
+a1a5bad6b0477409baaae0a61089a1d36ac08620 refs/tags/release-1-4-2
+9dc578d6007e061f208a864c4c04a6d68c5f40aa refs/tags/release-1-4-3
+16b5ce20cc7744315ee99f542b05512333feac2b refs/tags/release-1-4b
+cfac19ba4fb92bfbd03663a57297f7290ca4af1f refs/tags/release-1-4d
+80fd46e7e7b0f77890429017fa14d61d510ca94f refs/tags/release-1-5
+ffdecf01b561f26e451b1a0112e36ce08ad4dfe5 refs/tags/release-1-5-10
+2ecb80157d3793d67d2ad3be5e1d82f45b051e0c refs/tags/release-1-5-12
+a06680edab8b2fbd91d6025def66792ffac3e145 refs/tags/release-1-5-14
+fa8386bcbc3358a61ce997ac14a4a159c88bed67 refs/tags/release-1-5-16
+7afe3749da32ae4fe63ad88c85acf7d9cf5a237f refs/tags/release-1-5-18
+9f3d7b62eb6d6274ff413c216a734631c4aa644b refs/tags/release-1-5-2
+b67e34942fff85b20d65c894f61a71e12e5b897b refs/tags/release-1-5-20
+507cd3b063ff0d5c4574236dfeebefc749710b86 refs/tags/release-1-5-22
+4b4f5fc894b32009f4b54aba3fb9d2bbcea91bdc refs/tags/release-1-5-23b
+b0c1494ecfd362e86e1ddff6029b2ab1d914794e refs/tags/release-1-5-24
+e97b7611c1bc2b0dfa1182f19f839ebc0bd19e22 refs/tags/release-1-5-26
+37233799bd53303408cd66ea16dbc913b423811e refs/tags/release-1-5-4
+6881878df2e60f4a20884ec9bae44e9234f721f6 refs/tags/release-1-5-6
+2d5c3ec19063359f31f0b181856a79b039e25dac refs/tags/release-1-5-8
+0f329d5f72eb5db04d4805f4e298a9a4071a6337 refs/tags/release-1-9b
+a0a30505210d69fcadf5a1a94fcfd4bd11c8e2c6 refs/tags/release-1-9d
+47c7c5313a2979d6a630fe39a0b6e0fa657a1038 refs/tags/release-1-9f
+0ab46c6f8fb7320a6d6098b42e0f94a89e929c7c refs/tags/release-2-1b
+9843ca8ed92bb1a76c4d1c4bd21b7d104c2a80e9 refs/tags/release-2-2
+55a00b43d558415732e884b4315bd0ff9f599e3f refs/tags/release-2-2-2
+^724f29122c655bdbda845af92a3ca0cf36aaa67d
+4982013c547487402d400f8e341976e6ef6c9047 refs/tags/start
+44511fce19c1adc26ab608f518ad6ae447c870ad refs/tags/v2.2.10
+^c6b266a56fd2a9711d31e44f065701b8e78b3455
+3847f8ab7edde28b8adba8e532efce8d6d9d66f5 refs/tags/v2.2.2
+^724f29122c655bdbda845af92a3ca0cf36aaa67d
+1df2a14e0922346412d59969e1a87be64d9f9390 refs/tags/v2.2.4
+^0ac678eb2a7a6f06fbd4afe277219bbcd9c407b4
+997b5e62e48b86a601d9ea96120842ff945daa7f refs/tags/v2.2.6
+^c7f97f395615fb62c96de30c6925484ecd0cee2e
+696bbf80d1cea8deaf22d9a3363a688443f06c2e refs/tags/v2.2.6a
+^1d7d1f2c4b45bc98870d60b1af08c0fa851fedd2
+7181eeeee8dece6599bb6baac1ea35ad474fde62 refs/tags/v2.2.6b
+^3ddf7d3f6e84a20f46d5742433b44c3c571645e8
+13412c2e2dfe7a720483c8d1dc98ca21c13c0483 refs/tags/v2.2.7b
+^99da5501fcca20d7cab7f328e223c7520c1a6701
+2f7631018aefc396375b3c1ce1c2bea9ec675873 refs/tags/v2.2.8
+^2f666f77692f52e02d4b856f5764440c5a80cc35
+fd9f12048e1fd25f5bd3617135abe7fba2f47705 refs/tags/v2.4
+^e9170e0daf1880db04269434ab0ef8872b9cb4f7
+91c99165d9cbdd14569f046eb586c67020dd1045 refs/tags/v2.4.2
+^fdb4c546784aebacaf697ebd5f96e0d91c566597
+8ce3ae0ad103366fbc2511b55f8a174f1975937a refs/tags/v2.4.2.418
+^4427784fe74e8f18c781d62624a0adb647893849
+70f397e6a9ee6b9215ab74ce9ef5e35f5d7d9e37 refs/tags/v2.4.2.427
+^397f71725630cd6d97fe69104f170861f441507a
+5809bb1ca229c351b49b349d6ef3d9c4d536a0e5 refs/tags/v2.4.2.444
+^a4ffcdb5e0f207656bb2584b1c4e1702a6d7fa32
+6f15d1051612c8246e25eb7ef1499807497f1db9 refs/tags/v2.4.3
+^b9bf9fb6ef614520fa373631078cc0cc2e89aa0d
+dd13b1a4880ce89d4f970613a5da47a9d4ccd61e refs/tags/v2.4.4
+^81af21685032e96e6e93a24cc9c126e89dde8809
+0e8c2d8f0e69b385162cb41295531fc3536e9935 refs/tags/v2.4.5
+^cb90d8ed964125d44d56e26951833e04ab82bc01
+032183424a30ac7103d5b39d1e6fc61f9fbeecc6 refs/tags/v2.4.6
+^f09d00cbcf924c378573163e244fffeb8d28005f

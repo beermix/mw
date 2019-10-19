@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.32
-pkgrel=20
+pkgrel=29
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -35,6 +35,8 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         CVE-2019-12972.patch
         CVE-2019-14250.patch
         CVE-2019-14444.patch
+        CVE-2019-17450.patch
+        CVE-2019-17451.patch
         000-git32.patch)
 sha256sums=('de38b15c902eb2725eac6af21183a5f34ea4634cb0bcef19612b50e5ed31072d'
             'SKIP'
@@ -51,6 +53,8 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
   patch -p1 -i "${srcdir}"/000-git32.patch
+  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
+  patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
   patch -p1 -i "${srcdir}"/CVE-2019-9071.patch
   patch -p1 -i "${srcdir}"/CVE-2019-9074.patch
   patch -p1 -i "${srcdir}"/CVE-2019-9075.patch
@@ -64,7 +68,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
+  #patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
 
