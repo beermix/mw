@@ -229,10 +229,11 @@ build() {
     --enable-gnu-indirect-function \
     --enable-gnu-unique-object \
     --disable-vtable-verify \
+    --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
-    --with-gnu-as --with-gnu-ld --with-diagnostics-color=always --enable-default-ssp \
+    --with-gnu-as --with-gnu-ld \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
@@ -491,3 +492,4 @@ package_mingw-w64-x86_64-gcc-ada() {
 package_mingw-w64-x86_64-gcc-objc() {
   package_mingw-w64-gcc-objc
 }
+23:43 19.10.2019
