@@ -492,4 +492,3 @@ package_mingw-w64-x86_64-gcc-ada() {
 package_mingw-w64-x86_64-gcc-objc() {
   package_mingw-w64-gcc-objc
 }
-23:43 19.10.2019
