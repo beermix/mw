@@ -18,5 +18,8 @@
 /*/*-hg/
 */binutils/
 */openssl/
+*/libtool/
+*/gnulib/
+*/gnulib-bootstrap/
 */gcc/
 /mc/mc/
