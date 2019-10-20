@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _ver=1.0.2t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=82
+pkgrel=83
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -48,7 +48,7 @@ build() {
   cp -a ${srcdir}/${_realname}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -pipe -fomit-frame-pointer/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -O3 -pipe -fomit-frame-pointer/' ${srcdir}/build-${CARCH}/Configure
   #sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -pipe -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections -Wl,--gc-sections/' ${srcdir}/build-${CARCH}/Configure
   #sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -march=i486 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' ${srcdir}/build-${CARCH}/Configure
 
