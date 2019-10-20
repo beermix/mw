@@ -219,7 +219,6 @@ build() {
     --enable-__cxa_atexit \
     --enable-linker-build-id \
     --disable-libunwind-exceptions \
-    --with-gcc-major-version-only \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
