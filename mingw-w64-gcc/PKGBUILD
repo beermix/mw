@@ -181,6 +181,9 @@ build() {
   if [ "$_enable_objc" == "yes" ]; then
     _languages+=",objc,obj-c++"
   fi
+  
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -220,8 +223,6 @@ build() {
     --enable-gnu-indirect-function \
     --disable-vtable-verify \
     --enable-__cxa_atexit \
-    --enable-linker-build-id \
-    --enable-bootstrap \
     --disable-libunwind-exceptions \
     --with-gcc-major-version-only \
     --with-diagnostics-color=always \
