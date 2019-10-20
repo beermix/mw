@@ -20,7 +20,7 @@ _snapshot=20191019
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=31
+pkgrel=32
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -217,6 +217,7 @@ build() {
     --enable-gnu-unique-object \
     --disable-vtable-verify \
     --enable-__cxa_atexit \
+    --enable-default-ssp \
     --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
