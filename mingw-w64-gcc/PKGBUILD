@@ -228,8 +228,10 @@ build() {
     --with-system-zlib \
     --disable-libmpx \
     --enable-gnu-indirect-function \
+    --enable-bootstrap \
     --disable-vtable-verify \
     --enable-__cxa_atexit \
+    --enable-linker-build-id \
     --disable-libunwind-exceptions \
     --with-gcc-major-version-only \
     --with-diagnostics-color=always \
