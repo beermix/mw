@@ -214,7 +214,7 @@ build() {
     --with-system-zlib \
     --disable-libmpx \
     --enable-gnu-indirect-function \
-    --enable-bootstrap \
+    --enable-gnu-unique-object \
     --disable-vtable-verify \
     --enable-__cxa_atexit \
     --disable-libunwind-exceptions \
