@@ -97,14 +97,6 @@ build() {
   noti make MAKEINFO=true -j7
 }
 
-check() {
-  cd ${srcdir}/build-${MINGW_CHOST}
-
-  # unset LDFLAGS as testsuite makes assumptions about which ones are active
-  # do not abort on errors - manually check log files
-  make MAKEINFO=true LDFLAGS="" -k check || true
-}
-
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make MAKEINFO=true DESTDIR=${pkgdir} install -j1
