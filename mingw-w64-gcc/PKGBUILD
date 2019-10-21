@@ -20,7 +20,7 @@ _snapshot=20191019
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=34
+pkgrel=35
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -58,6 +58,20 @@ source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapsho
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         010-documentation.patch
+        openmp-vectorize-v2.patch
+        fortran-vector-v2.patch
+        optimize.patch
+        ipa-cp.patch
+        optimize-at-least-some.patch
+        gomp-relax.patch
+        avx512-when-we-ask-for-it.patch
+        arch-native-override.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+        0003-gcc-plugin-POSIX-include-sys-select-h.patch
+        0008-libgcc-disable-split-stack-nothreads.patch
+        icelake.patch
+        zero-regs-gcc8.patch
         0018-isl-0.20.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
@@ -117,7 +131,21 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     010-documentation.patch \
-    0018-isl-0.20.patch
+    0018-isl-0.20.patch \
+    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+    0008-libgcc-disable-split-stack-nothreads.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
+    avx512-when-we-ask-for-it.patch \
+    arch-native-override.patch \
+    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+    icelake.patch \
+    zero-regs-gcc8.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -146,13 +174,6 @@ prepare() {
 build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
-
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
-  else
-    extra_config+=("--enable-libstdcxx-debug")
-  fi
 
   case "${CARCH}" in
     i686)
@@ -198,7 +219,7 @@ build() {
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    ${extra_config} \
+    --disable-libstdcxx-debug \
     --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
@@ -214,9 +235,7 @@ build() {
     --with-system-zlib \
     --disable-libmpx \
     --disable-vtable-verify \
-    --enable-__cxa_atexit \
-    --enable-decimal-float \
-    --enable-c99 \
+    --with-linker-hash-style=gnu  \
     --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \

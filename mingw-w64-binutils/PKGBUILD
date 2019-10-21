@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=13
+pkgrel=15
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -27,6 +27,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         CVE-2019-17450.patch
         CVE-2019-17451.patch
         binutils-stable-branch.patch
+        binutils-add-LD_AS_NEEDED-global-env.patch
         0310-reproducible-import-libraries.patch)
 sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
             'SKIP'
@@ -51,6 +52,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
   patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
+  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
@@ -87,15 +89,12 @@ build() {
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
-    --enable-relro \
-    --enable-threads \
-    --disable-gdb \
-    --with-pic \
     --with-system-zlib \
     --enable-silent-rules \
+    --with-linker-hash-style=gnu \
     --disable-shared
 
-  nice -n 19 noti make MAKEINFO=true
+  noti make MAKEINFO=true -j7
 }
 
 check() {
@@ -108,7 +107,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make MAKEINFO=true DESTDIR=${pkgdir} install
+  make MAKEINFO=true DESTDIR=${pkgdir} install -j1
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
