@@ -117,6 +117,17 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -141,10 +152,8 @@ prepare() {
     ipa-cp.patch \
     optimize-at-least-some.patch \
     gomp-relax.patch \
-    avx512-when-we-ask-for-it.patch \
     arch-native-override.patch \
     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    icelake.patch \
     zero-regs-gcc8.patch
 
   apply_patch_with_msg \
@@ -235,7 +244,6 @@ build() {
     --with-system-zlib \
     --disable-libmudflap \
     --disable-libitm \
-    --disable-libgomp \
     --disable-libmpx \
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
