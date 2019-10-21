@@ -91,7 +91,6 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --with-system-zlib \
     --enable-silent-rules \
-    --with-linker-hash-style=gnu \
     --disable-shared
 
   noti make MAKEINFO=true -j7
