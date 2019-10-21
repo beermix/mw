@@ -4,7 +4,7 @@
 _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.6+42+gb88cebd5
+pkgver=2.4.6+42+b9b4453
 pkgrel=1
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=('any')
@@ -58,7 +58,7 @@ prepare() {
   git config --local submodule.gl-mod/bootstrap.url "$srcdir/gnulib-bootstrap"
   git submodule update
 
-  ./bootstrap
+  ./bootstrap --skip-git --skip-po --copy
 }
 
 build() {
@@ -69,13 +69,13 @@ build() {
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
-  make
+  make -j1
 }
 
-#check() {
-#  cd ${srcdir}/build-${MINGW_CHOST}
-#  make check
-#}
+check() {
+  cd ${srcdir}/build-${MINGW_CHOST}
+  make check
+}
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
