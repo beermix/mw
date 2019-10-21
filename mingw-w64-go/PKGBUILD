@@ -53,6 +53,7 @@ build() {
   export GO_CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
   export CFLAGS="-D__USE_MINGW_ANSI_STDIO=1"
   export GO_BUILD_VERBOSE=1
+  export CGO_ENABLED=1
 
   # I have no idea why we need this to be run from a completely seperate
   # MSDOS shell, but it does. Without this, the build exits with no info
