@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _ver=1.1.1d
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=2
+pkgrel=3
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -16,8 +16,12 @@ license=('BSD')
 url="https://www.openssl.org"
 noextract=(${_realname}-${_ver}.tar.gz)
 source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
-        'openssl-1.1.1-relocation.patch')
-sha256sums=('f6fb3079ad15076154eda9413fed42877d668e7069d9b87396d0804fdb3f4c90'
+        'openssl-1.1.1-relocation.patch'
+        '0001-BIO_f_zlib-Properly-handle-BIO_CTRL_PENDING-and.patch'
+        '0001-Use-clearlinux-CFLAGS-during-build.patch'
+        '0002-Hide-a-symbol-from-Steam.patch'
+        '0003-Use-OS-provided-copy-of-openssl.cnf-as-fallback.patch')
+sha256sums=('1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2'
             'SKIP'
             '5e1d04163a525861972f0c45ff37f2c219ebf657544bb7481faf08453b91640b')
 
@@ -50,7 +54,12 @@ prepare() {
   cd ${srcdir}/${_realname}-${_ver}
 
   apply_patch_with_msg \
-     openssl-1.1.1-relocation.patch
+     openssl-1.1.1-relocation.patch \
+     0001-BIO_f_zlib-Properly-handle-BIO_CTRL_PENDING-and.patch \
+     0001-Use-clearlinux-CFLAGS-during-build.patch \
+     0002-Hide-a-symbol-from-Steam.patch \
+     0003-Use-OS-provided-copy-of-openssl.cnf-as-fallback.patch
+
 }
 
 build() {
