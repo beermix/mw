@@ -3,10 +3,10 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-_ver=1.0.2t
+_ver=1.0.2s
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=100
+pkgrel=49
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -15,7 +15,7 @@ options=('strip' '!buildflags' 'staticlibs')
 license=('BSD')
 url="https://www.openssl.org"
 noextract=(${_realname}-${_ver}.tar.gz)
-source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz
+source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
         'openssl-1.0.0a-ldflags.patch'
         'openssl-1.0.2a-parallel-build.patch'
         'openssl-1.0.1-x32.patch'
@@ -42,8 +42,6 @@ prepare() {
   patch -p1 -i ${srcdir}/000-parallellez.patch
   patch -p1 -i ${srcdir}/openssl-1.0.1-x32.patch
   patch -p1 -i ${srcdir}/openssl-0.9.6-x509.patch
-#  patch -p1 -i ${srcdir}/openssl-1.0.1i-relocation.patch
-
 }
 
 build() {
@@ -52,7 +50,7 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -O3/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
@@ -63,29 +61,19 @@ build() {
   ./Configure \
     --prefix=${MINGW_PREFIX} \
     ${_mingw} \
-    shared \
     threads \
-    no-zlib \
-    no-zlib-dynamic \
-    enable-camellia \
-    enable-idea \
-    enable-mdc2 \
-    enable-ec2m \
-    enable-md2 \
-    enable-rc5 \
-    enable-tlsext \
-    enable-rfc3779 \
+    shared \
+    no-gost \
     enable-ec_nistp_64_gcc_128
 
-    make depend
-    noti make
-
- #make  ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
+  make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include -j7
 }
 
 package() {
   cd "${srcdir}/build-${CARCH}"
   make -j1 INSTALL_PREFIX="${pkgdir}" install_sw
+
+  install -D -m644 LICENSE ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE
 
   chmod -R 755 "${pkgdir}${MINGW_PREFIX}"/bin
   chmod -R 644 "${pkgdir}${MINGW_PREFIX}"/lib
