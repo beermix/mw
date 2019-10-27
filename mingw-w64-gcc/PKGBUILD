@@ -256,7 +256,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all -j8
+  nice -n 19 noti make V=1 all -j7
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
