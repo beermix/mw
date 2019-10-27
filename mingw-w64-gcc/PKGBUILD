@@ -142,7 +142,12 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     010-documentation.patch \
-    0018-isl-0.20.patch
+    0018-isl-0.20.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
