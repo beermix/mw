@@ -4,8 +4,8 @@
 _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.6+42+b9b4453
-pkgrel=2
+pkgver=2.4.6+44+gb9b44533
+pkgrel=1
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/libtool"
