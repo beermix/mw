@@ -20,7 +20,7 @@ _snapshot=20191026
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=40
+pkgrel=39
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -172,13 +172,6 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
 
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
-  else
-    extra_config+=("--enable-libstdcxx-debug")
-  fi
-
   case "${CARCH}" in
     i686)
       local _conf="--disable-sjlj-exceptions --with-dwarf2"
@@ -200,8 +193,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
   
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+  #export CC='ccache gcc'
+  #export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -223,7 +216,7 @@ build() {
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    ${extra_config} \
+    --disable-libstdcxx-debug \
     --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
@@ -237,6 +230,12 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libmudflap \
+    --disable-libitm \
+    --disable-libmpx \
+    --disable-vtable-verify \
+    --enable-ld=default \
+    --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \

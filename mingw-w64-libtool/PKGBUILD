@@ -4,15 +4,15 @@
 _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.6+42+gb88cebd5
-pkgrel=1
+pkgver=2.4.6+42+b9b4453
+pkgrel=2
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/libtool"
 license=("GPL")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('staticlibs' 'strip')
-_commit=b88cebd510add4420dd8f5367e3cc6e6e1f267cd
+_commit=b9b44533fbf7c7752ffd255c3d09cc360e24183b
 source=(git+https://git.savannah.gnu.org/git/libtool.git#commit=$_commit
         git+https://git.savannah.gnu.org/git/gnulib.git
         gnulib-bootstrap::git+https://github.com/gnulib-modules/bootstrap.git
