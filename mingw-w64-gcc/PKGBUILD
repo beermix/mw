@@ -194,8 +194,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC='ccache $CC'
-  export CXX='ccache $CXX'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
