@@ -6,7 +6,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 _base_ver=6.0
 _date_rev=20190630
 pkgver=${_base_ver}
-pkgrel=2
+pkgrel=4
 pkgdesc="System V Release 4.0 curses emulation library (mingw-w64)"
 arch=('any')
 depends=("${MINGW_PACKAGE_PREFIX}-libsystre")
@@ -29,7 +29,7 @@ prepare() {
   patch -p1 -i ${srcdir}/001-use-libsystre.patch
   patch -p1 -i ${srcdir}/100-ncurses-5.6-20080112-urxvt.patch
   patch -p1 -i ${srcdir}/101-ncurses-5.6-20080628-kbs.patch
-  patch -p1 -i ${srcdir}/102-ncurses-5.9-gcc-5.patch
+ # patch -p1 -i ${srcdir}/102-ncurses-5.9-gcc-5.patch
   patch -p1 -i ${srcdir}/200-fix_missing_include.patch
   patch -p1 -i ${srcdir}/900-terminfo.patch
 }
@@ -46,7 +46,7 @@ build() {
     --target=${MINGW_CHOST} \
     --without-ada \
     --with-cxx \
-    --without-shared \
+    --with-shared \
     --without-pthread \
     --enable-pc-files \
     --disable-rpath \
@@ -61,8 +61,9 @@ build() {
     --enable-sp-funcs \
     --enable-term-driver \
     --enable-interop \
-    --enable-widec \
-    --with-build-cppflags=-D_GNU_SOURCE
+    --with-ncursesw \
+    --with-ticlib \
+    --enable-widec
 
   make
 }
