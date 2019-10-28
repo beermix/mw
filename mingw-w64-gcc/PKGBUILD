@@ -196,8 +196,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
@@ -252,7 +252,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all MAKEINFO=missing
+  nice -n 19 noti MAKEINFO=missing make V=1 all MAKEINFO=missing
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -352,10 +352,10 @@ package_mingw-w64-gcc() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libgcc*            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
@@ -368,18 +368,18 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
-  #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  # mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  # cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
+  # cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
-  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
+  # cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
   cp -r share/gcc-${pkgver%%+*}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
