@@ -43,6 +43,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0130-libstdc++-in-out.patch
         0950-9.1.0-configure-msys2.patch
         0951-9.1.0-msys2-spec.patch
+        0018-isl-0.20.patch
         0953-9.1.0-testsuite-msys2.patch)
 sha256sums=('be303f7a8292982a35381489f5a9178603cbe9a4715ee4fa4a815d6bcd2b658d'
             '24bdd964c6479251af5a275965db42ed867599cd2d84ecb526397395e201cda4'
@@ -116,7 +117,8 @@ prepare() {
      0028-g++-time.patch \
      0030-newlib-ftm.patch \
      0031-define_std-unix.patch \
-     0032-fix-ada-malloc-error.patch
+     0032-fix-ada-malloc-error.patch \
+     0018-isl-0.20.patch
 
   # MINGW Patches
   apply_patch_with_msg 0130-libstdc++-in-out.patch
