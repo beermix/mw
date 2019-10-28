@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=25
+pkgrel=21
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -90,20 +90,16 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
-    --enable-relro \
-    --enable-threads \
-    --with-pic \
-    --with-system-zlib \
     --disable-gdb \
     --disable-sim \
     --disable-shared
 
-  noti make
+  noti make MAKEINFO=true -j7
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install -j1
+  make MAKEINFO=true DESTDIR=${pkgdir} install -j1
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
