@@ -21,7 +21,7 @@ pkgver=9.2.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-9.2.0
-pkgrel=52
+pkgrel=53
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -64,6 +64,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-9.2
         0003-gcc-plugin-POSIX-include-sys-select-h.patch
         0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
+        optimize.patch
+        optimize-at-least-some.patch
         0018-isl-0.20.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
@@ -123,7 +125,9 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0018-isl-0.20.patch
+    0018-isl-0.20.patch \
+    optimize.patch \
+    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -143,10 +147,10 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # Do not run fixincludes
-  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
