@@ -21,7 +21,7 @@ pkgver=9.2.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-9.2.0
-pkgrel=54
+pkgrel=55
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -40,6 +40,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib")
+#checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-9.2.0.tar.xz"{,.sig}
@@ -178,7 +179,7 @@ build() {
   esac
 
   local _languages="c,lto,c++,fortran"
-  if [ "$_enable_l" == "yes" ]; then
+  if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
   if [ "$_enable_objc" == "yes" ]; then
@@ -197,7 +198,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=core-avx2} \
+    --with-arch=core-avx2 \
     --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -207,7 +208,7 @@ build() {
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
-    --enable-libstdcxx-pch=yes \
+    --enable-libstdcxx-pch \
     ${extra_config} \
     --enable-lto \
     --enable-libgomp \
