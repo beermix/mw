@@ -66,7 +66,9 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
         optimize.patch
+        avx512-when-we-ask-for-it.patch
         ipa-cp.patch
+        gomp-relax.patch
         zero-regs-gcc8.patch
         0001-Fix-stack-protection-issues.patch
         optimize-at-least-some.patch
@@ -129,7 +131,6 @@ prepare() {
 #  rm -rf gcc/ada/*.ad*
 
   apply_patch_with_msg \
-    gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -143,14 +144,14 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0018-isl-0.20.patch \
+    gcc-stable-branch.patch \
     optimize.patch \
-    010-documentation.patch \
-    optimize-at-least-some.patch \
-    0001-Fix-stack-protection-issues.patch \
     ipa-cp.patch \
-    memcpy-avx2.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    zero-regs-gcc8.patch
+    zero-regs-gcc8.patch \
+    010-documentation.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -216,6 +217,14 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
 
   export MAKEINFO=missing
+
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
+  export CXXFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
