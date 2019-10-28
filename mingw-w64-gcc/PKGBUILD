@@ -193,9 +193,9 @@ build() {
   if [ "$_enable_objc" == "yes" ]; then
     _languages+=",objc,obj-c++"
   fi
-  
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+
+  export CC='ccache $CC'
+  export CXX='ccache $CXX'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -234,7 +234,6 @@ build() {
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-system-zlib \
-    --with-gcc-major-version-only \
     --disable-libmpx \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
@@ -267,27 +266,7 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
 
-  # Licensing information
-
-  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
-  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
-  # with GPL3+, the whole package can be redistributed under GPL3+.
-  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
-
-  # We explain the licensing in this generated README file
-  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
-  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
-The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
-GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
-by LGPL2+. The package as a whole can be redistributed under GPL3+.
-ENDFILE
-
-  # License files
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
+   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
@@ -424,71 +403,6 @@ package_mingw-w64-gcc-fortran() {
   cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
-package_mingw-w64-gcc-ada() {
-  pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
-
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
-
-  cp bin/{libgnarl*,libgnat*}.dll                       ${pkgdir}${MINGW_PREFIX}/bin/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adainclude     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
-}
-
-package_mingw-w64-gcc-objc() {
-  pkgdesc="GNU Compiler Collection (ObjC,Obj-C++) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
-
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/libobjc*.dll ${pkgdir}${MINGW_PREFIX}/bin/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/objc    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1obj.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1objplus.exe     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libobjc.*                                       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-}
-
-# Wrappers for package functions
-
-# 32-bit wrappers
-package_mingw-w64-i686-gcc-libs() {
-  package_mingw-w64-gcc-libs
-}
-
-package_mingw-w64-i686-gcc() {
-  package_mingw-w64-gcc
-}
-
-package_mingw-w64-i686-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-i686-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
-}
-
-package_mingw-w64-i686-gcc-ada() {
-  package_mingw-w64-gcc-ada
-}
-
-package_mingw-w64-i686-gcc-objc() {
-  package_mingw-w64-gcc-objc
-}
-
 # 64-bit wrappers
 package_mingw-w64-x86_64-gcc-libs() {
   package_mingw-w64-gcc-libs
@@ -504,12 +418,4 @@ package_mingw-w64-x86_64-gcc-libgfortran() {
 
 package_mingw-w64-x86_64-gcc-fortran() {
   package_mingw-w64-gcc-fortran
-}
-
-package_mingw-w64-x86_64-gcc-ada() {
-  package_mingw-w64-gcc-ada
-}
-
-package_mingw-w64-x86_64-gcc-objc() {
-  package_mingw-w64-gcc-objc
 }
