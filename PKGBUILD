@@ -17,11 +17,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 #_snapshot=20191026
-pkgver=9.2.0
+pkgver=9.2.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
-_sourcedir=${_realname}-${pkgver}
-pkgrel=80
+_sourcedir=${_realname}-9.2.0
+pkgrel=53
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -40,10 +40,9 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib")
-#checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-9.2.0.tar.xz"{,.sig}
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -66,7 +65,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
         optimize.patch
-        0001-Fix-stack-protection-issues.patch
         optimize-at-least-some.patch
         0018-isl-0.20.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
@@ -113,17 +111,6 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
-#  rm -rf gcc/ada/*.ad*
-
   apply_patch_with_msg \
     gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
@@ -140,7 +127,6 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0018-isl-0.20.patch \
     optimize.patch \
-    010-documentation.patch \
     optimize-at-least-some.patch
 
   apply_patch_with_msg \
@@ -161,8 +147,7 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # Do not run fixincludes
-  #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
-  echo ${pkgver} > gcc/BASE-VER
+  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
@@ -193,7 +178,7 @@ build() {
   esac
 
   local _languages="c,lto,c++,fortran"
-  if [ "$_enable_ada" == "yes" ]; then
+  if [ "$_enable_l" == "yes" ]; then
     _languages+=",ada"
   fi
   if [ "$_enable_objc" == "yes" ]; then
@@ -202,11 +187,6 @@ build() {
 
   #export CC='ccache gcc'
   #export CXX='ccache g++'
-
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-
-  export MAKEINFO=missing
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -217,7 +197,6 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=core-avx2 \
     --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -227,7 +206,7 @@ build() {
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
-    --disable-libstdcxx-pch \
+    --enable-libstdcxx-pch=yes \
     ${extra_config} \
     --enable-lto \
     --enable-libgomp \
@@ -240,8 +219,13 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --enable-__cxa_atexit \
+    --enable-linker-build-id \
+    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-system-zlib \
+    --disable-libmpx \
+    --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
@@ -255,7 +239,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n19 noti make MAKEINFO=missing all
+  nice -n 19 noti make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -271,6 +255,26 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
+
+  # Licensing information
+
+  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
+  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
+  # with GPL3+, the whole package can be redistributed under GPL3+.
+  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
+
+  # We explain the licensing in this generated README file
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
+  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
+The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
+GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
+by LGPL2+. The package as a whole can be redistributed under GPL3+.
+ENDFILE
+
+  # License files
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
@@ -351,6 +355,18 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
+  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+
+  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
   cp -r share/gcc-${pkgver%%+*}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
@@ -391,6 +407,10 @@ package_mingw-w64-gcc-fortran() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
+  cp share/man/man1/gfortran.1*                         ${pkgdir}${MINGW_PREFIX}/share/man/man1/
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada() {
