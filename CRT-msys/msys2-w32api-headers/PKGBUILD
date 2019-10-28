@@ -1,0 +1,55 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+pkgname="msys2-w32api-headers"
+pkgver=7.0.0.5558.e46aa77c
+pkgrel=1
+pkgdesc="Win32 API headers for MSYS2 32bit toolchain"
+arch=('i686' 'x86_64')
+url="https://mingw-w64.sourceforge.io/"
+license=('custom')
+groups=('msys2-devel')
+depends=()
+makedepends=('git' 'mingw-w64-cross-gcc')
+#provides=($pkgname)
+#conflicts=($pkgname)
+options=('staticlibs' '!buildflags')
+source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64"
+        001-add-corecrt-to-base-headers.patch)
+sha256sums=('SKIP'
+            '15e120559865471919db6e55b9206a71ccfa058f8f1d61d5f510d92ceb6ac346')
+
+MINGW_CHOST=${CARCH}-w64-mingw32
+
+prepare() {
+  cd "${srcdir}/mingw-w64/mingw-w64-headers"
+  #patch -p2 -i ${srcdir}/001-add-corecrt-to-base-headers.patch
+  autoreconf -fiv
+}
+
+pkgver() {
+  cd "${srcdir}/mingw-w64"
+  local _major=$(head -n 16 mingw-w64-headers/crt/_mingw_mac.h | grep '__MINGW64_VERSION_MAJOR' | sed -e 's/.* //' | tr '\n' '.' | sed 's/.$/\n/')
+  local _minor=$(head -n 16 mingw-w64-headers/crt/_mingw_mac.h | grep '__MINGW64_VERSION_MINOR' | sed -e 's/.* //' | tr '\n' '.' | sed 's/.$/\n/')
+  local _rev=0
+  printf "%s.%s.%s.%s.%s" ${_major} ${_minor} ${_rev} "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  cd ${srcdir}/mingw-w64/mingw-w64-headers
+
+  ./configure \
+     --build=${CHOST} \
+     --host=${MINGW_CHOST} \
+     --prefix=/usr \
+     --enable-sdk=all \
+     --enable-w32api \
+     --with-default-win32-winnt=0x601
+
+  make
+}
+
+package() {
+  cd ${srcdir}/mingw-w64/mingw-w64-headers
+
+  make DESTDIR=${pkgdir} install
+}

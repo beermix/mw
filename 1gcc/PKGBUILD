@@ -181,7 +181,7 @@ build() {
     --enable-bootstrap \
     --enable-shared --enable-shared-libgcc --enable-static \
     --enable-version-specific-runtime-libs \
-    --with-arch=${_arch} \
+    --with-arch=core-avx2 \
     --with-tune=core-avx2 \
     --disable-multilib \
     ${_arch_conf} \
