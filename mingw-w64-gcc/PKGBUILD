@@ -196,8 +196,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+  #export CC='ccache gcc'
+  #export CXX='ccache g++'
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
@@ -243,7 +243,6 @@ build() {
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
-    MAKEINFO=missing \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
@@ -253,7 +252,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make MAKEINFO=missing V=1 all
+  nice -n 19 noti make V=1 all MAKEINFO=missing
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
