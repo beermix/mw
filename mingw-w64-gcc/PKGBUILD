@@ -20,7 +20,7 @@ _snapshot=20191026
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=41
+pkgrel=42
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -119,17 +119,6 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-  rm -rf gcc/testsuite/ada
-  rm -rf gcc/testsuite/brig.dg
-  rm -rf gcc/testsuite/c-c++-common
-  rm -rf gcc/testsuite/ChangeLog*
-  rm -rf gcc/testsuite/config
-  rm -rf gcc/testsuite/g*
-  rm -rf gcc/testsuite/jit.dg
-  rm -rf gcc/testsuite/lib
-  rm -rf gcc/testsuite/o*
-  rm -rf gcc/ada/*.ad*
-
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -142,13 +131,7 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    010-documentation.patch \
-    0000-libtool-leave-framework-alone.patch \
-    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
-    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
-    0006-libgfortran-missing-include.patch \
-    0008-libgcc-disable-split-stack-nothreads.patch
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -168,10 +151,10 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # Do not run fixincludes
-  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -259,7 +242,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all -j8
+  nice -n 19 noti make V=1 all -j7
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
