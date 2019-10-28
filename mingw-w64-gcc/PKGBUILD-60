@@ -206,7 +206,6 @@ build() {
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --with-tune=core-avx2 \
-    --with-arch=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \

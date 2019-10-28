@@ -21,7 +21,7 @@ pkgver=9.2.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-9.2.0
-pkgrel=50
+pkgrel=52
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -59,23 +59,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-9.2
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         010-documentation.patch
-        openmp-vectorize-v2.patch
-        fortran-vector-v2.patch
-        optimize.patch
-        ipa-cp.patch
-        optimize-at-least-some.patch
-        gomp-relax.patch
-        avx512-when-we-ask-for-it.patch
-        arch-native-override.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
         0003-gcc-plugin-POSIX-include-sys-select-h.patch
         0008-libgcc-disable-split-stack-nothreads.patch
-        icelake.patch
-        zero-regs-gcc8.patch
-        0018-isl-0.20.patch
-        0006-libgfortran-missing-include.patch
-        0000-libtool-leave-framework-alone.patch
         gcc-stable-branch.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
@@ -155,10 +142,10 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # Do not run fixincludes
-  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -186,15 +173,15 @@ build() {
   esac
 
   local _languages="c,lto,c++,fortran"
-  if [ "$_enable_ada" == "yes" ]; then
+  if [ "$_enable_l" == "yes" ]; then
     _languages+=",ada"
   fi
   if [ "$_enable_objc" == "yes" ]; then
     _languages+=",objc,obj-c++"
   fi
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -206,7 +193,6 @@ build() {
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --with-tune=core-avx2 \
-    --with-arch=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
@@ -215,9 +201,8 @@ build() {
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
-    --disable-libstdcxx-pch \
+    --enable-libstdcxx-pch \
     ${extra_config} \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -229,7 +214,8 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --enable-gnu-indirect-function \
+    --enable-__cxa_atexit \
+    --enable-linker-build-id \
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-system-zlib \

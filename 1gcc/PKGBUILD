@@ -102,7 +102,6 @@ prepare() {
 
   # Cygwin patches
   apply_patch_with_msg \
-     gcc-stable-branch.patch \
      0009-Cygwin-uses-sysv-ABI-on-x86_64-V2.patch \
      0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch \
      0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch \
@@ -179,8 +178,7 @@ build() {
     --enable-shared --enable-shared-libgcc --enable-static \
     --enable-version-specific-runtime-libs \
     --with-arch=${_arch} \
-    --with-tune=haswell \
-    --with-arch=haswell \
+    --with-tune=core-avx2 \
     --disable-multilib \
     ${_arch_conf} \
     --enable-__cxa_atexit \
@@ -210,7 +208,7 @@ build() {
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n 19 noti make -j8
+  nice -n 19 noti make
 }
 
 package_gcc-libs()
@@ -348,7 +346,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-#  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
