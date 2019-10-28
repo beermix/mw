@@ -210,20 +210,8 @@ build() {
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n 19 noti make -j7
-
-  # make documentation
-  #cd $CHOST/libstdc++-v3
-  #make doc-man-doxygen
+  nice -n 19 noti make -j8
 }
-
-#check() {
-#  cd ${srcdir}/build-$(arch)
-
-#  # do not abort on error as some are "expected"
-#  make -k check || true
-#  ${srcdir}/gcc-${pkgver}/contrib/test_summary
-#}
 
 package_gcc-libs()
 {
@@ -360,7 +348,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+#  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
