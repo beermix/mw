@@ -21,7 +21,7 @@ pkgver=9.2.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-9.2.0
-pkgrel=53
+pkgrel=54
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -147,10 +147,10 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # Do not run fixincludes
-  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -219,8 +219,6 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --enable-__cxa_atexit \
-    --enable-linker-build-id \
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-system-zlib \
