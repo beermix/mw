@@ -1,0 +1,2 @@
+src/libgcc/dll_frame_info.o: \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/src/libgcc/dll_frame_info.c

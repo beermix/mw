@@ -1,0 +1,77 @@
+src/libwinpthread_la-spinlock.lo: \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/src/spinlock.c \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sys/types.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/process.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/limits.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/syslimits.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/limits.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/signal.h \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_signal.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sys/timeb.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_compat.h \
+ ../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_unistd.h
+
+../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sys/types.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/process.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt_startup.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/limits.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/syslimits.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/limits.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/signal.h:
+
+../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_signal.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sys/timeb.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sec_api/sys/timeb_s.h:
+
+../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_compat.h:
+
+../mingw-w64/mingw-w64-libraries/winpthreads/include/pthread_unistd.h:
