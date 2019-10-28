@@ -8,7 +8,7 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=6
+pkgrel=8
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 groups=('msys2-devel')
@@ -123,7 +123,8 @@ prepare() {
      0032-fix-ada-malloc-error.patch \
      0018-isl-0.20.patch \
      optimize.patch \
-     optimize-at-least-some.patch
+     optimize-at-least-some.patch \
+     gcc-stable-branch.patch
 
   # MINGW Patches
   apply_patch_with_msg 0130-libstdc++-in-out.patch
@@ -205,14 +206,20 @@ build() {
     --without-libintl-prefix \
     --with-system-zlib \
     --enable-linker-build-id \
-    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-default-libstdcxx-abi=gcc4-compatible \
-    --with-diagnostics-color=always \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n 19 make -j7
+  nice -n19 make -j7
 }
+
+#check() {
+#  cd ${srcdir}/build-$(arch)
+
+#  # do not abort on error as some are "expected"
+#  make -k check || true
+#  ${srcdir}/gcc-${pkgver}/contrib/test_summary
+#}
 
 package_gcc-libs()
 {
