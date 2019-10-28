@@ -202,7 +202,7 @@ build() {
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
-    --enable-libstdcxx-pch \
+    --enable-libstdcxx-pch=yes \
     ${extra_config} \
     --enable-lto \
     --enable-libgomp \
