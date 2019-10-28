@@ -211,7 +211,7 @@ build() {
     --with-diagnostics-color=always \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n 19 noti make -j7
+  nice -n 19 make -j7
 }
 
 package_gcc-libs()
