@@ -20,7 +20,7 @@ _snapshot=20191026
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=42
+pkgrel=43
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -243,7 +243,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all -j7
+  nice -n 19 noti make V=1 all -j8
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
