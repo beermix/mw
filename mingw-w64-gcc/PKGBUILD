@@ -111,6 +111,17 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -191,6 +202,8 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
 
+  export MAKEINFO=missing
+
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -230,6 +243,7 @@ build() {
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
+    MAKEINFO=missing \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
@@ -239,7 +253,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all
+  nice -n 19 noti make MAKEINFO=missing V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

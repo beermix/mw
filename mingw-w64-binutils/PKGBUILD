@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=32
+pkgrel=33
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -71,9 +71,12 @@ build() {
     CFLAGS+=" -O0"
   fi
 
+  export CC='ccache gcc'
+  export CXX='ccache g++'
+
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
-  ../${_realname}-${pkgver}/configure \
+  ../${_realname}-${pkgver}/configure MAKEINFO=true \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
@@ -96,7 +99,7 @@ build() {
     --with-system-zlib \
     --disable-shared
 
-  nice -n 19 make
+  MAKEINFO=true make
 }
 
 check() {
@@ -109,7 +112,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
