@@ -4,7 +4,7 @@
 _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.6+44+gb9b44533
+pkgver=2.4.6+42+gb88cebd5
 pkgrel=1
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=('any')
@@ -12,7 +12,7 @@ url="https://www.gnu.org/software/libtool"
 license=("GPL")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('staticlibs' 'strip')
-_commit=b9b44533fbf7c7752ffd255c3d09cc360e24183b
+_commit=b88cebd510add4420dd8f5367e3cc6e6e1f267cd
 source=(git+https://git.savannah.gnu.org/git/libtool.git#commit=$_commit
         git+https://git.savannah.gnu.org/git/gnulib.git
         gnulib-bootstrap::git+https://github.com/gnulib-modules/bootstrap.git
@@ -44,6 +44,7 @@ pkgver() {
 
 prepare() {
   cd ${srcdir}/${_realname}
+
   patch -p1 -i ${srcdir}/0002-cygwin-mingw-Create-UAC-manifest-files.mingw.patch
   patch -p1 -i ${srcdir}/0003-Pass-various-runtime-library-flags-to-GCC.mingw.patch
   patch -p1 -i ${srcdir}/0005-Fix-seems-to-be-moved.patch
@@ -58,18 +59,20 @@ prepare() {
   git config --local submodule.gl-mod/bootstrap.url "$srcdir/gnulib-bootstrap"
   git submodule update
 
-  ./bootstrap --skip-git --skip-po --copy
+  ./bootstrap
 }
 
 build() {
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
   ../${_realname}/configure \
-      --prefix=${MINGW_PREFIX} \
-      --build=${MINGW_CHOST} \
-      --host=${MINGW_CHOST} \
-      --target=${MINGW_CHOST}
-  make -j1
+  lt_cv_sys_lib_dlsearch_path_spec="/mingw64/lib" \
+  --prefix=${MINGW_PREFIX} \
+  --build=${MINGW_CHOST} \
+  --host=${MINGW_CHOST} \
+  --target=${MINGW_CHOST}
+
+  make
 }
 
 check() {
