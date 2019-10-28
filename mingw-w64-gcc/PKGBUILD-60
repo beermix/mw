@@ -228,8 +228,6 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --enable-__cxa_atexit \
-    --enable-clocale=gnu \
     --enable-gnu-indirect-function \
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
