@@ -8,7 +8,7 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=5
+pkgrel=6
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 groups=('msys2-devel')
@@ -43,6 +43,8 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0130-libstdc++-in-out.patch
         0950-9.1.0-configure-msys2.patch
         0951-9.1.0-msys2-spec.patch
+        optimize.patch
+        optimize-at-least-some.patch
         0018-isl-0.20.patch
         gcc-stable-branch.patch
         0953-9.1.0-testsuite-msys2.patch)
@@ -119,7 +121,9 @@ prepare() {
      0030-newlib-ftm.patch \
      0031-define_std-unix.patch \
      0032-fix-ada-malloc-error.patch \
-     0018-isl-0.20.patch
+     0018-isl-0.20.patch \
+     optimize.patch \
+     optimize-at-least-some.patch
 
   # MINGW Patches
   apply_patch_with_msg 0130-libstdc++-in-out.patch
@@ -196,7 +200,6 @@ build() {
     --disable-symvers \
     --with-gnu-ld \
     --with-gnu-as \
-    --disable-isl-version-check \
     --enable-checking=release \
     --without-libiconv-prefix \
     --without-libintl-prefix \
@@ -204,11 +207,11 @@ build() {
     --enable-linker-build-id \
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
-    --with-diagnostics-color=always \
     --with-default-libstdcxx-abi=gcc4-compatible \
+    --with-diagnostics-color=always \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n 19 noti make
+  nice -n 19 noti make -j7
 }
 
 package_gcc-libs()
@@ -346,7 +349,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
