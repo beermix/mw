@@ -111,16 +111,16 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-  rm -rf gcc/testsuite/ada
-  rm -rf gcc/testsuite/brig.dg
-  rm -rf gcc/testsuite/c-c++-common
-  rm -rf gcc/testsuite/ChangeLog*
-  rm -rf gcc/testsuite/config
-  rm -rf gcc/testsuite/g*
-  rm -rf gcc/testsuite/jit.dg
-  rm -rf gcc/testsuite/lib
-  rm -rf gcc/testsuite/o*
-  rm -rf gcc/ada/*.ad*
+#  rm -rf gcc/testsuite/ada
+#  rm -rf gcc/testsuite/brig.dg
+#  rm -rf gcc/testsuite/c-c++-common
+#  rm -rf gcc/testsuite/ChangeLog*
+#  rm -rf gcc/testsuite/config
+#  rm -rf gcc/testsuite/g*
+#  rm -rf gcc/testsuite/jit.dg
+#  rm -rf gcc/testsuite/lib
+#  rm -rf gcc/testsuite/o*
+#  rm -rf gcc/ada/*.ad*
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -136,8 +136,7 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0018-isl-0.20.patch \
-    010-documentation.patch \
-    0001-Fix-stack-protection-issues.patch
+    010-documentation.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
