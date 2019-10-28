@@ -20,7 +20,7 @@ _snapshot=20191026
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=62
+pkgrel=60
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -125,7 +125,6 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0018-isl-0.20.patch \
-    010-documentation.patch \
     0001-Fix-stack-protection-issues.patch \
     optimize.patch \
     optimize-at-least-some.patch
@@ -225,6 +224,12 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --enable-__cxa_atexit \
+    --enable-clocale=gnu \
+    --enable-gnu-unique-object \
+    --enable-linker-build-id \
+    --enable-gnu-indirect-function \
+    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-system-zlib \
     --with-diagnostics-color=always \
@@ -410,9 +415,9 @@ package_mingw-w64-gcc-fortran() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
-#  cp share/man/man1/gfortran.1*                         ${pkgdir}${MINGW_PREFIX}/share/man/man1/
+  cp share/man/man1/gfortran.1*                         ${pkgdir}${MINGW_PREFIX}/share/man/man1/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-#  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada() {
@@ -432,9 +437,9 @@ package_mingw-w64-gcc-ada() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-#  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-#  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-#  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc() {

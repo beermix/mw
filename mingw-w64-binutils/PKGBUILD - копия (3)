@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=32
+pkgrel=31
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -14,7 +14,6 @@ license=('GPL')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu' 'bc')
-checkdepends=('bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
@@ -91,12 +90,14 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
+    --enable-relro \
     --enable-threads \
     --with-pic \
     --with-system-zlib \
+    --enable-secureplt \
     --disable-shared
 
-  nice -n 19 make
+  nice -n 19 noti make
 }
 
 check() {
