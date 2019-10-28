@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=30
+pkgrel=31
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -94,9 +94,10 @@ build() {
     --enable-threads \
     --with-pic \
     --with-system-zlib \
+    --enable-secureplt \
     --disable-shared
 
-  make MAKEINFO=true
+  nice -n 19 noti make
 }
 
 check() {
@@ -104,12 +105,12 @@ check() {
 
   # unset LDFLAGS as testsuite makes assumptions about which ones are active
   # do not abort on errors - manually check log files
-  make MAKEINFO=true LDFLAGS="" -k check || true
+  make LDFLAGS="" -k check || true
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make MAKEINFO=true DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
