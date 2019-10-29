@@ -46,6 +46,11 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         optimize.patch
         optimize-at-least-some.patch
         0018-isl-0.20.patch
+        optimize-at-least-some.patch
+        gomp-relax.patch
+        ipa-cp.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        zero-regs-gcc8.patch
         gcc-stable-branch.patch
         0953-9.1.0-testsuite-msys2.patch)
 sha256sums=('be303f7a8292982a35381489f5a9178603cbe9a4715ee4fa4a815d6bcd2b658d'
@@ -122,8 +127,13 @@ prepare() {
      0031-define_std-unix.patch \
      0032-fix-ada-malloc-error.patch \
      0018-isl-0.20.patch \
+     gcc-stable-branch.patch \
      optimize.patch \
+     ipa-cp.patch \
      optimize-at-least-some.patch \
+     gomp-relax.patch \
+     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+     zero-regs-gcc8.patch \
      gcc-stable-branch.patch
 
   # MINGW Patches
@@ -210,7 +220,7 @@ build() {
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
-  nice -n19 make -j7
+     nice -n19 noti make
 }
 
 #check() {
