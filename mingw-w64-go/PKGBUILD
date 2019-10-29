@@ -59,7 +59,7 @@ build() {
   # about what went wrong.
 
   rm -f /tmp/bootstrap_go.bat
-  echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $MINGW_PREFIX/lib/go)"     > /tmp/bootstrap_go.bat
+ # echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $MINGW_PREFIX/lib/go)"     > /tmp/bootstrap_go.bat
   echo "cd $(cygpath -w $PWD)"                                      >> /tmp/bootstrap_go.bat
   echo "start /wait \"\" cmd.exe /c .\\make.bat -v"                    >> /tmp/bootstrap_go.bat
   /tmp/bootstrap_go.bat
