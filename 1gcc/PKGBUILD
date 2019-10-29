@@ -18,8 +18,6 @@ makedepends=('binutils' 'mpc-devel' 'gmp-devel'
              'mpfr-devel' 'isl-devel' 'zlib-devel'
              'windows-default-manifest')
 STRIP_OPTION="strip"
-#STRIP_OPTION="!strip"
-#DEBUG_OPTION="debug"
 DEBUG_OPTION="!debug"
 options=('!emptydirs' "$STRIP_OPTION" "$DEBUG_OPTION")
 source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
@@ -45,6 +43,7 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0951-9.1.0-msys2-spec.patch
         optimize.patch
         optimize-at-least-some.patch
+        010-documentation.patch
         0018-isl-0.20.patch
         optimize-at-least-some.patch
         gomp-relax.patch
@@ -134,7 +133,7 @@ prepare() {
      gomp-relax.patch \
      0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
      zero-regs-gcc8.patch \
-     gcc-stable-branch.patch
+     010-documentation.patch
 
   # MINGW Patches
   apply_patch_with_msg 0130-libstdc++-in-out.patch
@@ -220,7 +219,7 @@ build() {
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
-     nice -n19 noti make
+     nice -n19 make
 }
 
 #check() {
@@ -347,8 +346,8 @@ EOF
   #  ${CHOST}/libstdc++-v3/doc/doxygen/man/man3/*.3
 
   # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
+  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+   # ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-fortran()
@@ -366,7 +365,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+  #make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
