@@ -1,0 +1,84 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+pkgname=binutils
+pkgver=2.30
+pkgrel=3
+pkgdesc="A set of programs to assemble and manipulate binary and object files"
+arch=('i686' 'x86_64')
+url="https://www.gnu.org/software/binutils/"
+license=('GPL')
+groups=('msys2-devel')
+depends=('libiconv' 'libintl' 'zlib')
+checkdepends=('dejagnu' 'bc')
+makedepends=('libiconv-devel' 'gettext-devel' 'zlib-devel')
+options=('staticlibs' '!distcc' '!ccache')
+install=binutils.install
+source=(https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2
+        0050-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
+        0100-binutils-2.30-msys2.patch
+        binutils-stable-branch_2_30.patch
+        0200-remove-provide-qualifiers.patch)
+sha256sums=('efeade848067e9a03f1918b1da0d37aaffa0b0127a06b5e9236229851d9d0c09'
+            '604e76e0f702ced493ee22aa3c1768b4776b2008a7d70ae0dd35fe5be3522141'
+            '3ee46b3cab9db31d086ee422cef61d9a45d0c5a96c897093c680bdb18f70b3ba'
+            '40f124febb3ee60239988127cf16d6a4d1bd41b156db8ec843a6871492fcca28')
+
+prepare() {
+  cd "${srcdir}"/binutils-${pkgver}
+  #patch -p1 -i "${srcdir}"/binutils-stable-branch_2_30.patch
+  patch -p1 -i "${srcdir}"/0050-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
+  patch -p1 -i "${srcdir}"/0100-binutils-2.30-msys2.patch
+
+  # Upstream patches
+  # https://sourceware.org/bugzilla/show_bug.cgi?id=22762
+  patch -p1 -i "${srcdir}"/0200-remove-provide-qualifiers.patch
+
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
+
+  mkdir "${srcdir}"/binutils-${CARCH}
+}
+
+build() {
+  cd "${srcdir}"/binutils-${CARCH}
+
+  if [ "${CARCH}" = "x86_64" ]; then
+    local _conf='--enable-64-bit-bfd'
+  else
+    local _conf=''
+  fi
+  "${srcdir}"/binutils-${pkgver}/configure \
+    --prefix=/usr \
+    --{build,host,target}=${CHOST} \
+    --disable-werror \
+    --disable-sim \
+    --enable-silent-rules \
+    --with-system-zlib \
+    $_conf \
+    --without-libiconv-prefix \
+    --without-libintl-prefix
+
+  make MAKEINFO=true
+}
+
+check() {
+  # cd "${srcdir}"/binutils-${CARCH}
+
+  # unset LDFLAGS as testsuite makes assumptions about which ones are active
+  # do not abort on errors - manually check log files
+  # make LDFLAGS="" -k check || true
+  return 0
+}
+
+package() {
+  cd "${srcdir}"/binutils-${CARCH}
+  make DESTDIR=${pkgdir} MAKEINFO=true install
+  cp libiberty/libiberty.a ${pkgdir}/usr/lib
+
+  # Remove unwanted files
+  #rm ${pkgdir}/usr/share/info/{configure,standards}.info
+
+  # Add some useful headers
+  #install -m644 "${srcdir}"/binutils-${pkgver}/include/libiberty.h ${pkgdir}/usr/include
+  #install -m644 "${srcdir}"/binutils-${pkgver}/include/demangle.h ${pkgdir}/usr/include
+}

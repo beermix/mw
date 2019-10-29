@@ -5,7 +5,7 @@
 _realname=winpthreads
 pkgbase=mingw-w64-${_realname}-git
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git" "${MINGW_PACKAGE_PREFIX}-libwinpthread-git")
-pkgver=7.0.0.5561.cf67d78f
+pkgver=7.0.0.5564.d2448124
 pkgrel=1
 pkgdesc="MinGW-w64 winpthreads library"
 url="https://mingw-w64.sourceforge.io/"
@@ -60,6 +60,7 @@ build() {
     --target=${MINGW_CHOST} \
     --enable-static \
     --enable-shared \
+    --enable-silent-rules \
     "${extra_config[@]}"
 
   # I failed to figure out how to disable stripping, this

@@ -57,6 +57,7 @@ build() {
     --enable-sdk=all \
     --with-default-win32-winnt=0x601 \
     --enable-idl \
+    --enable-silent-rules \
     --without-widl
 }
 
