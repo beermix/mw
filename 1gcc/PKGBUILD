@@ -244,12 +244,12 @@ package_gcc-libs()
   done
 
   make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
-  #make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
-  #make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
+  make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
+  make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
 
   make -j1 DESTDIR=${pkgdir} install-target-libquadmath
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
-  #make -j1 DESTDIR=${pkgdir} install-target-libssp
+  make -j1 DESTDIR=${pkgdir} install-target-libssp
   make -j1 DESTDIR=${pkgdir} install-target-libatomic
   #make -j1 DESTDIR=${pkgdir} install-target-libcilkrts
   make -j1 DESTDIR=${pkgdir} install-target-libvtv
@@ -257,13 +257,6 @@ package_gcc-libs()
   rm -f ${pkgdir}/*.dll
   rm -rf ${pkgdir}/usr/lib/
   rm -rf ${pkgdir}/usr/share/gcc-${pkgver}
-
-  # remove static libraries
-  #find ${pkgdir} -name *.a -delete
-
-  # Install Runtime Library Exception
-  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-   # ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc()
@@ -339,15 +332,6 @@ exec /usr/bin/gcc $fl ${1+"$@"}
 EOF
 
   chmod 755 ${pkgdir}/usr/bin/c{8,9}9
-
-  # install the libstdc++ man pages
-  # install -dm755 ${pkgdir}/usr/share/man/man3
-  # install -m644 -t ${pkgdir}/usr/share/man/man3 \
-  #  ${CHOST}/libstdc++-v3/doc/doxygen/man/man3/*.3
-
-  # Install Runtime Library Exception
-  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-   # ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-fortran()
@@ -365,7 +349,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  #make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
@@ -378,8 +362,4 @@ package_gcc-fortran()
   rm ${pkgdir}/usr/share/info/libquadmath.info
   rm -r ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/include
   # rm ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/libgfortran.a
-
-  # Install Runtime Library Exception
-  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-   # ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
 }
