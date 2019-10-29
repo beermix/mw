@@ -244,8 +244,8 @@ package_gcc-libs()
   done
 
   make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
-  make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
-  make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
+  #make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
+  #make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
 
   make -j1 DESTDIR=${pkgdir} install-target-libquadmath
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
@@ -262,8 +262,8 @@ package_gcc-libs()
   #find ${pkgdir} -name *.a -delete
 
   # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
+  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+   # ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc()
@@ -380,6 +380,6 @@ package_gcc-fortran()
   # rm ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/libgfortran.a
 
   # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
+  #install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+   # ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
 }
