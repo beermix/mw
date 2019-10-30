@@ -147,6 +147,8 @@ prepare() {
     gcc-stable-branch.patch \
     ipa-cp.patch \
     gomp-relax.patch \
+    optimize.patch \
+    optimize-at-least-some.patch \
     zero-regs-gcc8.patch \
     010-documentation.patch
 
@@ -172,7 +174,7 @@ prepare() {
   echo ${pkgver} > gcc/BASE-VER
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -212,8 +214,6 @@ build() {
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
-
-  export MAKEINFO=missing
 
 #  unset CFLAGS
 #  unset CXXFLAGS
