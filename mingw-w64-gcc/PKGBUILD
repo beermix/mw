@@ -22,7 +22,7 @@ _islver=0.21
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=91
+pkgrel=100
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -159,9 +159,10 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  # Do not run fixincludes
-  #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
   echo ${pkgver} > gcc/BASE-VER
+
+  # Do not run fixincludes
+  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
@@ -374,6 +375,35 @@ package_mingw-w64-gcc() {
   # install "custom" system gdbinit
   install -D -m644 ${srcdir}/gdbinit ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
+  
+  # POSIX conformance launcher scripts for c89 and c99
+  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c89 <<"EOF"
+#!/bin/sh
+fl="-std=c89"
+for opt; do
+  case "\$opt" in
+    -ansi|-std=c89|-std=iso9899:1990) fl="";;
+    -std=*) echo "`basename \$0` called with non ANSI/ISO C option \$opt" >&2
+        exit 1;;
+  esac
+done
+exec /mingw64/bin/gcc $fl ${1+"$@"}
+EOF
+
+  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c99 <<"EOF"
+#!/bin/sh
+fl="-std=c99"
+for opt; do
+  case "\$opt" in
+    -std=c99|-std=iso9899:1999) fl="";;
+    -std=*) echo "`basename \$0` called with non ISO C99 option \$opt" >&2
+        exit 1;;
+  esac
+done
+exec /mingw64/bin/gcc $fl ${1+"$@"}
+EOF
+
+  chmod 755 ${pkgdir}/${MINGW_PREFIX}/bin/c{8,9}9
 }
 
 package_mingw-w64-gcc-libgfortran() {
