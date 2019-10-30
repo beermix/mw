@@ -366,7 +366,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,info}
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95

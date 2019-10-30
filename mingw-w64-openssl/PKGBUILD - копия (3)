@@ -71,10 +71,19 @@ build() {
     threads \
     no-zlib \
     no-zlib-dynamic \
-    enable-ec_nistp_64_gcc_128
+    enable-camellia \
+    enable-idea \
+    enable-mdc2 \
+    enable-ec2m \
+    enable-md2 \
+    enable-rc5 \
+    enable-tlsext \
+    enable-rfc3779 \
+    enable-ec_nistp_64_gcc_128 \
+    "-Wa,--noexecstack"
 
-    noti make depend all
-    #noti make
+    make depend
+    noti make
 
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
 }
