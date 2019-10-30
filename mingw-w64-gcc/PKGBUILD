@@ -18,10 +18,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
         )
 #_snapshot=20191026
 pkgver=9.2.0
+_islver=0.21
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=90
+pkgrel=91
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -33,7 +34,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
              "${MINGW_PACKAGE_PREFIX}-gmp"
-             "${MINGW_PACKAGE_PREFIX}-isl"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-mpc"
              "${MINGW_PACKAGE_PREFIX}-mpfr"
@@ -44,6 +44,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -116,19 +117,11 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
 
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
-#  rm -rf gcc/ada/*.ad*
+  ln -s ../isl-${_islver} isl
+
+   del_file_exists intl/canonicalize.c intl/canonicalize.h \
+    intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -143,9 +136,7 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0018-isl-0.20.patch \
     gcc-stable-branch.patch \
-    ipa-cp.patch \
     gomp-relax.patch \
     optimize.patch \
     optimize-at-least-some.patch \
@@ -173,7 +164,7 @@ prepare() {
   echo ${pkgver} > gcc/BASE-VER
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -214,14 +205,6 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
-#  export CXXFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
-
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -237,7 +220,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -254,6 +236,8 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --with-ppl=yes \
+    --disable-libmpx \
     --enable-__cxa_atexit \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
@@ -301,7 +285,6 @@ package_mingw-w64-gcc() {
   depends=("${MINGW_PACKAGE_PREFIX}-binutils"
            "${MINGW_PACKAGE_PREFIX}-crt"
            "${MINGW_PACKAGE_PREFIX}-headers"
-           "${MINGW_PACKAGE_PREFIX}-isl"
            "${MINGW_PACKAGE_PREFIX}-libiconv"
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}"
