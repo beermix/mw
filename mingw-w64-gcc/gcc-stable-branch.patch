@@ -39495,3 +39495,569 @@ index 00000000000..580c6ec069d
 +/* { dg-final { scan-assembler-not "\\\.reloc\t1f,R_MIPS_JALR,foo" } } */
 +/* { dg-final { scan-assembler-not "\\\.reloc\t1f,R_MIPS_JALR,bar" } } */
 +/* { dg-final { scan-assembler "\\.set\tnomacro\n\tjalr\t\\\$25" } } */
+
+commit 9e1a4909e59d7c763b6701fc729ff2563e3d5728
+Author: iains <iains@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date:   Wed Oct 30 19:56:41 2019 +0000
+
+    [Darwin] Use of symbol stubs should depend on the linker in use.
+    
+    This is a combination of two patches that prevents a bootstrap fail when
+    a modern assembler/linker pair are used that don't support the JBSR reloc
+    (but don't require it for long calls).
+    
+    272356 The need for picsym stubs is dependent on linker used, not OS rev.
+    
+    For very old toolchains, the compiler generated pic symbol stubs that
+    provide the necessary indirections. We no longer need this (since xcode
+    3 era) and it's more efficient for the linker to make one stub when it
+    knows a symbol is needed that for us to emit them speculatively in every
+    object.
+    
+    Our current codegen is making the assumption that a specific OS version
+    uses a specific linker version - and therefore the presence of support
+    could be based on the target OS rev. Of course, that's way too simplistic
+    (most likely bogus for cross-toolchains) and we want to make things explict.
+    
+    Since we have detection of the linker version, we can use that directly
+    (A config test for support for stub-less linking might also be feasible
+    but much more involved).
+    
+    Finally, should the user wish to generate code that caters for export to
+    use in an environment with an older toolchain, the generation of stubs
+    can be forced from the command line.
+    
+    In addition to the points above, branch islanding and a long branch opt
+    for PowerPC Darwin has become conflated with the emission of these stubs
+    (which is confusing, and will be rectified in a following patch).
+    
+    274397 There is no need to distinguish PIC/non-PIC symbol stubs.
+    
+    So we can use a single flag for both.
+    
+    2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backport from mainline
+            2019-08-13 Iain Sandoe <iain@sandoe.co.uk>
+    
+            * config/darwin.c (machopic_indirect_call_target): Rename symbol stub
+            flag.
+            (darwin_override_options): Likewise.
+            * config/darwin.h: Likewise.
+            * config/darwin.opt: Likewise.
+            * config/i386/i386.c (output_pic_addr_const): Likewise.
+            * config/rs6000/darwin.h: Likewise.
+            * config/rs6000/rs6000.c (rs6000_call_darwin_1): Likewise.
+            * config/i386/darwin.h (TARGET_MACHO_PICSYM_STUBS): Rename to ...
+            ... this TARGET_MACHO_SYMBOL_STUBS.
+            (FUNCTION_PROFILER):Likewise.
+            * config/i386/i386.h: Likewise.
+    
+            Backport from mainline
+            2019-06-16  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            * config/darwin.c (machopic_indirect_call_target): Use renamed
+            darwin_picsymbol_stubs to decide on output.
+            (darwin_override_options): Handle darwin_picsymbol_stubs.
+            * config/darwin.h (MIN_LD64_OMIT_STUBS): New.
+            (LD64_VERSION): Revise default.
+            * config/darwin.opt: (mpic-symbol-stubs): New option.
+            (darwin_picsymbol_stubs): New variable.
+            * config/i386/darwin.h (TARGET_MACHO_BRANCH_ISLANDS):
+            rename to TARGET_MACHO_PICSYM_STUBS.
+            * config/i386/i386.c (output_pic_addr_const): Likewise.
+            * config/i386/i386.h Likewise.
+            * config/rs6000/darwin.h: Likewise.
+            * config/rs6000/rs6000.c (rs6000_call_darwin_1): Use renamed
+            darwin_picsymbol_stubs.
+    
+    
+    
+    git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-9-branch@277638 138bc75d-0d04-0410-961f-82ee72b054a4
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 8cd677e55f7..648034e2dc1 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,39 @@
++2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backport from mainline
++	2019-08-13 Iain Sandoe <iain@sandoe.co.uk>
++
++	* config/darwin.c (machopic_indirect_call_target): Rename symbol stub
++	flag.
++	(darwin_override_options): Likewise.
++	* config/darwin.h: Likewise.
++	* config/darwin.opt: Likewise.
++	* config/i386/i386.c (output_pic_addr_const): Likewise.
++	* config/rs6000/darwin.h: Likewise.
++	* config/rs6000/rs6000.c (rs6000_call_darwin_1): Likewise.
++	* config/i386/darwin.h (TARGET_MACHO_PICSYM_STUBS): Rename to ...
++	... this TARGET_MACHO_SYMBOL_STUBS.
++	(FUNCTION_PROFILER):Likewise.
++	* config/i386/i386.h: Likewise.
++
++	Backport from mainline
++	2019-06-16  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* config/darwin.c (machopic_indirect_call_target): Use renamed
++	darwin_picsymbol_stubs to decide on output.
++	(darwin_override_options): Handle darwin_picsymbol_stubs.
++	* config/darwin.h (MIN_LD64_OMIT_STUBS): New.
++	(LD64_VERSION): Revise default.
++	* config/darwin.opt: (mpic-symbol-stubs): New option.
++	(darwin_picsymbol_stubs): New variable.
++	* config/i386/darwin.h (TARGET_MACHO_BRANCH_ISLANDS):
++	rename to TARGET_MACHO_PICSYM_STUBS.
++	* config/i386/i386.c (output_pic_addr_const): Likewise.
++	* config/i386/i386.h Likewise.
++	* config/rs6000/darwin.h: Likewise.
++	* config/rs6000/rs6000.c (rs6000_call_darwin_1): Use renamed
++	darwin_picsymbol_stubs.
++
+ 2019-10-30  Dragan Mladjenovic  <dmladjenovic@wavecomp.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/darwin.c b/gcc/config/darwin.c
+index 0d21d86b98a..597f3c63440 100644
+--- a/gcc/config/darwin.c
++++ b/gcc/config/darwin.c
+@@ -78,12 +78,6 @@ along with GCC; see the file COPYING3.  If not see
+    of MACHO_SYMBOL_FLAG_STATIC for the code that handles @code{static}
+    symbol indirection.  */
+ 
+-/* For darwin >= 9  (OSX 10.5) the linker is capable of making the necessary
+-   branch islands and we no longer need to emit darwin stubs.
+-   However, if we are generating code for earlier systems (or for use in the 
+-   kernel) the stubs might still be required, and this will be set true.  */
+-int darwin_emit_branch_islands = false;
+-
+ typedef struct GTY(()) cdtor_record {
+   rtx symbol;
+   int priority;		/* [con/de]structor priority */
+@@ -810,7 +804,7 @@ machopic_indirect_data_reference (rtx orig, rtx reg)
+ rtx
+ machopic_indirect_call_target (rtx target)
+ {
+-  if (! darwin_emit_branch_islands)
++  if (! darwin_symbol_stubs)
+     return target;
+ 
+   if (GET_CODE (target) != MEM)
+@@ -3345,11 +3339,31 @@ darwin_override_options (void)
+       flag_pic = 2;
+     }
+ 
+-  /* It is assumed that branch island stubs are needed for earlier systems.  */
+-  if (generating_for_darwin_version < 9)
+-    darwin_emit_branch_islands = true;
+-  else
+-    emit_aligned_common = true; /* Later systems can support aligned common.  */
++  /* Linkers >= ld64-62.1 (at least) are capable of making the necessary PIC
++     indirections and we no longer need to emit pic symbol stubs.
++     However, if we are generating code for earlier ones (or for use in the
++     kernel) the stubs might still be required, and this will be set true.
++     If the user sets it on or off - then that takes precedence. */
++
++  if (!global_options_set.x_darwin_symbol_stubs)
++    {
++      if (darwin_target_linker) {
++	if (strverscmp (darwin_target_linker, MIN_LD64_OMIT_STUBS) < 0)
++	  darwin_symbol_stubs = true;
++      } else if (generating_for_darwin_version < 9)
++	/* We know no better than to assume the use of an earlier linker.  */
++	darwin_symbol_stubs = true;
++    }
++  else if (DARWIN_X86 && darwin_symbol_stubs && TARGET_64BIT)
++    {
++      inform (input_location,
++	      "%<-mpic-symbol-stubs%> is not required for 64b code (ignored)");
++      darwin_symbol_stubs = false;
++    }
++
++  if (generating_for_darwin_version >= 9)
++    /* Later systems can support aligned common.  */
++    emit_aligned_common = true;
+ 
+   /* The c_dialect...() macros are not available to us here.  */
+   darwin_running_cxx = (strstr (lang_hooks.name, "C++") != 0);
+diff --git a/gcc/config/darwin.h b/gcc/config/darwin.h
+index 4f1268494b1..a8046d000e3 100644
+--- a/gcc/config/darwin.h
++++ b/gcc/config/darwin.h
+@@ -1023,8 +1023,12 @@ extern void darwin_driver_init (unsigned int *,struct cl_decoded_option **);
+    _tested_ version known to support this so far.  */
+ #define MIN_LD64_NO_COAL_SECTS "236.4"
+ 
++/* From at least version 62.1, ld64 can build symbol indirection stubs as
++   needed, and there is no need for the compiler to emit them.  */
++#define MIN_LD64_OMIT_STUBS "85.2"
++
+ #ifndef LD64_VERSION
+-#define LD64_VERSION "85.2"
++#define LD64_VERSION "62.1"
+ #else
+ #define DEF_LD64 LD64_VERSION
+ #endif
+diff --git a/gcc/config/darwin.opt b/gcc/config/darwin.opt
+index 3f04375e633..7f5616cbe07 100644
+--- a/gcc/config/darwin.opt
++++ b/gcc/config/darwin.opt
+@@ -75,6 +75,10 @@ mone-byte-bool
+ Target RejectNegative Report Var(darwin_one_byte_bool)
+ Set sizeof(bool) to 1.
+ 
++msymbol-stubs
++Target Report Var(darwin_symbol_stubs) Init(0)
++Force generation of external symbol indirection stubs.
++
+ ; Some code-gen may be improved / adjusted if the linker is sufficiently modern.
+ mtarget-linker=
+ Target RejectNegative Joined Report Alias(mtarget-linker)
+diff --git a/gcc/config/i386/darwin.h b/gcc/config/i386/darwin.h
+index 3284af2fb20..bdb36f00959 100644
+--- a/gcc/config/i386/darwin.h
++++ b/gcc/config/i386/darwin.h
+@@ -90,14 +90,12 @@ along with GCC; see the file COPYING3.  If not see
+ #undef WCHAR_TYPE_SIZE
+ #define WCHAR_TYPE_SIZE 32
+ 
+-/* Generate branch islands stubs if this is true.  */
+-extern int darwin_emit_branch_islands;
+-
+-#undef TARGET_MACHO_BRANCH_ISLANDS
+-#define TARGET_MACHO_BRANCH_ISLANDS darwin_emit_branch_islands
++/* Generate pic symbol indirection stubs if this is true.  */
++#undef TARGET_MACHO_SYMBOL_STUBS
++#define TARGET_MACHO_SYMBOL_STUBS (darwin_symbol_stubs)
+ 
+ /* For compatibility with OSX system tools, use the new style of pic stub
+-   if this is set.  */
++   if this is set (default).  */
+ #undef  MACHOPIC_ATT_STUB
+ #define MACHOPIC_ATT_STUB (darwin_macho_att_stub)
+ 
+@@ -245,7 +243,7 @@ extern int darwin_emit_branch_islands;
+ #undef FUNCTION_PROFILER
+ #define FUNCTION_PROFILER(FILE, LABELNO)				\
+   do {									\
+-    if (TARGET_MACHO_BRANCH_ISLANDS 					\
++    if (TARGET_MACHO_SYMBOL_STUBS 					\
+ 	&& MACHOPIC_INDIRECT && !TARGET_64BIT)				\
+       {									\
+ 	const char *name = machopic_mcount_stub_name ();		\
+diff --git a/gcc/config/i386/i386.c b/gcc/config/i386/i386.c
+index 2b37296e537..73a3ef364b3 100644
+--- a/gcc/config/i386/i386.c
++++ b/gcc/config/i386/i386.c
+@@ -16960,7 +16960,7 @@ output_pic_addr_const (FILE *file, rtx x, int code)
+       break;
+ 
+     case SYMBOL_REF:
+-      if (TARGET_64BIT || ! TARGET_MACHO_BRANCH_ISLANDS)
++      if (TARGET_64BIT || ! TARGET_MACHO_SYMBOL_STUBS)
+ 	output_addr_const (file, x);
+       else
+ 	{
+diff --git a/gcc/config/i386/i386.h b/gcc/config/i386/i386.h
+index 2cb16d9fbf6..170bbdd7fbf 100644
+--- a/gcc/config/i386/i386.h
++++ b/gcc/config/i386/i386.h
+@@ -640,7 +640,7 @@ extern tree x86_mfence;
+ /* Replace MACH-O, ifdefs by in-line tests, where possible. 
+    (a) Macros defined in config/i386/darwin.h  */
+ #define TARGET_MACHO 0
+-#define TARGET_MACHO_BRANCH_ISLANDS 0
++#define TARGET_MACHO_SYMBOL_STUBS 0
+ #define MACHOPIC_ATT_STUB 0
+ /* (b) Macros defined in config/darwin.h  */
+ #define MACHO_DYNAMIC_NO_PIC_P 0
+diff --git a/gcc/config/rs6000/darwin.h b/gcc/config/rs6000/darwin.h
+index 9fab84fd82e..523ddb6900f 100644
+--- a/gcc/config/rs6000/darwin.h
++++ b/gcc/config/rs6000/darwin.h
+@@ -75,9 +75,6 @@
+     }							\
+   while (0)
+ 
+-/* Generate branch islands stubs if this is true.  */
+-extern int darwin_emit_branch_islands;
+-
+ #define SUBTARGET_OVERRIDE_OPTIONS darwin_rs6000_override_options ()
+ 
+ #define C_COMMON_OVERRIDE_OPTIONS do {					\
+diff --git a/gcc/config/rs6000/rs6000.c b/gcc/config/rs6000/rs6000.c
+index 6523dd2dabc..2a8932d80aa 100644
+--- a/gcc/config/rs6000/rs6000.c
++++ b/gcc/config/rs6000/rs6000.c
+@@ -21434,7 +21434,7 @@ print_operand (FILE *file, rtx x, int code)
+ 	{
+ 	  const char *name = XSTR (x, 0);
+ #if TARGET_MACHO
+-	  if (darwin_emit_branch_islands
++	  if (darwin_symbol_stubs
+ 	      && MACHOPIC_INDIRECT
+ 	      && machopic_classify_symbol (x) == MACHOPIC_UNDEFINED_FUNCTION)
+ 	    name = machopic_indirection_name (x, /*stub_p=*/true);
+@@ -38383,7 +38383,8 @@ rs6000_call_darwin_1 (rtx value, rtx func_desc, rtx tlsarg,
+   if ((cookie_val & CALL_LONG) != 0
+       && GET_CODE (func_desc) == SYMBOL_REF)
+     {
+-      if (darwin_emit_branch_islands && TARGET_32BIT)
++      /* FIXME: the longcall opt should not hang off picsymbol stubs.  */
++      if (darwin_symbol_stubs && TARGET_32BIT)
+ 	make_island = true; /* Do nothing yet, retain the CALL_LONG flag.  */
+       else
+ 	{
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 19272a43775..ab5a39fccc3 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,13 @@
++2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backport from mainline.
++	2019-08-13  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* obj-c++.dg/stubify-1.mm: Rename symbol stub option.
++	* obj-c++.dg/stubify-2.mm: Likewise.
++	* objc.dg/stubify-1.m: Likewise.
++	* objc.dg/stubify-2.m: Likewise.
++
+ 2019-10-30  Dragan Mladjenovic  <dmladjenovic@wavecomp.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/testsuite/obj-c++.dg/stubify-1.mm b/gcc/testsuite/obj-c++.dg/stubify-1.mm
+index c2355437afc..46ce3fb8158 100644
+--- a/gcc/testsuite/obj-c++.dg/stubify-1.mm
++++ b/gcc/testsuite/obj-c++.dg/stubify-1.mm
+@@ -4,7 +4,7 @@
+ /* { dg-do compile { target *-*-darwin* } } */
+ /* { dg-skip-if "" { *-*-* } { "-fgnu-runtime" } { "" } } */
+ /* { dg-require-effective-target ilp32 } */
+-/* { dg-options "-Os -mdynamic-no-pic -fno-exceptions -mmacosx-version-min=10.4" } */
++/* { dg-options "-Os -mdynamic-no-pic -fno-exceptions -mmacosx-version-min=10.4 -msymbol-stubs" } */
+ 
+ typedef struct objc_object { } *id ;
+ int x = 41 ;
+diff --git a/gcc/testsuite/obj-c++.dg/stubify-2.mm b/gcc/testsuite/obj-c++.dg/stubify-2.mm
+index a9f66cac5d2..dd88974e259 100644
+--- a/gcc/testsuite/obj-c++.dg/stubify-2.mm
++++ b/gcc/testsuite/obj-c++.dg/stubify-2.mm
+@@ -4,7 +4,7 @@
+ /* { dg-do compile { target *-*-darwin* } } */
+ /* { dg-skip-if "" { *-*-* } { "-fgnu-runtime" } { "" } } */
+ /* { dg-require-effective-target ilp32 } */
+-/* { dg-options "-mdynamic-no-pic -fdump-rtl-jump -mmacosx-version-min=10.4" } */
++/* { dg-options "-mdynamic-no-pic -fdump-rtl-jump -mmacosx-version-min=10.4 -msymbol-stubs" } */
+ 
+ typedef struct objc_object { } *id ;
+ int x = 41 ;
+diff --git a/gcc/testsuite/objc.dg/stubify-1.m b/gcc/testsuite/objc.dg/stubify-1.m
+index 91bf73a14f7..97d5b598380 100644
+--- a/gcc/testsuite/objc.dg/stubify-1.m
++++ b/gcc/testsuite/objc.dg/stubify-1.m
+@@ -4,7 +4,7 @@
+ /* { dg-do compile { target *-*-darwin* } } */
+ /* { dg-skip-if "" { *-*-* } { "-fgnu-runtime" } { "" } } */
+ /* { dg-require-effective-target ilp32 } */
+-/* { dg-options "-Os -mdynamic-no-pic -mmacosx-version-min=10.4" } */
++/* { dg-options "-Os -mdynamic-no-pic -mmacosx-version-min=10.4 -msymbol-stubs" } */
+ 
+ typedef struct objc_object { } *id ;
+ int x = 41 ;
+diff --git a/gcc/testsuite/objc.dg/stubify-2.m b/gcc/testsuite/objc.dg/stubify-2.m
+index eaf4b964e4b..a07992a5a9e 100644
+--- a/gcc/testsuite/objc.dg/stubify-2.m
++++ b/gcc/testsuite/objc.dg/stubify-2.m
+@@ -4,7 +4,7 @@
+ /* { dg-do compile { target powerpc*-*-darwin* } } */
+ /* { dg-skip-if "" { *-*-* } { "-fgnu-runtime" } { "" } } */
+ /* { dg-require-effective-target ilp32 } */
+-/* { dg-options "-mdynamic-no-pic -fdump-rtl-jump -mmacosx-version-min=10.4" } */
++/* { dg-options "-mdynamic-no-pic -fdump-rtl-jump -mmacosx-version-min=10.4 -msymbol-stubs" } */
+ 
+ typedef struct objc_object { } *id ;
+ int x = 41 ;
+
+commit 11dbb4dad86723fa7d99727c5614d6e946316b3f
+Author: iains <iains@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date:   Wed Oct 30 20:05:32 2019 +0000
+
+    [Darwin] The need for FDE symbols is dependent on linker used, not OS rev.
+    
+    For very old toolchains, the compiler generated extra symbols that mark the
+    start of each FDE.  We no longer need this (since xcode 3 era) - so, for
+    compatibility with newer linkers, omit this when it is not required.
+    
+    Since we have detection of the linker version, we can use that directly to
+    determine if support is needed.
+    
+    2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backport from mainline
+            2019-06-18  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            * config/darwin.c (darwin_emit_unwind_label): New default to false.
+            (darwin_override_options): Set darwin_emit_unwind_label as needed.
+    
+    
+    
+    git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-9-branch@277640 138bc75d-0d04-0410-961f-82ee72b054a4
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 648034e2dc1..5178bd6daa1 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,11 @@
++2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backport from mainline
++	2019-06-18  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* config/darwin.c (darwin_emit_unwind_label): New.
++	(darwin_override_options): Set darwin_emit_unwind_label as needed.
++
+ 2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/darwin.c b/gcc/config/darwin.c
+index 597f3c63440..59f3e2c2345 100644
+--- a/gcc/config/darwin.c
++++ b/gcc/config/darwin.c
+@@ -99,6 +99,10 @@ int generating_for_darwin_version ;
+    for weak or single-definition items.  */
+ static bool ld_uses_coal_sects = false;
+ 
++/* Very old (ld_classic) linkers need a symbol to mark the start of
++   each FDE.  */
++static bool ld_needs_eh_markers = false;
++
+ /* Section names.  */
+ section * darwin_sections[NUM_DARWIN_SECTIONS];
+ 
+@@ -2164,11 +2168,11 @@ darwin_emit_unwind_label (FILE *file, tree decl, int for_eh, int empty)
+   static int invok_count = 0;
+   static tree last_fun_decl = NULL_TREE;
+   
+-  /* We use the linker to emit the .eh labels for Darwin 9 and above.  */
+-  if (! for_eh || generating_for_darwin_version >= 9)
++  /* Modern linkers can produce distinct FDEs without compiler support.  */
++  if (! for_eh || ! ld_needs_eh_markers)
+     return;
+ 
+-  /* FIXME: This only works when the eh for all sections of a function is 
++  /* FIXME: This only works when the eh for all sections of a function are
+      emitted at the same time.  If that changes, we would need to use a lookup
+      table of some form to determine what to do.  Also, we should emit the
+      unadorned label for the partition containing the public label for a
+@@ -3343,21 +3347,34 @@ darwin_override_options (void)
+      indirections and we no longer need to emit pic symbol stubs.
+      However, if we are generating code for earlier ones (or for use in the
+      kernel) the stubs might still be required, and this will be set true.
+-     If the user sets it on or off - then that takes precedence. */
++     If the user sets it on or off - then that takes precedence.
++
++     Linkers that don't need stubs, don't need the EH symbol markers either.
++  */
+ 
+   if (!global_options_set.x_darwin_symbol_stubs)
+     {
+-      if (darwin_target_linker) {
+-	if (strverscmp (darwin_target_linker, MIN_LD64_OMIT_STUBS) < 0)
++      if (darwin_target_linker)
++	{
++	  if (strverscmp (darwin_target_linker, MIN_LD64_OMIT_STUBS) < 0)
++	    {
++	      darwin_symbol_stubs = true;
++	      ld_needs_eh_markers = true;
++	    }
++	}
++      else if (generating_for_darwin_version < 9)
++	{
++	  /* If we don't know the linker version and we're targeting an old
++	     system, we know no better than to assume the use of an earlier
++	     linker.  */
+ 	  darwin_symbol_stubs = true;
+-      } else if (generating_for_darwin_version < 9)
+-	/* We know no better than to assume the use of an earlier linker.  */
+-	darwin_symbol_stubs = true;
++	  ld_needs_eh_markers = true;
++	}
+     }
+   else if (DARWIN_X86 && darwin_symbol_stubs && TARGET_64BIT)
+     {
+       inform (input_location,
+-	      "%<-mpic-symbol-stubs%> is not required for 64b code (ignored)");
++	      "%<-msymbol-stubs%> is not required for 64b code (ignored)");
+       darwin_symbol_stubs = false;
+     }
+ 
+
+commit d028c042893530c9ce4db153313b6474f1f3a008
+Author: iains <iains@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date:   Wed Oct 30 20:12:17 2019 +0000
+
+    [Darwin, PPC] Move the out of line register save/restore to an endfile.
+    
+    Part 1 of fixes to build and link conditions for older Darwin versions.
+    
+    We have been including these endfiles in libgcc, which means that we have to
+    append -lgcc even when using shared libgcc.  In preparation for revision of
+    libgcc split this into an endfile.
+    
+    2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backport from mainline
+            2019-06-27  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            * config/rs6000/darwin.h (ENDFILE_SPEC): Correct whitespace in the
+            spec.
+    
+            Backport from mainline
+            2019-06-25  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            * config/rs6000/darwin.h (ENDFILE_SPEC): New.
+    
+    
+    
+    git-svn-id: svn+ssh://gcc.gnu.org/svn/gcc/branches/gcc-9-branch@277641 138bc75d-0d04-0410-961f-82ee72b054a4
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 5178bd6daa1..1873defbe08 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,16 @@
++2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backport from mainline
++	2019-06-27  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* config/rs6000/darwin.h (ENDFILE_SPEC): Correct whitespace in the
++	spec.
++
++	Backport from mainline
++	2019-06-25  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* config/rs6000/darwin.h (ENDFILE_SPEC): New.
++
+ 2019-10-30  Iain Sandoe  <iain@sandoe.co.uk>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/rs6000/darwin.h b/gcc/config/rs6000/darwin.h
+index 523ddb6900f..0f458f8bec5 100644
+--- a/gcc/config/rs6000/darwin.h
++++ b/gcc/config/rs6000/darwin.h
+@@ -140,6 +140,11 @@
+ #define DARWIN_CRT2_SPEC \
+   "%{!m64:%:version-compare(!> 10.4 mmacosx-version-min= crt2.o%s)}"
+ 
++/* The PPC regs save/restore functions are leaves and could, conceivably
++   be used by the tm destructor.  */
++#undef ENDFILE_SPEC
++#define ENDFILE_SPEC TM_DESTRUCTOR " -lef_ppc"
++
+ #undef SUBTARGET_EXTRA_SPECS
+ #define SUBTARGET_EXTRA_SPECS			\
+   DARWIN_EXTRA_SPECS                            \

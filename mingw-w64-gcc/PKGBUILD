@@ -71,6 +71,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         ipa-cp.patch
         gomp-relax.patch
         zero-regs-gcc8.patch
+        fortran-vector-v2.patch
         0001-Fix-stack-protection-issues.patch
         optimize-at-least-some.patch
         0018-isl-0.20.patch
@@ -138,8 +139,8 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     gcc-stable-branch.patch \
     gomp-relax.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
+    ipa-cp.patch \
+    fortran-vector-v2.patch \
     0001-Fix-stack-protection-issues.patch \
     010-documentation.patch
 
@@ -201,8 +202,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC="ccache gcc"
-  export CXX="ccache g++"
+  #export CC="ccache gcc"
+  #export CXX="ccache g++"
 
   export gcc_cv_libc_provides_ssp=yes
 
@@ -230,7 +231,6 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
