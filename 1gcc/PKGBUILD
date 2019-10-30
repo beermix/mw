@@ -8,7 +8,7 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=8
+pkgrel=9
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 groups=('msys2-devel')
@@ -18,6 +18,8 @@ makedepends=('binutils' 'mpc-devel' 'gmp-devel'
              'mpfr-devel' 'isl-devel' 'zlib-devel'
              'windows-default-manifest')
 STRIP_OPTION="strip"
+#STRIP_OPTION="!strip"
+#DEBUG_OPTION="debug"
 DEBUG_OPTION="!debug"
 options=('!emptydirs' "$STRIP_OPTION" "$DEBUG_OPTION")
 source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
@@ -131,8 +133,6 @@ prepare() {
      ipa-cp.patch \
      optimize-at-least-some.patch \
      gomp-relax.patch \
-     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-     zero-regs-gcc8.patch \
      010-documentation.patch
 
   # MINGW Patches
@@ -216,6 +216,9 @@ build() {
     --with-system-zlib \
     --enable-linker-build-id \
     --disable-libunwind-exceptions \
+    --enable-gnu-unique-object \
+    --enable-gnu-indirect-function \
+    --with-diagnostics-color=always \
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
@@ -249,7 +252,7 @@ package_gcc-libs()
 
   make -j1 DESTDIR=${pkgdir} install-target-libquadmath
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
-  make -j1 DESTDIR=${pkgdir} install-target-libssp
+  #make -j1 DESTDIR=${pkgdir} install-target-libssp
   make -j1 DESTDIR=${pkgdir} install-target-libatomic
   #make -j1 DESTDIR=${pkgdir} install-target-libcilkrts
   make -j1 DESTDIR=${pkgdir} install-target-libvtv
@@ -257,6 +260,13 @@ package_gcc-libs()
   rm -f ${pkgdir}/*.dll
   rm -rf ${pkgdir}/usr/lib/
   rm -rf ${pkgdir}/usr/share/gcc-${pkgver}
+
+  # remove static libraries
+  #find ${pkgdir} -name *.a -delete
+
+  # Install Runtime Library Exception
+  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+    ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc()
@@ -332,6 +342,15 @@ exec /usr/bin/gcc $fl ${1+"$@"}
 EOF
 
   chmod 755 ${pkgdir}/usr/bin/c{8,9}9
+
+  # install the libstdc++ man pages
+  # install -dm755 ${pkgdir}/usr/share/man/man3
+  # install -m644 -t ${pkgdir}/usr/share/man/man3 \
+  #  ${CHOST}/libstdc++-v3/doc/doxygen/man/man3/*.3
+
+  # Install Runtime Library Exception
+  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+    ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-fortran()
@@ -362,4 +381,8 @@ package_gcc-fortran()
   rm ${pkgdir}/usr/share/info/libquadmath.info
   rm -r ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/include
   # rm ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/libgfortran.a
+
+  # Install Runtime Library Exception
+  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
+    ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
 }
