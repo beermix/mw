@@ -130,9 +130,7 @@ prepare() {
      0018-isl-0.20.patch \
      gcc-stable-branch.patch \
      optimize.patch \
-     ipa-cp.patch \
      optimize-at-least-some.patch \
-     gomp-relax.patch \
      010-documentation.patch
 
   # MINGW Patches
