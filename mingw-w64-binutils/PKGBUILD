@@ -69,6 +69,9 @@ build() {
     CFLAGS+=" -O0"
   fi
 
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+
   rm -rf gdb libdecnumber readline sim
 
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}

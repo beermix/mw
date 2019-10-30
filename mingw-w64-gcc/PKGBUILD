@@ -121,7 +121,7 @@ prepare() {
 
   ln -s ../isl-${_islver} isl
 
-   del_file_exists intl/canonicalize.c intl/canonicalize.h \
+  del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
@@ -141,8 +141,12 @@ prepare() {
     gomp-relax.patch \
     ipa-cp.patch \
     fortran-vector-v2.patch \
-    0001-Fix-stack-protection-issues.patch \
-    010-documentation.patch
+    010-documentation.patch \
+    0000-libtool-leave-framework-alone.patch \
+    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+    0006-libgfortran-missing-include.patch \
+    0008-libgcc-disable-split-stack-nothreads.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -205,8 +209,6 @@ build() {
   #export CC="ccache gcc"
   #export CXX="ccache g++"
 
-  export gcc_cv_libc_provides_ssp=yes
-
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
 
@@ -242,12 +244,12 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --disable-libssp \
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libitm \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
+    --enable-ld=default \
     --with-system-zlib \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
@@ -264,7 +266,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n19 noti make MAKEINFO=missing all
+  nice -n19 noti make V=1 all MAKEINFO=missing
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -326,7 +328,7 @@ package_mingw-w64-gcc() {
   #cp bin/{libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
-  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
+  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -345,7 +347,7 @@ package_mingw-w64-gcc() {
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  #cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
