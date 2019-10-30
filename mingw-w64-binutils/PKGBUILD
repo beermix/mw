@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=40
+pkgrel=51
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -54,7 +54,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 }
 
 build() {
@@ -89,6 +89,7 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
+    --disable-libssp \
     --disable-gdb \
     --disable-sim \
     --disable-shared
@@ -108,8 +109,9 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 

@@ -163,10 +163,10 @@ prepare() {
   echo ${pkgver} > gcc/BASE-VER
 
   # Do not run fixincludes
-  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
+  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -246,7 +246,6 @@ build() {
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libitm \
-    --enable-install-libiberty \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --with-system-zlib \
@@ -265,11 +264,11 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n19 noti make all
+  nice -n19 noti make MAKEINFO=missing all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
-  make -j1 DESTDIR=${srcdir} install
+  make -j1 DESTDIR=${srcdir} MAKEINFO=missing install
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
