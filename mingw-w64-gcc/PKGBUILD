@@ -138,6 +138,7 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     gcc-stable-branch.patch \
     gomp-relax.patch \
+    0018-isl-0.20.patch \
     optimize.patch \
     optimize-at-least-some.patch \
     010-documentation.patch
@@ -200,8 +201,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+  #export CC='ccache gcc'
+  #export CXX='ccache g++'
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
