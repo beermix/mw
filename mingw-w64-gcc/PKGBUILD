@@ -22,7 +22,7 @@ _islver=0.21
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=100
+pkgrel=101
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -138,9 +138,9 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     gcc-stable-branch.patch \
     gomp-relax.patch \
-    0018-isl-0.20.patch \
     optimize.patch \
     optimize-at-least-some.patch \
+    0001-Fix-stack-protection-issues.patch \
     010-documentation.patch
 
   apply_patch_with_msg \
@@ -201,8 +201,10 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
+  export CC="ccache gcc"
+  export CXX="ccache g++"
+
+  export gcc_cv_libc_provides_ssp=yes
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
@@ -222,11 +224,13 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -238,9 +242,11 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --with-ppl=yes \
+    --disable-libssp \
     --disable-libmpx \
-    --enable-__cxa_atexit \
+    --disable-libmudflap \
+    --disable-libitm \
+    --enable-install-libiberty \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --with-system-zlib \
@@ -280,7 +286,7 @@ package_mingw-w64-gcc-libs() {
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -321,7 +327,7 @@ package_mingw-w64-gcc() {
   #cp bin/{libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
+  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -340,7 +346,7 @@ package_mingw-w64-gcc() {
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  #cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
