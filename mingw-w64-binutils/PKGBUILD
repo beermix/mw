@@ -69,6 +69,8 @@ build() {
     CFLAGS+=" -O0"
   fi
 
+  rm -rf gdb libdecnumber readline sim
+
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
   ../${_realname}-${pkgver}/configure \
@@ -89,13 +91,13 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
-    --disable-libssp \
-    --disable-gdb \
-    --disable-sim \
-    --disable-shared
+    --enable-ld=default \
+    --enable-threads \
+    --enable-secureplt \
+    --enable-shared --disable-static \
+    --with-system-zlib
 
-  make configure-host
-  nice -n19 make MAKEINFO=true
+  nice -n19 make tooldir=${MINGW_PREFIX} MAKEINFO=true
 }
 
 package() {
@@ -114,9 +116,4 @@ package() {
   install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
-
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING      ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.LIB  ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.LIB
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3     ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3.LIB ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3.LIB
 }
