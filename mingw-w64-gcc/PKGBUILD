@@ -82,24 +82,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0003-gcc-plugin-POSIX-include-sys-select-h.patch
         0006-libgfortran-missing-include.patch
         0008-libgcc-disable-split-stack-nothreads.patch
+        gdc_thunk_weak_ref.patch
+        gdc_phobos_path.patch
+        gdc_artificial_decl.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
-sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
-            'SKIP'
-            'dea2bbad4967280910559c6a11b865aeec19cab34647fb5894cb498b24b14462'
-            '2dd7498bcb25b41afcc458696386b456ee4ff440bf395519a23d1f945ba15a41'
-            '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
-            '388f423a67e4be6f547ca7e340ff8ee4c78b1ed83f3fd698daa409e309911807'
-            '86fc77d5a6c137a9aca65ad6ba56653fb41b05636b763ce2c0b0b14d617c9de4'
-            'd1e10cd2ef5594c34acead334bb93af500e00699ba673edc8916da22a572677d'
-            '3629446c0039d9061cfedcb6d7a7589279588bb4601c7ce233546d357bd4be34'
-            'ec6800816632234afc35ce40542a6aab3ee76e8514a7d0cb4171fd874353ecd7'
-            '0eaee0e1201f4f85ea20756432a9d51531e0e859f6f121276684e2b63b2ee315'
-            '0decbbebda7ceac91da5d3dec9b7330f406a4358fa150560f08ff6f54739035f'
-            '8faff8e503a617f283270f411399a8bcacda3ab62b4072dedf117e108af4844a'
-            'e427297a118c47d2e71cb05dd9a496e9ada497917721c16918548ee2f13ad709'
-            '2321c7dce29a600477e481d16d847f05dc8c6d6461ee1eba7814c5bf62c2ef95'
-            'a526cfab91a1499be92c824c7f2185a013a38dbdfbeabe63ecbe84451e07b021'
-            'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -124,7 +110,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  ln -s ../isl-${_islver} isl
+  cp -r ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -151,7 +137,10 @@ prepare() {
     0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
     0003-gcc-plugin-POSIX-include-sys-select-h.patch \
     0006-libgfortran-missing-include.patch \
-    0008-libgcc-disable-split-stack-nothreads.patch
+    0008-libgcc-disable-split-stack-nothreads.patch \
+    gdc_thunk_weak_ref.patch \
+    gdc_phobos_path.patch \
+    gdc_artificial_decl.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -251,7 +240,6 @@ build() {
     --with-libiconv \
     --disable-libmpx \
     --disable-libmudflap \
-    --disable-libitm \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --enable-ld=default \
@@ -273,7 +261,7 @@ build() {
 
   nice -n19 noti make V=1 all MAKEINFO=missing
 
-  rm -rf ${srcdir}${MINGW_PREFIX}
+  rm -rf ${srcdir}${MINGW0:55 31.10.2019_PREFIX}
 
   make -j1 DESTDIR=${srcdir} MAKEINFO=missing install
   if [ "$_enable_ada" == "yes" ]; then
