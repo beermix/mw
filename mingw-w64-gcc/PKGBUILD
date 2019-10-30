@@ -21,7 +21,7 @@ pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=81
+pkgrel=82
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -145,11 +145,8 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0018-isl-0.20.patch \
     gcc-stable-branch.patch \
-    optimize.patch \
     ipa-cp.patch \
-    optimize-at-least-some.patch \
     gomp-relax.patch \
-    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
     zero-regs-gcc8.patch \
     010-documentation.patch
 
@@ -175,7 +172,7 @@ prepare() {
   echo ${pkgver} > gcc/BASE-VER
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -218,13 +215,13 @@ build() {
 
   export MAKEINFO=missing
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
-  export CXXFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
+#  export CXXFLAGS="-march=core-avx2 -g1 -O2 -mtune=core-avx2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -260,6 +257,7 @@ build() {
     --with-libiconv \
     --disable-libunwind-exceptions \
     --with-system-zlib \
+    --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \

@@ -2,11 +2,11 @@
 
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
-pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-1.0")
 _ver=1.0.2t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=101
+pkgrel=110
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -21,7 +21,9 @@ source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz
         'openssl-1.0.1-x32.patch'
         'openssl-0.9.6-x509.patch'
         '000-parallellez.patch'
-        'openssl-1.0.1i-relocation.patch')
+        'openssl-1.0.1i-relocation.patch'
+        'openssl-1.0-versioned-symbols.patch'
+        'ssl3-test-failure.patch')
 sha256sums=('50a98e07b1a89eb8f6a99477f262df71c6fa7bef77df4dc83025a2845c827d00'
             'SKIP'
             '164aa4928b022cc716fac545b4fd69899cb274682aa487100e595abb652adbae'
@@ -42,8 +44,8 @@ prepare() {
   patch -p1 -i ${srcdir}/000-parallellez.patch
   patch -p1 -i ${srcdir}/openssl-1.0.1-x32.patch
   patch -p1 -i ${srcdir}/openssl-0.9.6-x509.patch
-#  patch -p1 -i ${srcdir}/openssl-1.0.1i-relocation.patch
-
+  patch -p1 -i ${srcdir}/openssl-1.0-versioned-symbols.patch
+  patch -p1 -i ${srcdir}/ssl3-test-failure.patch
 }
 
 build() {
@@ -52,16 +54,18 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -O3/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=core-avx2 -O3/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
     _mingw=mingw64
   fi
+
+
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
   ./Configure \
-    --prefix=${MINGW_PREFIX} \
+    --prefix=/oth \
     ${_mingw} \
     shared \
     threads \
@@ -74,23 +78,24 @@ build() {
     enable-md2 \
     enable-rc5 \
     enable-tlsext \
-    enable-rfc3779
+    enable-rfc3779 \
+    no-ssl3-method
 
-    make depend
-    noti make
+    noti make depend all
+    #noti make
 
- #make  ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
+    #make  ZLIB_INCLUDE=-I"/oth"/include depend all
 }
 
 package() {
   cd "${srcdir}/build-${CARCH}"
-  make -j1 INSTALL_PREFIX="${pkgdir}" install_sw
+  make -j1 INSTALL_PREFIX="${pkgdir}" install_sw -j1
 
-  chmod -R 755 "${pkgdir}${MINGW_PREFIX}"/bin
-  chmod -R 644 "${pkgdir}${MINGW_PREFIX}"/lib
-  chmod -R 755 "${pkgdir}${MINGW_PREFIX}"/lib/engines
+  chmod -R 755 "${pkgdir}/oth"/bin
+  chmod -R 644 "${pkgdir}/oth"/lib
+  chmod -R 755 "${pkgdir}/oth"/lib/engines
 
-  install -m644 ms/applink.c "${pkgdir}${MINGW_PREFIX}"/include/openssl/
-  rm -rf "${pkgdir}${MINGW_PREFIX}"/bin/c_rehash
-  rm -rf "${pkgdir}${MINGW_PREFIX}"/{ssl/misc}
+  install -m644 ms/applink.c "${pkgdir}/oth"/include/openssl/
+  rm -rf "${pkgdir}/oth"/bin/c_rehash
+  rm -rf "${pkgdir}/oth"/{ssl/misc}
 }

@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 _ver=1.1.1d
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=3
+pkgrel=4
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -60,11 +60,6 @@ build() {
   mkdir -p ${srcdir}/build-${CARCH}
 #  cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
-  # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' \
-     ${srcdir}/${_realname}-${_ver}/Configure
-#     ${srcdir}/build-${CARCH}/Configure
-
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
     _mingw=mingw64
@@ -83,8 +78,9 @@ build() {
     enable-mdc2 \
     enable-rc5  \
     enable-rfc3779 \
+    enable-ec_nistp_64_gcc_128 \
     -D__MINGW_USE_VC2005_COMPAT \
-    -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\"
+    -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\" -march=core-avx2
 
   make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
 }
