@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
         )
 #_snapshot=20191026
 pkgver=9.2.0
-_islver=0.21
+_islver=0.16.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
@@ -44,7 +44,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
-        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+        #http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+        https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -110,7 +111,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  mv -fv ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -200,11 +201,12 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  #export CC="ccache gcc"
-  #export CXX="ccache g++"
+# export CC="ccache gcc"
+# export CXX="ccache g++"
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -221,7 +223,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -237,12 +238,9 @@ build() {
     --disable-werror \
     --disable-symvers \
     --enable-plugin \
-    --with-libiconv \
     --disable-libmpx \
     --disable-libmudflap \
-    --disable-libunwind-exceptions \
-    --enable-linker-build-id \
-    --enable-ld=default \
+    --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \

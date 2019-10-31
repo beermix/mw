@@ -8,7 +8,7 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=11
+pkgrel=15
 _islver=0.21
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
@@ -55,6 +55,14 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         zero-regs-gcc8.patch
         gcc-stable-branch.patch
+        0000-libtool-leave-framework-alone.patch
+        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+        0003-gcc-plugin-POSIX-include-sys-select-h.patch
+        0006-libgfortran-missing-include.patch
+        0008-libgcc-disable-split-stack-nothreads.patch
+        gdc_thunk_weak_ref.patch
+        gdc_phobos_path.patch
+        gdc_artificial_decl.patch
         0953-9.1.0-testsuite-msys2.patch)
 sha256sums=('be303f7a8292982a35381489f5a9178603cbe9a4715ee4fa4a815d6bcd2b658d'
             '24bdd964c6479251af5a275965db42ed867599cd2d84ecb526397395e201cda4'
@@ -132,9 +140,15 @@ prepare() {
      0031-define_std-unix.patch \
      0032-fix-ada-malloc-error.patch \
      gcc-stable-branch.patch \
-     optimize.patch \
-     optimize-at-least-some.patch \
-     010-documentation.patch
+     010-documentation.patch \
+     0000-libtool-leave-framework-alone.patch \
+     0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+     0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+     0006-libgfortran-missing-include.patch \
+     0008-libgcc-disable-split-stack-nothreads.patch \
+     gdc_thunk_weak_ref.patch \
+     gdc_phobos_path.patch \
+     gdc_artificial_decl.patch
 
   # MINGW Patches
   apply_patch_with_msg 0130-libstdc++-in-out.patch
@@ -149,7 +163,7 @@ prepare() {
   #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
   echo ${pkgver} > gcc/BASE-VER
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
   
   [[ -d ${srcdir}/build-$(arch) ]] && rm -rf ${srcdir}/build-$(arch)
   mkdir ${srcdir}/build-$(arch)
@@ -216,21 +230,15 @@ build() {
     --without-libintl-prefix \
     --with-system-zlib \
     --enable-linker-build-id \
+    --enable-ld=default \
     --disable-libunwind-exceptions \
+    --disable-vtable-verify \
     --with-diagnostics-color=always \
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
      nice -n19 make
 }
-
-#check() {
-#  cd ${srcdir}/build-$(arch)
-
-#  # do not abort on error as some are "expected"
-#  make -k check || true
-#  ${srcdir}/gcc-${pkgver}/contrib/test_summary
-#}
 
 package_gcc-libs()
 {
@@ -246,8 +254,8 @@ package_gcc-libs()
   done
 
   make -j1 -C $CHOST/libstdc++-v3/po DESTDIR=${pkgdir} install
-  make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
-  make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
+  #make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-info
+  #make -j1 -C $CHOST/libquadmath DESTDIR=${pkgdir} install-info
 
   make -j1 DESTDIR=${pkgdir} install-target-libquadmath
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
@@ -262,10 +270,6 @@ package_gcc-libs()
 
   # remove static libraries
   #find ${pkgdir} -name *.a -delete
-
-  # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-libs/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc()
@@ -341,15 +345,6 @@ exec /usr/bin/gcc $fl ${1+"$@"}
 EOF
 
   chmod 755 ${pkgdir}/usr/bin/c{8,9}9
-
-  # install the libstdc++ man pages
-  # install -dm755 ${pkgdir}/usr/share/man/man3
-  # install -m644 -t ${pkgdir}/usr/share/man/man3 \
-  #  ${CHOST}/libstdc++-v3/doc/doxygen/man/man3/*.3
-
-  # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc/RUNTIME.LIBRARY.EXCEPTION
 }
 
 package_gcc-fortran()
@@ -367,7 +362,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-common
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
@@ -380,8 +375,4 @@ package_gcc-fortran()
   rm ${pkgdir}/usr/share/info/libquadmath.info
   rm -r ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/include
   # rm ${pkgdir}/usr/lib/gcc/$CHOST/${pkgver}/libgfortran.a
-
-  # Install Runtime Library Exception
-  install -Dm644 ${srcdir}/gcc-${pkgver}/COPYING.RUNTIME \
-    ${pkgdir}/usr/share/licenses/gcc-fortran/RUNTIME.LIBRARY.EXCEPTION
 }
