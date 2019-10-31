@@ -45,7 +45,7 @@ prepare() {
   patch -p1 -i ${srcdir}/openssl-1.0.1-x32.patch
   patch -p1 -i ${srcdir}/openssl-0.9.6-x509.patch
   patch -p1 -i ${srcdir}/openssl-1.0-versioned-symbols.patch
-  #patch -p1 -i ${srcdir}/ssl3-test-failure.patch
+  patch -p1 -i ${srcdir}/ssl3-test-failure.patch
 }
 
 build() {
@@ -71,9 +71,10 @@ build() {
     threads \
     no-zlib \
     no-zlib-dynamic \
+    no-ssl3-method \
     enable-ec_nistp_64_gcc_128
 
-    noti make depend all
+    make depend all
     #noti make
 
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
