@@ -4,7 +4,7 @@
 _realname=go
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.13.3
+pkgver=1.13.4
 pkgrel=2
 pkgdesc="Go Lang (mingw-w64)"
 arch=('any')
