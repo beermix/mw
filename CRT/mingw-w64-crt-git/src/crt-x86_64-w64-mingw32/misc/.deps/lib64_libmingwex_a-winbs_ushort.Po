@@ -1,2 +1,0 @@
-misc/lib64_libmingwex_a-winbs_ushort.o: \
- G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/misc/winbs_ushort.c
