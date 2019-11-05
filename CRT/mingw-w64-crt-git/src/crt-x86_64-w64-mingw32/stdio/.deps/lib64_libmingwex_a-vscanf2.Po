@@ -1,0 +1,8 @@
+stdio/lib64_libmingwex_a-vscanf2.o: \
+ G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/stdio/vscanf2.S \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/stdio/scanf2-template.S
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/stdio/scanf2-template.S:

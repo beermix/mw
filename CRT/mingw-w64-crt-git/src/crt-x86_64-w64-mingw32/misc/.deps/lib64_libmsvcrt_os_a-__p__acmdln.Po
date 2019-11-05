@@ -1,0 +1,20 @@
+misc/lib64_libmsvcrt_os_a-__p__acmdln.o: \
+ G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/misc/__p__acmdln.c \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h:

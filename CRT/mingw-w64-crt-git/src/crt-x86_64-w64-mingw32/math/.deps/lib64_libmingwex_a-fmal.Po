@@ -1,0 +1,53 @@
+math/lib64_libmingwex_a-fmal.o: \
+ G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/fmal.c \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/math.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdint.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stdint.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/limits.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/syslimits.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/limits.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdbool.h
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/math.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdint.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stdint.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/limits.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include-fixed/syslimits.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/limits.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdbool.h:

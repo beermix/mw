@@ -1,0 +1,62 @@
+misc/lib64_libmsvcr120_a-uchar_c16rtomb.o: \
+ G:/.DEV/mingw/home/User/mw-my/crt/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/misc/uchar_c16rtomb.c \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/uchar.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h \
+ G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdint.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stdint.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/wchar.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/swprintf.inl \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_directx.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/uchar.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stddef.h:
+
+G:/.DEV/mingw/mingw64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/stdint.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/stdint.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/wchar.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt_wstdlib.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_off_t.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_stat64.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/swprintf.inl:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sec_api/wchar_s.h:

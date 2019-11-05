@@ -1,0 +1,1 @@
+lib64_libmoldname_a-_libm_dummy.o: _libm_dummy.c
