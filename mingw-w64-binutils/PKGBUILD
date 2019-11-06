@@ -90,6 +90,7 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
     --enable-secureplt \
+    --enable-relro \
     --enable-shared --disable-static \
     --with-system-zlib
 
@@ -107,8 +108,8 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
-  install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
