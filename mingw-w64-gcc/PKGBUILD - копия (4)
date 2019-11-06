@@ -129,7 +129,19 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    gcc-stable-branch.patch
+    gcc-stable-branch.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    fortran-vector-v2.patch \
+    010-documentation.patch \
+    0000-libtool-leave-framework-alone.patch \
+    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+    0006-libgfortran-missing-include.patch \
+    0008-libgcc-disable-split-stack-nothreads.patch \
+    gdc_thunk_weak_ref.patch \
+    gdc_phobos_path.patch \
+    gdc_artificial_decl.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
