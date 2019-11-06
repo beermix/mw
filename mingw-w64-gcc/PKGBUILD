@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
         )
 #_snapshot=20191026
 pkgver=9.2.0
-_islver=0.21
+_islver=0.16.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
@@ -229,7 +229,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
