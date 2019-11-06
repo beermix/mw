@@ -117,7 +117,6 @@ source=("https://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz
         2701-disable-broken-gdbm-module.patch
         2030-fix-msvc9-import.patch
         0001-Skip-mhlib-tests.patch
-        0001-Support-os-release-file-Modification-of-issue-17762-.patch
         link-opt.patch
         link-whole-archive.patch
         lto-link-flags.patch
@@ -283,8 +282,8 @@ prepare() {
   apply_patch_with_msg 2030-fix-msvc9-import.patch
 
   # clr patches
+  apply_patch_with_msg apply_patch_with_msg
   apply_patch_with_msg 0001-Skip-mhlib-tests.patch
-  apply_patch_with_msg 0001-Support-os-release-file-Modification-of-issue-17762-.patch
   apply_patch_with_msg link-opt.patch
   apply_patch_with_msg link-whole-archive.patch
   apply_patch_with_msg lto-link-flags.patch
