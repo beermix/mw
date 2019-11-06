@@ -343,14 +343,14 @@ package_mingw-w64-gcc() {
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
   #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
