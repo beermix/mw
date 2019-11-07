@@ -20,8 +20,8 @@ _snapshot=20191102
 pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-pkgrel=39
-_islver=0.16.1
+pkgrel=40
+_islver=0.20
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -43,9 +43,9 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=(ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
-        "gdbinit"
-        https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
-https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
+        #https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
+        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+        https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
@@ -128,7 +128,16 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    010-documentation.patch
+    010-documentation.patch \
+    0018-isl-0.20.patch \
+    optimize.patch \
+    avx512-when-we-ask-for-it.patch \
+    ipa-cp.patch \
+    gomp-relax.patch \
+    zero-regs-gcc8.patch \
+    fortran-vector-v2.patch \
+    0001-Fix-stack-protection-issues.patch \
+    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -228,6 +237,8 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-vtable-verify \
+    --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
