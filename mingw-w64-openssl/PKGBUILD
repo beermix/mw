@@ -73,7 +73,7 @@ build() {
     enable-ec_nistp_64_gcc_128
 
     make depend all
-    #noti make
+    noti make
 
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
 }
