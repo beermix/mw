@@ -21,8 +21,8 @@ pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=41
-_islver=0.21
+pkgrel=42
+_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -69,7 +69,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
         optimize.patch
-        avx512-when-we-ask-for-it.patch
         ipa-cp.patch
         gomp-relax.patch
         zero-regs-gcc8.patch
@@ -78,7 +77,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize-at-least-some.patch
         0018-isl-0.20.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        memcpy-avx2.patch
         0000-libtool-leave-framework-alone.patch
         0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
         0003-gcc-plugin-POSIX-include-sys-select-h.patch
@@ -118,6 +116,7 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -133,14 +132,12 @@ prepare() {
     010-documentation.patch \
     0018-isl-0.20.patch \
     optimize.patch \
-    avx512-when-we-ask-for-it.patch \
     ipa-cp.patch \
     gomp-relax.patch \
     zero-regs-gcc8.patch \
     fortran-vector-v2.patch \
     0001-Fix-stack-protection-issues.patch \
-    optimize-at-least-some.patch \
-    gcc-stable-branch.patch
+    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
