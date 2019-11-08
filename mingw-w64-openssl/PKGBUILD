@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-1.0")
 _ver=1.0.2t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=112
+pkgrel=115
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -70,10 +70,18 @@ build() {
     no-zlib \
     no-zlib-dynamic \
     no-ssl3-method \
+    enable-camellia \
+    enable-idea \
+    enable-mdc2 \
+    enable-ec2m \
+    enable-md2 \
+    enable-rc5 \
+    enable-tlsext \
+    enable-rfc3779 \
     enable-ec_nistp_64_gcc_128
 
-    make depend all
-    noti make
+    noti make depend all
+    #noti make
 
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
 }
