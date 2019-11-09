@@ -21,8 +21,8 @@ pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=42
-_islver=0.16.1
+pkgrel=45
+_islver=0.20
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -130,14 +130,7 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     010-documentation.patch \
-    0018-isl-0.20.patch \
-    optimize.patch \
-    ipa-cp.patch \
-    gomp-relax.patch \
-    zero-regs-gcc8.patch \
-    fortran-vector-v2.patch \
-    0001-Fix-stack-protection-issues.patch \
-    optimize-at-least-some.patch
+    0018-isl-0.20.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -204,6 +197,8 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
+  export MAKEINFO=missing
+
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -237,7 +232,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
@@ -254,7 +248,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n19 noti make V=1 MAKEINFO=missing all
+  nice -n19 noti make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -372,35 +366,6 @@ package_mingw-w64-gcc() {
   # install "custom" system gdbinit
   install -D -m644 ${srcdir}/gdbinit ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
-  
-  # POSIX conformance launcher scripts for c89 and c99
-  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c89 <<"EOF"
-#!/bin/sh
-fl="-std=c89"
-for opt; do
-  case "\$opt" in
-    -ansi|-std=c89|-std=iso9899:1990) fl="";;
-    -std=*) echo "`basename \$0` called with non ANSI/ISO C option \$opt" >&2
-        exit 1;;
-  esac
-done
-exec /mingw64/bin/gcc $fl ${1+"$@"}
-EOF
-
-  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c99 <<"EOF"
-#!/bin/sh
-fl="-std=c99"
-for opt; do
-  case "\$opt" in
-    -std=c99|-std=iso9899:1999) fl="";;
-    -std=*) echo "`basename \$0` called with non ISO C99 option \$opt" >&2
-        exit 1;;
-  esac
-done
-exec /mingw64/bin/gcc $fl ${1+"$@"}
-EOF
-
-  chmod 755 ${pkgdir}/${MINGW_PREFIX}/bin/c{8,9}9
 }
 
 package_mingw-w64-gcc-libgfortran() {

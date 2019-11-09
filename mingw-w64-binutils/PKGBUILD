@@ -24,15 +24,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.bz2{,.sig}
         0020-binutils_2.31_mkdtemp_impl.patch
         0110-binutils-mingw-gnu-print.patch
         0300-default-secure-pe-flags.patch
-        CVE-2019-17450.patch
-        CVE-2019-17451.patch
-        binutils-stable-branch.patch
-        binutils-add-LD_AS_NEEDED-global-env.patch
-        0310-reproducible-import-libraries.patch
-        0001-gas-Add-md_cons_worker.patch
-        0002-gas-Add-md_generic_table_relax_frag.patch
-        0003-i386-Align-branches-within-a-fixed-boundary.patch
-        0004-i386-Add-mbranches-within-32B-boundaries.patch)
+        binutils-stable-branch.patch)
 sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
             'SKIP'
             '93296b909e1a4f9d8a4bbe2437aafa17ca565ef6642a9812b0360c05be228c9d'
@@ -46,21 +38,14 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
-#  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
-#  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
-#  patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
+  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-
-#  patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
-#  patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
-#  patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
-#  patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
-
-#  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
+  #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
+  #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
 }
 
 build() {
@@ -74,10 +59,6 @@ build() {
   if check_option "debug" "y"; then
     CFLAGS+=" -O0"
   fi
-
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
 
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
@@ -99,9 +80,7 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-silent-rules \
-    --enable-relro \
-    --enable-shared --disable-static \
-    --with-system-zlib
+    --disable-shared
 
   make
 }
@@ -117,9 +96,9 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
-  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 }
