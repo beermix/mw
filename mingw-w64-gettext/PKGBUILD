@@ -5,7 +5,7 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=8
+pkgrel=10
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
@@ -77,7 +77,6 @@ prepare() {
   #patch -p1 -i ${srcdir}/121-keep-posix-path.patch
   patch -p1 -i ${srcdir}/122-Use-LF-as-newline-in-envsubst.patch
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
-  patch -p1 -i ${srcdir}/0001-error_print_progname.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
 
   libtoolize --automake --copy --force
