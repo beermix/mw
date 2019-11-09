@@ -5,7 +5,7 @@ _realname=xz
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=5.2.4
-pkgrel=3
+pkgrel=4
 pkgdesc="Library and command line tools for XZ and LZMA compressed files (mingw-w64)"
 arch=('any')
 url="https://tukaani.org/xz"
@@ -28,7 +28,7 @@ sha256sums=('b512f3b726d3b37b6dc4c8570e137b9311e7552e8ccbab4d39d47ce5f4177145')
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 #  patch -p1 -i "${srcdir}"/001-relative-pkg-config-paths.patch
-  patch -p1 -i "${srcdir}"/default-threading.patch
+#  patch -p1 -i "${srcdir}"/default-threading.patch
   patch -p1 -i "${srcdir}"/io-size.patch
   patch -p1 -i "${srcdir}"/speedup.patch
 #  patch -p1 -i "${srcdir}"/xz-01-init-uninitialized-variables.patch
