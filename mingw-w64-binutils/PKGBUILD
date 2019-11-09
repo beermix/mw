@@ -51,6 +51,9 @@ prepare() {
   patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
+
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 }
 
 build() {
