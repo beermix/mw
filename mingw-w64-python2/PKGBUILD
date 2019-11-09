@@ -287,8 +287,8 @@ prepare() {
   apply_patch_with_msg link-whole-archive.patch
   apply_patch_with_msg lto-link-flags.patch
   apply_patch_with_msg 0001-Add-pybench-to-the-PROFILE_TASK-rule.patch
-  apply_patch_with_msg avx2-distutils.patch
-  apply_patch_with_msg load-avx2.patch
+#  apply_patch_with_msg avx2-distutils.patch
+#  apply_patch_with_msg load-avx2.patch
   apply_patch_with_msg 0001-python-Add-deprecation-notice-for-Python-2.7-in-inte.patch
 
   autoreconf -vfi
