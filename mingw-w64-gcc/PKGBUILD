@@ -16,7 +16,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-_snapshot=20191102
+#_snapshot=20191102
 pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
@@ -43,11 +43,11 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
         #ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
         #https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
         http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
-        https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
+        #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
