@@ -22,7 +22,7 @@ _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 pkgrel=46
-_islver=0.21
+_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -214,6 +214,7 @@ build() {
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
