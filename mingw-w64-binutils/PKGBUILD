@@ -87,7 +87,7 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --disable-shared
 
-    MAKEINFO=true make
+    make MAKEINFO=true
 }
 
 package() {
