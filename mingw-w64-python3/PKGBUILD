@@ -306,8 +306,8 @@ prepare() {
 
   # clr patches
   apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
-  apply_patch_with_msg 0004-Add-avx2-and-avx512-support.patch
-  apply_patch_with_msg 0005-Build-avx2-and-avx512-versions-of-the-math-library.patch
+#  apply_patch_with_msg 0004-Add-avx2-and-avx512-support.patch
+#  apply_patch_with_msg 0005-Build-avx2-and-avx512-versions-of-the-math-library.patch
 
   autoreconf -vfi
 
@@ -385,6 +385,9 @@ build() {
 
   [[ -d "${srcdir}/build-${CARCH}" ]] && rm -rf "${srcdir}/build-${CARCH}"
   mkdir -p "${srcdir}/build-${CARCH}" && cd "${srcdir}/build-${CARCH}"
+
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   MSYSTEM=MINGW ../Python-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \

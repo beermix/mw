@@ -282,7 +282,6 @@ prepare() {
   apply_patch_with_msg 2030-fix-msvc9-import.patch
 
   # clr patches
-  apply_patch_with_msg apply_patch_with_msg
   apply_patch_with_msg 0001-Skip-mhlib-tests.patch
   apply_patch_with_msg link-opt.patch
   apply_patch_with_msg link-whole-archive.patch
@@ -354,6 +353,9 @@ build() {
 
   [ -d "${srcdir}/build-${CARCH}" ] && rm -rf "${srcdir}/build-${CARCH}"
   mkdir -p "${srcdir}/build-${CARCH}" && cd "${srcdir}/build-${CARCH}"
+
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   MSYSTEM=MINGW ../Python-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
