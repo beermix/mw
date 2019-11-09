@@ -24,6 +24,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.bz2{,.sig}
         0020-binutils_2.31_mkdtemp_impl.patch
         0110-binutils-mingw-gnu-print.patch
         0300-default-secure-pe-flags.patch
+        0310-reproducible-import-libraries.patch
         binutils-stable-branch.patch)
 sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
             'SKIP'
@@ -79,10 +80,9 @@ build() {
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-pc-mingw64 \
-    --enable-silent-rules \
     --disable-shared
 
-  make
+  make MAKEINFO=true
 }
 
 package() {
@@ -96,9 +96,9 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
   # Add some useful headers
-  install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
-  install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
-  install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
+  #install -m644 ${srcdir}/${_realname}-${pkgver}/include/plugin-api.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 }
