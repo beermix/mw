@@ -4,7 +4,7 @@ _realname=crt
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
-pkgver=8.0.0.5575.ec3f56a3
+pkgver=7.0.0.5553.e922460c
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=('any')
@@ -47,10 +47,10 @@ build() {
   msg "Building ${MINGW_CHOST} CRT"
   case "$CARCH" in
     i686)
-      _crt_configure_args="--disable-lib64 --enable-lib32 --enable-silent-rules"
+      _crt_configure_args="--disable-lib64 --enable-lib32"
     ;;
     x86_64)
-      _crt_configure_args="--disable-lib32 --enable-lib64 --enable-silent-rules"
+      _crt_configure_args="--disable-lib32 --enable-lib64"
     ;;
   esac
 
