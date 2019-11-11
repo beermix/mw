@@ -21,7 +21,7 @@ pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=47
+pkgrel=48
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -231,6 +231,7 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --disable-libunwind-exceptions \
     --with-system-zlib \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
