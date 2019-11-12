@@ -62,28 +62,7 @@ source=(#https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         010-documentation.patch
-        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
-        0003-gcc-plugin-POSIX-include-sys-select-h.patch
-        0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
-        optimize.patch
-        ipa-cp.patch
-        gomp-relax.patch
-        zero-regs-gcc8.patch
-        fortran-vector-v2.patch
-        0001-Fix-stack-protection-issues.patch
-        optimize-at-least-some.patch
-        0018-isl-0.20.patch
-        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        0000-libtool-leave-framework-alone.patch
-        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
-        0003-gcc-plugin-POSIX-include-sys-select-h.patch
-        0006-libgfortran-missing-include.patch
-        0008-libgcc-disable-split-stack-nothreads.patch
-        gdc_thunk_weak_ref.patch
-        gdc_phobos_path.patch
-        gdc_artificial_decl.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 
 # Helper macros to help make tasks easier #
@@ -115,6 +94,7 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    010-documentation.patch
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -126,8 +106,7 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    010-documentation.patch
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -146,7 +125,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  #echo ${pkgver} > gcc/BASE-VER
+  # echo ${pkgver} > gcc/BASE-VER
 
   # Do not run fixincludes
   # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
@@ -187,12 +166,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC="ccache gcc"
-#  export CXX="ccache g++"
-
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -262,6 +238,26 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
+
+  # Licensing information
+
+  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
+  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
+  # with GPL3+, the whole package can be redistributed under GPL3+.
+  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
+
+  # We explain the licensing in this generated README file
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
+  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
+The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
+GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
+by LGPL2+. The package as a whole can be redistributed under GPL3+.
+ENDFILE
+
+  # License files
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
@@ -343,14 +339,14 @@ package_mingw-w64-gcc() {
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
   #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
@@ -393,6 +389,8 @@ package_mingw-w64-gcc-fortran() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada() {
