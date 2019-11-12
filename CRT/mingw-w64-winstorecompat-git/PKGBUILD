@@ -35,7 +35,6 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
-    --enable-silent-rules \
     --target=${MINGW_CHOST}
 
   make

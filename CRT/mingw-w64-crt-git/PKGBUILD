@@ -63,7 +63,6 @@ build() {
     --target=${MINGW_CHOST} \
     --with-sysroot=${MINGW_PREFIX}/${MINGW_CHOST} \
     --enable-wildcard \
-    --enable-silent-rules \
     ${_crt_configure_args}
   make
 }
