@@ -17,11 +17,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 _snapshot=20191109
-pkgver=9.2.1
+pkgver=9.2.0
 _majorver=${pkgver:0:1}
-_sourcedir=${_realname}-${_majorver}-${_snapshot}
-#_sourcedir=${_realname}-${pkgver}
-pkgrel=95
+#_sourcedir=${_realname}-${_majorver}-${_snapshot}
+_sourcedir=${_realname}-${pkgver}
+pkgrel=96
 #_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -42,8 +42,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=(#https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
-        ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
+source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
+        #ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
         #https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
         #http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
@@ -168,8 +168,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+#  export CC='ccache gcc'
+#  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -180,7 +180,6 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=core-avx2 \
     --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -202,12 +201,7 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
-    --disable-vtable-verify \
-    --disable-libunwind-exceptions \
-    --enable-gnu-indirect-function \
-    --enable-linker-build-id \
     --with-system-zlib \
-    --with-ppl=yes \
     --disable-libmpx \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
