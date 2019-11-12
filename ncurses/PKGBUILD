@@ -4,7 +4,7 @@ pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
 _basever=6.0
 pkgver=${_basever}
-pkgrel=3
+pkgrel=4
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/ncurses/"
@@ -53,7 +53,7 @@ build() {
     --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
-  noti make
+  make
   make DESTDIR=${srcdir}/dest install
 }
 
@@ -69,9 +69,9 @@ package_ncurses() {
   cp -rf $srcdir/dest/usr/share ${pkgdir}/usr/
 
   # install license, rip it from the readme
-  cd ${srcdir}/$pkgname-${_basever}
-  install -dm755 ${pkgdir}/usr/share/licenses/$pkgname
-  grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
+  #cd ${srcdir}/$pkgname-${_basever}
+  #install -dm755 ${pkgdir}/usr/share/licenses/$pkgname
+  #grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
 }
 
 package_ncurses-devel() {
