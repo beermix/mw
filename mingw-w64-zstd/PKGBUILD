@@ -4,7 +4,7 @@ _realname=zstd
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.4.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Zstandard - Fast real-time compression algorithm (mingw-w64)"
 arch=('any')
 url='https://facebook.github.io/zstd/'
@@ -44,6 +44,9 @@ build() {
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
       "${extra_config[@]}" \
       -DZSTD_BUILD_CONTRIB=ON \
+      -DZSTD_LEGACY_SUPPORT=OFF \
+      -DZSTD_MULTITHREAD_SUPPORT=ON \
+      -DZSTD_PROGRAMS_LINK_SHARED=OFF \
       ../${_realname}-${pkgver}/build/cmake
 
   make
