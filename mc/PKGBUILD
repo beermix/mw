@@ -50,17 +50,10 @@ build() {
   ./configure --build=${CHOST} \
     --prefix=/usr \
     --sysconfdir=/etc \
-    --without-libintl-prefix \
-    --without-libiconv-prefix \
     --with-screen=ncursesw \
     --enable-charset \
-    --disable-rpath \
     --enable-threads \
     --enable-largefile \
-    --enable-maintainer-mode \
-    --disable-doxygen-html \
-    --disable-doxygen-dot \
-    --disable-doxygen-doc \
     --libexecdir=/usr/lib \
     --disable-aspell \
     --without-diff-viewer \
@@ -72,10 +65,8 @@ build() {
     --disable-doxygen-dot \
     --disable-doxygen-html \
     --with-internal-edit=no \
-    --with-diff-viewer=no \
     --disable-mclib \
-    --with-subshell=no \
-    --enable-vfs-extfs \
+    --with-subshell \
     --enable-vfs-ftp \
     --enable-vfs-sftp \
     --enable-vfs-tar \
