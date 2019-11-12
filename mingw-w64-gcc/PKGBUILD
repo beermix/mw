@@ -226,6 +226,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --disable-libunwind-exceptions \
+    --enable-gnu-indirect-function \
     --enable-linker-build-id \
     --with-system-zlib \
     --with-ppl=yes \
