@@ -66,12 +66,11 @@ source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pk
         gcc-stable-branch.patch
         0140-gcc-8.2.0-diagnostic-color.patch
         fortran-vector-v2.patch
-        gomp-relax.patc
+        gomp-relax.patch
         ipa-cp.patch
         openmp-vectorize-v2.patch
         optimize.patch
         optimize-at-least-some.patch
-        pow-optimization.patch
         zero-regs-gcc8.patch)
 
 # Helper macros to help make tasks easier #
@@ -135,7 +134,6 @@ prepare() {
     openmp-vectorize-v2.patch \
     optimize.patch \
     optimize-at-least-some.patch \
-    pow-optimization.patch \
     zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
