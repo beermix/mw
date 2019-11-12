@@ -64,8 +64,6 @@ build() {
     --with-screen=ncursesw \
     --without-slang \
     --enable-charset \
-    --enable-threads \
-    --enable-largefile \
     --disable-aspell \
     --without-diff-viewer \
     --disable-doxygen-doc \
@@ -83,8 +81,6 @@ build() {
     --enable-vfs-tar \
     --enable-vfs-cpio \
     --enable-vfs-extfs \
-    --enable-background \
-    --without-x \
     --libexecdir=/usr/lib
 
   make
