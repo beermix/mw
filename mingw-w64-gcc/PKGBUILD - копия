@@ -64,15 +64,7 @@ source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pk
         0130-libstdc++-in-out.patch
         010-documentation.patch
         gcc-stable-branch.patch
-        0140-gcc-8.2.0-diagnostic-color.patch
-        fortran-vector-v2.patch
-        gomp-relax.patc
-        ipa-cp.patch
-        openmp-vectorize-v2.patch
-        optimize.patch
-        optimize-at-least-some.patch
-        pow-optimization.patch
-        zero-regs-gcc8.patch)
+        0140-gcc-8.2.0-diagnostic-color.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -127,16 +119,6 @@ prepare() {
 
   apply_patch_with_msg \
     010-documentation.patch
-    
-  apply_patch_with_msg \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
-    pow-optimization.patch \
-    zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -188,8 +170,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -257,6 +239,26 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
+
+  # Licensing information
+
+  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
+  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
+  # with GPL3+, the whole package can be redistributed under GPL3+.
+  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
+
+  # We explain the licensing in this generated README file
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
+  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
+The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
+GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
+by LGPL2+. The package as a whole can be redistributed under GPL3+.
+ENDFILE
+
+  # License files
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
