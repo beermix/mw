@@ -4,13 +4,13 @@ _realname=zstd
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.4.4
-pkgrel=1
+pkgrel=2
 pkgdesc="Zstandard - Fast real-time compression algorithm (mingw-w64)"
 arch=('any')
 url='https://facebook.github.io/zstd/'
 license=('BSD')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
-             "${MINGW_PACKAGE_PREFIX}-cmake")
+             "${MINGW_PACKAGE_PREFIX}-meson")
 source=(${_realname}-${pkgver}.tar.gz::"https://github.com/facebook/${_realname}/archive/v${pkgver}.tar.gz"
         install-pkgconfig.patch
         zstd-1.4.0-fileio-mingw.patch
@@ -31,32 +31,21 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("-DCMAKE_BUILD_TYPE=Release")
-  else
-    extra_config+=("-DCMAKE_BUILD_TYPE=Debug")
-  fi
-  
-    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
-    ${MINGW_PREFIX}/bin/cmake \
-      -G'MSYS Makefiles' \
-      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-      "${extra_config[@]}" \
-      -DZSTD_BUILD_CONTRIB=ON \
-      ../${_realname}-${pkgver}/build/cmake
+   meson \
+    --buildtype=plain \
+     -Ddefault_library=both \
+     -Dlegacy_level=0 \
+     -Ddebug_level=0 \
+     -Dbin_programs=true \
+     -Dbin_tests=false \
+     -Dmulti_thread=enabled \
+     "../zstd-${pkgver}/build/meson"
 
-  make
+   ninja
 }
 
 
 package() {
   cd "${srcdir}"/build-${CARCH}
-  make install DESTDIR="${pkgdir}"
-
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/LICENSE" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
-
-  for pcfile in "${pkgdir}${MINGW_PREFIX}"/lib/pkgconfig/*.pc; do
-    sed -s "s|$(cygpath -m ${MINGW_PREFIX})|${MINGW_PREFIX}|g" -i "${pcfile}"
-  done
+  DESTDIR="${pkgdir}${MINGW_PREFIX}" ninja install
 }
