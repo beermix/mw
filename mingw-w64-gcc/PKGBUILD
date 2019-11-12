@@ -186,8 +186,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -221,6 +221,7 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --disable-libmpx \
+    --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --enable-clocale=gnu \
     --enable-linker-build-id \
