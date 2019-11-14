@@ -6,7 +6,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-1.0")
 _ver=1.0.2t
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=116
+pkgrel=120
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -54,7 +54,7 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=core-avx2 -O3/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=native -O3 -pipe/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
