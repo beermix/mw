@@ -19,7 +19,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 conflicts=("${MINGW_PACKAGE_PREFIX}-python2<2.7.16-7")
 _pybasever=3.8
 pkgver=${_pybasever}.0
-pkgrel=5
+pkgrel=6
 pkgdesc="A high-level scripting language (mingw-w64)"
 arch=('any')
 license=('PSF')
@@ -345,8 +345,8 @@ check() {
 build() {
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
 
-  CFLAGS+=" -O3 -fwrapv -D__USE_MINGW_ANSI_STDIO=1 -D_WIN32_WINNT=0x0601"
-  CXXFLAGS+=" -O3 -fwrapv -D__USE_MINGW_ANSI_STDIO=1 -D_WIN32_WINNT=0x0601"
+  CFLAGS+=" -O3 -mfma -fwrapv -D__USE_MINGW_ANSI_STDIO=1 -D_WIN32_WINNT=0x0601"
+  CXXFLAGS+=" -O3 -mfma -fwrapv -D__USE_MINGW_ANSI_STDIO=1 -D_WIN32_WINNT=0x0601"
   CPPFLAGS+=" -I${PREFIX_WIN}/include/ncurses "
 
   declare -a _extra_config
@@ -355,8 +355,8 @@ build() {
   fi
   if check_option "debug" "n"; then
     CFLAGS+=" -DNDEBUG "
-    CXXFLAGS+=" -DNDEBUG "
-    _extra_config+=("--enable-optimizations")
+#    CXXFLAGS+=" -DNDEBUG "
+#    _extra_config+=("--enable-optimizations")
     _extra_config+=("--with-lto")
   else
     plain " -DDEBUG -DPy_DEBUG -D_DEBUG does not work unfortunately .."
@@ -386,9 +386,6 @@ build() {
   [[ -d "${srcdir}/build-${CARCH}" ]] && rm -rf "${srcdir}/build-${CARCH}"
   mkdir -p "${srcdir}/build-${CARCH}" && cd "${srcdir}/build-${CARCH}"
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
-
   MSYSTEM=MINGW ../Python-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --host=${MINGW_CHOST} \
@@ -399,6 +396,7 @@ build() {
     --with-system-ffi \
     --with-system-libmpdec \
     --without-ensurepip \
+    --with-lto=8 \
     --with-computed-gotos \
     "${_extra_config[@]}" \
     OPT=""
