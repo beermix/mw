@@ -124,7 +124,7 @@ prepare() {
 
   apply_patch_with_msg \
     010-documentation.patch
-    
+ 
   apply_patch_with_msg \
     fortran-vector-v2.patch \
     gomp-relax.patch \
@@ -181,8 +181,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  export CC="/home/User/.bin/ccache gcc"
+  export CXX="/home/User/.bin/ccache g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
