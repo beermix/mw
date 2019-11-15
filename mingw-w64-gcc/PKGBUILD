@@ -21,7 +21,7 @@ pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=100
+pkgrel=101
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -128,10 +128,7 @@ prepare() {
   apply_patch_with_msg \
     fortran-vector-v2.patch \
     gomp-relax.patch \
-    ipa-cp.patch \
     openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
     zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
@@ -222,6 +219,7 @@ build() {
     --disable-vtable-verify \
     --disable-libunwind-exceptions \
     --enable-clocale=gnu \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-linker-build-id \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \

@@ -28,7 +28,11 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         CVE-2019-17450.patch
         CVE-2019-17451.patch
         binutils-stable-branch.patch
-        0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch)
+        0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
+        0001-gas-Add-md_cons_worker.patch
+        0002-gas-Add-md_generic_table_relax_frag.patch
+        0003-i386-Align-branches-within-a-fixed-boundary.patch
+        0004-i386-Add-mbranches-within-32B-boundaries.patch)
 sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
             'SKIP'
             '93296b909e1a4f9d8a4bbe2437aafa17ca565ef6642a9812b0360c05be228c9d'
@@ -50,9 +54,14 @@ prepare() {
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
   patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
   patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
+  patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
+  patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
+  patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
+  patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
+  patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
+
   patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
-  patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
