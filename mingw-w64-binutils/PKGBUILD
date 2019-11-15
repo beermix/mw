@@ -27,7 +27,8 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0310-reproducible-import-libraries.patch
         CVE-2019-17450.patch
         CVE-2019-17451.patch
-        binutils-stable-branch.patch)
+        binutils-stable-branch.patch
+        0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch)
 sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
             'SKIP'
             '93296b909e1a4f9d8a4bbe2437aafa17ca565ef6642a9812b0360c05be228c9d'
