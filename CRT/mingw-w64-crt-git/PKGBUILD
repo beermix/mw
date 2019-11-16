@@ -1,4 +1,4 @@
-# Maintainer: Alexey Pavlov <alexpux@gmail.com> #branch=v7.x
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
 _realname=crt
 pkgbase=mingw-w64-${_realname}-git
