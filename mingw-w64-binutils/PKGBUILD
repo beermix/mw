@@ -105,13 +105,13 @@ build() {
     --with-pic \
     --with-system-zlib
 
-  make configure-host
-  make
+  make MAKEINFO=true configure-host
+  make MAKEINFO=true
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make MAKEINFO=true DESTDIR=${pkgdir} install
+  make MAKEINFO=true DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
