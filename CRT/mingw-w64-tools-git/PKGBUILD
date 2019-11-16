@@ -7,7 +7,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=7.0.0.5571.5eece15a
+pkgver=8.0.0.5576.3ac71ed3
 pkgrel=1
 pkgdesc="MinGW-w64 tools"
 arch=('any')
@@ -17,7 +17,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 makedepends=("git" "${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-libmangle")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 options=('staticlibs' '!emptydirs')
-source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#branch=v7.x")
+source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64")
 sha256sums=('SKIP')
 _tools="gendef genlib genidl genpeimg widl" # genstubdll
 
