@@ -48,6 +48,7 @@ build() {
     --disable-doc \
     --disable-werror \
     --enable-threads \
+    --enable-silent-rules \
     --disable-lzma-links
 
   make
