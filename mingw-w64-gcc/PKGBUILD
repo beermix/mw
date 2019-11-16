@@ -197,15 +197,18 @@ build() {
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --with-tune=core-avx2 \
+    --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -223,7 +226,7 @@ build() {
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
-    --with-pkgversion="Rev ${pkgrel}, Built by MSYS2 project" \
+    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
