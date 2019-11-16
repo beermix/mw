@@ -21,7 +21,7 @@ pkgver=9.2.0
 _majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=103
+pkgrel=105
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -40,6 +40,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib")
+#checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
@@ -184,8 +185,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  export CC="/home/User/.bin/ccache gcc"
-  export CXX="/home/User/.bin/ccache g++"
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
