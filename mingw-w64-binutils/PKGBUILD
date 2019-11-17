@@ -103,13 +103,13 @@ build() {
     --with-system-zlib \
     --disable-shared
 
-  make configure-host
-  make
+  make MAKEINFO=true configure-host
+  make MAKEINFO=true
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include

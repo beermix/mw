@@ -182,6 +182,7 @@ build() {
 
   export CC='ccache gcc'
   export CXX='ccache g++'
+  export MAKEINFO=missing
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -231,7 +232,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  MAKEINFO=missing nice -n 19 noti make
+  nice -n 19 noti make V=1 all MAKEINFO=missing 
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
