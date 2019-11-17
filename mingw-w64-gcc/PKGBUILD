@@ -218,6 +218,7 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv \
+    --disable-libunwind-exceptions \
     --with-system-zlib \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
