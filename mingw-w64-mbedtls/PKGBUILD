@@ -32,13 +32,6 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/${_realname}-${pkgver}"
-
-  local BUILD_TYPE="Release"
-  if check_option "debug" "y"; then
-    BUILD_TYPE="Debug"
-  fi
-  
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST}
   cd ${srcdir}/build-${MINGW_CHOST}
@@ -49,28 +42,16 @@ build() {
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_C_COMPILER=${MINGW_CHOST}-gcc \
-    -DENABLE_TESTING=ON \
+    -DENABLE_TESTING=OFF \
     -DENABLE_PROGRAMS=OFF \
     -DUSE_SHARED_MBEDTLS_LIBRARY=OFF \
     -DUSE_STATIC_MBEDTLS_LIBRARY=ON \
+    -DCMAKE_BUILD_TYPE=Release \
     ../${_realname}-${pkgver}
   make
-  # Generate the documentation
-  make apidoc
-}
-
-check() {
-  cd "${srcdir}/build-${MINGW_CHOST}"
-  cp -p library/*.dll tests/ # Tests are dynamically linked
-  make test
 }
 
 package () {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make DESTDIR=${pkgdir} install
-  
-  # Install the documentation
-  cd "${srcdir}/${_realname}-${pkgver}"
-  mkdir -p "${pkgdir}/${MINGW_PREFIX}/share/doc/${_realname}"
-  cp -Rp apidoc "${pkgdir}/${MINGW_PREFIX}/share/doc/${_realname}/html"
 }
