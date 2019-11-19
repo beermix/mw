@@ -21,8 +21,10 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --enable-minimal \
-    --disable-shared \
+    --disable-pie \
+    --disable-ssp \
+    --with-pthreads \
+    --enable-shared \
     --enable-static
 
   make
