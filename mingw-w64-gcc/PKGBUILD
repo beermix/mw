@@ -17,11 +17,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 _snapshot=20191116
-pkgver=9.2.1
+pkgver=9.2.0
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=110
+pkgrel=111
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -101,6 +101,7 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -138,7 +139,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  #echo ${pkgver} > gcc/BASE-VER
+  echo ${pkgver} > gcc/BASE-VER
 
   # Do not run fixincludes
   #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
