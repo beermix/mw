@@ -45,7 +45,7 @@ optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=(#https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
         ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
-        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+        #http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -95,7 +95,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -219,7 +219,7 @@ build() {
     --disable-libunwind-exceptions \
     --with-system-zlib \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
@@ -232,7 +232,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all MAKEINFO=missing 
+  nice -n 19 noti make V=1 all 
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
