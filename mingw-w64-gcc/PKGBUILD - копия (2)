@@ -193,7 +193,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-tune=core-avx2 \
+    --with-arch=core-avx2 \
     --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -232,7 +232,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  nice -n 19 noti make V=1 all 
+  nice -n 19 noti make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
