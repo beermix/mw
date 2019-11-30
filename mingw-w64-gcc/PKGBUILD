@@ -208,6 +208,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
