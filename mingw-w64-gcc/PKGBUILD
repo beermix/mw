@@ -11,8 +11,6 @@ _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
@@ -21,8 +19,8 @@ pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=121
-_islver=0.16.1
+pkgrel=123
+_islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -167,7 +165,7 @@ build() {
     ;;
   esac
 
-  local _languages="c,lto,c++,fortran"
+  local _languages="c,lto,c++"
   if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
@@ -365,39 +363,6 @@ package_mingw-w64-gcc() {
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
 }
 
-package_mingw-w64-gcc-libgfortran() {
-  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/libgfortran*.dll                                ${pkgdir}${MINGW_PREFIX}/bin/
-}
-
-package_mingw-w64-gcc-fortran() {
-  pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
-
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-  cp bin/${MINGW_CHOST}-gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-
-  #cp bin/libgfortran*.dll ${pkgdir}${MINGW_PREFIX}/bin/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/finclude       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
-  cp share/man/man1/gfortran.1*                         ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
-}
-
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
@@ -447,14 +412,6 @@ package_mingw-w64-i686-gcc() {
   package_mingw-w64-gcc
 }
 
-package_mingw-w64-i686-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-i686-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
-}
-
 package_mingw-w64-i686-gcc-ada() {
   package_mingw-w64-gcc-ada
 }
@@ -470,14 +427,6 @@ package_mingw-w64-x86_64-gcc-libs() {
 
 package_mingw-w64-x86_64-gcc() {
   package_mingw-w64-gcc
-}
-
-package_mingw-w64-x86_64-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-x86_64-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
 }
 
 package_mingw-w64-x86_64-gcc-ada() {
