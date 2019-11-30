@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=71
+pkgrel=72
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -52,20 +52,20 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
-  patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
-  patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
-  patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
-  patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
-  patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
-  patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
+  #patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
+  #patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
+  #patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
+  #patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
+  #patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
+  #patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
+  #patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 
-  patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
-  patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
+  #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
+  #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
-  #sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
-  #sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
+  # sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
 }
 
 build() {
