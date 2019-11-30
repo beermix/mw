@@ -44,11 +44,11 @@ prepare() {
 build() {
     cd "${srcdir}/${_realname}-${pkgver}"
 
-    export CC='ccache gcc'
-    export CXX='ccache g++'
+#    export CC='ccache gcc'
+#    export CXX='ccache g++'
 
     ./configure \
-        --disable-stack-protector \
+        --enable-stack-protector \
         --disable-werror \
         --disable-kvm \
         --disable-bluez \
@@ -60,7 +60,6 @@ build() {
         --disable-hax \
         --disable-gtk \
         --disable-sdl \
-	--disable-libiconv \
         --static \
         --prefix=${MINGW_PREFIX} \
         --bindir=${MINGW_PREFIX}/bin \
