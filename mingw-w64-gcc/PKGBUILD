@@ -21,7 +21,7 @@ pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=120
+pkgrel=121
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -187,8 +187,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=core-avx2 \
-    --with-tune=core-avx2 \
+    --with-arch=haswell \
+    --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
@@ -211,10 +211,6 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
-    --without-included-gettext \
-    --with-default-libstdcxx-abi=new \
-    --enable-gnu-unique-object \
-    --disable-vtable-verify \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
