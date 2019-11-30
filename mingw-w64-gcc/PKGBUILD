@@ -173,8 +173,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  export CC="/home/User/.bin/ccache gcc"
-#  export CXX="/home/User/.bin/ccache g++"
+#  export CC="ccache gcc"
+#  export CXX="ccache g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -240,26 +240,6 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
-
-  # Licensing information
-
-  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
-  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
-  # with GPL3+, the whole package can be redistributed under GPL3+.
-  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
-
-  # We explain the licensing in this generated README file
-  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
-  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
-The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
-GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
-by LGPL2+. The package as a whole can be redistributed under GPL3+.
-ENDFILE
-
-  # License files
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
