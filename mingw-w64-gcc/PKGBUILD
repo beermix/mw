@@ -11,8 +11,6 @@ _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
@@ -61,7 +59,6 @@ source=(#https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
-        fortran-vector-v2.patch
         gomp-relax.patch
         ipa-cp.patch
         openmp-vectorize-v2.patch
