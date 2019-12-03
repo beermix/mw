@@ -132,9 +132,7 @@ source=("https://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz
         2080-pkg-config-windows-must-link-ext-with-python-lib.patch
         5000-warnings-fixes.patch
         smoketests.py
-        0001-Add-pybench-for-pgo-optimization.patch
-        0004-Add-avx2-and-avx512-support.patch
-        0005-Build-avx2-and-avx512-versions-of-the-math-library.patch)
+        0001-Add-pybench-for-pgo-optimization.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -306,8 +304,6 @@ prepare() {
 
   # clr patches
   apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
-#  apply_patch_with_msg 0004-Add-avx2-and-avx512-support.patch
-#  apply_patch_with_msg 0005-Build-avx2-and-avx512-versions-of-the-math-library.patch
 
   autoreconf -vfi
 
@@ -355,8 +351,8 @@ build() {
   fi
   if check_option "debug" "n"; then
     CFLAGS+=" -DNDEBUG "
-#    CXXFLAGS+=" -DNDEBUG "
-#    _extra_config+=("--enable-optimizations")
+    CXXFLAGS+=" -DNDEBUG "
+    _extra_config+=("--enable-optimizations")
     _extra_config+=("--with-lto")
   else
     plain " -DDEBUG -DPy_DEBUG -D_DEBUG does not work unfortunately .."
