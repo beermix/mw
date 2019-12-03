@@ -11,8 +11,6 @@ _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
@@ -117,15 +115,6 @@ prepare() {
   # Вячеслав Петрищев <vyachemail@gmail.com>
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
-    
-  # Enable clear linux patches
-  apply_patch_with_msg \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
-    zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -163,7 +152,7 @@ build() {
     ;;
   esac
 
-  local _languages="c,lto,c++,fortran"
+  local _languages="c,lto,c++"
   if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
@@ -339,35 +328,6 @@ package_mingw-w64-gcc() {
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
 }
 
-package_mingw-w64-gcc-libgfortran() {
-  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/libgfortran*.dll                                ${pkgdir}${MINGW_PREFIX}/bin/
-}
-
-package_mingw-w64-gcc-fortran() {
-  pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
-
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-  cp bin/${MINGW_CHOST}-gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-
-  #cp bin/libgfortran*.dll ${pkgdir}${MINGW_PREFIX}/bin/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/finclude       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-}
-
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
@@ -417,14 +377,6 @@ package_mingw-w64-i686-gcc() {
   package_mingw-w64-gcc
 }
 
-package_mingw-w64-i686-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-i686-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
-}
-
 package_mingw-w64-i686-gcc-ada() {
   package_mingw-w64-gcc-ada
 }
@@ -440,14 +392,6 @@ package_mingw-w64-x86_64-gcc-libs() {
 
 package_mingw-w64-x86_64-gcc() {
   package_mingw-w64-gcc
-}
-
-package_mingw-w64-x86_64-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-x86_64-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
 }
 
 package_mingw-w64-x86_64-gcc-ada() {
