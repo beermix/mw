@@ -158,7 +158,6 @@ build() {
     --no-cmake-config \
     -sHAVE_ICU=1 \
     -sICU_PATH=${MINGW_PREFIX} \
-    -sICU_LINK="-L${MINGW_PREFIX}/lib -licuuc -licuin -licudt" \
     -sICONV_PATH=${MINGW_PREFIX} \
     -sICONV_LINK="-L${MINGW_PREFIX}/lib -liconv" \
     -sNO_BZIP2 \
@@ -208,7 +207,6 @@ package() {
       --no-cmake-config \
       -sHAVE_ICU=1 \
       -sICU_PATH=${MINGW_PREFIX} \
-      -sICU_LINK="-L${MINGW_PREFIX}/lib -licuuc -licuin -licudt" \
       -sICONV_PATH=${MINGW_PREFIX} \
       -sICONV_LINK="-L${MINGW_PREFIX}/lib -liconv" \
       -sNO_BZIP2 \
