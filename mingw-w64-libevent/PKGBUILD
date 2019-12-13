@@ -25,7 +25,7 @@ prepare() {
   # https://github.com/transmission/libevent/commit/72e50166aaa2c3b3c35e336039df7101bd418264
   patch -p1 -i ${srcdir}/event2-02-win32.patch
 
-#  ./autogen.sh
+  ./autogen.sh
 #  autoreconf -vfi
 }
 
