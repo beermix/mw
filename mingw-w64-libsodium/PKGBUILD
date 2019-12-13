@@ -28,17 +28,21 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --enable-silent-rules \
     --enable-minimal \
-    --enable-opt \
-    --with-pthreads \
-    --enable-static \
-    --enable-shared
+    --enable-opt=no \
+    --enable-shared \
+    --enable-static
 
   make
+}
+
+check() {
+  cd ${srcdir}/build-${MINGW_CHOST}
+  make -k check || true
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 }
