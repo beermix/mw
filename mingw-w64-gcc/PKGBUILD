@@ -200,6 +200,8 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libunwind-exceptions \
+    --disable-vtable-verify \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
