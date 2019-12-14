@@ -91,7 +91,6 @@ build() {
     --disable-werror \
     --enable-lto \
     --with-sysroot=${MINGW_PREFIX} \
-    --with-lib-path=${MINGW_PREFIX}/lib:${MINGW_PREFIX}/bin \
     --with-libiconv-prefix=${MINGW_PREFIX} \
     ${_conf} \
     --disable-nls \
@@ -101,14 +100,10 @@ build() {
     --enable-targets=x86_64-pc-mingw32 \
     --enable-plugins \
     --enable-gold \
-    --disable-shared \
     --without-ppl \
     --without-cloog \
-    --disable-werror \
-    --disable-multilib \
     --disable-libada \
     --disable-libssp \
-    --enable-version-specific-runtime-libs \
     --enable-ld=default
 
   make
