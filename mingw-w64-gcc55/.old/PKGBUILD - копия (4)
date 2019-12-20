@@ -11,16 +11,18 @@ _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
+         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
+         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-#_snapshot=20191130
+#_snapshot=20191026
 pkgver=9.2.0
+_islver=0.16.1
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=123
-_islver=0.16.1
+pkgrel=103
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -38,11 +40,12 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib")
+#checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
-        #ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
-        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+        #http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
+        https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -58,15 +61,32 @@ source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pk
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch
+        010-documentation.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+        0003-gcc-plugin-POSIX-include-sys-select-h.patch
+        0008-libgcc-disable-split-stack-nothreads.patch
         gcc-stable-branch.patch
-        gomp-relax.patch
-        ipa-cp.patch
-        openmp-vectorize-v2.patch
         optimize.patch
-        optimize-at-least-some.patch
+        avx512-when-we-ask-for-it.patch
+        ipa-cp.patch
+        gomp-relax.patch
         zero-regs-gcc8.patch
-        0001-Fix-stack-protection-issues.patch)
+        fortran-vector-v2.patch
+        0001-Fix-stack-protection-issues.patch
+        optimize-at-least-some.patch
+        0018-isl-0.20.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        memcpy-avx2.patch
+        0000-libtool-leave-framework-alone.patch
+        0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch
+        0003-gcc-plugin-POSIX-include-sys-select-h.patch
+        0006-libgfortran-missing-include.patch
+        0008-libgcc-disable-split-stack-nothreads.patch
+        gdc_thunk_weak_ref.patch
+        gdc_phobos_path.patch
+        gdc_artificial_decl.patch
+        0140-gcc-8.2.0-diagnostic-color.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -108,7 +128,20 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
+    gcc-stable-branch.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    fortran-vector-v2.patch \
+    010-documentation.patch \
+    0000-libtool-leave-framework-alone.patch \
+    0002-gcc-plugin-Win-Dont-need-undefined-extern-var-refs-nor-fpic.patch \
+    0003-gcc-plugin-POSIX-include-sys-select-h.patch \
+    0006-libgfortran-missing-include.patch \
+    0008-libgcc-disable-split-stack-nothreads.patch \
+    gdc_thunk_weak_ref.patch \
+    gdc_phobos_path.patch \
+    gdc_artificial_decl.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -117,11 +150,6 @@ prepare() {
   # Вячеслав Петрищев <vyachemail@gmail.com>
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
-    
-  # Enable clear linux patches
-    apply_patch_with_msg \
-    gcc-stable-branch.patch \
-    zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -135,13 +163,10 @@ prepare() {
   echo ${pkgver} > gcc/BASE-VER
 
   # Do not run fixincludes
-  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
-
-  # Arch Linux installs x86_64 libraries /lib
-  sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
+  # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -168,7 +193,7 @@ build() {
     ;;
   esac
 
-  local _languages="c,lto,c++"
+  local _languages="c,lto,c++,fortran"
   if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
@@ -176,15 +201,12 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  # using -pipe causes spurious test-suite failures
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
+# export CC="ccache gcc"
+# export CXX="ccache g++"
+
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
-
-  # use built-in SSP with Cygwin 2.10
-  # FIXME: --disable-libssp should suffice in GCC 8
-  # export gcc_cv_libc_provides_ssp=yes
-  # libssp: conflicts with builtin SSP
+  LDFLAGS=${LDFLAGS/-pipe/}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -195,13 +217,12 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
-    --with-tune=haswell \
+    --with-arch=core-avx2 \
+    --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -217,14 +238,12 @@ build() {
     --disable-werror \
     --disable-symvers \
     --enable-plugin \
+    --disable-libmpx \
+    --disable-libmudflap \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libmudflap \
-    --disable-libitm \
-    --disable-libquadmath \
-    --disable-libmpx \
-    --disable-libunwind-exceptions \
     --disable-vtable-verify \
+    --disable-libunwind-exceptions \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -240,11 +259,11 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n 19 make V=1 all
+  nice -n19 noti make V=1 all MAKEINFO=missing
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
-  make -j1 DESTDIR=${srcdir} install
+  make -j1 DESTDIR=${srcdir} MAKEINFO=missing install
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
@@ -261,7 +280,7 @@ package_mingw-w64-gcc-libs() {
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -320,7 +339,7 @@ package_mingw-w64-gcc() {
 
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -344,7 +363,7 @@ package_mingw-w64-gcc() {
   cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  # cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
@@ -358,8 +377,65 @@ package_mingw-w64-gcc() {
   # install "custom" system gdbinit
   install -D -m644 ${srcdir}/gdbinit ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
+  
+  # POSIX conformance launcher scripts for c89 and c99
+  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c89 <<"EOF"
+#!/bin/sh
+fl="-std=c89"
+for opt; do
+  case "\$opt" in
+    -ansi|-std=c89|-std=iso9899:1990) fl="";;
+    -std=*) echo "`basename \$0` called with non ANSI/ISO C option \$opt" >&2
+        exit 1;;
+  esac
+done
+exec /mingw64/bin/gcc $fl ${1+"$@"}
+EOF
+
+  cat > ${pkgdir}/${MINGW_PREFIX}/bin/c99 <<"EOF"
+#!/bin/sh
+fl="-std=c99"
+for opt; do
+  case "\$opt" in
+    -std=c99|-std=iso9899:1999) fl="";;
+    -std=*) echo "`basename \$0` called with non ISO C99 option \$opt" >&2
+        exit 1;;
+  esac
+done
+exec /mingw64/bin/gcc $fl ${1+"$@"}
+EOF
+
+  chmod 755 ${pkgdir}/${MINGW_PREFIX}/bin/c{8,9}9
 }
 
+package_mingw-w64-gcc-libgfortran() {
+  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
+  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
+
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
+  cd ${srcdir}${MINGW_PREFIX}
+  cp bin/libgfortran*.dll                                ${pkgdir}${MINGW_PREFIX}/bin/
+}
+
+package_mingw-w64-gcc-fortran() {
+  pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
+  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
+           "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
+
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
+
+  cd ${srcdir}${MINGW_PREFIX}
+  cp bin/gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/${MINGW_CHOST}-gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
+
+  #cp bin/libgfortran*.dll ${pkgdir}${MINGW_PREFIX}/bin/
+
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}
+  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/finclude       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+}
 
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
@@ -410,6 +486,14 @@ package_mingw-w64-i686-gcc() {
   package_mingw-w64-gcc
 }
 
+package_mingw-w64-i686-gcc-libgfortran() {
+  package_mingw-w64-gcc-libgfortran
+}
+
+package_mingw-w64-i686-gcc-fortran() {
+  package_mingw-w64-gcc-fortran
+}
+
 package_mingw-w64-i686-gcc-ada() {
   package_mingw-w64-gcc-ada
 }
@@ -425,6 +509,14 @@ package_mingw-w64-x86_64-gcc-libs() {
 
 package_mingw-w64-x86_64-gcc() {
   package_mingw-w64-gcc
+}
+
+package_mingw-w64-x86_64-gcc-libgfortran() {
+  package_mingw-w64-gcc-libgfortran
+}
+
+package_mingw-w64-x86_64-gcc-fortran() {
+  package_mingw-w64-gcc-fortran
 }
 
 package_mingw-w64-x86_64-gcc-ada() {

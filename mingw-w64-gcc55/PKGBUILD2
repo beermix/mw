@@ -14,13 +14,13 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-#_snapshot=20191130
+#_snapshot=20181214
 pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 pkgrel=123
-_islver=0.16.1
+_islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -59,14 +59,24 @@ source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pk
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
-        gcc-stable-branch.patch
-        gomp-relax.patch
-        ipa-cp.patch
-        openmp-vectorize-v2.patch
-        optimize.patch
-        optimize-at-least-some.patch
-        zero-regs-gcc8.patch
-        0001-Fix-stack-protection-issues.patch)
+        gcc-stable-branch.patch)
+sha256sums=('ea6ef08f121239da5695f76c9b33637a118dcf63e24164422231917fa61fb206'
+            'SKIP'
+            'dea2bbad4967280910559c6a11b865aeec19cab34647fb5894cb498b24b14462'
+            '2dd7498bcb25b41afcc458696386b456ee4ff440bf395519a23d1f945ba15a41'
+            '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
+            '388f423a67e4be6f547ca7e340ff8ee4c78b1ed83f3fd698daa409e309911807'
+            '86fc77d5a6c137a9aca65ad6ba56653fb41b05636b763ce2c0b0b14d617c9de4'
+            'd1e10cd2ef5594c34acead334bb93af500e00699ba673edc8916da22a572677d'
+            '3629446c0039d9061cfedcb6d7a7589279588bb4601c7ce233546d357bd4be34'
+            'ec6800816632234afc35ce40542a6aab3ee76e8514a7d0cb4171fd874353ecd7'
+            '0eaee0e1201f4f85ea20756432a9d51531e0e859f6f121276684e2b63b2ee315'
+            '0decbbebda7ceac91da5d3dec9b7330f406a4358fa150560f08ff6f54739035f'
+            '8faff8e503a617f283270f411399a8bcacda3ab62b4072dedf117e108af4844a'
+            'e427297a118c47d2e71cb05dd9a496e9ada497917721c16918548ee2f13ad709'
+            '2321c7dce29a600477e481d16d847f05dc8c6d6461ee1eba7814c5bf62c2ef95'
+            'a526cfab91a1499be92c824c7f2185a013a38dbdfbeabe63ecbe84451e07b021'
+            'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -97,6 +107,7 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   apply_patch_with_msg \
+    gcc-stable-branch.patch \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
     0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
@@ -117,11 +128,6 @@ prepare() {
   # Вячеслав Петрищев <vyachemail@gmail.com>
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
-    
-  # Enable clear linux patches
-    apply_patch_with_msg \
-    gcc-stable-branch.patch \
-    zero-regs-gcc8.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -133,15 +139,6 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
-
-  # Do not run fixincludes
-  sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
-
-  # Arch Linux installs x86_64 libraries /lib
-  sed -i '/m64=/s/lib64/lib/' gcc/config/i386/t-linux64
-
-  # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 }
 
 build() {
@@ -176,15 +173,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  # using -pipe causes spurious test-suite failures
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-
-  # use built-in SSP with Cygwin 2.10
-  # FIXME: --disable-libssp should suffice in GCC 8
-  # export gcc_cv_libc_provides_ssp=yes
-  # libssp: conflicts with builtin SSP
+#  export CC="ccache gcc"
+#  export CXX="ccache g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -201,7 +191,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -219,12 +208,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libmudflap \
-    --disable-libitm \
-    --disable-libquadmath \
-    --disable-libmpx \
-    --disable-libunwind-exceptions \
-    --disable-vtable-verify \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -240,7 +224,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n 19 make V=1 all
+  nice -n 19 noti make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -261,7 +245,7 @@ package_mingw-w64-gcc-libs() {
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -320,7 +304,7 @@ package_mingw-w64-gcc() {
 
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  # cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -344,7 +328,7 @@ package_mingw-w64-gcc() {
   cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  # cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
@@ -359,7 +343,6 @@ package_mingw-w64-gcc() {
   install -D -m644 ${srcdir}/gdbinit ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
 }
-
 
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
