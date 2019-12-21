@@ -4,15 +4,15 @@
 _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.4.6+44+gb9b44533
-pkgrel=1
+pkgver=2.4.6+42+gb88cebd5
+pkgrel=4
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=(x86_64)
 url='https://www.gnu.org/software/libtool'
 license=(GPL)
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" help2man)
 options=('staticlibs' 'strip')
-_commit=b9b44533fbf7c7752ffd255c3d09cc360e24183b
+_commit=b88cebd510add4420dd8f5367e3cc6e6e1f267cd
 source=(git+https://git.savannah.gnu.org/git/libtool.git#commit=$_commit
         git+https://git.savannah.gnu.org/git/gnulib.git
         gnulib-bootstrap::git+https://github.com/gnulib-modules/bootstrap.git
@@ -55,7 +55,7 @@ prepare() {
 
   ./bootstrap
 
-  patch -Np1 -i ${srcdir}/no_hostname.patch
+#  patch -Np1 -i ${srcdir}/no_hostname.patch
   patch -p1 -i ${srcdir}/0007-fix-cr-for-awk-in-configure.all.patch
 }
 
@@ -63,7 +63,7 @@ build() {
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
   ../${_realname}/configure \
-      --prefix=${MINGW_PREFIX} lt_cv_sys_lib_dlsearch_path_spec="/mingw64/lib /mingw64/bin" \
+      --prefix=${MINGW_PREFIX} lt_cv_sys_lib_dlsearch_path_spec="/mingw64/lib" \
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
@@ -82,4 +82,6 @@ package() {
   # it'll contain native paths, so sed them back again.
   local MINGW_PREFIX_W=$(cygpath -m "${MINGW_PREFIX}")
   sed -i "s#${MINGW_PREFIX_W}#${MINGW_PREFIX}#g" "${pkgdir}${MINGW_PREFIX}"/bin/libtool
+
+    rm -rf ${pkgdir}/usr/${_arch}/share/info/dir
 }
