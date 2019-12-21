@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=101
+pkgrel=102
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -55,11 +55,11 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
   patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
-  patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
-  patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
-  patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
-  patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
-  patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
+  #patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
+  #patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
+  #patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
+  #patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
+  #patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 
   patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
