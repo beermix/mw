@@ -1,0 +1,130 @@
+From d2008dd091c8d22688aed053e20b7fbd1e26b08f Mon Sep 17 00:00:00 2001
+From: Kyle Johnson <KyleJ61782@gmail.com>
+Date: Wed, 18 Dec 2019 13:01:17 -0600
+Subject: [PATCH 1/2] neon: Adding neon package to MINGW
+
+This removes the MSYS2 requirement for packages that don't need it.
+---
+ mingw-w64-neon/PKGBUILD                    | 57 ++++++++++++++++++++++
+ mingw-w64-neon/neon-0.30.2-mingw-w64.patch | 12 +++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 mingw-w64-neon/PKGBUILD
+ create mode 100644 mingw-w64-neon/neon-0.30.2-mingw-w64.patch
+
+diff --git a/mingw-w64-neon/PKGBUILD b/mingw-w64-neon/PKGBUILD
+new file mode 100644
+index 0000000000..340a5abd84
+--- /dev/null
++++ b/mingw-w64-neon/PKGBUILD
+@@ -0,0 +1,57 @@
++# Maintainer: Alexey Pavlov <Alexpux@gmail.com>
++
++pkgbase=neon
++pkgname=("${MINGW_PACKAGE_PREFIX}-lib${pkgbase}")
++pkgver=0.30.2
++pkgrel=1
++pkgdesc="HTTP and WebDAV client library with a C interface (mingw-w64)"
++arch=('i686' 'x86_64')
++url="http://www.webdav.org/neon/"
++license=('GPL' 'LGPL')
++depends=("${MINGW_PACKAGE_PREFIX}-expat" "${MINGW_PACKAGE_PREFIX}-openssl" \
++  "${MINGW_PACKAGE_PREFIX}-ca-certificates")
++makedepends=("${MINGW_PACKAGE_PREFIX}-expat" "${MINGW_PACKAGE_PREFIX}-openssl")
++options=('libtool') # FS#16067
++source=(http://www.webdav.org/${pkgbase}/${pkgbase}-${pkgver}.tar.gz{,.asc}
++        neon-0.30.2-mingw-w64.patch)
++sha256sums=('db0bd8cdec329b48f53a6f00199c92d5ba40b0f015b153718d1b15d3d967fbca'
++            'SKIP'
++            'a1e19dcd755784168542930a0e351506eb1bfc5d941904aa970f81b5b489a95d')
++validpgpkeys=('190555472DCC589BEF01609C608A86DF9833CC49') #Joe Orton <joe@manyfish.uk>
++
++prepare() {
++  cd "${srcdir}"/${pkgbase}-${pkgver}
++
++  patch -p1 -i ${srcdir}/neon-0.30.2-mingw-w64.patch
++
++  ./autogen.sh
++  #autoreconf -fi
++}
++
++build() {
++  cd "${srcdir}"/${pkgbase}-${pkgver}
++  ./configure --build=${MINGW_CHOST} \
++    --prefix=${MINGW_PREFIX} \
++    --host=${MINGW_CHOST} \
++    --with-expat \
++    --enable-shared \
++    --disable-static \
++    --with-ssl=openssl \
++    --with-ca-bundle=${MINGW_PREFIX}/ssl/certs/ca-bundle.crt
++  make
++
++  make DESTDIR="${srcdir}/dest" install
++}
++
++package() {
++  pkgdesc="Libneon headers and libraries (mingw_w64)"
++  options=('staticlibs')
++  depends=("${MINGW_PACKAGE_PREFIX}-expat" "${MINGW_PACKAGE_PREFIX}-openssl")
++
++  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
++  cp -f ${srcdir}/dest/${MINGW_PREFIX}/bin/*.dll ${pkgdir}${MINGW_PREFIX}/bin/
++  cp -f ${srcdir}/dest/${MINGW_PREFIX}/bin/*-config ${pkgdir}${MINGW_PREFIX}/bin/
++  cp -rf ${srcdir}/dest/${MINGW_PREFIX}/share ${pkgdir}${MINGW_PREFIX}/
++  cp -rf ${srcdir}/dest/${MINGW_PREFIX}/include ${pkgdir}${MINGW_PREFIX}/
++  cp -rf ${srcdir}/dest/${MINGW_PREFIX}/lib ${pkgdir}${MINGW_PREFIX}/
++}
+diff --git a/mingw-w64-neon/neon-0.30.2-mingw-w64.patch b/mingw-w64-neon/neon-0.30.2-mingw-w64.patch
+new file mode 100644
+index 0000000000..4f98e25b4d
+--- /dev/null
++++ b/mingw-w64-neon/neon-0.30.2-mingw-w64.patch
+@@ -0,0 +1,12 @@
++diff -durN neon-0.30.2.orig/macros/neon.m4 neon-0.30.2/macros/neon.m4
++--- neon-0.30.2.orig/macros/neon.m4	2016-09-30 03:53:25.000000000 -0500
+++++ neon-0.30.2/macros/neon.m4	2019-12-18 11:32:14.969216900 -0600
++@@ -544,7 +544,7 @@
++   # Consider format string mismatches as errors
++   CPPFLAGS="$CPPFLAGS -Wformat -Werror"
++   dnl obscured for m4 quoting: "for str in d ld lld; do"
++-  for str in ne_spec l]ne_spec[ ll]ne_spec[; do
+++  for str in ne_spec l]ne_spec[ I32]ne_spec[ ll]ne_spec[ I64]ne_spec[; do
++     AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <sys/types.h>
++ $2
++ #include <stdio.h>]], [[$1 i = 1; printf("%$str", i);]])],
+
+From 4a43a317a7136387e4785a540f7a72d8f9f76179 Mon Sep 17 00:00:00 2001
+From: Kyle Johnson <KyleJ61782@gmail.com>
+Date: Wed, 18 Dec 2019 14:25:58 -0600
+Subject: [PATCH 2/2] neon: Fixing build architecture and cleaning up
+
+---
+ mingw-w64-neon/PKGBUILD | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/mingw-w64-neon/PKGBUILD b/mingw-w64-neon/PKGBUILD
+index 340a5abd84..00d0e756b2 100644
+--- a/mingw-w64-neon/PKGBUILD
++++ b/mingw-w64-neon/PKGBUILD
+@@ -5,7 +5,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-lib${pkgbase}")
+ pkgver=0.30.2
+ pkgrel=1
+ pkgdesc="HTTP and WebDAV client library with a C interface (mingw-w64)"
+-arch=('i686' 'x86_64')
++arch=('any')
+ url="http://www.webdav.org/neon/"
+ license=('GPL' 'LGPL')
+ depends=("${MINGW_PACKAGE_PREFIX}-expat" "${MINGW_PACKAGE_PREFIX}-openssl" \
+@@ -30,9 +30,10 @@ prepare() {
+ 
+ build() {
+   cd "${srcdir}"/${pkgbase}-${pkgver}
+-  ./configure --build=${MINGW_CHOST} \
+-    --prefix=${MINGW_PREFIX} \
++  ./configure --prefix=${MINGW_PREFIX} \
++    --build=${MINGW_CHOST} \
+     --host=${MINGW_CHOST} \
++    --target=${MINGW_CHOST} \
+     --with-expat \
+     --enable-shared \
+     --disable-static \
