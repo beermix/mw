@@ -100,6 +100,7 @@ build() {
     --enable-targets=x86_64-pc-mingw32 \
     --enable-plugins \
     --enable-gold \
+    --enable-silent-rules \
     --disable-shared
 
   make
