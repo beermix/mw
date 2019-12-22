@@ -5,7 +5,7 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=12
+pkgrel=10
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
@@ -32,7 +32,6 @@ source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         121-keep-posix-path.patch
         122-Use-LF-as-newline-in-envsubst.patch
         200-tools-gnulib-define-installdir.patch
-        0001-error_print_progname.patch
         gettext-dont_build_docs_and_examples.patch)
 sha256sums=('ff942af0e438ced4a8b0ea4b0b6e0d6d657157c5e2364de57baa279c1c125c43'
             'SKIP'
@@ -99,6 +98,7 @@ build() {
     --disable-native-java \
     --disable-csharp \
     --enable-static \
+    --disable-shared \
     --enable-threads=windows \
     --enable-relocatable \
     --without-emacs \
@@ -109,7 +109,6 @@ build() {
     --with-included-libunistring \
     --with-included-libxml \
     --with-included-glib \
-    --disable-curses \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 

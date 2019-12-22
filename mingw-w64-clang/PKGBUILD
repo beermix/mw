@@ -9,8 +9,8 @@
 
 # We can switch to clang when it fully works with mingw-w64
 _compiler=gcc
-#_generator="MSYS Makefiles"
-_generator="Ninja"
+_generator="MSYS Makefiles"
+#_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
   _make_cmd="noti nice -n19 ninja -j7"
 else
@@ -274,9 +274,9 @@ build() {
   export CC='ccache gcc'
   export CXX='ccache g++'
 
-#  export CCACHE_CPP2=true
-#  export CCACHE_HARDLINK=true
-#  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
+  export CCACHE_CPP2=true
+  export CCACHE_HARDLINK=true
+  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
   local -a extra_config
 
@@ -297,15 +297,13 @@ build() {
   if [ "${_compiler}" == "clang" ]; then
     #export CC='clang -stdlib=libc++'
     #export CXX='clang++ -stdlib=libc++'
-    export CC='clang'
-    export CXX='clang++'
+    export CC='ccache clang'
+    export CXX='ccache clang++'
   fi
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
-    -DCMAKE_COLOR_MAKEFILE=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
