@@ -51,7 +51,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
-options=('ccache' 'strip')
+options=('!debug' 'strip' 'ccache')
 source=(${_url}/$pkgver/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/$pkgver/cfe-${pkgver}.src.tar.xz{,.sig}
         ${_url}/$pkgver/compiler-rt-${pkgver}.src.tar.xz{,.sig}
