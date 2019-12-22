@@ -21,7 +21,7 @@ pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=136
+pkgrel=137
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -206,7 +206,7 @@ build() {
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
-    --enable-threads=${_threads} \
+    --enable-threads=posix \
     --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
@@ -225,6 +225,9 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --with-target-system-zlib=auto \
+    --disable-libstdcxx-verbose \
+    --disable-libstdcxx-verbose
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -241,7 +244,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n 19 make all
+  noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

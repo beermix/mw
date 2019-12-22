@@ -98,7 +98,6 @@ build() {
     --disable-native-java \
     --disable-csharp \
     --enable-static \
-    --disable-shared \
     --enable-threads=windows \
     --enable-relocatable \
     --without-emacs \
