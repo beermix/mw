@@ -51,7 +51,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
-options=('!debug' 'strip' 'ccache')
+options=('!debug' 'strip')
 source=(${_url}/$pkgver/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/$pkgver/cfe-${pkgver}.src.tar.xz{,.sig}
         ${_url}/$pkgver/compiler-rt-${pkgver}.src.tar.xz{,.sig}
@@ -295,17 +295,17 @@ build() {
   if [ "${_compiler}" == "clang" ]; then
     #export CC='clang -stdlib=libc++'
     #export CXX='clang++ -stdlib=libc++'
-
-    export CC='/mingw64/bin/ccache /mingw64/bin/clang'
-    export CXX='/mingw64/bin/ccache /mingw64/bin/clang++'
+    export CC='clang'
+    export CXX='clang++'
   fi
 
-  export CC='/mingw64/bin/ccache /mingw64/bin/gcc'
-  export CXX='/mingw64/bin/ccache /mingw64/bin/g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
+    -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -470,7 +470,7 @@ package_llvm() {
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
   # TODO: why CMake haven't included it?
-  cp ../build-${CARCH}/lib/libLLVM.dll.a "${pkgdir}/${MINGW_PREFIX}/lib/"
+  #cp ../build-${CARCH}/lib/libLLVM.dll.a "${pkgdir}/${MINGW_PREFIX}/lib/"
 
   install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
@@ -483,7 +483,7 @@ package_llvm() {
   install -Dm755 "${srcdir}"/build-${CARCH}/bin/FileCheck.exe "${pkgdir}${MINGW_PREFIX}/bin/FileCheck.exe"
   # fox cmake files.
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
-  sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
+  #sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
 }
 
 package_polly() {

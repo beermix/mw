@@ -21,8 +21,8 @@ pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=135
-_islver=0.18
+pkgrel=136
+_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -225,11 +225,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libmudflap \
-    --enable-libquadmath \
-    --disable-libmpx \
-    --disable-libunwind-exceptions \
-    --disable-vtable-verify \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
