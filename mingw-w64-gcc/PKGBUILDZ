@@ -117,7 +117,7 @@ prepare() {
   # Вячеслав Петрищев <vyachemail@gmail.com>
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
-    
+
   # Enable clear linux patches
   apply_patch_with_msg \
     gomp-relax.patch \

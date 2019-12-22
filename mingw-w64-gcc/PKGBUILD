@@ -17,10 +17,10 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 _snapshot=20191121
-pkgver=9.2.0
-#_majorver=${pkgver:0:1}
+pkgver=9.2.1
+_majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
-_sourcedir=${_realname}-${pkgver}
+#_sourcedir=${_realname}-${pkgver}
 pkgrel=135
 _islver=0.18
 pkgdesc="GCC for the MinGW-w64"
@@ -122,7 +122,6 @@ prepare() {
 
   # Enable clear linux patches
     apply_patch_with_msg \
-    gcc-stable-branch.patch \
     gomp-relax.patch \
     ipa-cp.patch \
     openmp-vectorize-v2.patch \
@@ -139,7 +138,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+  #echo ${pkgver} > gcc/BASE-VER
 
   # Do not run fixincludes
   # sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
