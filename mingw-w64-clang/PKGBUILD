@@ -12,9 +12,9 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja"
+  _make_cmd="noti nice -n19 ninja -j7"
 else
-  _make_cmd="make -j6"
+  _make_cmd="noti nice -n19 make -j7"
 fi
 _realname=clang
 _url=https://releases.llvm.org
@@ -40,7 +40,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-python3-sphinx"
              "${MINGW_PACKAGE_PREFIX}-python2"
              "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
@@ -272,6 +271,13 @@ build() {
   [[ -d build-${CARCH} ]] && rm -rf build-${CARCH}
   mkdir build-${CARCH} && cd build-${CARCH}
 
+  export CC='/home/User/.bin/ccache gcc'
+  export CXX='/home/User/.bin/ccache g++'
+
+  export CCACHE_CPP2=true
+  export CCACHE_HARDLINK=true
+  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
+
   local -a extra_config
 
   if check_option "debug" "y"; then
@@ -315,7 +321,7 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
-    -DLLVM_ENABLE_SPHINX=ON \
+    -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \

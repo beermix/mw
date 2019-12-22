@@ -342,7 +342,7 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
 
-  cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
+  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
   cp -r share/gcc-${pkgver%%+*}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python/
 
