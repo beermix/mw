@@ -12,9 +12,9 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja"
+  _make_cmd="noti nice -n19 ninja -j7"
 else
-  _make_cmd="make"
+  _make_cmd="noti nice -n19 make -j6"
 fi
 _realname=clang
 _url=https://releases.llvm.org
@@ -299,12 +299,13 @@ build() {
     export CXX='clang++'
   fi
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
+    -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -469,7 +470,7 @@ package_llvm() {
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
   # TODO: why CMake haven't included it?
-  cp ../build-${CARCH}/lib/libLLVM.dll.a "${pkgdir}/${MINGW_PREFIX}/lib/"
+  #cp ../build-${CARCH}/lib/libLLVM.dll.a "${pkgdir}/${MINGW_PREFIX}/lib/"
 
   install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
@@ -482,7 +483,7 @@ package_llvm() {
   install -Dm755 "${srcdir}"/build-${CARCH}/bin/FileCheck.exe "${pkgdir}${MINGW_PREFIX}/bin/FileCheck.exe"
   # fox cmake files.
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
-  sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
+  #sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
 }
 
 package_polly() {
