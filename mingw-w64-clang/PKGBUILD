@@ -271,8 +271,8 @@ build() {
   [[ -d build-${CARCH} ]] && rm -rf build-${CARCH}
   mkdir build-${CARCH} && cd build-${CARCH}
 
-  export CC='/home/User/.bin/ccache gcc'
-  export CXX='/home/User/.bin/ccache g++'
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   export CCACHE_CPP2=true
   export CCACHE_HARDLINK=true
