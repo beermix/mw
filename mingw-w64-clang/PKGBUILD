@@ -14,7 +14,7 @@ _generator="MSYS Makefiles"
 if [ "${_generator}" = "Ninja" ]; then
   _make_cmd="noti nice -n19 ninja -j7"
 else
-  _make_cmd="noti nice -n19 make -j7"
+  _make_cmd="noti nice -n19 make -j6"
 fi
 _realname=clang
 _url=https://releases.llvm.org
