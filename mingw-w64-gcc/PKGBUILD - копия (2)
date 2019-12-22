@@ -11,18 +11,16 @@ _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-_snapshot=20191121
+#_snapshot=20191130
 pkgver=9.2.0
 #_majorver=${pkgver:0:1}
-_sourcedir=${_realname}-${_majorver}-${_snapshot}
+#_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=135
-_islver=0.18
+pkgrel=131
+_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -42,8 +40,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=(#https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
-        ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
+source=(https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz
+        #ftp://gcc.gnu.org/pub/gcc/snapshots/LATEST-9/gcc-${_majorver}-${_snapshot}.tar.xz
         http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
@@ -93,7 +91,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -175,7 +173,7 @@ build() {
     ;;
   esac
 
-  local _languages="c,lto,c++,fortran"
+  local _languages="c,lto,c++"
   if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
@@ -227,8 +225,8 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --disable-libmudflap \
-    --enable-libitm \
-    --enable-libquadmath \
+    --disable-libitm \
+    --disable-libquadmath \
     --disable-libmpx \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
@@ -269,7 +267,7 @@ package_mingw-w64-gcc-libs() {
 
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
-  cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp bin/{libatomic*,libgcc*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 }
 
 package_mingw-w64-gcc() {
@@ -328,7 +326,7 @@ package_mingw-w64-gcc() {
 
   cp lib/libgomp*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libitm*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  # cp lib/libquadmath*                                    ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libssp*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   # cp lib/libvtv*                                         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
@@ -343,10 +341,21 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
+  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  # cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
-  cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
+  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
   cp -r share/gcc-${pkgver%%+*}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python/
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
 
   # install plugins for binutils
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/bfd-plugins
@@ -357,34 +366,6 @@ package_mingw-w64-gcc() {
   sed -i 's|%GCC_NAME%|gcc-'${pkgver%%+*}'|g' ${pkgdir}${MINGW_PREFIX}/etc/gdbinit
 }
 
-package_mingw-w64-gcc-libgfortran() {
-  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/libgfortran*.dll                                ${pkgdir}${MINGW_PREFIX}/bin/
-}
-
-package_mingw-w64-gcc-fortran() {
-  pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
-
-  cd ${srcdir}${MINGW_PREFIX}
-  cp bin/gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-  cp bin/${MINGW_CHOST}-gfortran.exe ${pkgdir}${MINGW_PREFIX}/bin/
-
-  #cp bin/libgfortran*.dll ${pkgdir}${MINGW_PREFIX}/bin/
-
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}
-  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/finclude       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-}
 
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
@@ -401,6 +382,11 @@ package_mingw-w64-gcc-ada() {
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adainclude     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc() {
@@ -430,14 +416,6 @@ package_mingw-w64-i686-gcc() {
   package_mingw-w64-gcc
 }
 
-package_mingw-w64-i686-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-i686-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
-}
-
 package_mingw-w64-i686-gcc-ada() {
   package_mingw-w64-gcc-ada
 }
@@ -453,14 +431,6 @@ package_mingw-w64-x86_64-gcc-libs() {
 
 package_mingw-w64-x86_64-gcc() {
   package_mingw-w64-gcc
-}
-
-package_mingw-w64-x86_64-gcc-libgfortran() {
-  package_mingw-w64-gcc-libgfortran
-}
-
-package_mingw-w64-x86_64-gcc-fortran() {
-  package_mingw-w64-gcc-fortran
 }
 
 package_mingw-w64-x86_64-gcc-ada() {

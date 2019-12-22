@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=102
+pkgrel=103
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -93,7 +93,7 @@ build() {
     --with-sysroot=${MINGW_PREFIX} \
     --with-libiconv-prefix=${MINGW_PREFIX} \
     ${_conf} \
-    --enable-nls \
+    --disable-nls \
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
