@@ -1,4 +1,4 @@
-# Maintainer: Alexey Pavlov <alexpux@gmail.com> #branch=v7.x
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
 _realname=headers
 pkgbase=mingw-w64-${_realname}-git
@@ -37,7 +37,7 @@ prepare() {
 
   git am --committer-date-is-author-date "${srcdir}/0001-Allow-to-use-bessel-and-complex-functions-without-un.patch"
   #git am --committer-date-is-author-date "${srcdir}/0002-DirectX-9-fixes-for-VLC.patch"
-  git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
+  #git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
 
 
 
