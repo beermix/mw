@@ -1,7 +1,7 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
 pkgname="msys2-w32api-headers"
-pkgver=7.0.0.5479.8db8dd5a
+pkgver=8.0.0.5619.fd78dd54
 pkgrel=1
 pkgdesc="Win32 API headers for MSYS2 32bit toolchain"
 arch=('i686' 'x86_64')
@@ -22,7 +22,7 @@ MINGW_CHOST=${CARCH}-w64-mingw32
 
 prepare() {
   cd "${srcdir}/mingw-w64/mingw-w64-headers"
-  patch -p2 -i ${srcdir}/001-add-corecrt-to-base-headers.patch
+ # patch -p2 -i ${srcdir}/001-add-corecrt-to-base-headers.patch
   autoreconf -fiv
 }
 
