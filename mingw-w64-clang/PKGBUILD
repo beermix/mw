@@ -12,7 +12,7 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja"
+  _make_cmd="ninja -j7"
 else
   _make_cmd="make -j7"
 fi
@@ -31,7 +31,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.0
-pkgrel=1
+pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
