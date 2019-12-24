@@ -93,7 +93,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -207,9 +207,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=posix \
-    --enable-graphite \
-    --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -224,13 +221,11 @@ build() {
     --disable-symvers \
     --enable-plugin \
     --with-libiconv=no \
-    --with-system-zlib \
-    --with-target-system-zlib=auto \
     --disable-libstdcxx-verbose \
     --disable-libstdcxx-verbose
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --enable-silent-rules \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
