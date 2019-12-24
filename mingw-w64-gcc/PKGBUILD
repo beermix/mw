@@ -222,7 +222,6 @@ build() {
     --enable-plugin \
     --with-libiconv=no \
     --disable-libstdcxx-verbose \
-    --disable-libstdcxx-verbose
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
