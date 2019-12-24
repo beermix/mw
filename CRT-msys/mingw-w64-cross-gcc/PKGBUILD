@@ -4,7 +4,7 @@ _realname=gcc
 _mingw_suff=mingw-w64-cross
 pkgname=("${_mingw_suff}-${_realname}")
 pkgver=9.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Cross GCC for the MinGW-w64"
 arch=('i686' 'x86_64')
 url="https://gcc.gnu.org"
@@ -184,14 +184,12 @@ build() {
       --enable-languages=${_langs} \
       --enable-shared --enable-static \
       --enable-threads=${_threads} \
-      --enable-graphite \
       --enable-fully-dynamic-string \
       --enable-libstdcxx-time=yes \
       --disable-libstdcxx-pch \
       --disable-libstdcxx-debug \
       --enable-cloog-backend=isl \
       --enable-version-specific-runtime-libs \
-      --disable-isl-version-check \
       --enable-lto \
       --enable-libgomp \
       --disable-multilib \
@@ -203,6 +201,7 @@ build() {
       --with-libiconv \
       --with-system-zlib \
       --with-{gmp,mpfr,mpc,isl}=/usr \
+      --with-isl=no \
       --with-gnu-as --with-gnu-ld \
       ${_conf} \
       CFLAGS="-O2 -pipe" \
