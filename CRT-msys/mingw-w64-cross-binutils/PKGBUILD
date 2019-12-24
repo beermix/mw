@@ -38,7 +38,7 @@ _targets="i686-w64-mingw32 x86_64-w64-mingw32" # armv7-w64-mingw32
 prepare() {
   cd ${srcdir}/binutils-${pkgver}
 
-  patch -p1 -i "${srcdir}"/binutils-stable-branch_2_30.patch
+#  patch -p1 -i "${srcdir}"/binutils-stable-branch_2_30.patch
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
