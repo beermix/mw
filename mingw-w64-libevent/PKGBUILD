@@ -14,8 +14,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-openssl")
 optdepends=("${MINGW_PACKAGE_PREFIX}-python3")
 source=(https://github.com/${_realname}/${_realname}/releases/download/release-${pkgver}-stable/${_realname}-${pkgver}-stable.tar.gz
-        'event2-02-win32.patch'
-        '0001-Warn-if-forked-from-the-event-loop-during-event_reinit.patch')
+        'event2-02-win32.patch')
 sha256sums=('a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d'
             'e572ed628daba12915aaa5867b35ef1b0ca3ed3eb6e9759f97136dd8eab32c08')
 
@@ -25,7 +24,6 @@ prepare() {
   # to make transmission work, taken from:
   # https://github.com/transmission/libevent/commit/72e50166aaa2c3b3c35e336039df7101bd418264
   patch -p1 -i ${srcdir}/event2-02-win32.patch
-  patch -p1 -i ${srcdir}/0001-Warn-if-forked-from-the-event-loop-during-event_reinit.patch
 
   ./autogen.sh
 #  autoreconf -vfi
