@@ -48,7 +48,6 @@ build() {
     --with-manpage-aliases \
     --with-default-terminfo-dir=/usr/share/terminfo \
     --enable-echo \
-    --mandir=/usr/share/man \
     --includedir=/usr/include/ncursesw \
     --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
