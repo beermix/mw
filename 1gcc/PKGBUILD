@@ -110,7 +110,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/gcc-${pkgver}
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   # Remove files created by patches
   rm -f config/mt-cygwin \
@@ -208,14 +208,14 @@ build() {
     --enable-bootstrap \
     --enable-shared --enable-shared-libgcc --enable-static \
     --enable-version-specific-runtime-libs \
-    --with-arch=core-avx2 \
-    --with-tune=core-avx2 \
+    --with-arch=haswell \
+    --with-tune=haswell \
     --disable-multilib \
     ${_arch_conf} \
     --enable-__cxa_atexit \
     --with-dwarf2 \
     --enable-languages=c,c++,fortran,lto \
-    --with-isl \
+    --with-isl=no \
     --enable-threads=posix \
     --enable-libatomic \
     --enable-libgomp \
@@ -230,13 +230,12 @@ build() {
     --enable-checking=release \
     --without-libiconv-prefix \
     --without-libintl-prefix \
-    --with-system-zlib \
     --enable-linker-build-id \
     --with-diagnostics-color=always \
     --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
-     nice -n19 make MAKEINFO=missing
+     noti nice -n 19 make
 }
 
 package_gcc-libs()
@@ -247,7 +246,7 @@ package_gcc-libs()
   install=gcc-libs.install
 
   cd ${srcdir}/build-$(arch)
-  make -j1 -C $CHOST/libgcc DESTDIR=${pkgdir} MAKEINFO=missing install-shared
+  make -j1 -C $CHOST/libgcc DESTDIR=${pkgdir} install-shared
   for lib in libgomp libstdc++-v3/src; do
     make -j1 -C $CHOST/$lib DESTDIR=${pkgdir} install-toolexeclibLTLIBRARIES
   done
