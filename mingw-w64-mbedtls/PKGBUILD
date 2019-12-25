@@ -10,9 +10,7 @@ url='https://tls.mbed.org/'
 pkgdesc='mbed TLS is an open source and commercial SSL library licensed by ARM Limited. (mingw-w64)'
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
-             "${MINGW_PACKAGE_PREFIX}-cmake"
-             "${MINGW_PACKAGE_PREFIX}-doxygen"
-             "${MINGW_PACKAGE_PREFIX}-graphviz")
+             "${MINGW_PACKAGE_PREFIX}-cmake")
 license=('Apache License 2.0')
 options=('strip' 'staticlibs' 'docs')
 source=(${_realname}-${pkgver}.tar.gz::"https://tls.mbed.org/download/mbedtls-${pkgver}-apache.tgz"
@@ -42,11 +40,11 @@ build() {
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_C_COMPILER=${MINGW_CHOST}-gcc \
-    -DENABLE_TESTING=OFF \
-    -DENABLE_PROGRAMS=OFF \
-    -DUSE_SHARED_MBEDTLS_LIBRARY=ON \
-    -DUSE_STATIC_MBEDTLS_LIBRARY=ON \
-    -DLINK_WITH_PTHREAD=ON -Wno-dev \
+    -DENABLE_TESTING=1 \
+    -DENABLE_PROGRAMS=0 \
+    -DUSE_SHARED_MBEDTLS_LIBRARY=1 \
+    -DUSE_STATIC_MBEDTLS_LIBRARY=1 \
+    -DLINK_WITH_PTHREAD=ON -DCMAKE_BUILD_TYPE=Release \
     ../${_realname}-${pkgver}
   make
 }
