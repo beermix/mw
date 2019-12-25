@@ -14,7 +14,7 @@ _generator="MSYS Makefiles"
 if [ "${_generator}" = "Ninja" ]; then
   _make_cmd="nice -n 19 ninja"
 else
-  _make_cmd="nice -n 19 make"
+  _make_cmd="nice -n 19 make -j7"
 fi
 _realname=clang
 _url=https://releases.llvm.org
@@ -31,7 +31,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.0
-pkgrel=3
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
