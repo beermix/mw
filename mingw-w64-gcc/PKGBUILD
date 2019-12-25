@@ -184,8 +184,8 @@ build() {
 
   # using -pipe causes spurious test-suite failures
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
 
   # use built-in SSP with Cygwin 2.10
   # FIXME: --disable-libssp should suffice in GCC 8
@@ -220,7 +220,6 @@ build() {
     --disable-werror \
     --disable-symvers \
     --enable-plugin \
-    --enable-libitm \
     --enable-libquadmath \
     --enable-libquadmath-support \
     --disable-libstdcxx-verbose \
@@ -240,8 +239,8 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-#  noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
-   noti nice -n 19 make
+  noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
+#   noti nice -n 19 make
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
