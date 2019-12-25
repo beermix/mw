@@ -43,8 +43,8 @@ prepare() {
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
 
-  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
-  patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
+  #patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
+  #patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
   #patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
   #patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
   #patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
@@ -90,8 +90,6 @@ build() {
     --enable-targets=x86_64-pc-mingw32 \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
-    --enable-threads \
     --enable-secureplt \
     --disable-gdb \
     --disable-sim \
