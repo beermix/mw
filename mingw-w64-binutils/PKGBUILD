@@ -5,8 +5,8 @@
 _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=b68476f1368e49ef9aea08944d51ed2cb991253c
-pkgrel=110
+pkgver=2.33.1
+pkgrel=105
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -17,8 +17,7 @@ checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
-source=("${pkgver}.tar.gz"::"https://github.com/bminor/binutils-gdb/archive/${pkgver}.tar.gz"
-        #https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
+source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0001-enable-gold-on.mingw32.patch
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -37,7 +36,7 @@ source=("${pkgver}.tar.gz"::"https://github.com/bminor/binutils-gdb/archive/${pk
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
-  #patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -55,7 +54,9 @@ prepare() {
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
 
-  #sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
+  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
 }
 
 build() {
@@ -82,7 +83,7 @@ build() {
     --with-sysroot=${MINGW_PREFIX} \
     --with-libiconv-prefix=${MINGW_PREFIX} \
     ${_conf} \
-    --disable-nls \
+    --enable-nls \
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
@@ -97,7 +98,7 @@ build() {
     --enable-silent-rules \
     --disable-shared
 
-  make
+  make MAKEINFO=true
 }
 
 check() {
@@ -110,7 +111,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
