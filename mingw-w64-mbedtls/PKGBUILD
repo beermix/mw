@@ -44,7 +44,8 @@ build() {
     -DENABLE_PROGRAMS=0 \
     -DUSE_SHARED_MBEDTLS_LIBRARY=1 \
     -DUSE_STATIC_MBEDTLS_LIBRARY=1 \
-    -DLINK_WITH_PTHREAD=ON -DCMAKE_BUILD_TYPE=Release \
+    -DLINK_WITH_PTHREAD=ON \
+    -DCMAKE_BUILD_TYPE=Release \
     ../${_realname}-${pkgver}
   make
 }
