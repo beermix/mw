@@ -3,14 +3,14 @@
 _realname=libsodium
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.0.18
-pkgrel=2
+pkgver=b486ae3fc6322d2c55ed99b93d5f2e82d61cd987
+pkgrel=1
 pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
 arch=("any")
 url="https://github.com/jedisct1/libsodium"
 license=('custom:ISC')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
-source=("https://download.libsodium.org/libsodium/releases/${_realname}-${pkgver}.tar.gz")
+source=("https://github.com/jedisct1/libsodium/archive/${pkgver}.tar.gz")
 sha256sums=('6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1')
 
 prepare() {
