@@ -3,10 +3,10 @@
 _realname=qemu
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-_base_ver=4.1.1
+_base_ver=4.2.0
 _rc=
 pkgver=${_base_ver}${_rc//-/.}
-pkgrel=2
+pkgrel=1
 pkgdesc="A generic and open source processor emulator (mingw-w64)"
 arch=('any')
 license=('GPL2' 'LGPL2')
@@ -43,12 +43,8 @@ prepare() {
 
 build() {
     cd "${srcdir}/${_realname}-${pkgver}"
-
-#    export CC='ccache gcc'
-#    export CXX='ccache g++'
-
     ./configure \
-        --enable-stack-protector \
+        --disable-stack-protector \
         --disable-werror \
         --disable-kvm \
         --disable-bluez \
@@ -56,11 +52,6 @@ build() {
         --disable-libnfs \
         --disable-libssh \
         --enable-lzo \
-        --disable-snappy \
-        --disable-hax \
-        --disable-gtk \
-        --disable-sdl \
-        --static \
         --prefix=${MINGW_PREFIX} \
         --bindir=${MINGW_PREFIX}/bin \
         --datadir=${MINGW_PREFIX}/bin \
@@ -68,8 +59,7 @@ build() {
         --python=${MINGW_PREFIX}/bin/python3 \
         --mandir=${MINGW_PREFIX}/share/qemu \
         --docdir=${MINGW_PREFIX}/share/qemu
-
-    noti nice -n19 make
+   make
 }
 
 package() {
