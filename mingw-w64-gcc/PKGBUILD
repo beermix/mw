@@ -21,7 +21,7 @@ pkgver=9.2.1
 _majorver=${pkgver:0:1}
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
 #_sourcedir=${_realname}-${pkgver}
-pkgrel=138
+pkgrel=139
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -220,6 +220,9 @@ build() {
     --disable-werror \
     --disable-symvers \
     --enable-plugin \
+    --enable-libitm \
+    --enable-libquadmath \
+    --enable-libquadmath-support \
     --with-libiconv=no \
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
