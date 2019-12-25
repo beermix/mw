@@ -198,6 +198,7 @@ prepare() {
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
       "0014-winpthreads-workaround.patch" \
+      "enable-SSP-and-PIE-by-default.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -211,8 +212,7 @@ prepare() {
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
       "0103-Set-the-x86-arch-name-to-i686-for-mingw-w64.patch" \
-      "0104-link-pthread-with-mingw.patch" \
-      "enable-SSP-and-PIE-by-default.patch"
+      "0104-link-pthread-with-mingw.patch"
 
   cd "${srcdir}/compiler-rt-${pkgver}.src"
   apply_patch_with_msg \
@@ -306,6 +306,7 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -323,7 +324,7 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
-    -DLLVM_ENABLE_SPHINX=ON \
+    -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \
