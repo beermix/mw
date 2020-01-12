@@ -4,7 +4,7 @@ _realname=crt
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
-pkgver=8.0.0.5626.6f5bc51c
+pkgver=8.0.0.5628.9c15be82
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=('any')
@@ -40,7 +40,7 @@ prepare() {
 
   git am --committer-date-is-author-date "${srcdir}/0001-Allow-to-use-bessel-and-complex-functions-without-un.patch"
   #git am --committer-date-is-author-date "${srcdir}/0002-DirectX-9-fixes-for-VLC.patch"
-  git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
+  #git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
 }
 
 build() {
