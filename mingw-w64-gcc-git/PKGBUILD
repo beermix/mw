@@ -5,7 +5,7 @@
 # Contributor: Liu Hao <lh_mouse@126.com>
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
-_enable_fortran=no
+_enable_fortran=yes
 _enable_ada=no
 _enable_objc=no
 _realname=gcc
@@ -19,7 +19,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
 pkgver=9.1.1.d20190612.c10.geaf19faa8ed
-pkgrel=1
+pkgrel=2
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -189,6 +189,7 @@ build() {
     --disable-symvers \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
@@ -210,7 +211,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti make all
+  noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
