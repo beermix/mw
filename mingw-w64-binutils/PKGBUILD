@@ -6,14 +6,14 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=107
+pkgrel=108
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-checkdepends=('dejagnu' 'bc')
+#checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
@@ -75,7 +75,7 @@ build() {
   if check_option "debug" "y"; then
     CFLAGS+=" -O0"
   fi
-  
+
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
   ../${_realname}-${pkgver}/configure \
@@ -95,11 +95,10 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
     --enable-silent-rules \
     --disable-shared
 
-  make MAKEINFO=true
+  noti nice -n 19 make MAKEINFO=true
 }
 
 check() {
@@ -120,9 +119,18 @@ package() {
   mv ${pkgdir}${MINGW_PREFIX}/include/*.h ${pkgdir}${MINGW_PREFIX}/include/${_realname}
   mv ${pkgdir}${MINGW_PREFIX}/lib/*.a ${pkgdir}${MINGW_PREFIX}/lib/${_realname}
 
+  # Remove unwanted files
+  find ${pkgdir}${MINGW_PREFIX}/share/locale -type f -iname "bfd.*" -o -iname "opcodes.*" | xargs -rtl1 rm
+  # rm -rf ${pkgdir}${MINGW_PREFIX}/share
+
   # Add some useful headers
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
+
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING      ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.LIB  ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.LIB
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3     ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3.LIB ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3.LIB
 }
