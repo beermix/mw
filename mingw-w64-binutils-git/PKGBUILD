@@ -89,10 +89,11 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --enable-plugins \
     --enable-gold \
-    --enable-silent-rules \
+    --disable-gdb \
+    --disable-sim \
     --disable-shared
 
-  noti nice -n 19 make
+  noti nice -n 19 make MAKEINFO=true
 }
 
 check() {
@@ -105,7 +106,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
