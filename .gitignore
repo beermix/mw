@@ -23,6 +23,7 @@
 */gcc/
 /mc/mc/
 /*/mingw-w64/
+/*/binutils/
 /*/gcc-git/
 /*/*/mingw-w64/
 /*/*/windows-default-manifest/
