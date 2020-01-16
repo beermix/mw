@@ -92,7 +92,7 @@ build() {
     --enable-silent-rules \
     --disable-shared
 
-  noti nice -n 19 make MAKEINFO=true
+  noti nice -n 19 make
 }
 
 check() {
@@ -105,7 +105,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} MAKEINFO=true install
+  make DESTDIR=${pkgdir} install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
