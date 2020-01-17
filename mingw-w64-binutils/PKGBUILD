@@ -88,19 +88,10 @@ build() {
     --enable-gold \
     --enable-silent-rules \
     --with-system-zlib \
-    --enable-threads \
     --disable-shared
 
-  noti make all
+  make all
   make install
-}
-
-check() {
-  cd ${srcdir}/build-${MINGW_CHOST}
-
-  # unset LDFLAGS as testsuite makes assumptions about which ones are active
-  # do not abort on errors - manually check log files
-  make LDFLAGS="" -k check || true
 }
 
 package() {
