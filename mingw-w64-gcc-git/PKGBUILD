@@ -18,8 +18,8 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200117.c11.g26b2838fc9b
-pkgrel=2
+pkgver=9.2.1.d20200117.c10.gf158d9197de
+pkgrel=1
 #_islver=0.22.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -64,8 +64,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch"
         "0017-gcc-7-branch-Enable-std-experimental-filesystem.patch"
         "0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch"
-        "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch"
-        "fortran-vector-v2.patch")
+        "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch")
 sha256sums=('SKIP'
             '83e9c6f76f728ae3e2f2eabb588b0d6cea7a3eda03cd5e77aed9d613143b7348'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -108,7 +107,6 @@ prepare() {
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
-  # ${GIT_AM} ${srcdir}/fortran-vector-v2.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
