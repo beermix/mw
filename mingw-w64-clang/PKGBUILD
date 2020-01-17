@@ -40,7 +40,6 @@ arch=('any')
 url="https://llvm.org/"
 license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
-             "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
@@ -295,8 +294,6 @@ build() {
 
   local -a extra_config
 
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
-
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
   FFI_INCLUDE_DIR=$(echo $FFI_INCLUDE_DIR | sed 's|-I||g')
@@ -318,21 +315,22 @@ build() {
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
   fi
+  # -DLLVM_TARGETS_TO_BUILD=X86 \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
-    -G"$_generator" \
+    -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
-    -DLIBOMP_FORTRAN_MODULES=ON \
+    -DLIBOMP_FORTRAN_MODULES=OFF \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DCLANG_ANALYZER_BUILD_Z3=ON \
+    -DCLANG_ANALYZER_BUILD_Z3=OFF \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -350,6 +348,26 @@ build() {
     -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLDB_DISABLE_PYTHON=ON \
+    -DLLVM_BUILD_EXAMPLES=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_BUILD_TESTS=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_INCLUDE_GO_TESTS=OFF \
+    -DLLVM_BUILD_BENCHMARKS=OFF \
+    -DLLVM_BUILD_DOCS=OFF \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_ENABLE_DOXYGEN=OFF \
+    -DLLVM_ENABLE_SPHINX=OFF \
+    -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_ENABLE_BINDINGS=OFF \
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DLLVM_ENABLE_WERROR=OFF \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    -DLLVM_APPEND_VC_REV=OFF \
+    -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_ENABLE_UNWIND_TABLES=OFF \
+    -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
@@ -382,8 +400,7 @@ package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-gcc"
-           "${MINGW_PACKAGE_PREFIX}-z3")
+           "${MINGW_PACKAGE_PREFIX}-gcc")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install

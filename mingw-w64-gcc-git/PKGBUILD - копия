@@ -6,8 +6,8 @@
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
 _enable_fortran=yes
-_enable_ada=no
-_enable_objc=no
+_enable_ada=yes
+_enable_objc=yes
 _realname=gcc
 _sourcedir=${_realname}-git
 pkgbase=mingw-w64-${_realname}-git
@@ -173,9 +173,6 @@ build() {
   if [ "$_enable_objc" == "yes" ]; then
     _languages+=",objc,obj-c++"
   fi
-  
-    export CC='ccache gcc'
-    export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -218,6 +215,7 @@ build() {
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin \
+    --enable-libitm \
     --enable-objc-gc \
     --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
     --enable-version-specific-runtime-libs \
