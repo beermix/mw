@@ -5,7 +5,7 @@
 # Contributor: Liu Hao <lh_mouse@126.com>
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
-_enable_fortran=no
+_enable_fortran=yes
 _enable_ada=no
 _enable_objc=no
 _realname=gcc
