@@ -66,7 +66,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch"
         "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch"
         "fortran-vector-v2.patch"
-        "gomp-relax.patch")
+        "zero-regs-gcc8.patch")
 sha256sums=('SKIP'
             '83e9c6f76f728ae3e2f2eabb588b0d6cea7a3eda03cd5e77aed9d613143b7348'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -110,7 +110,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
   ${GIT_AM} ${srcdir}/fortran-vector-v2.patch
-  ${GIT_AM} ${srcdir}/gomp-relax.patch
+  ${GIT_AM} ${srcdir}/zero-regs-gcc8.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
