@@ -45,7 +45,7 @@ prepare() {
   patch -p1 -i ${srcdir}/make-4.2.1-Makefile.am-gcc-only-link-libgnumake-1.dll.a.patch
   patch -p1 -i ${srcdir}/make-3.82-011-noclock_gettime.patch
   patch -p1 -i ${srcdir}/make-3.82-016-weird-shell.patch
-  patch -p1 -i ${srcdir}/make-4.2-j8k.patch
+  #patch -p1 -i ${srcdir}/make-4.2-j8k.patch
   #patch -p1 -i ${srcdir}/make-4.0-newlines.patch
 
   # 1 - The import library libgnumake-1.dll.a contains the name of the program to be
