@@ -20,7 +20,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
         )
 pkgver=9.2.1.d20200117.c10.g26b2838fc9b
 pkgrel=1
-_islver=0.22.1
+_islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -42,8 +42,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' '!emptydirs' '!strip' 'debug')
 
-_branch=master
-#_branch=releases/gcc-9
+#_branch=releases/gcc-7
+_branch=releases/gcc-9
 _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
@@ -181,6 +181,7 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-libstdcxx-filesystem-ts=yes \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -321,7 +322,7 @@ package_mingw-w64-gcc-git() {
   cp lib/libstdc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libsupc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{info,locale}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale}
   #cp -r share/doc/gcc-${_realpkgver} ${pkgdir}${MINGW_PREFIX}/share/doc/
   cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
   cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
