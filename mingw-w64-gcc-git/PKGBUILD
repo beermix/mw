@@ -108,7 +108,8 @@ prepare() {
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
-  ${GIT_AM} ${srcdir}/010-documentation.patch
+
+  patch -p1 -i "${srcdir}"/010-documentation.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
@@ -133,7 +134,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  #ln -s ../isl-${_islver} isl
+  # ln -s ../isl-${_islver} isl
 }
 
 build() {
