@@ -51,8 +51,9 @@ prepare() {
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
   # sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
+  # --enable-targets=x86_64-pep
 
-  rm -rf gdb readline libdecnumber sim
+  # rm -rf gdb readline libdecnumber sim
 }
 
 build() {
@@ -83,7 +84,6 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
-    --enable-targets=x86_64-pc-mingw64,x86_64-pc-mingw32 \
     --enable-plugins \
     --enable-gold \
     --enable-silent-rules \
@@ -91,7 +91,7 @@ build() {
     --enable-threads \
     --disable-shared
 
-  noti nice -n 19 make
+  noti make MAKEINFO=true
 }
 
 check() {
@@ -104,7 +104,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
@@ -116,5 +116,10 @@ package() {
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/libiberty.h ${pkgdir}${MINGW_PREFIX}/include
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
+  # Remove unwanted files
+  # find ${pkgdir}${MINGW_PREFIX}/share/locale -type f -iname "bfd.*" -o -iname "opcodes.*" | xargs -rtl1 rm
+  # rm -rf ${pkgdir}${MINGW_PREFIX}/share
+
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share
 }
