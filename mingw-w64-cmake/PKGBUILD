@@ -5,7 +5,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.15.6
-pkgrel=3
+pkgrel=5
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -28,8 +28,6 @@ options=('staticlibs') # '!strip' 'debug'
 source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
         "0003-Disable-response-files-for-MSYS-Generator.patch"
-        "0004-Implement-Qt5-static-plugin-support.patch"
-        "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
         "0007-Do-not-generate-import-libs-for-exes.patch"
         "0008-Output-line-numbers-in-callstacks.patch")
@@ -68,8 +66,6 @@ prepare() {
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
-    0004-Implement-Qt5-static-plugin-support.patch \
-    0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
     0008-Output-line-numbers-in-callstacks.patch
@@ -79,10 +75,12 @@ build() {
   mkdir -p "${srcdir}/build-${MINGW_CHOST}"
   cd "${srcdir}/build-${MINGW_CHOST}"
 
+  MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
     "${srcdir}"/${_realname}-${pkgver}/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --no-system-libs                                 \
-    --no-system-expat                             \
+    --no-system-expat  
+    --system-openssl                           \
     --no-qt-gui                                      \
     --parallel=${NUMBER_OF_PROCESSORS}
   plain "Start building..."
