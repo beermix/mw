@@ -69,14 +69,7 @@ build() {
     threads \
     no-zlib \
     no-zlib-dynamic \
-    enable-camellia \
-    enable-idea \
-    enable-mdc2 \
-    enable-ec2m \
-    enable-md2 \
-    enable-rc5 \
-    enable-tlsext \
-    enable-rfc3779
+    enable-ec_nistp_64_gcc_128
 
     make depend all
     #noti make
