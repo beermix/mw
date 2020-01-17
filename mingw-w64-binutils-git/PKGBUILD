@@ -37,25 +37,14 @@ pkgver() {
 
 prepare() {
   cd ${srcdir}/${_realname}
-#  git am "${srcdir}"/0001-enable-gold-on.mingw32.patch
-#  git am "${srcdir}"/0002-check-for-unusual-file-harder.patch
-#  git am "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
-#  git am "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
-#  git am "${srcdir}"/0110-binutils-mingw-gnu-print.patch
+  ${GIT_AM} ${srcdir}/binutils-stable-branch.patch
+  ${GIT_AM} ${srcdir}/0001-enable-gold-on.mingw32.patch
+  ${GIT_AM} ${srcdir}/0002-check-for-unusual-file-harder.patch
+  ${GIT_AM} ${srcdir}/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
+  ${GIT_AM} ${srcdir}/0020-binutils_2.31_mkdtemp_impl.patch
+  ${GIT_AM} ${srcdir}/0110-binutils-mingw-gnu-print.patch
 
-  patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
-  patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
-  patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
-  patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
-  patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-  #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
-  #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
-
-  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
-  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
-  # sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
-
-  rm -rf gdb readline libdecnumber sim
+  #rm -rf gdb readline libdecnumber sim
 }
 
 build() {
@@ -87,14 +76,17 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
-    --enable-targets=x86_64-pc-mingw64 \
+    --enable-targets=x86_64-pc-mingw64,x86_64-pc-mingw32 \
     --enable-plugins \
     --enable-gold \
-    --disable-gdb \
+    --enable-silent-rules \
+    --with-system-zlib \
+    --enable-threads \
     --disable-sim \
+    --disable-gdb \
     --disable-shared
 
-  noti nice -n 19 make MAKEINFO=true
+  noti MAKEINFO=true make
 }
 
 check() {
