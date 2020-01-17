@@ -78,9 +78,8 @@ build() {
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
     "${srcdir}"/${_realname}-${pkgver}/configure  \
     --prefix=${MINGW_PREFIX}                      \
-    --no-system-libs                                 \
+    --system-libs                                 \
     --no-system-expat  
-    --system-openssl                           \
     --no-qt-gui                                      \
     --parallel=${NUMBER_OF_PROCESSORS}
   plain "Start building..."
