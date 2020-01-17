@@ -332,14 +332,6 @@ package_mingw-w64-gcc-git() {
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python
   cp -r share/gcc-${_realpkgver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python/
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
-  #cp share/man/man1/cpp.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/gcc.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/gcov.1*                              ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/fsf-funding.7*                       ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/gfdl.7*                              ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/gpl.7*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/g++.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
 }
 
 package_mingw-w64-gcc-libgfortran-git() {
@@ -383,7 +375,7 @@ package_mingw-w64-gcc-ada-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
