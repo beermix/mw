@@ -13,9 +13,9 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="nice -n 19 ninja"
+  _make_cmd="noti nice -n 19 ninja"
 else
-  _make_cmd="nice -n 19 make"
+  _make_cmd="noti nice -n 19 make"
 fi
 _realname=clang
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
@@ -342,7 +342,6 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
-    -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
