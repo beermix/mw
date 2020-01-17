@@ -295,12 +295,7 @@ build() {
 
   local -a extra_config
 
-  if check_option "debug" "y"; then
-    extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
-    VERBOSE="VERBOSE=0"
-  else
     extra_config+=(-DCMAKE_BUILD_TYPE=Release)
-  fi
 
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -324,8 +319,8 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
@@ -360,7 +355,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  ${_make_cmd} VERBOSE=0
+  ${_make_cmd}
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
