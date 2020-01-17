@@ -88,6 +88,7 @@ build() {
     --enable-gold \
     --enable-silent-rules \
     --with-system-zlib \
+    --enable-threads \
     --disable-shared
 
   noti nice -n 19 make
