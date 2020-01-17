@@ -304,8 +304,8 @@ build() {
   # "Ninja" cant install each component seperately
   # https://github.com/martine/ninja/issues/932
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+#  export CC='ccache gcc'
+#  export CXX='ccache g++'
 
   if [ "${_compiler}" == "clang" ]; then
     #export CC='clang -stdlib=libc++'
@@ -323,6 +323,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
