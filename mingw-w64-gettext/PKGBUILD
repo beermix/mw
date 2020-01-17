@@ -104,10 +104,7 @@ build() {
     --disable-openmp \
     --without-cvs \
     --without-git \
-    --with-included-libcroco \
-    --with-included-libunistring \
     --with-included-libxml \
-    --with-included-glib \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
