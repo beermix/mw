@@ -192,11 +192,10 @@ build() {
     --disable-werror \
     --disable-symvers \
     --with-libiconv \
-    --with-system-zlib \
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --enable-silent-rules \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \

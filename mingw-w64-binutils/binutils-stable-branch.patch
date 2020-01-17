@@ -3003,3 +3003,23 @@ index 0000000000..728765f61d
 +[ \t0-9a-f]+:[ \t]+9b031845[ \t]+madd[ \t]+x5, x2, x3, x6
 +[ \t0-9a-f]+:[ \t0-9a-z]+[ \t]+b[ \t]+[0-9a-f]+ <a1ldr\+0x[0-9a-f]+>
 +#pass
+
+commit 1c71e324d8d5a8487d439993d2ff0c57eabc03f5
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Fri Jan 17 00:02:00 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 6d879e8ed0..85ac8b1a5c 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200116
++#define BFD_VERSION_DATE 20200117
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
