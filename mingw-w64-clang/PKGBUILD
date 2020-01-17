@@ -11,10 +11,10 @@
 
 # We can switch to clang when it fully works with mingw-w64
 _compiler=gcc
-_generator="MSYS Makefiles"
-#_generator="Ninja"
+#_generator="MSYS Makefiles"
+_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="noti nice -n 19 ninja"
+  _make_cmd="noti ninja -j7"
 else
   _make_cmd="noti nice -n 19 make"
 fi
@@ -304,8 +304,8 @@ build() {
   # "Ninja" cant install each component seperately
   # https://github.com/martine/ninja/issues/932
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  # export CC='ccache gcc'
+  # export CXX='ccache g++'
 
   if [ "${_compiler}" == "clang" ]; then
     #export CC='clang -stdlib=libc++'
@@ -323,7 +323,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
