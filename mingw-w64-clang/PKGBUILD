@@ -18,7 +18,7 @@ else
   _make_cmd="nice -n 19 make"
 fi
 _realname=clang
-_url=https://releases.llvm.org
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-analyzer"
@@ -32,8 +32,8 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
-pkgver=9.0.0
-pkgrel=5
+pkgver=9.0.1
+pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -55,18 +55,18 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
-source=(${_url}/$pkgver/llvm-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/openmp-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/cfe-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/compiler-rt-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/test-suite-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/libcxx-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/libcxxabi-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/lld-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/lldb-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/libunwind-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/$pkgver/polly-${pkgver}.src.tar.xz{,.sig}
+source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/openmp-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/test-suite-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/libcxx-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/libcxxabi-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/lldb-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/libunwind-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/polly-${pkgver}.src.tar.xz{,.sig}
         "0001-mingw-w64-use-MSVC-style-ByteAlignment.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
@@ -174,7 +174,7 @@ sha256sums=('d6a0565cf21f22e9b4353b2eb92622e8365000a9e90a16b09b56f8157eabfe84'
             'f7958638e73273ea6a8df4a4e8726a0904d049fdaea7e84c33db5dec1af08fa8')
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
-noextract=(cfe-${pkgver}.src.tar.xz
+noextract=(clang-${pkgver}.src.tar.xz
            libcxx-${pkgver}.src.tar.xz
            lldb-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
@@ -189,8 +189,8 @@ apply_patch_with_msg() {
 
 prepare() {
   plain "Extracting clang-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-  [[ -d ${srcdir}/cfe-${pkgver} ]] && rm -rf ${srcdir}/cfe-${pkgver}
-  [[ -d ${srcdir}/cfe-${pkgver} ]] || tar -xJvf ${srcdir}/cfe-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
+  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJvf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
@@ -219,7 +219,7 @@ prepare() {
   apply_patch_with_msg \
       "0007-getLoadAddressWithOffset-assertion.patch"
 
-  cd "${srcdir}/cfe-${pkgver}.src"
+  cd "${srcdir}/clang-${pkgver}.src"
   apply_patch_with_msg \
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
@@ -275,7 +275,7 @@ prepare() {
   cd "${srcdir}"/llvm-${pkgver}.src
   rm -rf tools/clang tools/clang/tools/extra tools/lld tools/lldb tools/polly projects/compiler-rt projects/libcxx \
          projects/libcxxabi projects/libunwind projects/openmp projects/test-suite | true
-  mv "${srcdir}/cfe-${pkgver}.src"               tools/clang
+  mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
   mv "${srcdir}/lld-${pkgver}.src"               tools/lld
   mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
@@ -326,6 +326,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
