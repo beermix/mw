@@ -297,7 +297,7 @@ build() {
 
   if check_option "debug" "y"; then
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
-    VERBOSE="VERBOSE=1"
+    VERBOSE="VERBOSE=0"
   else
     extra_config+=(-DCMAKE_BUILD_TYPE=Release)
   fi
@@ -324,9 +324,8 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
