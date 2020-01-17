@@ -86,8 +86,6 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --enable-plugins \
     --enable-gold \
-    --disable-gdb \
-    --disable-sim \
     --enable-silent-rules \
     --disable-shared
 
