@@ -88,6 +88,7 @@ build() {
     --enable-gold \
     --disable-gdb \
     --disable-sim \
+    --enable-silent-rules \
     --disable-shared
 
   noti nice -n 19 make MAKEINFO=true
