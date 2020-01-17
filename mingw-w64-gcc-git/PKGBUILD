@@ -198,6 +198,7 @@ build() {
     --disable-werror \
     --disable-symvers \
     --with-libiconv \
+    --with-system-zlib \
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --enable-silent-rules \

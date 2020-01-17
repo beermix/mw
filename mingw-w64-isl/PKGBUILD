@@ -32,6 +32,7 @@ build() {
     --build=${MINGW_CHOST} \
     --enable-static \
     --disable-shared \
+    --disable-silent-rules \
     --with-gmp-prefix=${MINGW_PREFIX}
 
   make
