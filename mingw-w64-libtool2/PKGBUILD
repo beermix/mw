@@ -63,17 +63,18 @@ build() {
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
-  make
+
+  make V=s -j1
 }
 
-#check() {
-#  cd ${srcdir}/build-${MINGW_CHOST}
-#  make check gl_public_submodule_commit=
-#}
+check() {
+  cd ${srcdir}/build-${MINGW_CHOST}
+  make check gl_public_submodule_commit=
+}
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  make DESTDIR="${pkgdir}" install
+  make -j1 DESTDIR="${pkgdir}" install
   # Because libtool will have queried native compilers,
   # it'll contain native paths, so sed them back again.
   local MINGW_PREFIX_W=$(cygpath -m "${MINGW_PREFIX}")
