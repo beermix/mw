@@ -176,7 +176,7 @@ build() {
 
     export CC='ccache gcc'
     export CXX='ccache g++'
-#    export MAKEINFO=missing
+    export MAKEINFO=missing
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
