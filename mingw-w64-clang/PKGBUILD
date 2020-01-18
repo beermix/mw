@@ -322,7 +322,10 @@ build() {
 
   # ${_make_cmd} VERBOSE=99 2>&1 | tee build.log | egrep -i '(warn|error)'
 
-  noti nice -n 20 ${_make_cmd} VERBOSE=1
+# # noti nice -n 20 ${_make_cmd} VERBOSE=1
+
+   noti nice -n 20 make -j7
+
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
