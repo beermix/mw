@@ -5,7 +5,7 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=11
+pkgrel=5
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
@@ -32,7 +32,8 @@ source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         121-keep-posix-path.patch
         122-Use-LF-as-newline-in-envsubst.patch
         200-tools-gnulib-define-installdir.patch
-        gettext-dont_build_docs_and_examples.patch)
+        0001-error_print_progname.patch
+        0002-Update-after-gnulib-changed.patch)
 sha256sums=('ff942af0e438ced4a8b0ea4b0b6e0d6d657157c5e2364de57baa279c1c125c43'
             'SKIP'
             '030987c317279c27eea503ef257c7c3cf4ff947de8ea71d84fdf5eea802ee587'
@@ -76,8 +77,13 @@ prepare() {
   #patch -p1 -i ${srcdir}/121-keep-posix-path.patch
   patch -p1 -i ${srcdir}/122-Use-LF-as-newline-in-envsubst.patch
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
-  patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
+#  patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
+  patch -p1 -i ${srcdir}/0001-error_print_progname.patch
+  patch -p1 -i ${srcdir}/0002-Update-after-gnulib-changed.patch
 
+  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' ./gettext-tools/Makefile.in
+  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' ./gettext-runtime/Makefile.in
+	
   libtoolize --automake --copy --force
   WANT_AUTOMAKE=latest ./autogen.sh --skip-gnulib
 }
@@ -104,7 +110,10 @@ build() {
     --disable-openmp \
     --without-cvs \
     --without-git \
+    --with-included-libcroco \
+    --with-included-libunistring \
     --with-included-libxml \
+    --with-included-glib \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
