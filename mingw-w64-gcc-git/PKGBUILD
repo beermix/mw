@@ -235,15 +235,15 @@ build() {
   fi
 }
 
-check() {
-  cd ${srcdir}/${_sourcedir}
+#check() {
+#  cd ${srcdir}/${_sourcedir}
 
   # disable libphobos test to avoid segfaults and other unfunny ways to waste my time  
-  sed -i '/maybe-check-target-libphobos \\/d' Makefile 
+#  sed -i '/maybe-check-target-libphobos \\/d' Makefile 
 
   # do not abort on error as some are "expected"
-  make -k check || true "/src/gcc-git/contrib/test_summary"
-}
+#  make -k check || true "/src/gcc-git/contrib/test_summary"
+#}
 
 package_mingw-w64-gcc-libs-git() {
   pkgdesc="GNU Compiler Collection (libraries) for MinGW-w64"
