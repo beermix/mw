@@ -14,9 +14,9 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja"
+  _make_cmd="noti nice -n 19 ninja"
 else
-  _make_cmd="make"
+  _make_cmd="noti nice -n 19 make"
 fi
 _realname=clang
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
@@ -365,15 +365,16 @@ build() {
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_OPTIMIZED_TABLEGEN=ON \
     -DLLVM_ENABLE_BINDINGS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
 # -DLLVM_TARGETS_TO_BUILD=X86 \
-#  -DLLVM_ENABLE_TERMINFO=OFF \
-#  -DLLVM_ENABLE_WERROR=OFF \
-#  -DLLVM_OPTIMIZED_TABLEGEN=ON \
+# -DLLVM_ENABLE_TERMINFO=OFF \
+# -DLLVM_ENABLE_WERROR=OFF \
+# 
 # -DLLVM_APPEND_VC_REV=OFF \
 #  DLLVM_ENABLE_RTTI=ON \
 # -DLLVM_ENABLE_UNWIND_TABLES=OFF \
@@ -383,7 +384,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  noti nice -n 19 ${_make_cmd} VERBOSE=1
+  ${_make_cmd} VERBOSE=1
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
