@@ -103,7 +103,79 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch")
-noextract=(clang-${pkgver}.src.tar.xz
+# Some patch notes :)
+#0001-0099 -> llvm
+#0101-0199 -> clang
+#0201-0299 -> rt
+#0301-0399 -> lld
+#0401-0499 -> libc++
+#0501-0599 -> lldb
+#0601-0699 -> libunwind
+#0701-0799 -> libc++abi
+#0801-0899 -> polly
+#0901-0999 -> openmp
+sha256sums=('d6a0565cf21f22e9b4353b2eb92622e8365000a9e90a16b09b56f8157eabfe84'
+            'SKIP'
+            '9979eb1133066376cc0be29d1682bc0b0e7fb541075b391061679111ae4d3b5b'
+            'SKIP'
+            '7ba81eef7c22ca5da688fdf9d88c20934d2d6b40bfe150ffd338900890aa4610'
+            'SKIP'
+            '56e4cd96dd1d8c346b07b4d6b255f976570c6f2389697347a6c3dcb9e820d10e'
+            'SKIP'
+            '2ba3cde840c1c0ef744c93ae6a921207dbb9ccbb39f93f7ace9252e5203307cf'
+            'SKIP'
+            '3c4162972b5d3204ba47ac384aa456855a17b5e97422723d4758251acf1ed28c'
+            'SKIP'
+            '675041783565c906ac2f7f8b2bc5c40f14d871ecfa8ade34855aa18de95530e9'
+            'SKIP'
+            'ea1c86ce352992d7b6f6649bc622f6a2707b9f8b7153e9f9181a35c76aa3ac10'
+            'SKIP'
+            '31c6748b235d09723fb73fea0c816ed5a3fab0f96b66f8fbc546a0fcc8688f91'
+            'SKIP'
+            '1e4c2f6a1f153f4b8afa2470d2e99dab493034c1ba8b7ffbbd7600de016d0794'
+            'SKIP'
+            '976a8d09e1424fb843210eecec00a506b956e6c31adda3b0d199e945be0d0db2'
+            'SKIP'
+            'a4fa92283de725399323d07f18995911158c1c5838703f37862db815f513d433'
+            'SKIP'
+            '05f07589d2e255c1a867b5558bbbabad55a9d2ba8084b22f4dc5e08608f07aae'
+            '9b6d3ecb0ef4a38d34aefaefff8c6257ff22d366d84630020d7f079dc8065d97'
+            '1f318c0370357fdf9c54ae6d31bad761b0caa58ac099998937b636309ecb6590'
+            '7f0c64cd87b61e894be632f180ae5291e1aa9f1d9d382608f659067eeeda7146'
+            '2c2431997e664c5b42b359f4134a4773578753e5e25c505ba30de42d357f3057'
+            '1887ea21fcd591a50dd10559774e872ce1183177e672b028133d9b669e3cac32'
+            '33400d16d5f6671a8fd60345c3ae44b9777a7d600061957889d14305eb2ad709'
+            '8c216c885a1cd84a63c842ac4ce7c857b1bb4952a46bbd9905adaadacb1a758a'
+            '18e719f49af8704c66d7d5e0c0c94ab04a7206fe2a3d711eb652e0afb35ff52c'
+            'c486e1d45f6fb2a24823d776d2b47d6930530d423df73cc635f863265210c294'
+            '656007a5eb587ac51e8d953fd28522c53cc56d297f2fa87ba818a0fe2ebd2b76'
+            'd32f3be9c0ac5a1fc7c187e2497af4359036c4d76a5123d73a9d06f75edc73b1'
+            'b2e5fd29bf666998d495a321690c97fe239bb998abcf0739418ac0ea725fecd6'
+            '01b029f2a21bd998ce374a90d41d214c891dfbb611dfbd9ca147517cd2c228ea'
+            'ab49b90d69a609f441fa58e835873f2b1a8a060c9ca6358fee7d99c1973da692'
+            '53646dd01af2862473e9719c5223366486268891ccbff86413943a432a8342e9'
+            'a60f7328d84628a56a9f626e4dc26ffd0c35292c79eeba62ac3d4f25aef2fe5c'
+            '5d6b066d63ea927b87e32b8e70a38f763373622ae4f6a5062db7a5e087b41faf'
+            '219eca2ad015ababb05d81ed97b4b40cf13ea189ee93cf57aa814cca7cf40001'
+            '2f8f3c819837e4a16a364ed6e2a0a879cd10f924169ed7d89c27c1ed64edfe95'
+            'a219798d0199e0b34c90fcdacada7e0f6d179fa4349a26bce8f714173046ecc7'
+            'bdb2d82c1508dd3ed79ec10fd265aca10c07dc27e63e72b8c0eeda9a777fb073'
+            '37dedb324ea1204d360c6c75446a732b310c938926d0fb806b1e1f16d5e0432e'
+            '9322401fa79f37bd746972f059ef9c07b96b97cb66c73a6290ed15853c9009d6'
+            '7bbcca0ecd52e11401809fb543b8ba39a859ebeed52d15b672d50fff89de1a20'
+            '9591d2890a4f4d1ac32d2032b7f03ca9151b7a2c2a29f281051a70c749e4a0f3'
+            '78d52a2e11b3e6d0acbaab8b603921674dfed70062bf3aaf37ce1961de68d416'
+            'dc656168d3e3067e57b342fbd9a9eb57dd95d8d8e540e7e66e48c3cea790bbb3'
+            'f065285abd6bf5f67599a82f8c2338c57c1c5b4b3088b5d62c12356c3703f74e'
+            '963387da0ff24e167c91d193def2f5a7581dca41166f73b8914fcf8fd636101f'
+            'b9727a84f6e412ef9ace5f1b4030ccbc8789a6f1ef74cc09f95dfa9118515b8a'
+            'eaa7ad87e3f0fc9ff697c8865cce5c501fcb3a71a9a29c9497e444013163976f'
+            'bc394e597f8939b6f6630bd88c990f951738aaadacded2f3be71c658e9608fe7'
+            'db8dc554f7780609ee4eb4bc9e3817d4a9409b622f6471c8db06c92705805ead'
+            'f7958638e73273ea6a8df4a4e8726a0904d049fdaea7e84c33db5dec1af08fa8')
+validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
+              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
+noextract=(cfe-${pkgver}.src.tar.xz
            libcxx-${pkgver}.src.tar.xz
            lldb-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
@@ -251,9 +323,9 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CCACHE_HASHDIR=true
-  export CCACHE_CPP2=true
-  export CCACHE_HARDLINK=true
+$  export CCACHE_HASHDIR=true
+$  export CCACHE_CPP2=true
+$  export CCACHE_HARDLINK=true
   export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
 # -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-missing-field-initializers -Wno-unused-parameter -Wno-class-memaccess
@@ -286,42 +358,25 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
+    -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLDB_DISABLE_PYTHON=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
-    -DCLANG_INCLUDE_DOCS=OFF \
-    -DCLANG_INCLUDE_TESTS=OFF \
-    -DCLANG_BUILD_EXAMPLES=OFF \
-    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
-    -DLLVM_ENABLE_ZLIB=ON \
-    -DLLVM_ENABLE_CXX1Y=OFF \
-    -DLLVM_ENABLE_CXX1Z=OFF
-    -DLLVM_ENABLE_MODULES=OFF \
-    -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
-    -DLLVM_BUILD_EXAMPLES=OFF \
-    -DLLVM_ENABLE_DOXYGEN=OFF \
-    -DLLVM_ENABLE_OCAMLDOC=OFF \
-    -DLLVM_ENABLE_SPHINX=OFF \
-    -DLLVM_INCLUDE_EXAMPLES=OFF \
-    -DLLVM_INCLUDE_DOCS=OFF \
-    -DLLVM_INCLUDE_GO_TESTS=OFF \
-    -DLLVM_INCLUDE_TESTS=OFF \
-    -DLLVM_DYLIB_COMPONENTS=all \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
 
-#    -DLLVM_BUILD_EXAMPLES=OFF \
-#    -DLLVM_BUILD_TESTS=OFF \
-#    -DLLVM_BUILD_BENCHMARKS=OFF \
-#    -DLLVM_ENABLE_OCAMLDOC=OFF \
-#    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-#    -DLLVM_ENABLE_WERROR=OFF \
+#  -DLLVM_BUILD_EXAMPLES=OFF \
+#  -DLLVM_BUILD_TESTS=OFF \
+#  -DLLVM_BUILD_BENCHMARKS=OFF \
+#  -DLLVM_ENABLE_OCAMLDOC=OFF \
+#  -DLLVM_OPTIMIZED_TABLEGEN=ON \
+#  -DLLVM_ENABLE_WERROR=OFF \
 #
-#    -DLLVM_ENABLE_RTTI=ON \
-#    -DLLVM_ENABLE_BINDINGS=OFF \
+#  -DLLVM_ENABLE_RTTI=ON \
+#  -DLLVM_ENABLE_BINDINGS=OFF \
 #  -DLLVM_ENABLE_BINDINGS=OFF \
 #  -DBUILD_SHARED_LIBS=ON \
 #  -DLLVM_TARGETS_TO_BUILD=X86 \
@@ -331,6 +386,26 @@ build() {
 #  -DLLVM_ENABLE_UNWIND_TABLES=OFF \
 #  -DLLVM_ENABLE_Z3_SOLVER=OFF \
 #  -DBUILD_SHARED_LIBS=OFF
+#
+#  -DCLANG_INCLUDE_DOCS=OFF \
+#  -DCLANG_INCLUDE_TESTS=OFF \
+#  -DCLANG_BUILD_EXAMPLES=OFF \
+#  -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+#  -DLLVM_ENABLE_ZLIB=ON \
+#  -DLLVM_ENABLE_CXX1Y=OFF \
+#  -DLLVM_ENABLE_CXX1Z=OFF
+#  -DLLVM_ENABLE_MODULES=OFF \
+#  -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
+#  -DLLVM_BUILD_EXAMPLES=OFF \
+#  -DLLVM_ENABLE_DOXYGEN=OFF \
+#  -DLLVM_ENABLE_OCAMLDOC=OFF \
+#  -DLLVM_ENABLE_SPHINX=OFF \
+#  -DLLVM_INCLUDE_EXAMPLES=OFF \
+#  -DLLVM_INCLUDE_DOCS=OFF \
+#  -DLLVM_INCLUDE_GO_TESTS=OFF \
+#  -DLLVM_INCLUDE_TESTS=OFF \
+#  -DLLVM_DYLIB_COMPONENTS=all \
+
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
@@ -348,7 +423,7 @@ build() {
   #
   sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
   sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
-  sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
+# sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
