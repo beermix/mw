@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200117.c10.g3815f211649
+pkgver=9.2.1.d20200118.c10.g41fd95e6dbd
 pkgrel=1
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
@@ -242,8 +242,7 @@ check() {
   sed -i '/maybe-check-target-libphobos \\/d' Makefile 
 
   # do not abort on error as some are "expected"
-  make -k check || true
-  "$srcdir/${_sourcedir}/contrib/test_summary"
+  make -k check || true "/src/gcc-git/contrib/test_summary"
 }
 
 package_mingw-w64-gcc-libs-git() {
