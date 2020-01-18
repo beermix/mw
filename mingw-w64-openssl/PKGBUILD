@@ -71,16 +71,15 @@ build() {
     no-zlib-dynamic \
     enable-ec_nistp_64_gcc_128
 
-    make depend all
+    nice -n 19 make depend all
     #noti make
     #     enable-ec_nistp_64_gcc_128
-
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
 }
 
 package() {
   cd "${srcdir}/build-${CARCH}"
-  make -j1 INSTALL_PREFIX="${pkgdir}" install_sw -j1
+  make -j1 INSTALL_PREFIX="${pkgdir}" install_sw
 
   chmod -R 755 "${pkgdir}/oth"/bin
   chmod -R 644 "${pkgdir}/oth"/lib
