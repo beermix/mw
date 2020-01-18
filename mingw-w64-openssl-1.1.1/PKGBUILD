@@ -55,7 +55,7 @@ prepare() {
 
 build() {
   rm -rf ${srcdir}/build-${CARCH}
- 
+
   # No support for out-of-source builds
   mkdir -p ${srcdir}/build-${CARCH}
 #  cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
@@ -64,6 +64,9 @@ build() {
   sed -i -e '/^"mingw"/ s/-fomit-frame-pointer -O3 -Wall/-O2 -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4/' \
      ${srcdir}/${_realname}-${_ver}/Configure
 #     ${srcdir}/build-${CARCH}/Configure
+
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
@@ -91,7 +94,7 @@ build() {
 
 check() {
   cd "${srcdir}/build-${CARCH}"
-  make VERBOSE=1 test
+  make VERBOSE=1 test -j3
 }
 
 package() {

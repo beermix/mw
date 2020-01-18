@@ -6,18 +6,17 @@
 # Contributor: Yuui Tanabe <yuuitanabe@163.com>
 # Contributor: Oscar Fuentes <ofv@wanadoo.es>
 # Contributor: Adrian Pop <adrian.pop@liu.se>
-# https://github.com/llvm/llvm-project/releases
-# ionice -c 3 nice -n 20 make -j 2 V=s CONFIG_DEBUG_SECTION_MISMATCH=y 2>&1 | tee build.log | egrep -i '(warn|error)'
+# https://github.com/llvm/llvm-project/releases/
+
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=clang
 _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="noti nice -n 19 ninja"
+  _make_cmd="ninja"
 else
-  _make_cmd="noti nice -n 19 make"
+  _make_cmd="make"
 fi
 _realname=clang
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
@@ -175,7 +174,7 @@ sha256sums=('d6a0565cf21f22e9b4353b2eb92622e8365000a9e90a16b09b56f8157eabfe84'
             'f7958638e73273ea6a8df4a4e8726a0904d049fdaea7e84c33db5dec1af08fa8')
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
-noextract=(cfe-${pkgver}.src.tar.xz
+noextract=(clang-${pkgver}.src.tar.xz
            libcxx-${pkgver}.src.tar.xz
            lldb-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
@@ -323,11 +322,10 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-$  export CCACHE_HASHDIR=true
-$  export CCACHE_CPP2=true
-$  export CCACHE_HARDLINK=true
-  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
-
+#  export CCACHE_HASHDIR=true
+#  export CCACHE_CPP2=true
+#  export CCACHE_HARDLINK=true
+#  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 # -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-missing-field-initializers -Wno-unused-parameter -Wno-class-memaccess
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -343,7 +341,7 @@ $  export CCACHE_HARDLINK=true
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -std=gnu++14" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
@@ -411,12 +409,7 @@ $  export CCACHE_HARDLINK=true
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  # ${_make_cmd} VERBOSE=99 2>&1 | tee build.log | egrep -i '(warn|error)'
-
-# # noti nice -n 20 ${_make_cmd} VERBOSE=1
-
-   noti nice -n 20 make -j7
-
+  noti nice -n 19 ${_make_cmd}
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should

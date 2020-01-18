@@ -311,10 +311,10 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    #export CC='clang -stdlib=libc++'
-    #export CXX='clang++ -stdlib=libc++'
-    export CC='clang'
-    export CXX='clang++'
+    export CC='clang -stdlib=libc++'
+    export CXX='clang++ -stdlib=libc++'
+    #export CC='clang'
+    #export CXX='clang++'
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
@@ -381,8 +381,7 @@ build() {
 #  -DLLVM_ENABLE_OCAMLDOC=OFF \
 #  -DLLVM_OPTIMIZED_TABLEGEN=ON \
 #  -DLLVM_ENABLE_BINDINGS=OFF \
-#
-#  -DBUILD_SHARED_LIBS=ON \
+#  -DBUILD_SHARED_LIBS=OFF \
 #  -DCLANG_LINK_CLANG_DYLIB=OFF \
 #  -DLLVM_ENABLE_RTTI=ON \
 #  -DLLVM_TARGETS_TO_BUILD=X86 \
