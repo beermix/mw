@@ -85,7 +85,11 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
+    --target=x86_64-w64-mingw32 \
+    --enable-threads \
+    --with-system-zlib \
     --enable-gold \
+    --enable-lto \
     --enable-silent-rules \
     --disable-shared
 

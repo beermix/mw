@@ -200,11 +200,9 @@ build() {
     --disable-symvers \
     --with-libiconv \
     --with-system-zlib \
-    --enable-gnu-unique-object \
-    --enable-linker-build-id \
+    --without-dwarf2 \
+    --enable-objc-gc \
     --disable-libstdcxx-verbose \
-    --enable-install-libiberty \
-    --enable-gnu-indirect-function \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -213,10 +211,6 @@ build() {
     --with-gnu-as --with-gnu-ld \
     --enable-plugin  \
     ${_conf}
-    #--enable-libitm
-    #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
-    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -225,7 +219,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n19 make all
+  noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
