@@ -251,10 +251,10 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-#  export CCACHE_HASHDIR=ye
-#  export CCACHE_CPP2=true -D_GNU_SOURCE
-#  export CCACHE_HARDLINK=true
-#  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
+  export CCACHE_HASHDIR=true
+  export CCACHE_CPP2=true
+  export CCACHE_HARDLINK=true
+  export CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
 # -Wno-unused-local-typedefs -Wno-maybe-uninitialized -Wno-missing-field-initializers -Wno-unused-parameter -Wno-class-memaccess
 
@@ -271,7 +271,7 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -std=gnu++14" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
@@ -286,27 +286,42 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
-    -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLDB_DISABLE_PYTHON=ON \
+    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DCLANG_INCLUDE_DOCS=OFF \
+    -DCLANG_INCLUDE_TESTS=OFF \
+    -DCLANG_BUILD_EXAMPLES=OFF \
+    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_ENABLE_CXX1Y=OFF \
+    -DLLVM_ENABLE_CXX1Z=OFF
+    -DLLVM_ENABLE_MODULES=OFF \
+    -DLLVM_ENABLE_MODULE_DEBUGGING=OFF
     -DLLVM_BUILD_EXAMPLES=OFF \
-    -DLLVM_INCLUDE_EXAMPLES=OFF \
-    -DLLVM_BUILD_TESTS=OFF \
-    -DLLVM_BUILD_BENCHMARKS=OFF \
-    -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
-    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-    -DLLVM_ENABLE_BINDINGS=OFF \
-    -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_ENABLE_RTTI=ON \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DLLVM_ENABLE_SPHINX=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_INCLUDE_GO_TESTS=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_DYLIB_COMPONENTS=all \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
 
+#    -DLLVM_BUILD_EXAMPLES=OFF \
+#    -DLLVM_BUILD_TESTS=OFF \
+#    -DLLVM_BUILD_BENCHMARKS=OFF \
+#    -DLLVM_ENABLE_OCAMLDOC=OFF \
+#    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+#    -DLLVM_ENABLE_WERROR=OFF \
+#
+#    -DLLVM_ENABLE_RTTI=ON \
+#    -DLLVM_ENABLE_BINDINGS=OFF \
 #  -DLLVM_ENABLE_BINDINGS=OFF \
 #  -DBUILD_SHARED_LIBS=ON \
 #  -DLLVM_TARGETS_TO_BUILD=X86 \
@@ -315,6 +330,7 @@ build() {
 #  -DLLVM_APPEND_VC_REV=OFF \
 #  -DLLVM_ENABLE_UNWIND_TABLES=OFF \
 #  -DLLVM_ENABLE_Z3_SOLVER=OFF \
+#  -DBUILD_SHARED_LIBS=OFF
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
@@ -332,7 +348,7 @@ build() {
   #
   sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
   sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
-# sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
+  sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
