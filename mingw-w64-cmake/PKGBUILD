@@ -40,7 +40,6 @@ sha256sums=('3fa17992ac97d3fc856ffba5d3b10578744ea5b4736818f01e6067f0253b2db5'
             'd0aaa6fbf3e740341aaac2b43033f6c20f56a94ea0b2c509233f693cabe2a912'
             '94642670c922c9acfade79bc567c6b28f2d2f89e27aa391b562e8c90baa49ce1')
 
-
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -76,11 +75,11 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/configure  \
-    --prefix=${MINGW_PREFIX}                      \
-    --system-libs                                 \
-    --no-system-expat                                 \
-    --no-qt-gui                                      \
+    "${srcdir}"/${_realname}-${pkgver}/bootstrap \
+    --prefix=${MINGW_PREFIX} \
+    --system-libs \
+    --no-system-expat \
+    --no-qt-gui \
     --parallel=${NUMBER_OF_PROCESSORS}
   plain "Start building..."
   make
