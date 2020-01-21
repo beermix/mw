@@ -100,13 +100,13 @@ prepare() {
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
 
-  patch -p1 -i "${srcdir}"/010-documentation.patch
-  patch -p1 -i "${srcdir}"/gomp-relax.patch
-  patch -p1 -i "${srcdir}"/ipa-cp.patch
-  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
-  patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
-  patch -p1 -i "${srcdir}"/optimize.patch
-  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
+#  patch -p1 -i "${srcdir}"/010-documentation.patch
+#  patch -p1 -i "${srcdir}"/gomp-relax.patch
+#  patch -p1 -i "${srcdir}"/ipa-cp.patch
+#  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
+#  patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
+#  patch -p1 -i "${srcdir}"/optimize.patch
+#  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
@@ -132,8 +132,6 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   ln -s ../isl-${_islver} isl
-
-#  tar xf %{SOURCE1} && ln -sf isl-%{isl_version} isl
 }
 
 build() {
@@ -200,17 +198,20 @@ build() {
     --disable-symvers \
     --with-libiconv \
     --with-system-zlib \
-    --without-dwarf2 \
-    --enable-objc-gc \
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --enable-silent-rules \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
+    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin  \
     ${_conf}
+    #--enable-libitm
+    #--enable-objc-gc
+    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
+    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -254,7 +255,7 @@ package_mingw-w64-gcc-libs-git() {
   # libitm* and libvtv* are disbled until fixed
   cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
 
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
+#  rm -rf ${pkgdir}${MINGW_PREFIX}/share
 }
 
 package_mingw-w64-gcc-git() {
@@ -319,6 +320,18 @@ package_mingw-w64-gcc-git() {
   cp lib/libstdc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libsupc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  #cp -r share/doc/gcc-${_realpkgver} ${pkgdir}${MINGW_PREFIX}/share/doc/
+  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+
+  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python
   cp -r share/gcc-${_realpkgver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python/
 }
@@ -332,8 +345,6 @@ package_mingw-w64-gcc-libgfortran-git() {
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/libgfortran*.dll                                ${pkgdir}${MINGW_PREFIX}/bin/
-
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
 }
 
 package_mingw-w64-gcc-fortran-git() {
@@ -355,7 +366,10 @@ package_mingw-w64-gcc-fortran-git() {
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libgfortran*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
+  cp share/man/man1/gfortran.1*                         ${pkgdir}${MINGW_PREFIX}/share/man/man1/
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada-git() {
@@ -376,7 +390,10 @@ package_mingw-w64-gcc-ada-git() {
   cp -r lib/gcc/${MINGW_CHOST}/${_realpkgver}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
+  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc-git() {
@@ -395,8 +412,6 @@ package_mingw-w64-gcc-objc-git() {
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/cc1obj.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/cc1objplus.exe     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libobjc.*                                            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
-
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
 }
 
 # Wrappers for package functions
