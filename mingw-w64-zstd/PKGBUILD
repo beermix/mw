@@ -52,7 +52,6 @@ build() {
   make
 }
 
-
 package() {
   cd "${srcdir}"/build-${CARCH}
   make install DESTDIR="${pkgdir}"
