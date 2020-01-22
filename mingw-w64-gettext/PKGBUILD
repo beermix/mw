@@ -108,6 +108,7 @@ build() {
     --enable-threads=win32 \
     --enable-relocatable \
     --without-emacs \
+    --enable-nls \
     --disable-openmp \
     --without-cvs \
     --without-git \
