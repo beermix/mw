@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=120
+pkgrel=122
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -78,20 +78,18 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
-    --target=x86_64-w64-mingw32 \
     --enable-gold \
     --enable-lto \
-    --with-system-zlib \
     --enable-silent-rules \
     --disable-shared
 
-  make all
-  make install
+  MAKEINFO=true make all
+  MAKEINFO=true make install
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
@@ -104,5 +102,9 @@ package() {
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
-#    rm -rf ${pkgdir}${MINGW_PREFIX}/share
+
+#  rm -rf ${pkgdir}${MINGW_PREFIX}/share
+#  rm -rf ${pkgdir}${MINGW_PREFIX}/share/licenses
+#  rm -rf ${pkgdir}${MINGW_PREFIX}/share/locale
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/man
 }
