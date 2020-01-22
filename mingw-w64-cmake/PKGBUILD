@@ -5,7 +5,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.16.3
-pkgrel=5
+pkgrel=6
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -75,11 +75,11 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/bootstrap \
-    --prefix=${MINGW_PREFIX} \
-    --system-libs \
-    --no-system-expat \
-    --no-qt-gui \
+    "${srcdir}"/${_realname}-${pkgver}/configure  \
+    --prefix=${MINGW_PREFIX}                      \
+    --system-libs                                 \
+    --no-system-expat                             \
+    --no-qt-gui                                      \
     --parallel=7
   plain "Start building..."
   make
