@@ -83,8 +83,8 @@ build() {
     --enable-silent-rules \
     --disable-shared
 
-  MAKEINFO=true make all
-  MAKEINFO=true make install
+  make MAKEINFO=true all
+  make MAKEINFO=true install
 }
 
 package() {
