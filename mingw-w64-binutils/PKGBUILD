@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=122
+pkgrel=123
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -81,6 +81,7 @@ build() {
     --enable-gold \
     --enable-lto \
     --enable-silent-rules \
+    --with-system-zlib \
     --disable-shared
 
   make MAKEINFO=true all
@@ -103,8 +104,8 @@ package() {
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 
-#  rm -rf ${pkgdir}${MINGW_PREFIX}/share
-#  rm -rf ${pkgdir}${MINGW_PREFIX}/share/licenses
-#  rm -rf ${pkgdir}${MINGW_PREFIX}/share/locale
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/licenses
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/locale
   rm -rf ${pkgdir}${MINGW_PREFIX}/share/man
 }
