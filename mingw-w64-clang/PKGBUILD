@@ -44,7 +44,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
-             "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
              "groff")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
@@ -224,7 +223,34 @@ build() {
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
     VERBOSE="VERBOSE=1"
   else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release \
+                   -DLLVM_BUILD_TESTS=OFF \
+                   -DLLVM_BUILD_BENCHMARKS=OFF \
+                   -DLLVM_INCLUDE_DOCS=OFF \
+                   -DLLVM_ENABLE_DOXYGEN=OFF \
+                   -DLLVM_ENABLE_OCAMLDOC=OFF \
+                   -DLLVM_OPTIMIZED_TABLEGEN=ON \
+                   -DLLVM_ENABLE_BINDINGS=OFF \
+                   -DBUILD_SHARED_LIBS=OFF \
+                   -DCLANG_LINK_CLANG_DYLIB=OFF \
+                   -DLLVM_ENABLE_RTTI=ON \
+                   -DLLVM_ENABLE_TERMINFO=OFF \
+                   -DLLVM_ENABLE_WERROR=OFF \
+                   -DCLANG_INCLUDE_DOCS=OFF \
+                   -DCLANG_INCLUDE_TESTS=OFF \
+                   -DCLANG_BUILD_EXAMPLES=OFF \
+                   -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+                   -DLLVM_ENABLE_ZLIB=ON \
+                   -DLLVM_ENABLE_CXX1Y=OFF \
+                   -DLLVM_ENABLE_CXX1Z=OFF \
+                   -DLLVM_ENABLE_MODULES=OFF \
+                   -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
+                   -DLLVM_BUILD_EXAMPLES=OFF \
+                   -DLLVM_ENABLE_SPHINX=OFF \
+                   -DLLVM_INCLUDE_EXAMPLES=OFF \
+                   -DLLVM_INCLUDE_GO_TESTS=OFF \
+                   -DLLVM_INCLUDE_TESTS=OFF \
+                   -DLLVM_DYLIB_COMPONENTS=all)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -251,7 +277,7 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
@@ -420,8 +446,7 @@ package_lldb() {
   depends=("${MINGW_PACKAGE_PREFIX}-libxml2"
            "${MINGW_PACKAGE_PREFIX}-llvm"
            "${MINGW_PACKAGE_PREFIX}-python"
-           "${MINGW_PACKAGE_PREFIX}-readline"
-           "${MINGW_PACKAGE_PREFIX}-swig")
+           "${MINGW_PACKAGE_PREFIX}-readline")
 
   cd "${srcdir}/llvm-${pkgver}.src"
 
