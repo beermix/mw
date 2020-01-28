@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=123
+pkgrel=124
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -79,13 +79,19 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --enable-lto \
     --enable-silent-rules \
     --with-system-zlib \
     --disable-shared
 
-  make MAKEINFO=true all
-  make MAKEINFO=true install
+  make MAKEINFO=true
+}
+
+check() {
+  cd ${srcdir}/build-${MINGW_CHOST}
+
+  # unset LDFLAGS as testsuite makes assumptions about which ones are active
+  # do not abort on errors - manually check log files
+  make LDFLAGS="" -k check || true
 }
 
 package() {
@@ -104,8 +110,8 @@ package() {
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share/licenses
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share/locale
-  rm -rf ${pkgdir}${MINGW_PREFIX}/share/man
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING      ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.LIB  ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.LIB
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3     ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3.LIB ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3.LIB
 }
