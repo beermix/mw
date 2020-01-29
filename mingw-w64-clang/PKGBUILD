@@ -242,6 +242,7 @@ build() {
     		     -DLLVM_ENABLE_SPHINX=OFF \
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
     		     -DLLVM_INCLUDE_TESTS=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
