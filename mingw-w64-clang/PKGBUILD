@@ -236,6 +236,7 @@ build() {
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
     		     -DLLVM_INCLUDE_TESTS=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=ON \
     		     -DCLANG_INCLUDE_DOCS=OFF \
     		     -DCLANG_INCLUDE_TESTS=OFF \
     		     -DCLANG_BUILD_EXAMPLES=OFF)
