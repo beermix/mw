@@ -3,7 +3,7 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
 
-_external_minizip=yes
+_external_minizip=no
 _realname=zlib
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
@@ -57,10 +57,9 @@ prepare() {
 
 build() {
   cd ${srcdir}/${_realname}-*
-  #CFLAGS=${CFLAGS/-O2/-O3}
+  CFLAGS=${CFLAGS/-O2/-O3}
   CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
-
  
   # build minizip
   if [ "${_external_minizip}" != "yes" ]; then

@@ -5,7 +5,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.16.3
-pkgrel=6
+pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -30,7 +30,8 @@ source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
         "0007-Do-not-generate-import-libs-for-exes.patch"
-        "0008-Output-line-numbers-in-callstacks.patch")
+        "0008-Output-line-numbers-in-callstacks.patch"
+        "0009-FindSWIG-allow-to-provide-search-prefix-on-Windows.patch")
 sha256sums=('3fa17992ac97d3fc856ffba5d3b10578744ea5b4736818f01e6067f0253b2db5'
             '1b68fe64e1b389134db44dc34368713f6e28d3463ab1e7fc3d93857c0459beb7'
             '77763df03e8a9ca66c3f9368fe7e1fc36bb041455733258d73aeb40246a61354'
@@ -65,6 +66,7 @@ prepare() {
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
+    0009-FindSWIG-allow-to-provide-search-prefix-on-Windows.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
     0008-Output-line-numbers-in-callstacks.patch
