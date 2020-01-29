@@ -236,13 +236,11 @@ build() {
     		     -DCLANG_INCLUDE_TESTS=OFF \
     		     -DCLANG_BUILD_EXAMPLES=OFF \
     		     -DLLVM_ENABLE_ZLIB=ON \
-    		     -DLLVM_ENABLE_MODULES=OFF \
-    		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
     		     -DLLVM_BUILD_EXAMPLES=OFF \
-    		     -DLLVM_ENABLE_SPHINX=OFF \
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
-    		     -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
+    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=OFF \
     		     -DLLVM_INCLUDE_TESTS=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
