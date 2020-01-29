@@ -65,6 +65,9 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch"
         "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch"
         "010-documentation.patch"
+        "ipa-cp.patch"
+        "optimize.patch"
+        "optimize-at-least-some.patch"
         "gomp-relax.patch"
         "openmp-vectorize-v2.patch"
         "zero-regs-gcc8.patch")
@@ -112,11 +115,11 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/010-documentation.patch
   patch -p1 -i "${srcdir}"/gomp-relax.patch
-#  patch -p1 -i "${srcdir}"/ipa-cp.patch
+  patch -p1 -i "${srcdir}"/ipa-cp.patch
   patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
   patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
-#  patch -p1 -i "${srcdir}"/optimize.patch
-#  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
+  patch -p1 -i "${srcdir}"/optimize.patch
+  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
@@ -209,14 +212,10 @@ build() {
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --enable-silent-rules \
-    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
+    --with-pkgversion="Rev${pkgrel}" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin  \
     ${_conf}
-    #--enable-libitm
-    #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
-    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
