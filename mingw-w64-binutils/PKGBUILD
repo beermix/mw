@@ -52,13 +52,13 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-  patch -p2 -i "${srcdir}"/CVE-2019-17450.patch
-  patch -p2 -i "${srcdir}"/CVE-2019-17451.patch
-  patch -p2 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
-  patch -p2 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
-  patch -p2 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
-  patch -p2 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
-  patch -p2 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
+  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
+  patch -p1 -i "${srcdir}"/CVE-2019-17451.patch
+  patch -p1 -i "${srcdir}"/0001-gas-Add-md_cons_worker.patch
+  patch -p1 -i "${srcdir}"/0002-gas-Add-md_generic_table_relax_frag.patch
+  patch -p1 -i "${srcdir}"/0003-i386-Align-branches-within-a-fixed-boundary.patch
+  patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
+  patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 }
 
 build() {
@@ -76,11 +76,11 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-  export GCC_IGNORE_WERROR=1
-  export CFLAGS="$CFLAGS -O3"
-  export FCFLAGS="$CFLAGS -O3"
-  export FFLAGS="$CFLAGS -O3"
-  export CXXFLAGS="$CXXFLAGS -O3"
+  GCC_IGNORE_WERROR=1
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-O2/-O3}
+  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -98,10 +98,10 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --enable-silent-rules \
+    --enable-secureplt \
     --with-system-zlib \
     --enable-targets=x86_64-pc-mingw64 \
-    --disable-shared
+    --enable-shared --disable-static
 
   make
 }
