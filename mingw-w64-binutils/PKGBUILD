@@ -75,6 +75,12 @@ build() {
 
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
+
+  export CFLAGS="$CFLAGS -O3"
+  export FCFLAGS="$CFLAGS -O3"
+  export FFLAGS="$CFLAGS -O3"
+  export CXXFLAGS="$CXXFLAGS -O3"
+
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
