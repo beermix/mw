@@ -8,7 +8,6 @@
 _enable_fortran=yes
 _enable_ada=no
 _enable_objc=no
-_threads="posix"
 _realname=gcc
 _sourcedir=${_realname}-git
 pkgbase=mingw-w64-${_realname}-git
