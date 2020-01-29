@@ -8,7 +8,7 @@ _realname=zlib
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=1.2.11.1_jtkv6.3
-pkgrel=20
+pkgrel=1
 pkgdesc="Compression library implementing the deflate compression method found in gzip and PKZIP (mingw-w64)"
 arch=('any')
 license=(ZLIB)
@@ -44,34 +44,24 @@ prepare() {
   patch -p1 -i ${srcdir}/01-zlib-1.2.11-1-buildsys.mingw.patch
   patch -p2 -i ${srcdir}/03-dont-put-sodir-into-L.mingw.patch
   patch -p1 -i ${srcdir}/04-fix-largefile-support.patch
-#  patch -p1 -i ${srcdir}/lto.patch
+  patch -p1 -i ${srcdir}/lto.patch
   patch -p1 -i ${srcdir}/configure.patch
 
   if [ "${_external_minizip}" != "yes" ]; then
     patch -p2 -i ${srcdir}/06-add-64bit-functions-and-fix-typos.patch
     cd ${srcdir}/${_realname}-${pkgver}/contrib/minizip
     patch -p1 -i ${srcdir}/07-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
-    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch
+    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch  
   fi
 }
 
 build() {
   cd ${srcdir}/${_realname}-*
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CFLAGS_GENERATE="$CFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FCFLAGS_GENERATE="$FCFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export FFLAGS_GENERATE="$FFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CXXFLAGS_GENERATE="$CXXFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
-export CFLAGS_USE="$CFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FCFLAGS_USE="$FCFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export FFLAGS_USE="$FFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-export CXXFLAGS_USE="$CXXFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
-  CHOST=${MINGW_CHOST} CFLAGS="${CFLAGS_GENERATE}" CXXFLAGS="${CXXFLAGS_GENERATE}" FFLAGS="${FFLAGS_GENERATE}" FCFLAGS="${FCFLAGS_GENERATE}" ./configure --prefix=${MINGW_PREFIX} --shared
+  #CFLAGS=${CFLAGS/-O2/-O3}
+  CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
 
+ 
   # build minizip
   if [ "${_external_minizip}" != "yes" ]; then
     pushd contrib/minizip > /dev/null
