@@ -21,7 +21,7 @@ pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=2
+pkgrel=3
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -67,7 +67,17 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize.patch
         optimize-at-least-some.patch
         zero-regs-gcc8.patch
-        0001-Fix-stack-protection-issues.patch)
+        0001-Fix-stack-protection-issues.patch
+        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+        zero-regs-gcc8.patch
+        0001-Fix-stack-protection-issues.patch
+        openmp-vectorize-v2.patch
+        fortran-vector-v2.patch
+        optimize.patch
+        ipa-cp.patch
+        optimize-at-least-some.patch
+        gomp-relax.patch
+        COLLECT_AS_OPTIONS.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -121,7 +131,17 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-stable-branch.patch
+    gcc-stable-branch.patch \
+    COLLECT_AS_OPTIONS.patch \
+    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+    zero-regs-gcc8.patch \
+    0001-Fix-stack-protection-issues.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
