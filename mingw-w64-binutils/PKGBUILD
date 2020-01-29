@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=134
+pkgrel=135
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -15,7 +15,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
+options=('staticlibs' 'distcc' 'strip') # 'debug' '!strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         binutils-stable-branch.patch
@@ -33,16 +33,6 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0003-i386-Align-branches-within-a-fixed-boundary.patch
         0004-i386-Add-mbranches-within-32B-boundaries.patch
         0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch)
-sha256sums=('0cb4843da15a65a953907c96bad658283f3c4419d6bcc56bf2789db16306adb2'
-            'SKIP'
-            '93296b909e1a4f9d8a4bbe2437aafa17ca565ef6642a9812b0360c05be228c9d'
-            '2c99345fc575c3a060d6677537f636c6c4154fac0fde508070f3b6296c1060d4'
-            '604e76e0f702ced493ee22aa3c1768b4776b2008a7d70ae0dd35fe5be3522141'
-            '34ba6c001ff7f95ae1da0619c73130112b76d0d2a31bb8a00602eb22f1f84cb8'
-            'd0d5d7fbf26b4ea902583ca5cd03fe1721adc0582f05f4ce9595f6b0a1f3c4d8'
-            '53c8b1a2455dc3ac9e2bba766c68294bae5c4e357f17a32f1f3ad4f24b2b44ea'
-            'd0d969fd18d3acce9b93461b506fb20e90507109639b55d6945c5d9a7f55bf37')
-validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
@@ -82,12 +72,16 @@ build() {
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
   GCC_IGNORE_WERROR=1
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
+
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -105,6 +99,7 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --enable-targets=x86_64-*-mingw* \
     --disable-shared
 
   make MAKEINFO=true
