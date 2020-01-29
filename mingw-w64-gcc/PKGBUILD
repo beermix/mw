@@ -187,6 +187,10 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
+
   unset CFLAGS
   unset CXXFLAGS
   export CFLAGS="-march=haswell -g1 -O3"

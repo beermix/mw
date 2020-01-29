@@ -84,6 +84,8 @@ build() {
   GCC_IGNORE_WERROR=1
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
+
   CFLAGS=${CFLAGS/-O2/-O3}
   CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
