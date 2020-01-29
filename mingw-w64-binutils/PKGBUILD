@@ -102,7 +102,7 @@ build() {
     --enable-targets=x86_64-pc-mingw64 \
     --disable-shared
 
-  make MAKEINFO=true
+  make
 }
 
 check() {
@@ -115,7 +115,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} MAKEINFO=true install
+  make DESTDIR=${pkgdir} install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
