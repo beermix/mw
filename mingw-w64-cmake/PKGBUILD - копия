@@ -5,7 +5,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.16.3
-pkgrel=5
+pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -17,7 +17,12 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-zstd")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-pkg-config"
-         "${MINGW_PACKAGE_PREFIX}-openssl"
+         "${MINGW_PACKAGE_PREFIX}-curl"
+         "${MINGW_PACKAGE_PREFIX}-expat"
+         "${MINGW_PACKAGE_PREFIX}-jsoncpp"
+         "${MINGW_PACKAGE_PREFIX}-libarchive"
+         "${MINGW_PACKAGE_PREFIX}-libuv"
+         "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs') # '!strip' 'debug'
 source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
@@ -73,27 +78,18 @@ build() {
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
     "${srcdir}"/${_realname}-${pkgver}/configure  \
-    --prefix=${MINGW_PREFIX} \
-    --no-qt-gui \
-    --no-system-libs \
-    --parallel=8
+    --prefix=${MINGW_PREFIX}                      \
+    --system-libs                                 \
+    --no-system-expat                             \
+    --no-qt-gui                                      \
+    --parallel=7
   plain "Start building..."
-
-  export CC='/mingw64/bin/ccache /mingw64/bin/gcc'
-  export CXX='/mingw64/bin/ccache /mingw64/bin/g++'
-
   make
 }
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  export CC='/mingw64/bin/ccache /mingw64/bin/gcc'
-  export CXX='/mingw64/bin/ccache /mingw64/bin/g++'
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_C_FLAGS="-march=haswell -O2 -Wall -pipe -Wno-format-security" \
-     -DCMAKE_CXX_FLAGS="-march=haswell -O2 -Wall -pipe -Wno-format-security" \
-     -DCMAKE_USE_OPENSSL=ON \
-     -DBUILD_CursesDialog=0 \
-     -P cmake_install.cmake
+     -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
 }

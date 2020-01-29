@@ -79,7 +79,7 @@ build() {
 
 package() {
   cd "${srcdir}/build-${CARCH}"
-  make -j1 INSTALL_PREFIX="${pkgdir}" install_sw
+  make INSTALL_PREFIX="${pkgdir}" install_sw -j1
 
   chmod -R 755 "${pkgdir}/oth"/bin
   chmod -R 644 "${pkgdir}/oth"/lib
