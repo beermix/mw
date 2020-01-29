@@ -229,7 +229,19 @@ build() {
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
     VERBOSE="VERBOSE=1"
   else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release \
+    		     -DLLVM_BUILD_BENCHMARKS=OFF \
+    		     -DLLVM_INCLUDE_DOCS=OFF \
+    		     -DLLVM_ENABLE_DOXYGEN=OFF \
+    		     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    		     -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    		     -DLLVM_ENABLE_WERROR=OFF \
+    		     -DLLVM_ENABLE_ZLIB=ON \
+    		     -DLLVM_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DCLANG_BUILD_EXAMPLES=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -254,9 +266,6 @@ build() {
 #     -DLLVM_TARGETS_TO_BUILD="X86" \
 #     -DLLVM_ENABLE_CXX1Y=OFF \
 #     -DLLVM_ENABLE_CXX1Z=OFF \
-
-  # Avoid shipping libclang-cpp before removing BUILD_SHARED_LIBS=ON
-  sed -i '/add_clang_subdirectory(clang-shlib)/d' tools/CMakeLists.txt
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -285,14 +294,6 @@ build() {
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=ON \
-    -DBUILD_SHARED_LIBS=ON \
-    -DLLVM_LINK_LLVM_DYLIB=ON \
-    -DCLANG_LINK_CLANG_DYLIB=OFF \
-    -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_BUILD_TESTS=ON \
-    -DLLVM_INCLUDE_DOCS=OFF \
-    -DLLVM_BUILD_DOCS=OFF \
-    -DSPHINX_WARNINGS_AS_ERRORS=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
@@ -319,6 +320,14 @@ build() {
   sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
+
+#check() {
+#  cd "${srcdir}"/build-${CARCH}
+#  # Remove || true once testcase doesn't cause failures.
+#  make check || true
+#  make check-clang || true
+#  make check-polly || true
+#}
 
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
