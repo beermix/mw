@@ -231,16 +231,16 @@ build() {
     		     -DLLVM_ENABLE_OCAMLDOC=OFF \
     		     -DLLVM_OPTIMIZED_TABLEGEN=ON \
     		     -DLLVM_ENABLE_WERROR=OFF \
-    		     -DCLANG_INCLUDE_DOCS=OFF \
-    		     -DCLANG_INCLUDE_TESTS=OFF \
-    		     -DCLANG_BUILD_EXAMPLES=OFF \
     		     -DLLVM_ENABLE_ZLIB=ON \
     		     -DLLVM_BUILD_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
     		     -DLLVM_ENABLE_CXX1Y=OFF \
     		     -DLLVM_ENABLE_CXX1Z=OFF \
-    		     -DLLVM_INCLUDE_TESTS=OFF)
+    		     -DLLVM_INCLUDE_TESTS=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DCLANG_INCLUDE_TESTS=OFF \
+    		     -DCLANG_BUILD_EXAMPLES=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
