@@ -101,7 +101,7 @@ build() {
     --enable-secureplt \
     --with-system-zlib \
     --enable-targets=x86_64-pc-mingw64 \
-    --enable-shared --disable-static
+    --disable-shared --enable-static
 
   make
 }
