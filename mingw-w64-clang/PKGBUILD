@@ -19,7 +19,6 @@ else
   _make_cmd="make"
 fi
 _realname=clang
-_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-analyzer"
@@ -35,12 +34,12 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.1
 pkgrel=12
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
 license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
-             "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python2"
@@ -243,7 +242,14 @@ build() {
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_DOCS=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
-    		     -DLLVM_INCLUDE_TESTS=OFF)
+    		     -DLLVM_INCLUDE_TESTS=OFF \
+    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=OFF \
+    		     -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
+    		     -DGO_EXECUTABLE=GO_EXECUTABLE-NOTFOUND \
+    		     -DOCAMLFIND=OCAMLFIND-NOTFOUND \
+    		     -DLLVM_OPTIMIZED_TABLEGEN=ON)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -282,7 +288,7 @@ build() {
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DCLANG_ANALYZER_BUILD_Z3=ON \
+    -DCLANG_ANALYZER_BUILD_Z3=OFF \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -334,8 +340,7 @@ package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-gcc"
-           "${MINGW_PACKAGE_PREFIX}-z3")
+           "${MINGW_PACKAGE_PREFIX}-gcc")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install

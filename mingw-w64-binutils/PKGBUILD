@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=133
+pkgrel=134
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -86,8 +86,8 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CXXFLAGS/-O2/-O3}
+#  CFLAGS=${CFLAGS/-O2/-O3}
+#  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -107,7 +107,7 @@ build() {
     --enable-gold \
     --disable-shared
 
-  make
+  make MAKEINFO=true
 }
 
 check() {
@@ -120,7 +120,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
