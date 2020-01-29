@@ -71,10 +71,8 @@ build() {
     no-zlib-dynamic \
     enable-ec_nistp_64_gcc_128
 
-    make depend all
-    #noti make
-    #     enable-ec_nistp_64_gcc_128
-    #make  ZLIB_INCLUDE=-I"/oth"/include depend all
+    make depend
+    make
 }
 
 package() {
