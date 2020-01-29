@@ -77,7 +77,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         ipa-cp.patch
         optimize-at-least-some.patch
         gomp-relax.patch
-        COLLECT_AS_OPTIONS.patch)
+        COLLECT_AS_OPTIONS.patch
+        avx512-when-we-ask-for-it.patch
+        arch-native-override.patch
+        icelake.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -141,7 +144,10 @@ prepare() {
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    gomp-relax.patch
+    gomp-relax.patch \
+    avx512-when-we-ask-for-it.patch \
+    arch-native-override.patch \
+    icelake.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -191,13 +197,15 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g0 -O3"
-#  export CXXFLAGS="-march=haswell -g0 -O3"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g0 -O3"
+  export CXXFLAGS="-march=haswell -g0 -O3"
+  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O3"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O3"
+  export BOOT_CFLAGS="-march=haswell -g0 -O3"
+  export BOOT_CXXFLAGS="-march=haswell -g0 -O3"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -208,7 +216,6 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -248,7 +255,11 @@ build() {
 
   # nice -n 19
 
-  noti make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
+#  noti make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
+
+#  noti make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
+
+  noti make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
