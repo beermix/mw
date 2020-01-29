@@ -191,13 +191,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g0 -O3"
+#  export CXXFLAGS="-march=haswell -g0 -O3"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -247,7 +247,8 @@ build() {
   fi
 
   # nice -n 19
-  noti make all
+
+  noti make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
