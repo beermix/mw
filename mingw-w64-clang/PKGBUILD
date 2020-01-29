@@ -237,6 +237,7 @@ build() {
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
     		     -DLLVM_INCLUDE_TESTS=OFF \
     		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
     		     -DCLANG_INCLUDE_TESTS=OFF \
     		     -DCLANG_BUILD_EXAMPLES=OFF)
   fi
@@ -254,12 +255,11 @@ build() {
     export CXX='clang++'
   fi
 
-  
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
   fi
- 
+
 #     -DLLVM_TARGETS_TO_BUILD="X86" \
 #    		     -DLLVM_ENABLE_CXX1Y=OFF \
 #    		     -DLLVM_ENABLE_CXX1Z=OFF \
@@ -306,7 +306,8 @@ build() {
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
 #  /home/User/.go/bin/noti ${_make_cmd} VERBOSE=1 -j7
-  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j8
+  /home/User/.go/bin/noti ${_make_cmd} -j7
+#  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j8
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
