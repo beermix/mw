@@ -331,8 +331,7 @@ package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-gcc"
-           "${MINGW_PACKAGE_PREFIX}-z3")
+           "${MINGW_PACKAGE_PREFIX}-gcc")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
@@ -455,7 +454,6 @@ package_lldb() {
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
-           "${MINGW_PACKAGE_PREFIX}-z3"
            "${MINGW_PACKAGE_PREFIX}-gcc-libs") # "compiler-rt"
 
   cd "${srcdir}"/llvm-${pkgver}.src
