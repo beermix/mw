@@ -235,8 +235,6 @@ build() {
     		     -DLLVM_BUILD_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_EXAMPLES=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
-    		     -DLLVM_ENABLE_CXX1Y=OFF \
-    		     -DLLVM_ENABLE_CXX1Z=OFF \
     		     -DLLVM_INCLUDE_TESTS=OFF \
     		     -DCLANG_INCLUDE_DOCS=OFF \
     		     -DCLANG_INCLUDE_TESTS=OFF \
@@ -263,6 +261,8 @@ build() {
   fi
  
 #     -DLLVM_TARGETS_TO_BUILD="X86" \
+#    		     -DLLVM_ENABLE_CXX1Y=OFF \
+#    		     -DLLVM_ENABLE_CXX1Z=OFF \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
