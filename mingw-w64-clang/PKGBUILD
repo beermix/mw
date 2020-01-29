@@ -10,7 +10,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=clang
+_compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
