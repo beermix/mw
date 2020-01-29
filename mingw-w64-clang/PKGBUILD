@@ -231,7 +231,17 @@ build() {
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
     VERBOSE="VERBOSE=1"
   else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release \
+    		     -DLLVM_BUILD_BENCHMARKS=OFF \
+    		     -DLLVM_INCLUDE_DOCS=OFF \
+    		     -DLLVM_ENABLE_DOXYGEN=OFF \
+    		     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    		     -DLLVM_ENABLE_WERROR=OFF \
+    		     -DLLVM_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DCLANG_BUILD_EXAMPLES=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
