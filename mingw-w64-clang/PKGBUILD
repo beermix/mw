@@ -224,33 +224,27 @@ build() {
     VERBOSE="VERBOSE=1"
   else
     extra_config+=(-DCMAKE_BUILD_TYPE=Release \
-                   -DLLVM_BUILD_TESTS=OFF \
-                   -DLLVM_BUILD_BENCHMARKS=OFF \
-                   -DLLVM_INCLUDE_DOCS=OFF \
-                   -DLLVM_ENABLE_DOXYGEN=OFF \
-                   -DLLVM_ENABLE_OCAMLDOC=OFF \
-                   -DLLVM_OPTIMIZED_TABLEGEN=ON \
-                   -DLLVM_ENABLE_BINDINGS=OFF \
-                   -DBUILD_SHARED_LIBS=OFF \
-                   -DCLANG_LINK_CLANG_DYLIB=OFF \
-                   -DLLVM_ENABLE_RTTI=ON \
-                   -DLLVM_ENABLE_TERMINFO=OFF \
-                   -DLLVM_ENABLE_WERROR=OFF \
-                   -DCLANG_INCLUDE_DOCS=OFF \
-                   -DCLANG_INCLUDE_TESTS=OFF \
-                   -DCLANG_BUILD_EXAMPLES=OFF \
-                   -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
-                   -DLLVM_ENABLE_ZLIB=ON \
-                   -DLLVM_ENABLE_CXX1Y=OFF \
-                   -DLLVM_ENABLE_CXX1Z=OFF \
-                   -DLLVM_ENABLE_MODULES=OFF \
-                   -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
-                   -DLLVM_BUILD_EXAMPLES=OFF \
-                   -DLLVM_ENABLE_SPHINX=OFF \
-                   -DLLVM_INCLUDE_EXAMPLES=OFF \
-                   -DLLVM_INCLUDE_GO_TESTS=OFF \
-                   -DLLVM_INCLUDE_TESTS=OFF \
-                   -DLLVM_DYLIB_COMPONENTS=all)
+    		     -DLLVM_BUILD_TESTS=OFF \
+    		     -DLLVM_BUILD_BENCHMARKS=OFF \
+    		     -DLLVM_INCLUDE_DOCS=OFF \
+    		     -DLLVM_ENABLE_DOXYGEN=OFF \
+    		     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    		     -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    		     -DLLVM_ENABLE_RTTI=ON \
+    		     -DLLVM_ENABLE_WERROR=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DCLANG_INCLUDE_TESTS=OFF \
+    		     -DCLANG_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_ENABLE_ZLIB=ON \
+    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=OFF \
+    		     -DLLVM_ENABLE_MODULES=OFF \
+    		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
+    		     -DLLVM_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_ENABLE_SPHINX=OFF \
+    		     -DLLVM_INCLUDE_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DLLVM_INCLUDE_TESTS=OFF)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -315,7 +309,8 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  make -j7
+#  /home/User/.go/bin/noti ${_make_cmd} VERBOSE=1 -j7
+  /home/User/.go/bin/noti ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
