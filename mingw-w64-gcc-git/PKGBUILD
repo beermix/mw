@@ -113,7 +113,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
 
-  patch -p1 -i "${srcdir}"/010-documentation.patch
+#  patch -p1 -i "${srcdir}"/010-documentation.patch
   patch -p1 -i "${srcdir}"/gomp-relax.patch
   patch -p1 -i "${srcdir}"/ipa-cp.patch
   patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
