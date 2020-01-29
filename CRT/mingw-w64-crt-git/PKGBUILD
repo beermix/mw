@@ -4,7 +4,7 @@ _realname=crt
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
-pkgver=8.0.0.5634.fabd26c4
+pkgver=8.0.0.5633.53fab17a
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=('any')
@@ -35,13 +35,13 @@ pkgver() {
   printf "%s.%s.%s.%s.%s" ${_major} ${_minor} ${_rev} "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-  cd ${srcdir}/mingw-w64
+#prepare() {
+#  cd ${srcdir}/mingw-w64
 
-  git am --committer-date-is-author-date "${srcdir}/0001-Allow-to-use-bessel-and-complex-functions-without-un.patch"
+  #git am --committer-date-is-author-date "${srcdir}/0001-Allow-to-use-bessel-and-complex-functions-without-un.patch"
   #git am --committer-date-is-author-date "${srcdir}/0002-DirectX-9-fixes-for-VLC.patch"
   #git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
-}
+#}
 
 build() {
   msg "Building ${MINGW_CHOST} CRT"
