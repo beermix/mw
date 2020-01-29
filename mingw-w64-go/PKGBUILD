@@ -1,10 +1,11 @@
 # Maintainer: Martell Malone < martell malone at g mail dot com >
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
+# https://github.com/golang/go/releases
 
 _realname=go
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.13.6
+pkgver=1.13.7
 pkgrel=1
 pkgdesc="Go Lang (mingw-w64)"
 arch=('any')
