@@ -323,7 +323,7 @@ package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-gcc"
+           "${MINGW_PACKAGE_PREFIX}-gcc")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
@@ -353,7 +353,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-
 }
 
 package_clang-tools-extra() {

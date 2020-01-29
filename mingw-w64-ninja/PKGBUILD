@@ -22,10 +22,9 @@ prepare () {
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
       -DCMAKE_BUILD_TYPE=Release \
-      "${extra_config[@]}" \
       ../${_realname}-${pkgver}
 
-  make -j7
+  make
 }
 
 package() {
