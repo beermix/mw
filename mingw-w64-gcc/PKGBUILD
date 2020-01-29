@@ -231,8 +231,7 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --enable-silent-rules \
-    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
+    --with-pkgversion="Rev${pkgrel}" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
