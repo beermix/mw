@@ -12,7 +12,7 @@
 # We can switch to clang when it fully works with mingw-w64
 _compiler=gcc
 _generator="MSYS Makefiles"
-_generator="Ninja"
+#_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
   _make_cmd="ninja"
 else
@@ -272,7 +272,7 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
