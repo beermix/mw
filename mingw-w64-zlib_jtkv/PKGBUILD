@@ -3,7 +3,7 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
 
-_external_minizip=no
+_external_minizip=yes
 _realname=zlib
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
