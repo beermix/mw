@@ -1,0 +1,36 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Renato Silva <br.renatosilva@gmail.com>
+
+_realname=expat
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=2.2.9
+pkgrel=1
+pkgdesc="An XML parser library (mingw-w64)"
+arch=('any')
+url="https://libexpat.github.io/"
+license=(MIT)
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config")
+options=('strip' 'staticlibs')
+source=("${pkgver}.tar.gz"::"https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.xz")
+
+prepare () {
+  cd ${srcdir}/${_realname}-${pkgver}
+
+    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_PREFIX}/bin/cmake \
+      -G'MSYS Makefiles' \
+      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DEXPAT_BUILD_DOCS=0 \
+      -DEXPAT_BUILD_EXAMPLES=0 \
+      "${extra_config[@]}" \
+      ../${_realname}-${pkgver}
+
+  make -j7
+}
+
+package() {
+  cd ${srcdir}/${_realname}-${pkgver}
+  make DESTDIR=${pkgdir} install
+}

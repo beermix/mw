@@ -7,7 +7,7 @@ pkgver=08ecbd6c15800a791163d2b133dae0e9f0bb418a
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
-url="https://ninja-build.org"
+url="https://github.com/ninja-build/ninja/"
 license=('Apache')
 depends=()
 options=('strip' 'staticlibs')
@@ -15,7 +15,7 @@ makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python3" "${MINGW_PACKAGE_PREFIX}-c
 source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz")
 
 prepare () {
-  cd ${srcdir}/ninja-${pkgver}
+  cd ${srcdir}/${_realname}-${pkgver}
 
     MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_PREFIX}/bin/cmake \
@@ -29,7 +29,7 @@ prepare () {
 }
 
 package() {
-  cd ${srcdir}/ninja-${pkgver}
+  cd ${srcdir}/${_realname}-${pkgver}
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin/
   mv ninja.exe "${pkgdir}${MINGW_PREFIX}"/bin/
 }
