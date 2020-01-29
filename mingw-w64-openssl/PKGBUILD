@@ -54,7 +54,7 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -g0 -O3 -pipe/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -pipe/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
@@ -71,7 +71,7 @@ build() {
     no-zlib-dynamic \
     enable-ec_nistp_64_gcc_128
 
-    nice -n 19 make depend all
+    make depend all
     #noti make
     #     enable-ec_nistp_64_gcc_128
     #make  ZLIB_INCLUDE=-I"/oth"/include depend all
@@ -79,7 +79,7 @@ build() {
 
 package() {
   cd "${srcdir}/build-${CARCH}"
-  make INSTALL_PREFIX="${pkgdir}" install_sw -j1
+  make INSTALL_PREFIX="${pkgdir}" install_sw
 
   chmod -R 755 "${pkgdir}/oth"/bin
   chmod -R 644 "${pkgdir}/oth"/lib
