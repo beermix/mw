@@ -229,7 +229,27 @@ build() {
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
     VERBOSE="VERBOSE=1"
   else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release \
+    		     -DLLVM_BUILD_BENCHMARKS=OFF \
+    		     -DLLVM_ENABLE_WERROR=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DLLVM_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_BUILD_DOCS=OFF \
+    		     -DLLVM_BUILD_TESTS=OFF \
+    		     -DLLVM_ENABLE_DOXYGEN=OFF \
+    		     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    		     -DLLVM_ENABLE_SPHINX=OFF \
+    		     -DLLVM_INCLUDE_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_DOCS=OFF \
+    		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DLLVM_INCLUDE_TESTS=OFF \
+    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=OFF \
+    		     -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
+    		     -DGO_EXECUTABLE=GO_EXECUTABLE-NOTFOUND \
+    		     -DOCAMLFIND=OCAMLFIND-NOTFOUND \
+    		     -DLLVM_OPTIMIZED_TABLEGEN=ON)
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -246,7 +266,6 @@ build() {
   fi
 
 
-  
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
