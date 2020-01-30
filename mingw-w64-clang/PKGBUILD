@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.1
-pkgrel=13
+pkgrel=14
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
@@ -229,7 +229,30 @@ build() {
     extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
     VERBOSE="VERBOSE=1"
   else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release \
+    		     -DLLVM_BUILD_BENCHMARKS=OFF \
+    		     -DLLVM_ENABLE_WERROR=OFF \
+    		     -DCLANG_INCLUDE_DOCS=OFF \
+    		     -DLLVM_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_BUILD_DOCS=OFF \
+    		     -DLLVM_BUILD_TESTS=OFF \
+    		     -DLLVM_ENABLE_DOXYGEN=OFF \
+    		     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    		     -DLLVM_ENABLE_SPHINX=OFF \
+    		     -DLLVM_INCLUDE_EXAMPLES=OFF \
+    		     -DLLVM_INCLUDE_DOCS=OFF \
+    		     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    		     -DLLVM_INCLUDE_TESTS=OFF \
+    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Z=ON \
+    		     -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
+    		     -DGO_EXECUTABLE=GO_EXECUTABLE-NOTFOUND \
+    		     -DOCAMLFIND=OCAMLFIND-NOTFOUND \
+    		     -DLLVM_ENABLE_ZLIB=ON \
+    		     -DCLANG_BUILD_EXAMPLES=OFF \
+    		     -DLLVM_OPTIMIZED_TABLEGEN=ON)
+
   fi
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
@@ -245,7 +268,6 @@ build() {
     export CXX='clang++'
   fi
 
-
   
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
@@ -258,7 +280,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DLLVM_CCACHE_BUILD=ON \
-    -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
@@ -268,7 +290,6 @@ build() {
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DCLANG_ANALYZER_BUILD_Z3=OFF \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
