@@ -21,7 +21,7 @@ pkgver=9.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-_islver=0.16.1
+_islver=0.22.1
 pkgrel=4
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -34,6 +34,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
              "${MINGW_PACKAGE_PREFIX}-gmp"
+             "${MINGW_PACKAGE_PREFIX}-isl"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-mpc"
              "${MINGW_PACKAGE_PREFIX}-mpfr"
@@ -44,7 +45,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' 'strip')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
-        "https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2"
+        #"http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
@@ -78,9 +79,13 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize-at-least-some.patch
         gomp-relax.patch
         COLLECT_AS_OPTIONS.patch
-        avx512-when-we-ask-for-it.patch
         arch-native-override.patch
-        icelake.patch)
+        icelake.patch
+        0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
+        0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
+        0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
+        0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
+        0014-clone_function_name_1-Retain-any-stdcall-suffix.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -105,7 +110,7 @@ del_file_exists() {
 prepare() {
   cd ${srcdir}/${_sourcedir}
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
@@ -145,9 +150,7 @@ prepare() {
     ipa-cp.patch \
     optimize-at-least-some.patch \
     gomp-relax.patch \
-    avx512-when-we-ask-for-it.patch \
-    arch-native-override.patch \
-    icelake.patch
+    arch-native-override.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -199,6 +202,7 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
+
   export CFLAGS="-march=haswell -g0 -O2"
   export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
@@ -207,6 +211,9 @@ build() {
   export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
   export FFLAGS_FOR_TARGET="$FFLAGS"
 
+  export CC='ccache gcc'
+  export CXX='ccache g++'
+ 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -238,27 +245,22 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --enable-silent-rules \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
-  #     --disable-libstdcxx-verbose \
   # .. we may as well not strip anything.
   if check_option "strip" "n"; then
     sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  # nice -n 19
-
-#  noti make "CFLAGS=-march=haswell -g0 -O2" "CXXFLAGS=-march=haswell -g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-march=haswell -g0 -O2" "BOOT_CXXFLAGS=-march=haswell -g0 -O2" all
-
-#  noti make "CFLAGS=-march=haswell -g0 -O2" "CXXFLAGS=-march=haswell -g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-march=haswell -g0 -O2" "BOOT_CXXFLAGS=-march=haswell -g0 -O2" all
-
   noti nice -n 19 make all
+
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
