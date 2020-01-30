@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.22.1
-pkgrel=4
+pkgrel=5
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -140,17 +140,18 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    COLLECT_AS_OPTIONS.patch \
-    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    zero-regs-gcc8.patch \
-    0001-Fix-stack-protection-issues.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    optimize.patch \
-    ipa-cp.patch \
-    optimize-at-least-some.patch \
-    gomp-relax.patch \
-    arch-native-override.patch
+    COLLECT_AS_OPTIONS.patch
+   
+#    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+#    zero-regs-gcc8.patch \
+#    0001-Fix-stack-protection-issues.patch \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    optimize.patch \
+#    ipa-cp.patch \
+#    optimize-at-least-some.patch \
+#    gomp-relax.patch \
+#    arch-native-override.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -202,18 +203,12 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
-  export BOOT_CFLAGS="-march=haswell -g0 -O2"
-  export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
- 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -260,7 +255,6 @@ build() {
   fi
 
   noti nice -n 19 make all
-
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
