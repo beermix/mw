@@ -1,10 +1,11 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # http://isl.gforge.inria.fr/?C=M;O=D
+# -O3 -fomit-frame-pointer -malign-double -fstrict-aliasing -ffast-math
 
 _realname=isl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=0.22
+pkgver=0.22.1
 pkgrel=1
 pkgdesc="Library for manipulating sets and relations of integer points bounded by linear constraints (mingw-w64)"
 arch=('any')
@@ -26,7 +27,7 @@ prepare() {
   unset CXXFLAGS
   unset LDFLAGS
 
-  autoreconf -fi
+  autoreconf -ifv
 }
 
 build() {
@@ -42,7 +43,6 @@ build() {
     --enable-static \
     --disable-shared \
     --disable-silent-rules \
-    --with-gcc-arch=haswell \
     --with-gmp-prefix=${MINGW_PREFIX}
 
   make
