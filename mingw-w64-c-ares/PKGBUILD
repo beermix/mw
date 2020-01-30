@@ -51,19 +51,19 @@ prepare() {
     0002-Add-static-pkg-config.patch \
     0003-fix-cmake-targets.patch
 
-  autoreconf -fi
+#  autoreconf -fi
 }
 
 build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
-  
-  ../${_realname}-cares-${pkgver//./_}/configure \
-    --prefix=${MINGW_PREFIX} \
-    --build=${MINGW_CHOST} \
-    --host=${MINGW_CHOST} \
-    --enable-shared \
-    --enable-static
+# 
+#  ../${_realname}-cares-${pkgver//./_}/configure \
+#    --prefix=${MINGW_PREFIX} \
+#    --build=${MINGW_CHOST} \
+#    --host=${MINGW_CHOST} \
+#    --enable-shared \
+#    --enable-static
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake \

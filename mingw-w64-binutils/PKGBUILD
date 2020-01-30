@@ -15,7 +15,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs' '!distcc' 'strip') # 'debug' '!strip')
+options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         binutils-stable-branch.patch
@@ -72,16 +72,16 @@ build() {
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
   GCC_IGNORE_WERROR=1
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -100,8 +100,7 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
-    --enable-targets=x86_64-*-mingw* \
-    --disable-shared
+     --disable-shared
 
   make MAKEINFO=true
 }
