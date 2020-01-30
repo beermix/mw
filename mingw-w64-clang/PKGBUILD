@@ -259,6 +259,7 @@ build() {
     -G"$_generator" \
     -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
@@ -313,6 +314,7 @@ build() {
 #  make check-clang || true
 #  make check-polly || true
 #}
+
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
