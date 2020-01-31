@@ -15,7 +15,7 @@ makedepends=('git' "${MINGW_PACKAGE_PREFIX}-tools")
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 options=('!strip' '!libtool' '!emptydirs')
-source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#tag=v7.0.0"
+source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64"
         0001-Allow-to-use-bessel-and-complex-functions-without-un.patch
         0002-DirectX-9-fixes-for-VLC.patch
         0003-DirectX-11-fixes-for-VLC.patch)
