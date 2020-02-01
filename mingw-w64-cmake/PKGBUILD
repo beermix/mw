@@ -26,14 +26,15 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 optdepends=("${MINGW_PACKAGE_PREFIX}-emacs: for cmake emacs mode")
-options=('staticlibs' 'strip') # '!strip' 'debug'
+options=('staticlibs') # '!strip' 'debug'
 source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
         "0007-Do-not-generate-import-libs-for-exes.patch"
-        "0008-Output-line-numbers-in-callstacks.patch")
+        "0008-Output-line-numbers-in-callstacks.patch"
+        "100-disable_qt_tests.patch")
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -60,10 +61,12 @@ prepare() {
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
+    100-disable_qt_tests.patch \
     0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
     0008-Output-line-numbers-in-callstacks.patch
+
 }
 
 build() {
@@ -71,7 +74,7 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-  "${srcdir}"/${_realname}-${pkgver}/configure  \
+    "${srcdir}"/${_realname}-${pkgver}/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
