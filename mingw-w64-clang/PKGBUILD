@@ -258,10 +258,10 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    export CC='clang -stdlib=libc++'
-    export CXX='clang++ -stdlib=libc++'
-    #export CC='clang'
-    #export CXX='clang++'
+    #export CC='clang -stdlib=libc++'
+    #export CXX='clang++ -stdlib=libc++'
+    export CC='clang'
+    export CXX='clang++'
   fi
 
   
