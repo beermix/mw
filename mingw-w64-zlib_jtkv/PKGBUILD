@@ -44,7 +44,7 @@ prepare() {
   patch -p1 -i ${srcdir}/01-zlib-1.2.11-1-buildsys.mingw.patch
   patch -p2 -i ${srcdir}/03-dont-put-sodir-into-L.mingw.patch
   patch -p1 -i ${srcdir}/04-fix-largefile-support.patch
-  patch -p1 -i ${srcdir}/lto.patch
+  #patch -p1 -i ${srcdir}/lto.patch
   patch -p1 -i ${srcdir}/configure.patch
 
   if [ "${_external_minizip}" != "yes" ]; then
