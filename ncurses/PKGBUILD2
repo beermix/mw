@@ -2,32 +2,30 @@
 
 pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
-_basever=6.0
-pkgver=${_basever}
-pkgrel=5
+_basever=6.1
+_date=20200118
+pkgver=${_basever}.${_date}
+pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/ncurses/"
 license=('MIT')
-source=("${pkgbase}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/ncurses-6.0.tar.gz"
-	100-ncurses-5.6-20080112-urxvt.patch
-	101-ncurses-5.6-20080628-kbs.patch
-	102-ncurses-5.9-gcc-5.patch
-	200-fix_missing_include.patch
-	900-terminfo.patch)
+source=("${pkgbase}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/current/${pkgbase}-${_basever}-${_date}.tgz"
+	02-debian-backspace.diff
+	02-debian-drop-rin-from-screen-256color.diff
+	03-debian-ncursesconfig-omit-L.diff)
+
 
 prepare() {
-  cd ${srcdir}/${pkgbase}-${_basever}
+  cd ${srcdir}/${pkgbase}-${_basever}-${_date}
 
-    patch -p1 -i ${srcdir}/100-ncurses-5.6-20080112-urxvt.patch
-    patch -p1 -i ${srcdir}/101-ncurses-5.6-20080628-kbs.patch
-    patch -p1 -i ${srcdir}/102-ncurses-5.9-gcc-5.patch
-    patch -p1 -i ${srcdir}/200-fix_missing_include.patch
-    patch -p1 -i ${srcdir}/900-terminfo.patch
+    patch -p1 -i ${srcdir}/02-debian-backspace.diff
+    patch -p1 -i ${srcdir}/02-debian-drop-rin-from-screen-256color.diff
+    patch -p1 -i ${srcdir}/03-debian-ncursesconfig-omit-L.diff
 }
 
 build() {
-  cd ${srcdir}/${pkgbase}-${_basever}
+  cd ${srcdir}/${pkgbase}-${_basever}-${_date}
 
   ./configure \
     --build=${CHOST} \
@@ -54,13 +52,12 @@ build() {
     --disable-mixed-case \
     --with-pkg-config \
     --enable-pc-files \
-    --without-tests \
-    --without-manpages \
-    --disable-warnings \
+    --with-manpage-format=normal \
+    --with-manpage-aliases \
     --with-default-terminfo-dir=/usr/share/terminfo \
     --enable-echo \
     --includedir=/usr/include/ncursesw \
-    --with-build-cppflags=-D_GNU_SOURCE \
+    --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
   make
