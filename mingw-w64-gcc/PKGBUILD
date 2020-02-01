@@ -126,7 +126,7 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+    0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
