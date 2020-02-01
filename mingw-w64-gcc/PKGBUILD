@@ -71,7 +71,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         zero-regs-gcc8.patch
         0001-Fix-stack-protection-issues.patch
-        openmp-vectorize-v2.patch
         fortran-vector-v2.patch
         optimize.patch
         ipa-cp.patch
@@ -151,16 +150,16 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     0001-Fix-stack-protection-issues.patch \
-    COLLECT_AS_OPTIONS.patch
-    
+    COLLECT_AS_OPTIONS.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    gomp-relax.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch
+
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
 #    zero-regs-gcc8.patch \
-#    penmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    optimize.patch \
-#    ipa-cp.patch \
-#    optimize-at-least-some.patch \
-#    gomp-relax.patch \
 #    arch-native-override.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
@@ -213,8 +212,8 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
@@ -269,7 +268,7 @@ build() {
   fi
 
 #  noti nice -n 19 make CFLAGS="-g0 -march=haswell -O2" CXXFLAGS="-g0 -march=haswell -O2" CFLAGS_FOR_TARGET="-g0 -march=haswell -O2" CXXFLAGS_FOR_TARGET="-g0 -march=haswell -O2" BOOT_CFLAGS="-g0 -march=haswell -O2" BOOT_CXXFLAGS="-g0 -march=haswell -O2" all
-  noti nice -n 19 make all
+  noti nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
