@@ -5,7 +5,7 @@ _realname=ccache
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.7.7
-pkgrel=2
+pkgrel=3
 pkgdesc="Compiler cache that speeds up recompilation by caching previous compilations (mingw-w64)"
 arch=('any')
 url="https://github.com/ccache/ccache/releases"
@@ -25,6 +25,8 @@ validpgpkeys=('5A939A71A46792CF57866A51996DDA075594ADB8') # Joel Rosdahl <joel@r
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   patch -p1 -i "${srcdir}/01-directory-separator.patch"
+
+ autoreconf -ifv
 }
 
 build() {
@@ -38,7 +40,7 @@ build() {
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST} \
       --disable-man \
-      --with-bundled-zlib
+      --with-bundled-zlib=no
 
   make
 }

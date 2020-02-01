@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 #_islver=0.16.1
-pkgrel=8
+pkgrel=9
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -80,6 +80,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         COLLECT_AS_OPTIONS.patch
         arch-native-override.patch
         icelake.patch
+        010-documentation.patch
         0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
         0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
         0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
@@ -142,6 +143,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
+    010-documentation.patch \
     disable-multilib.patch \
     gcov.patch \
     vmov-alignment.patch
@@ -222,9 +224,11 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -252,7 +256,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n 19 make CFLAGS="-g0 -march=haswell -O3" CXXFLAGS="-g0 -march=haswell -O3" CFLAGS_FOR_TARGET="-g0 -march=haswell -O3" CXXFLAGS_FOR_TARGET="-g0 -march=haswell -O3" BOOT_CFLAGS="-g0 -march=haswell -O3" BOOT_CXXFLAGS="-g0 -march=haswell -O3" all
+  noti nice -n 19 make CFLAGS="-g0 -march=haswell -O2" CXXFLAGS="-g0 -march=haswell -O2" CFLAGS_FOR_TARGET="-g0 -march=haswell -O2" CXXFLAGS_FOR_TARGET="-g0 -march=haswell -O2" BOOT_CFLAGS="-g0 -march=haswell -O2" BOOT_CXXFLAGS="-g0 -march=haswell -O2" all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -347,16 +351,16 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale}
   #cp -r share/doc/gcc-${pkgver%%+*} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   # cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
@@ -398,8 +402,8 @@ package_mingw-w64-gcc-fortran() {
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libgfortran*                                   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  #cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada() {
@@ -417,10 +421,10 @@ package_mingw-w64-gcc-ada() {
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adainclude     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  #cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc() {
