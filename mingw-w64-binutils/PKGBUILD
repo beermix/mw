@@ -71,10 +71,10 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-  GCC_IGNORE_WERROR=1
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  GCC_IGNORE_WERROR=1
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
   CFLAGS=${CFLAGS/-O2/-O3}
   CXXFLAGS=${CXXFLAGS/-O2/-O3}
