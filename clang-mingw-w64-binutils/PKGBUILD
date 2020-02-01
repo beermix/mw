@@ -53,7 +53,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
   patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 
-  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
+#  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
 }
 
 build() {
@@ -99,6 +99,8 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --enable-silent-rules \
+    --enable-targets=x86_64-*-mingw* \
     --disable-shared
 
   make MAKEINFO=true
