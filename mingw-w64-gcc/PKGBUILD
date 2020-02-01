@@ -42,7 +42,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' 'strip')
+options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
@@ -196,17 +196,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
-
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -217,12 +209,14 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
+    --with-arch=${_arch} \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -241,6 +235,7 @@ build() {
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-isl \
     --enable-silent-rules \
     --with-gnu-as --with-gnu-ld \
