@@ -26,7 +26,7 @@ prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   patch -p1 -i "${srcdir}/01-directory-separator.patch"
 
- autoreconf -ifv
+# autoreconf -ifv
 }
 
 build() {
