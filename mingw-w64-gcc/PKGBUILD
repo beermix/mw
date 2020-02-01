@@ -140,7 +140,7 @@ prepare() {
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
 
-  # Enable clear linux patches
+  # Enable debian mingw linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
     010-documentation.patch \
@@ -148,10 +148,14 @@ prepare() {
     gcov.patch \
     vmov-alignment.patch
 
+  # Enable clear linux patches
+  apply_patch_with_msg \
+    0001-Fix-stack-protection-issues.patch \
+    COLLECT_AS_OPTIONS.patch
+    
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
 #    zero-regs-gcc8.patch \
-#    0001-Fix-stack-protection-issues.patch \
-#    openmp-vectorize-v2.patch \
+#    penmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
 #    optimize.patch \
 #    ipa-cp.patch \
