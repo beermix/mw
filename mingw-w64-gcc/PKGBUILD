@@ -84,7 +84,11 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
         0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
         0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
-        0014-clone_function_name_1-Retain-any-stdcall-suffix.patch)
+        0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
+        disable-multilib.patch
+        gcov.patch
+        reproducible-s-oscons.patch
+        vmov-alignment.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -139,8 +143,11 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    COLLECT_AS_OPTIONS.patch
-   
+    disable-multilib.patch \
+    gcov.patch \
+    reproducible-s-oscons.patch \
+    vmov-alignment.patch
+
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
 #    zero-regs-gcc8.patch \
 #    0001-Fix-stack-protection-issues.patch \

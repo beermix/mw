@@ -1,0 +1,15 @@
+Description: Use the epoch date for s-oscons.ads
+Author: Stephen Kitt <skitt@debian.org>
+
+Index: gcc-mingw-w64/src/gcc/ada/gcc-interface/Makefile.in
+===================================================================
+--- gcc-mingw-w64.orig/src/gcc/ada/gcc-interface/Makefile.in	2019-02-04 14:06:31.966764994 +0100
++++ gcc-mingw-w64/src/gcc/ada/gcc-interface/Makefile.in	2019-02-04 14:06:31.962764878 +0100
+@@ -2407,6 +2407,7 @@
+ 	    $(OSCONS_CPP) ; \
+ 	    $(OSCONS_EXTRACT) ; \
+ 	    ../bldtools/oscons/xoscons s-oscons)
++	touch --date='@$(SOURCE_DATE_EPOCH)' $@
+ 
+ gnatlib: ../stamp-gnatlib1-$(RTSDIR) ../stamp-gnatlib2-$(RTSDIR) $(RTSDIR)/s-oscons.ads
+ 	test -f $(RTSDIR)/s-oscons.ads || exit 1

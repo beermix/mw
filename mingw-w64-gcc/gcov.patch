@@ -1,0 +1,17 @@
+Description: Add __gcov_exit for gcov fallback
+Author: Stephen Kitt <skitt@debian.org>
+
+When gcov is not supported on the target, gcc uses a fallback
+do-nothing implementation. That’s missing a __gcov_exit()
+implementation, causing linking errors.
+
+--- a/src/libgcc/libgcov-driver.c
++++ b/src/libgcc/libgcov-driver.c
+@@ -30,6 +30,7 @@
+ 
+ #if defined(L_gcov)
+ void __gcov_init (struct gcov_info *p __attribute__ ((unused))) {}
++void __gcov_exit (void) {}
+ #endif
+ 
+ #else /* inhibit_libc */
