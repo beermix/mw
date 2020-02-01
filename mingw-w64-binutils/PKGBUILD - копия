@@ -88,12 +88,19 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --enable-targets=x86_64-pc-mingw64 \
+    --enable-targets=x86_64-*-mingw* \
     --with-system-zlib \
+    --enable-threads \
+    --disable-gdb \
+    --with-pic \
     --enable-silent-rules \
+    --enable-relro \
     --disable-shared
 
-  noti make MAKEINFO=true -j7
+  make MAKEINFO=true configure-host
+  make MAKEINFO=true tooldir=${MINGW_PREFIX}
+
+#  noti make MAKEINFO=true -j7
 }
 
 package() {
