@@ -243,7 +243,7 @@ build() {
     		     -DLLVM_INCLUDE_DOCS=OFF \
     		     -DLLVM_INCLUDE_GO_TESTS=OFF \
     		     -DLLVM_INCLUDE_TESTS=OFF \
-    		     -DLLVM_ENABLE_CXX1Y=OFF \
+    		     -DLLVM_ENABLE_CXX1Y=ON \
     		     -DLLVM_ENABLE_CXX1Z=ON \
     		     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
@@ -262,10 +262,10 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    #export CC='clang -stdlib=libc++'
-    #export CXX='clang++ -stdlib=libc++'
-    export CC='clang'
-    export CXX='clang++'
+    export CC='clang -stdlib=libc++'
+    export CXX='clang++ -stdlib=libc++'
+    #export CC='clang'
+    #export CXX='clang++'
   fi
 
   
@@ -279,7 +279,7 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
