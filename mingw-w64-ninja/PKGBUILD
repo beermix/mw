@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.10.0
+pkgver=b8e3841d69efea53e93b3fb522d74551dd5992fd
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -12,7 +12,7 @@ license=('Apache')
 depends=()
 options=('strip' 'staticlibs')
 makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python3" "${MINGW_PACKAGE_PREFIX}-cmake")
-source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/v1.10.0.tar.gz")
+source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz")
 
 prepare () {
   cd ${srcdir}/${_realname}-${pkgver}
@@ -24,7 +24,7 @@ prepare () {
       -DCMAKE_BUILD_TYPE=Release \
       ../${_realname}-${pkgver}
 
-  make
+  make -j7
 }
 
 package() {
