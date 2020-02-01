@@ -5,13 +5,12 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=11
+pkgrel=12
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
-         #"${MINGW_PACKAGE_PREFIX}-termcap"
         )
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git")
 options=('strip' 'staticlibs')
@@ -79,8 +78,8 @@ prepare() {
   patch -p1 -i ${srcdir}/122-Use-LF-as-newline-in-envsubst.patch
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
-#  patch -p1 -i ${srcdir}/0001-error_print_progname.patch
-#  patch -p1 -i ${srcdir}/0002-Update-after-gnulib-changed.patch
+  patch -p1 -i ${srcdir}/0001-error_print_progname.patch
+  patch -p1 -i ${srcdir}/0002-Update-after-gnulib-changed.patch
 
   sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' ./gettext-tools/Makefile.in
   sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' ./gettext-runtime/Makefile.in
@@ -115,26 +114,17 @@ build() {
     --with-included-libunistring \
     --with-included-libxml \
     --with-included-glib \
+    --disable-curses \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
   # to make relocate() in gnulib-lib work
   sed -s "s|${MINGW_PREFIX}|$(cygpath -m ${MINGW_PREFIX})|g" -i gettext-tools/config.h
 
-  make V=1
+  make
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
-  # Licenses
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING"                                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/COPYING"                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/intl/COPYING.LIB"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/intl/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING.LIB" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/COPYING"                   "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/gnulib-lib/libxml/COPYING" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/gnulib-lib/libxml/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gnulib-local/lib/libxml/COPYING"         "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gnulib-local/lib/libxml/COPYING"
-  rm "${pkgdir}${MINGW_PREFIX}/share/${_realname}/intl/COPYING.LIB"
 }

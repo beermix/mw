@@ -42,7 +42,6 @@ license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-python2"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
@@ -362,10 +361,10 @@ package_clang-analyzer() {
   ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view -j1 DESTDIR="${pkgdir}" install
 
   # Use Python 2
-  sed -i \
-    -e 's|env python$|&2|' \
-    -e 's|/usr/bin/python$|&2|' \
-    "${pkgdir}"${MINGW_PREFIX}/bin/scan-view
+#  sed -i \
+#    -e 's|env python$|&2|' \
+#    -e 's|/usr/bin/python$|&2|' \
+#    "${pkgdir}"${MINGW_PREFIX}/bin/scan-view
 
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
