@@ -5,7 +5,7 @@ pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
 pkgdesc="MinGW-w64 headers for Windows"
-pkgver=7.0.0.5574.0f6153eb
+pkgver=8.0.0.5634.fabd26c4
 pkgrel=1
 arch=('any')
 url="https://mingw-w64.sourceforge.io/"
@@ -36,10 +36,6 @@ prepare() {
   cd ${srcdir}/mingw-w64
 
   git am --committer-date-is-author-date "${srcdir}/0001-Allow-to-use-bessel-and-complex-functions-without-un.patch"
-  git am --committer-date-is-author-date "${srcdir}/0002-DirectX-9-fixes-for-VLC.patch"
-  git am --committer-date-is-author-date "${srcdir}/0003-DirectX-11-fixes-for-VLC.patch"
-
-
 
   cd ${srcdir}/mingw-w64/mingw-w64-headers
   touch include/windows.*.h include/wincrypt.h include/prsht.h
