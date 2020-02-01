@@ -1,13 +1,13 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
-_realname=libsodium
+_realname=libressl
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=2.9.2
-pkgrel=2
-pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
+pkgrel=1
+pkgdesc=""
 arch=("any")
-url="https://github.com/jedisct1/libsodium"
+url="http://mirror.ox.ac.uk/pub/OpenBSD/LibreSSL/"
 license=('custom:ISC')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 source=("http://mirror.ox.ac.uk/pub/OpenBSD/LibreSSL/${_realname}-${pkgver}.tar.gz"
@@ -15,7 +15,7 @@ source=("http://mirror.ox.ac.uk/pub/OpenBSD/LibreSSL/${_realname}-${pkgver}.tar.
 sha256sums=('6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1')
 
 prepare() {
-  cd "${srcdir}/${_realname}-${pkgver}-stable"
+  cd "${srcdir}/${_realname}-${pkgver}"
 
   # to make transmission work, taken from:
   # https://github.com/transmission/libevent/commit/72e50166aaa2c3b3c35e336039df7101bd418264
@@ -30,7 +30,8 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --disable-shared
+    --disable-shared \
+    --disable-hardening
 
   make
 }
