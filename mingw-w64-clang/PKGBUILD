@@ -245,9 +245,7 @@ build() {
     		     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
     		     -DGO_EXECUTABLE=GO_EXECUTABLE-NOTFOUND \
     		     -DOCAMLFIND=OCAMLFIND-NOTFOUND \
-    		     -DLLVM_ENABLE_ZLIB=ON \
-    		     -DCLANG_BUILD_EXAMPLES=OFF \
-    		     -DLLVM_OPTIMIZED_TABLEGEN=ON)
+    		     -DCLANG_BUILD_EXAMPLES=OFF)
 
   fi
   # Include location of libffi headers in CPPFLAGS
