@@ -5,7 +5,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.16.3
-pkgrel=7
+pkgrel=2
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -14,6 +14,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
              "${MINGW_PACKAGE_PREFIX}-emacs"
              "${MINGW_PACKAGE_PREFIX}-ncurses"
+             "${MINGW_PACKAGE_PREFIX}-qt5"
              "${MINGW_PACKAGE_PREFIX}-xz"
              "${MINGW_PACKAGE_PREFIX}-zstd")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
@@ -42,6 +43,7 @@ sha256sums=('e54f16df9b53dac30fd626415833a6e75b0e47915393843da1825b096ee60668'
             'b3905abed55c012108b0254c69cb4027a739f15772500b0a99c400d9dfdf50a7'
             'd0aaa6fbf3e740341aaac2b43033f6c20f56a94ea0b2c509233f693cabe2a912'
             '94642670c922c9acfade79bc567c6b28f2d2f89e27aa391b562e8c90baa49ce1')
+
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -83,7 +85,8 @@ build() {
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
-    --no-qt-gui                                      \
+    --qt-gui                                      \
+    --qt-qmake=${MINGW_PREFIX}/bin/qmake.exe      \
     --parallel=7
   plain "Start building..."
   make
