@@ -87,7 +87,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
         disable-multilib.patch
         gcov.patch
-        reproducible-s-oscons.patch
         vmov-alignment.patch)
 
 # Helper macros to help make tasks easier #
@@ -145,7 +144,6 @@ prepare() {
     gcc-stable-branch.patch \
     disable-multilib.patch \
     gcov.patch \
-    reproducible-s-oscons.patch \
     vmov-alignment.patch
 
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \

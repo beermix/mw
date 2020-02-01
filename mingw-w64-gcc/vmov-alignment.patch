@@ -2,8 +2,8 @@ Description: Use unaligned VMOV instructions
 Author: Claude Heiland-Allen <claude@mathr.co.uk>
 Bug-Debian: https://bugs.debian.org/939559
 
---- a/src/gcc/config/i386/i386.md
-+++ b/src/gcc/config/i386/i386.md
+--- a/gcc/config/i386/i386.md
++++ b/gcc/config/i386/i386.md
 @@ -2055,7 +2055,7 @@
  	  || misaligned_operand (operands[1], XImode))
  	return "vmovdqu32\t{%1, %0|%0, %1}";
@@ -121,8 +121,8 @@ Bug-Debian: https://bugs.debian.org/939559
  
  	case MODE_SI:
  	  return "%vmovd\t{%1, %0|%0, %1}";
---- a/src/gcc/config/i386/mmx.md
-+++ b/src/gcc/config/i386/mmx.md
+--- a/gcc/config/i386/mmx.md
++++ b/gcc/config/i386/mmx.md
 @@ -124,16 +124,16 @@
  	    return "%vmovd\t{%1, %0|%0, %1}";
  	  return "%vmovq\t{%1, %0|%0, %1}";
@@ -143,8 +143,8 @@ Bug-Debian: https://bugs.debian.org/939559
  
  	default:
  	  gcc_unreachable ();
---- a/src/gcc/config/i386/sse.md
-+++ b/src/gcc/config/i386/sse.md
+--- a/gcc/config/i386/sse.md
++++ b/gcc/config/i386/sse.md
 @@ -1001,13 +1001,13 @@
  	      {
  	      case MODE_V8SF:
