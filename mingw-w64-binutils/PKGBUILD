@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=143
+pkgrel=144
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -15,7 +15,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
+options=('staticlibs' '!distcc' 'strip') # 'debug' '!strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         binutils-stable-branch.patch
@@ -48,7 +48,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
 
   patch -p1 -i "${srcdir}"/0003-Revert-PR24311-FAIL-S-records-with-constructors.patch
-  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
+#  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
 #  patch -p1 -i "${srcdir}"/0001-sh-conf.patch
 #  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
@@ -79,7 +79,7 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-  GCC_IGNORE_WERROR=1
+#  GCC_IGNORE_WERROR=1
 #  CFLAGS=${CFLAGS/-pipe/}
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDLAGS=${LDLAGS/-pipe/}
@@ -109,8 +109,6 @@ build() {
     --enable-gold \
     --enable-targets=x86_64-w64-mingw32 \
     --enable-deterministic-archives \
-    --enable-relro \
-    --enable-threads \
     --disable-gdb \
     --with-system-zlib \
     --enable-silent-rules \
