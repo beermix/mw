@@ -79,13 +79,13 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-#  GCC_IGNORE_WERROR=1
+  GCC_IGNORE_WERROR=1
 #  CFLAGS=${CFLAGS/-pipe/}
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDLAGS=${LDLAGS/-pipe/}
 
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CXXFLAGS/-O2/-O3}
+#  CFLAGS=${CFLAGS/-O2/-O3}
+#  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -116,8 +116,8 @@ build() {
     --enable-silent-rules \
     --disable-shared
 
-  make MAKEINFO=true configure-host
-  make MAKEINFO=true
+#  make MAKEINFO=true configure-host
+  make MAKEINFO=true all
   
 #  make tooldir=${MINGW_CHOST}
 #  make MAKEINFO=true
