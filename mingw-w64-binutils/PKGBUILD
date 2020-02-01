@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.33.1
-pkgrel=144
+pkgrel=145
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -101,21 +101,21 @@ build() {
     --with-sysroot=${MINGW_PREFIX} \
     --with-libiconv-prefix=${MINGW_PREFIX} \
     ${_conf} \
-    --enable-nls \
+    --disable-nls \
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-w64-mingw32 \
-    --enable-deterministic-archives \
+    --disable-deterministic-archives \
     --disable-gdb \
     --with-system-zlib \
     --enable-silent-rules \
     --disable-shared
 
 #  make MAKEINFO=true configure-host
-  make MAKEINFO=true all
+  make MAKEINFO=true
   
 #  make tooldir=${MINGW_CHOST}
 #  make MAKEINFO=true
