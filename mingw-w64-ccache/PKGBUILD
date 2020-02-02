@@ -39,7 +39,7 @@ build() {
 
    export CC='clang'
    export CXX='clang++'
-  CFLAGS=${CFLAGS/-O2/}
+   #CFLAGS=${CFLAGS/-O2/}
 
   ../${_realname}-${pkgver}/configure \
       --prefix=${MINGW_PREFIX} \
