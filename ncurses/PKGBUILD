@@ -61,6 +61,7 @@ build() {
     --enable-echo \
     --includedir=/usr/include/ncursesw \
     --with-build-cppflags=-D_GNU_SOURCE \
+    --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
   make

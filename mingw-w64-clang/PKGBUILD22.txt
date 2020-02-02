@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.1
-pkgrel=20
+pkgrel=19
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -154,8 +154,7 @@ prepare() {
 
   cd "${srcdir}/clang-${pkgver}.src"
   apply_patch_with_msg \
-      "0101-Allow-build-static-clang-library-for-mingw.patch" \
-      "0102-fix-libclang-name-for-mingw.patch" \
+       "0102-fix-libclang-name-for-mingw.patch" \
       "0103-Set-the-x86-arch-name-to-i686-for-mingw-w64.patch" \
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch"
@@ -167,8 +166,7 @@ prepare() {
   cd "${srcdir}/libcxx-${pkgver}.src"
   apply_patch_with_msg \
       "0401-disable-visibility-annotations.patch" \
-      "0405-fix-conflict-win32-posix-threads.patch" \
-      "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
+      "0405-fix-conflict-win32-posix-threads.patch"
 
   cd "${srcdir}/lldb-${pkgver}.src"
   apply_patch_with_msg \
@@ -181,9 +179,6 @@ prepare() {
       "0508-add-share-header.patch" \
       "0509-include-crtdbg.patch" \
       "0510-fix-CMake-when-LLDB_DISABLE_PYTHON-if-ON-and-ep.patch"
-  cd "${srcdir}/libunwind-${pkgver}.src"
-  apply_patch_with_msg \
-      "0601-fix-static-assert-macro.patch"
 
   cd "${srcdir}/libcxxabi-${pkgver}.src"
   apply_patch_with_msg \
@@ -272,20 +267,16 @@ build() {
 #    -DBUILD_SHARED_LIBS=ON \
 #    -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
 # -DLLVM_USE_SANITIZER=OFF
-#    -DLLVM_BUILD_TOOLS=OFF \
-#    -DLLVM_INCLUDE_TESTS=OFF \
-#     -DLLVM_APPEND_VC_REV=OFF \
-#    -DENABLE_CRASH_OVERRIDES=ON \ -DLLVM_TARGETS_TO_BUILD="X86" \ -DLLVM_ENABLE_LIBXML2=OFF \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_VERBOSE_MAKEFILE=OFF \
-    -DENABLE_CRASH_OVERRIDES=ONb \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_APPEND_VC_REV=OFF \
+    -DENABLE_CRASH_OVERRIDES=ON \
+    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
@@ -295,19 +286,21 @@ build() {
     -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
-    -DLIBCLANG_BUILD_STATIC=ON \
-    -DLIBCXX_ENABLE_SHARED=OFF \
-    -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
+    -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DLLVM_ENABLE_WARNINGS=OFF \
+    -DLLVM_ENABLE_PEDANTIC=OFF \
+    -DLLVM_ENABLE_WERROR=OFF \
+    -DLIBCXX_HAS_WIN32_THREAD_API=ON \
     -DCLANG_INCLUDE_DOCS=OFF \
+    -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
-    -DLIBCXX_HAS_WIN32_THREAD_API=ON \
-    -DLIBCXXABI_ENABLE_SHARED=OFF \
-    -DLIBUNWIND_ENABLE_SHARED=OFF \
-    -DLLVM_BUILD_STATIC=OFF \
+    -DLLVM_INCLUDE_GO_TESTS=OFF \
+    -DGO_EXECUTABLE=GO_EXECUTABLE-NOTFOUND \
+    -DOCAMLFIND=OCAMLFIND-NOTFOUND \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
@@ -319,6 +312,12 @@ build() {
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLDB_DISABLE_PYTHON=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCLANG_LINK_CLANG_DYLIB=OFF \
+    -DLLVM_BUILD_TOOLS=OFF \
+    -DLLVM_INCLUDE_TESTS=OFF \
+    -DLLVM_ENABLE_CXX1Y=OFF \
+    -DLLVM_ENABLE_CXX1Z=ON \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
@@ -327,7 +326,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j5
+  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -357,8 +356,8 @@ package_clang() {
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
 
   # Install static libraries
-  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
-  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang_static.a
+  #install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
+  #install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang_static.a
 }
 
 package_clang-analyzer() {
@@ -453,13 +452,11 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
-  install -Dm644 tools/lldb/LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
-           "${MINGW_PACKAGE_PREFIX}-z3"
            "${MINGW_PACKAGE_PREFIX}-gcc-libs") # "compiler-rt"
 
   cd "${srcdir}"/llvm-${pkgver}.src

@@ -26,12 +26,18 @@ sha256sums=('6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1')
 build() {
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
+  CFLAGS=${CFLAGS/-O2/-Ofast} \
+  CXXFLAGS=${CXXFLAGS/-O2/-Ofast} \
+  CC='clang' CXX='clang++' \
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --enable-minimal
+    --enable-minimal \
+    --enable-static \
+    --enable-shared \
+    --enable-silent-rules
 
   make
 }

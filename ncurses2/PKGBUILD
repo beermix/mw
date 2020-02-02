@@ -52,8 +52,9 @@ build() {
     --disable-mixed-case \
     --with-pkg-config \
     --enable-pc-files \
-    --with-manpage-format=normal \
-    --with-manpage-aliases \
+    --without-tests \
+    --without-manpages \
+    --disable-warnings \
     --with-default-terminfo-dir=/usr/share/terminfo \
     --enable-echo \
     --includedir=/usr/include/ncursesw \
