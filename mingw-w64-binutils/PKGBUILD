@@ -5,7 +5,7 @@
 _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=2.34
+pkgver=2.33.1
 pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
@@ -13,7 +13,7 @@ url="https://www.gnu.org/software/binutils/"
 license=('GPL')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-#checkdepends=('dejagnu' 'bc')
+checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
@@ -40,7 +40,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-#  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -48,7 +48,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
 
 #  patch -p1 -i "${srcdir}"/0003-Revert-PR24311-FAIL-S-records-with-constructors.patch
-  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
+#  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
 #  patch -p1 -i "${srcdir}"/0001-sh-conf.patch
 #  patch -p1 -i "${srcdir}"/CVE-2019-17450.patch
