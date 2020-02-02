@@ -5,7 +5,7 @@ _realname=ccache
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.7.7
-pkgrel=3
+pkgrel=4
 pkgdesc="Compiler cache that speeds up recompilation by caching previous compilations (mingw-w64)"
 arch=('any')
 url="https://github.com/ccache/ccache/releases"
@@ -32,15 +32,15 @@ prepare() {
 build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST}  && cd ${srcdir}/build-${MINGW_CHOST}
- # CC=clang 
+  CC='clang' CXX='clang++' \
   ../${_realname}-${pkgver}/configure \
       --prefix=${MINGW_PREFIX} \
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST} \
       --disable-man \
-      --with-bundled-zlib \
-      --disable-silent-rules
+      --with-bundled-zlib=no \
+      ENABLE_CACHE_CLEANUP_TESTS=1
 
   make
 }
