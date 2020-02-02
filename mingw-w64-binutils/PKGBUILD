@@ -15,7 +15,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs' '!distcc' 'strip') # 'debug' '!strip')
+options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         binutils-stable-branch.patch
@@ -53,7 +53,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0004-i386-Add-mbranches-within-32B-boundaries.patch
   patch -p1 -i "${srcdir}"/0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch
 
-  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
+#  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
 }
 
 build() {
@@ -71,7 +71,7 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-  GCC_IGNORE_WERROR=1
+#  GCC_IGNORE_WERROR=1
 #  CFLAGS=${CFLAGS/-pipe/}
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDLAGS=${LDLAGS/-pipe/}
@@ -79,9 +79,9 @@ build() {
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -103,7 +103,7 @@ build() {
     --enable-targets=x86_64-*-mingw* \
     --disable-shared
 
-  make MAKEINFO=true all
+  make
 }
 
 check() {
@@ -116,7 +116,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} MAKEINFO=true install
+  make DESTDIR=${pkgdir} install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include

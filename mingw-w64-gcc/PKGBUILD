@@ -143,9 +143,7 @@ prepare() {
   apply_patch_with_msg \
     gcc-stable-branch.patch \
     010-documentation.patch \
-    disable-multilib.patch \
-    gcov.patch \
-    vmov-alignment.patch
+    disable-multilib.patch
 
   # Enable clear linux patches
   apply_patch_with_msg \
