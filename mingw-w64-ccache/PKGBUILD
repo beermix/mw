@@ -33,7 +33,7 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST}  && cd ${srcdir}/build-${MINGW_CHOST}
 
-  export CFLAGS="-march=haswell -O2 -ffast-math -fsanitize-thread-atomics -fsanitize-thread-func-entry-exit -fsanitize-thread-memory-access"
+  export CFLAGS="-march=haswell -O2 -fstack-protector-strong"
   #export LDFLAGS=" -Wl,-z,relro -Wl,-z,now -s"
   #export CPPFLAGS=" -D_FORTIFY_SOURCE=2"
   export CC='clang'
