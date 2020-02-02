@@ -41,11 +41,12 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
 #  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
-#  patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
-#  patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
-#  patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
-#  patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
-#  patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
+
+  patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
+  patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
+  patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
+  patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
+  patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
 
 #  patch -p1 -i "${srcdir}"/0003-Revert-PR24311-FAIL-S-records-with-constructors.patch
 #  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
@@ -87,9 +88,9 @@ build() {
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  unset LDFLAGS
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -112,7 +113,6 @@ build() {
     --enable-silent-rules \
     --disable-shared
 
-#  make MAKEINFO=true configure-host
    make MAKEINFO=true all
 }
 
