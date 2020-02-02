@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.1
-pkgrel=17
+pkgrel=18
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -42,6 +42,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
+             "${MINGW_PACKAGE_PREFIX}-python2"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
              "tar"
              "groff"
@@ -125,6 +126,11 @@ prepare() {
   plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
   [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+
+  plain "Extracting test-suite-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/test-suite-${pkgver} ]] && rm -rf ${srcdir}/test-suite-${pkgver}
+  [[ -d ${srcdir}/test-suite-${pkgver} ]] || tar -xJvf ${srcdir}/test-suite-${pkgver}.src.tar.xz -C ${srcdir} || true
+
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
@@ -211,7 +217,7 @@ prepare() {
   mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
   mv "${srcdir}/libunwind-${pkgver}.src"         projects/libunwind
   mv "${srcdir}/openmp-${pkgver}.src"            projects/openmp
-  #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
+  mv "${srcdir}/test-suite-${pkgver}.src"         projects/test-suite
 }
 
 build() {
@@ -255,15 +261,24 @@ build() {
 #     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
 #                    -DLLVM_ENABLE_MODULES=OFF \
 #     		     -DLLVM_DYLIB_COMPONENTS=all \
-##     -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+#     -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
 #    -DLLVM_ENABLE_CXX1Y=OFF \
 #    -DLLVM_ENABLE_CXX1Z=OFF \
 #  CFLAGS=${CFLAGS/-O2/}
 #  CXXFLAGS=${CXXFLAGS/-O2/}
 #     -DLLVM_INCLUDE_TESTS=OFF \     -DLLVM_ENABLE_WERROR=OFF \
-#   CXXFLAGS=${CXXFLAGS/-std=gnu++14/}
+#   CXXFLAGS=${CXXFLAGS/-std=gnu++14/}             |||  -Wno-unused-parameter -Wwrite-strings
 # -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -pedantic -D_GNU_SOURCE
-
+#
+#     -DLLVM_USE_SANITIZER=0 \
+#    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+#    -DLLVM_ENABLE_CXX1Y=OFF \
+#    -DLLVM_ENABLE_CXX1Z=ON \
+#    -DLIBCLANG_BUILD_STATIC=ON \
+#        -DCLANG_LINK_CLANG_DYLIB=OFF \
+#    -DLLVM_BUILD_TESTS=ON \
+#     -DLLVM_USE_SANITIZER=0 \
+#    -DBUILD_SHARED_LIBS=ON \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -279,11 +294,16 @@ build() {
     -DLIBOMP_FORTRAN_MODULES=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
-    -DCMAKE_C_FLAGS="-march=haswell -pipe -Wno-unused-parameter -Wwrite-strings -fomit-frame-pointer" \
-    -DCMAKE_CXX_FLAGS="-march=haswell -pipe -pedantic -D_GNU_SOURCE -fomit-frame-pointer" \
+    -DCMAKE_C_FLAGS="-march=haswell -pipe -fomit-frame-pointer" \
+    -DCMAKE_CXX_FLAGS="-march=haswell -pipe -fomit-frame-pointer" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
+    -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
+    -DLLVM_ENABLE_WARNINGS=OFF \
+    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+    -DLLVM_ENABLE_CXX1Y=OFF \
+    -DLLVM_ENABLE_CXX1Z=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -294,7 +314,6 @@ build() {
     -DCLANG_INCLUDE_DOCS=OFF \
     -DLLVM_BUILD_EXAMPLES=OFF \
     -DLLVM_BUILD_DOCS=OFF \
-    -DLLVM_BUILD_TESTS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
     -DLLVM_ENABLE_SPHINX=OFF \
@@ -312,6 +331,7 @@ build() {
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLDB_DISABLE_PYTHON=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DLLVM_BUILD_TESTS=ON \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
@@ -319,7 +339,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j6
+  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -349,7 +369,8 @@ package_clang-analyzer() {
   pkgdesc="A source code analysis framework (mingw-w64)"
   url="https://clang-analyzer.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-python")
+           "${MINGW_PACKAGE_PREFIX}-python"
+           "${MINGW_PACKAGE_PREFIX}-python2")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build -j1 DESTDIR="${pkgdir}" install
@@ -441,8 +462,7 @@ package_lldb() {
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
-           "${MINGW_PACKAGE_PREFIX}-gcc-libs"
-           "compiler-rt") # "compiler-rt"
+           "${MINGW_PACKAGE_PREFIX}-gcc-libs") # "compiler-rt"
 
   cd "${srcdir}"/llvm-${pkgver}.src
 
