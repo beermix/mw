@@ -146,14 +146,14 @@ prepare() {
     disable-multilib.patch
 
   # Enable clear linux patches
-  apply_patch_with_msg \
-    COLLECT_AS_OPTIONS.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
-    optimize.patch \
-    ipa-cp.patch \
-    optimize-at-least-some.patch
+#  apply_patch_with_msg \
+#    COLLECT_AS_OPTIONS.patch \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    gomp-relax.patch \
+#    optimize.patch \
+#    ipa-cp.patch \
+#    optimize-at-least-some.patch
 
 #    0001-Fix-stack-protection-issues.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
