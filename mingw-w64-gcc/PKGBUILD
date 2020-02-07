@@ -208,13 +208,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -266,8 +266,9 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-#  noti nice -n 19 make CFLAGS="-g0 -march=haswell -O2" CXXFLAGS="-g0 -march=haswell -O2" CFLAGS_FOR_TARGET="-g0 -march=haswell -O2" CXXFLAGS_FOR_TARGET="-g0 -march=haswell -O2" BOOT_CFLAGS="-g0 -march=haswell -O2" BOOT_CXXFLAGS="-g0 -march=haswell -O2" all
-  noti nice -n19 make V=1 all
+  noti nice -n 19 make CFLAGS="-g0 -march=haswell -O2" CXXFLAGS="-g0 -march=haswell -O2" CFLAGS_FOR_TARGET="-g0 -march=haswell -O2" CXXFLAGS_FOR_TARGET="-g0 -march=haswell -O2" BOOT_CFLAGS="-g0 -march=haswell -O2" BOOT_CXXFLAGS="-g0 -march=haswell -O2" all
+
+#  noti nice -n19 make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
