@@ -89,11 +89,10 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
-    --enable-targets=x86_64-*-mingw* \
     --enable-silent-rules \
     --disable-shared
 
-   make MAKEINFO=true all
+   make MAKEINFO=true
 }
 
 check() {
