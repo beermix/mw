@@ -23,6 +23,9 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-analyzer"
          "${MINGW_PACKAGE_PREFIX}-clang-tools-extra"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
+         "${MINGW_PACKAGE_PREFIX}-libc++"
+         "${MINGW_PACKAGE_PREFIX}-libc++abi"
+         "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.0rc1
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0-rc1
@@ -51,7 +54,10 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}.src.tar.xz
         ${_url}/test-suite-${pkgver}.src.tar.xz
+        ${_url}/libcxx-${pkgver}.src.tar.xz
+        ${_url}/libcxxabi-${pkgver}.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
+        ${_url}/lld-${pkgver}.src.tar.xz
         "0001-mingw-w64-use-MSVC-style-ByteAlignment.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
@@ -85,6 +91,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch")
 noextract=(clang-${pkgver}.src.tar.xz
+           libcxx-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -100,9 +107,9 @@ prepare() {
   [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
   [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJvf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
 
-#  plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-#  [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
-#  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
 #  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
 #  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
@@ -143,6 +150,15 @@ prepare() {
   apply_patch_with_msg \
       "0201-mingw-w64-__udivdi3-mangle-hack.patch"
 
+  cd "${srcdir}/libcxx-${pkgver}.src"
+  apply_patch_with_msg \
+      "0401-disable-visibility-annotations.patch" \
+      "0405-fix-conflict-win32-posix-threads.patch" \
+      "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
+
+  cd "${srcdir}/libcxxabi-${pkgver}.src"
+  apply_patch_with_msg \
+      "0701-disable-visibility-annotations.patch"
 
   # At the present, clang must reside inside the LLVM source code tree to build
   # See https://bugs.llvm.org/show_bug.cgi?id=4840
@@ -152,7 +168,10 @@ prepare() {
          projects/libcxxabi projects/libunwind projects/openmp projects/test-suite | true
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
+  mv "${srcdir}/lld-${pkgver}.src"               tools/lld
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
+  mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
+  mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
   #mv "${srcdir}/test-suite-${pkgver}.src"         projects/test-suite
 }
 
@@ -209,33 +228,41 @@ build() {
 #    -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
 #    -DLLVM_USE_SANITIZER=OFF
 #    -DLLVM_BUILD_TOOLS=OFF \
-#    -DLLVM_APPEND_VC_REV=OFF \     -DENABLE_CRASH_OVERRIDES=ON \
-# -DLLVM_OPTIMIZED_TABLEGEN=ON \
+#    -DLLVM_APPEND_VC_REV=OFF \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DENABLE_CRASH_OVERRIDES=ON \
     -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-    -DLLVM_ENABLE_TERMINFO=ON \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_ZLIB=ON \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
+    -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
+    -DLIBOMP_FORTRAN_MODULES=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DCMAKE_C_FLAGS="${CFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DLIBCLANG_BUILD_STATIC=ON \
+    -DLIBCXX_ENABLE_SHARED=OFF \
+    -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
     -DLLVM_ENABLE_WARNINGS=OFF \
     -DCLANG_INCLUDE_DOCS=OFF \
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
     -DLLVM_ENABLE_OCAMLDOC=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
+    -DLIBCXX_HAS_WIN32_THREAD_API=ON \
+    -DLIBCXXABI_ENABLE_SHARED=OFF \
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
@@ -253,10 +280,10 @@ build() {
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
   #
-  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
-  sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
+#  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
+#  sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
 # sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
-  sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
+#  sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
 
@@ -279,6 +306,8 @@ package_clang() {
   # Install static libraries
   install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
   install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang_static.a
+
+
 }
 
 package_clang-analyzer() {
@@ -316,6 +345,32 @@ package_compiler-rt() {
 
   cd "${srcdir}"/llvm-${pkgver}.src
   ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
+}
+
+package_libcxx() {
+  pkgdesc="C++ Standard Library (mingw-w64)"
+  url="https://libcxx.llvm.org/"
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/projects/libcxx -j1 DESTDIR="${pkgdir}" install
+}
+
+package_libcxxabi() {
+  pkgdesc="C++ Standard Library Support (mingw-w64)"
+  url="https://libcxxabi.llvm.org/"
+  # Don't depend on libunwind until it actually works as installing it breaks some packages
+  #depends="${MINGW_PACKAGE_PREFIX}-libunwind"
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/projects/libcxxabi -j1 DESTDIR="${pkgdir}" install
+}
+
+package_lld() {
+  pkgdesc="Linker tools for LLVM (mingw-w64)"
+  url="https://lld.llvm.org/"
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/tools/lld -j1 DESTDIR="${pkgdir}" install
 }
 
 package_llvm() {
@@ -359,6 +414,17 @@ package_mingw-w64-i686-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-i686-libc++abi(){
+  package_libcxxabi
+}
+package_mingw-w64-i686-libc++(){
+  package_libcxx
+}
+
+package_mingw-w64-i686-lld(){
+  package_lld
+}
+
 package_mingw-w64-i686-llvm(){
   package_llvm
 }
@@ -377,6 +443,17 @@ package_mingw-w64-x86_64-clang-tools-extra(){
 
 package_mingw-w64-x86_64-compiler-rt(){
   package_compiler-rt
+}
+
+package_mingw-w64-x86_64-libc++abi(){
+  package_libcxxabi
+}
+package_mingw-w64-x86_64-libc++(){
+  package_libcxx
+}
+
+package_mingw-w64-x86_64-lld(){
+  package_lld
 }
 
 package_mingw-w64-x86_64-llvm(){
