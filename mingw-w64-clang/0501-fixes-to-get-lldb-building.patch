@@ -138,36 +138,3 @@ index 54a472d..196e012 100644
  #include <atomic>
  #include <map>
  #include <mutex>
-diff --git a/tools/lldb-mi/MIDataTypes.h b/tools/lldb-mi/MIDataTypes.h
-index 34fe457..8372e8c 100644
---- a/tools/lldb-mi/MIDataTypes.h
-+++ b/tools/lldb-mi/MIDataTypes.h
-@@ -19,6 +19,8 @@
- // Windows headers:
- #ifdef _WIN32
- 
-+#include <windows.h>
-+
- // Debugging:
- #ifdef _DEBUG
- #include <crtdbg.h> // C-runtime debugging library (defines _ASSERT).
-diff --git a/tools/lldb-mi/Platform.h b/tools/lldb-mi/Platform.h
-index ce2de1b..d334d75 100644
---- a/tools/lldb-mi/Platform.h
-+++ b/tools/lldb-mi/Platform.h
-@@ -78,8 +78,12 @@ typedef void (*sighandler_t)(int);
- 
- #include <getopt.h>
- #include <libgen.h>
-+
-+#ifndef __MINGW64_VERSION_MAJOR
- #include <sys/ioctl.h>
- #include <termios.h>
-+#endif
-+
- #include <unistd.h>
- 
- #include <pthread.h>
--- 
-2.14.1.windows.1
-
