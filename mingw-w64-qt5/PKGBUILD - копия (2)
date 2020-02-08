@@ -33,20 +33,20 @@ if [ "${_variant}" = "-static" ]; then
 else
   _namesuff=
   _build_mode=("-release")
-  _with_icu=no
+  _with_icu=yes
   _with_fontconfig=yes
   _with_openssl=yes
   _with_dbus=yes
   _system_freetype=yes
   _system_zlib=yes
   _system_pcre=yes
-  _system_libpng=no
-  _system_libjpeg=no
+  _system_libpng=yes
+  _system_libjpeg=yes
   _system_harfbuzz=yes
-  _system_assimp=no
-  _system_doubleconversion=no
-  _system_libtiff=no
-  _system_libwebp=no
+  _system_assimp=yes
+  _system_doubleconversion=yes
+  _system_libtiff=yes
+  _system_libwebp=yes
   _build_examples=no
   _build_tools=yes
   _build_tests=no
@@ -131,15 +131,20 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-qtbinpatcher"
          "${MINGW_PACKAGE_PREFIX}-z3"
          $([[ "$_variant" == "-shared" ]] && echo \
+            $([[ "$_system_assimp" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-assimp") \
             $([[ "$_system_doubleconversion" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-double-conversion") \
             $([[ "$_with_dbus" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-dbus") \
             $([[ "$_with_fontconfig" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-fontconfig") \
             $([[ "$_system_freetype" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-freetype") \
             $([[ "$_system_harfbuzz" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-harfbuzz") \
             "${MINGW_PACKAGE_PREFIX}-jasper" \
+            $([[ "$_system_libjpeg" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libjpeg") \
             "${MINGW_PACKAGE_PREFIX}-libmng" \
+            $([[ "$_system_libpng" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libpng") \
+            $([[ "$_system_libtiff" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libtiff") \
             "${MINGW_PACKAGE_PREFIX}-libxml2" \
             "${MINGW_PACKAGE_PREFIX}-libxslt" \
+            $([[ "$_system_libwebp" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libwebp") \
             $([[ "$_with_openssl" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-openssl") \
             "${MINGW_PACKAGE_PREFIX}-openal" \
             $([[ "$_system_pcre" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-pcre2") \
@@ -148,7 +153,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
             "${MINGW_PACKAGE_PREFIX}-xpm-nox" \
             $([[ "$_system_zlib" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-zlib"))
             $([[ "$_with_icu" == "yes" ]] && echo \
-             )
+              "${MINGW_PACKAGE_PREFIX}-icu" \
+              "${MINGW_PACKAGE_PREFIX}-icu-debug-libs")
         )
 optdepends=($([[ "$_variant" == "-shared" ]] && echo \
               "${MINGW_PACKAGE_PREFIX}-clang" \
@@ -613,7 +619,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make} ${MAKEFLAGS} -j7 || ${_make} ${MAKEFLAGS}
+  /home/User/.go/bin/noti.exe nice -n 19 ${_make} ${MAKEFLAGS} -j6 || ${_make} ${MAKEFLAGS}
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
   # ${_make} module-qtwebengine

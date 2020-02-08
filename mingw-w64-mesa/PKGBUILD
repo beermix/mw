@@ -1,0 +1,117 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+_realname=mesa
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=19.3.3
+pkgrel=2
+pkgdesc="Open-source implementation of the OpenGL specification (mingw-w64)"
+arch=('any')
+makedepends=("${MINGW_PACKAGE_PREFIX}-llvm"
+             "${MINGW_PACKAGE_PREFIX}-gcc"
+             "${MINGW_PACKAGE_PREFIX}-zlib"
+             "${MINGW_PACKAGE_PREFIX}-python3-mako"
+             "${MINGW_PACKAGE_PREFIX}-meson"
+             "${MINGW_PACKAGE_PREFIX}-pkg-config")
+# Workaround bug https://gitlab.freedesktop.org/mesa/mesa/issues/2012 by adding dependencies
+depends=("${MINGW_PACKAGE_PREFIX}-zlib"
+         "${MINGW_PACKAGE_PREFIX}-gcc-libs")
+optdepends=("${MINGW_PACKAGE_PREFIX}-opengl-man-pages: for the OpenGL API man pages"
+            "${MINGW_PACKAGE_PREFIX}-llvm: for shared linking LLVM")
+url="https://www.mesa3d.org/"
+license=('MIT')
+options=('staticlibs' 'strip')
+source=(https://mesa.freedesktop.org/archive/${_realname}-${pkgver}.tar.xz{,.sig}
+        llvmwrapgen.sh)
+sha256sums=('81ce4810bb25d61300f8104856461f4d49cf7cb794aa70cb572312e370c39f09'
+            'SKIP'
+            'e0340aad84db73fea994f2ce6a91bd19e54c17b6137e0dfb1bc8fabca8e72ed8')
+validpgpkeys=('8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D') # Emil Velikov <emil.l.velikov@gmail.com>
+validpgpkeys+=('946D09B5E4C9845E63075FF1D961C596A7203456') # Andres Gomez <tanty@igalia.com>
+validpgpkeys+=('E3E8F480C52ADD73B278EE78E1ECBE07D7D70895') # Juan Antonio Suárez Romero (Igalia, S.L.) <jasuarez@igalia.com>"
+validpgpkeys+=('A5CC9FEC93F2F837CB044912336909B6B25FADFA') # Juan A. Suarez Romero <jasuarez@igalia.com>
+validpgpkeys+=('71C4B75620BC75708B4BDB254C95FAAB3EB073EC') # Dylan Baker <dylan@pnwbakers.com>
+
+noextract=(${_realname}-${pkgver}.tar.xz)
+
+case ${MINGW_CHOST} in
+  i686*)
+    _mach=x86
+  ;;
+  x86_64*)
+    _mach=x86_64
+  ;;
+esac
+
+# Helper macros to help make tasks easier #
+apply_patch_with_msg() {
+  for _patch in "$@"
+  do
+    msg2 "Applying $_patch"
+    patch -Nbp1 -i "${srcdir}/$_patch"
+  done
+}
+
+del_file_exists() {
+  for _fname in "$@"
+  do
+    if [ -f $_fname ]; then
+      rm -rf $_fname
+    fi
+  done
+}
+# =========================================== #
+
+prepare() {
+  [[ -d ${srcdir}/${_realname}-${pkgver} ]] && rm -rf ${srcdir}/${_realname}-${pkgver}
+  tar -xJf ${srcdir}/${_realname}-${pkgver}.tar.xz -C ${srcdir} || true
+
+  cd ${srcdir}/${_realname}-${pkgver}
+
+# Run and optionally test LLVM Meson wrap generator
+
+  ${srcdir}/llvmwrapgen.sh
+# /bin/cat ${srcdir}/${_realname}-${pkgver}/subprojects/llvm/meson.build
+}
+
+buildcmd(){
+  ${MINGW_PREFIX}/bin/meson ./build/windows-${_mach} \
+  --prefix=${MINGW_PREFIX} \
+  --includedir=include/mesa \
+  --default-library=both \
+  --buildtype=release \
+  --backend=ninja \
+  -Dshared-glapi=true \
+  -Dgles1=true \
+  -Dgles2=true \
+  -Dllvm=true \
+  -Dosmesa=gallium \
+  -Dbuild-tests=true
+  ${MINGW_PREFIX}/bin/ninja -C ./build/windows-${_mach}
+}
+
+build() {
+  cd ${srcdir}/${_realname}-${pkgver}
+  CFLAGS="-march=haswell -pipe" \
+  CXXFLAGS="-march=haswell -pipe" \
+  LDFLAGS="-s" \
+  PROCESSOR_ARCHITECTURE="${CARCH}" \
+  buildcmd
+}
+
+package() {
+  cd ${srcdir}/${_realname}-${pkgver}/build/windows-${_mach}
+  DESTDIR=${pkgdir}${MINGW_PREFIX} ${MINGW_PREFIX}/bin/meson install
+  cp -f ${srcdir}/${_realname}-${pkgver}/build/windows-${_mach}/src/gallium/targets/graw-gdi/graw.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp -f ${srcdir}/${_realname}-${pkgver}/build/windows-${_mach}/src/gallium/targets/graw-null/graw_null.dll ${pkgdir}${MINGW_PREFIX}/bin/
+  cp -f ${srcdir}/${_realname}-${pkgver}/build/windows-${_mach}/src/gallium/targets/graw-gdi/graw.dll.a ${pkgdir}${MINGW_PREFIX}/lib/
+
+# fixup .pc files with valid info
+  sed -e "s|$(cygpath -m ${MINGW_PREFIX})|${MINGW_PREFIX}|g" \
+    -e "s|8.0.0|${pkgver}|g" \
+    -i ${pkgdir}${MINGW_PREFIX}/lib/pkgconfig/osmesa.pc
+  sed -e "s|$(cygpath -m ${MINGW_PREFIX})|${MINGW_PREFIX}|g" \
+    -i ${pkgdir}${MINGW_PREFIX}/lib/pkgconfig/glesv1_cm.pc
+  sed -e "s|$(cygpath -m ${MINGW_PREFIX})|${MINGW_PREFIX}|g" \
+    -i ${pkgdir}${MINGW_PREFIX}/lib/pkgconfig/glesv2.pc
+}
