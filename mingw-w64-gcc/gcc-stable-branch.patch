@@ -69434,3 +69434,244 @@ index ed0c2645f7b..3907f3c0ba9 100644
 @@ -1 +1 @@
 -20200209
 +20200210
+
+commit 3fde3398341ba900ed2e1eaecf00799fda66686a
+Author: H.J. Lu <hjl.tools@gmail.com>
+Date:   Mon Feb 10 07:58:45 2020 -0800
+
+    i386: Properly pop restore token in signal frame
+    
+    Linux CET kernel places a restore token on shadow stack for signal
+    handler to enhance security.  The restore token is 8 byte and aligned
+    to 8 bytes.  It is usually transparent to user programs since kernel
+    will pop the restore token when signal handler returns.  But when an
+    exception is thrown from a signal handler, now we need to pop the
+    restore token from shadow stack.  For x86-64, we just need to treat
+    the signal frame as normal frame.  For i386, we need to search for
+    the restore token to check if the original shadow stack is 8 byte
+    aligned.  If the original shadow stack is 8 byte aligned, we just
+    need to pop 2 slots, one restore token, from shadow stack.  Otherwise,
+    we need to pop 3 slots, one restore token + 4 byte padding, from
+    shadow stack.
+    
+    This patch also includes 2 tests, one has a restore token with 4 byte
+    padding and one without.
+    
+    Tested on Linux/x86-64 CET machine with and without -m32.
+    
+    libgcc/
+    
+            Backport from mainline
+            PR libgcc/85334
+            * config/i386/shadow-stack-unwind.h (_Unwind_Frames_Increment):
+            New.
+    
+    gcc/testsuite/
+    
+            Backport from mainline
+            PR libgcc/85334
+            * g++.target/i386/pr85334-1.C: New test.
+            * g++.target/i386/pr85334-2.C: Likewise.
+    
+    (cherry picked from commit bf6465d0461234ccd45ae34d5e2375a0bee0081d)
+
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index db7ffdf2de4..31143d2ecbf 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,12 @@
++2020-02-10  H.J. Lu  <hongjiu.lu@intel.com>
++
++	Backport from mainline
++	2020-02-10  H.J. Lu  <hongjiu.lu@intel.com>
++
++	PR libgcc/85334
++	* g++.target/i386/pr85334-1.C: New test.
++	* g++.target/i386/pr85334-2.C: Likewise.
++
+ 2020-02-07  H.J. Lu  <hongjiu.lu@intel.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/testsuite/g++.target/i386/pr85334-1.C b/gcc/testsuite/g++.target/i386/pr85334-1.C
+new file mode 100644
+index 00000000000..3c5ccad1714
+--- /dev/null
++++ b/gcc/testsuite/g++.target/i386/pr85334-1.C
+@@ -0,0 +1,55 @@
++// { dg-do run }
++// { dg-require-effective-target cet }
++// { dg-additional-options "-fexceptions -fnon-call-exceptions -fcf-protection" }
++
++// Delta between numbers of call stacks of pr85334-1.C and pr85334-2.C is 1.
++
++#include <signal.h>
++#include <stdlib.h>
++
++void sighandler (int signo, siginfo_t * si, void * uc)
++{
++  throw (5);
++}
++
++char *
++__attribute ((noinline, noclone))
++dosegv ()
++{    
++  * ((volatile int *)0) = 12;
++  return 0;
++}
++
++int
++__attribute ((noinline, noclone))
++func2 ()
++{
++  try {
++    dosegv ();
++  }
++  catch (int x) {
++    return (x != 5);
++  }
++  return 1;
++}
++
++int
++__attribute ((noinline, noclone))
++func1 ()
++{
++  return func2 ();
++}
++
++int main ()
++{
++  struct sigaction sa;
++  int status;
++
++  sa.sa_sigaction = sighandler;
++  sa.sa_flags = SA_SIGINFO;
++    
++  status = sigaction (SIGSEGV, & sa, NULL);
++  status = sigaction (SIGBUS, & sa, NULL);
++
++  return func1 ();
++}
+diff --git a/gcc/testsuite/g++.target/i386/pr85334-2.C b/gcc/testsuite/g++.target/i386/pr85334-2.C
+new file mode 100644
+index 00000000000..e2b5afe78cb
+--- /dev/null
++++ b/gcc/testsuite/g++.target/i386/pr85334-2.C
+@@ -0,0 +1,48 @@
++// { dg-do run }
++// { dg-require-effective-target cet }
++// { dg-additional-options "-fexceptions -fnon-call-exceptions -fcf-protection" }
++
++// Delta between numbers of call stacks of pr85334-1.C and pr85334-2.C is 1.
++
++#include <signal.h>
++#include <stdlib.h>
++
++void sighandler (int signo, siginfo_t * si, void * uc)
++{
++  throw (5);
++}
++
++char *
++__attribute ((noinline, noclone))
++dosegv ()
++{    
++  * ((volatile int *)0) = 12;
++  return 0;
++}
++
++int
++__attribute ((noinline, noclone))
++func1 ()
++{
++  try {
++    dosegv ();
++  }
++  catch (int x) {
++    return (x != 5);
++  }
++  return 1;
++}
++
++int main ()
++{
++  struct sigaction sa;
++  int status;
++
++  sa.sa_sigaction = sighandler;
++  sa.sa_flags = SA_SIGINFO;
++    
++  status = sigaction (SIGSEGV, & sa, NULL);
++  status = sigaction (SIGBUS, & sa, NULL);
++
++  return func1 ();
++}
+diff --git a/libgcc/ChangeLog b/libgcc/ChangeLog
+index 66ce37a1fc1..7630d6ef81d 100644
+--- a/libgcc/ChangeLog
++++ b/libgcc/ChangeLog
+@@ -1,3 +1,12 @@
++2020-02-10  H.J. Lu  <hongjiu.lu@intel.com>
++
++	Backport from mainline
++	2020-02-10  H.J. Lu  <hongjiu.lu@intel.com>
++
++	PR libgcc/85334
++	* config/i386/shadow-stack-unwind.h (_Unwind_Frames_Increment):
++	New.
++
+ 2019-11-17  John David Anglin  <danglin@gcc.gnu.org>
+ 
+ 	* config/pa/linux-atomic.c (__kernel_cmpxchg): Change argument 1 to
+diff --git a/libgcc/config/i386/shadow-stack-unwind.h b/libgcc/config/i386/shadow-stack-unwind.h
+index c53c3fe5c63..129d6d19c37 100644
+--- a/libgcc/config/i386/shadow-stack-unwind.h
++++ b/libgcc/config/i386/shadow-stack-unwind.h
+@@ -49,3 +49,46 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+ 	}					\
+     }						\
+     while (0)
++
++/* Linux CET kernel places a restore token on shadow stack for signal
++   handler to enhance security.  The restore token is 8 byte and aligned
++   to 8 bytes.  It is usually transparent to user programs since kernel
++   will pop the restore token when signal handler returns.  But when an
++   exception is thrown from a signal handler, now we need to pop the
++   restore token from shadow stack.  For x86-64, we just need to treat
++   the signal frame as normal frame.  For i386, we need to search for
++   the restore token to check if the original shadow stack is 8 byte
++   aligned.  If the original shadow stack is 8 byte aligned, we just
++   need to pop 2 slots, one restore token, from shadow stack.  Otherwise,
++   we need to pop 3 slots, one restore token + 4 byte padding, from
++   shadow stack.  */
++#ifndef __x86_64__
++#undef _Unwind_Frames_Increment
++#define _Unwind_Frames_Increment(context, frames)	\
++  if (_Unwind_IsSignalFrame (context))			\
++    do							\
++      {							\
++	_Unwind_Word ssp, prev_ssp, token;		\
++	ssp = _get_ssp ();				\
++	if (ssp != 0)					\
++	  {						\
++	    /* Align shadow stack pointer to the next	\
++	       8 byte aligned boundary.  */		\
++	    ssp = (ssp + 4) & ~7;			\
++	    do						\
++	      {						\
++		/* Look for a restore token.  */	\
++		token = (*(_Unwind_Word *) (ssp - 8));	\
++		prev_ssp = token & ~7;			\
++		if (prev_ssp == ssp)			\
++		  break;				\
++		ssp += 8;				\
++	      }						\
++	    while (1);					\
++	    frames += (token & 0x4) ? 3 : 2;		\
++	  }						\
++      }							\
++    while (0);						\
++  else							\
++    frames++;
++#endif
