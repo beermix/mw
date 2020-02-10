@@ -69392,3 +69392,45 @@ index 00000000000..8c9279a18bf
 +    return 0; 
 +  abort ();   
 +}
+
+commit 3f764f459a9c77f2af58f6878293e2b4bd1def78
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sat Feb 8 00:18:45 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index d1f8004d309..8a8d82a3a12 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200207
++20200208
+
+commit 060c5df73b28c2c09f0d160970c91bdabd3edd0d
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sun Feb 9 00:18:28 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 8a8d82a3a12..ed0c2645f7b 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200208
++20200209
+
+commit f1ee6f0fe443129448fc90c42aaafc869a9f636f
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Mon Feb 10 00:18:34 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index ed0c2645f7b..3907f3c0ba9 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200209
++20200210
