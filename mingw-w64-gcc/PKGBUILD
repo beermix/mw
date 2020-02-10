@@ -208,8 +208,8 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
+  unset CFLAGS
+  unset CXXFLAGS
 #  export CFLAGS="-march=haswell -g1 -O2"
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
