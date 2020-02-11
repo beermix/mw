@@ -41,6 +41,9 @@ build() {
     --disable-libevent-regress \
     --disable-debug-mode \
     --disable-samples \
+    --disable-shared \
+    --enable-static \
+    --disable-shared \
     --disable-silent-rules
 
   make
