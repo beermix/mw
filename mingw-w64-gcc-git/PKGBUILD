@@ -47,9 +47,10 @@ _commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
 
 _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
 
+# commit=${_commit}
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 # source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
+source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0002-Relocate-libintl.patch"
         "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
         "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
@@ -206,7 +207,6 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -219,6 +219,9 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --disable-libstdcxx-verbose \
+    --with-default-libstdcxx-abi=new \
+    --disable-vtable-verify \
+    --enable-gnu-unique-object \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
