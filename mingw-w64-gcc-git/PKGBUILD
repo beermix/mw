@@ -222,9 +222,10 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --disable-libstdcxx-verbose \
-    --disable-vtable-verify \
     --with-diagnostics-color=always \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
     --with-gnu-as --with-gnu-ld \
