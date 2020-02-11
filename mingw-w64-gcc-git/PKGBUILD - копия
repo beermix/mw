@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs')
+options=('staticlibs' '!emptydirs' 'strip')
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
@@ -188,7 +188,6 @@ build() {
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 #  export FFLAGS_FOR_TARGET="$FFLAGS"
-
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -204,12 +203,10 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -222,7 +219,9 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --disable-libstdcxx-verbose \
+    --with-default-libstdcxx-abi=new \
     --disable-vtable-verify \
+    --enable-gnu-unique-object \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
@@ -253,6 +252,16 @@ build() {
     cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
 }
+
+#check() {
+#  cd ${srcdir}/${_sourcedir}
+
+  # disable libphobos test to avoid segfaults and other unfunny ways to waste my time  
+#  sed -i '/maybe-check-target-libphobos \\/d' Makefile 
+
+  # do not abort on error as some are "expected"
+#  make -k check || true "/src/gcc-git/contrib/test_summary"
+#}
 
 package_mingw-w64-gcc-libs-git() {
   pkgdesc="GNU Compiler Collection (libraries) for MinGW-w64"
