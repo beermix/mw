@@ -224,7 +224,7 @@ build() {
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-default-libstdcxx-abi=gcc4-compatible \
-    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
