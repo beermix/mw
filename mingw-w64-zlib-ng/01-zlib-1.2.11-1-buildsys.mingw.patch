@@ -1,0 +1,127 @@
+--- zlib-1.2.11/configure.orig	2016-12-31 21:06:40.000000000 +0300
++++ zlib-1.2.11/configure	2017-01-17 08:32:52.101363500 +0300
+@@ -38,6 +38,7 @@
+ 
+ # destination name for static library
+ STATICLIB=libz.a
++IMPORTLIB=
+ 
+ # extract zlib version numbers from zlib.h
+ VER=`sed -n -e '/VERSION "/s/.*"\(.*\)".*/\1/p' < ${SRCDIR}zlib.h`
+@@ -74,7 +75,7 @@
+ prefix=${prefix-/usr/local}
+ exec_prefix=${exec_prefix-'${prefix}'}
+ libdir=${libdir-'${exec_prefix}/lib'}
+-sharedlibdir=${sharedlibdir-'${libdir}'}
++sharedlibdir=${sharedlibdir-'${exec_prefix}/bin'}
+ includedir=${includedir-'${prefix}/include'}
+ mandir=${mandir-'${prefix}/share/man'}
+ shared_ext='.so'
+@@ -89,6 +90,7 @@
+ debug=0
+ old_cc="$CC"
+ old_cflags="$CFLAGS"
++old_ldflags="$LDFLAGS"
+ OBJC='$(OBJZ) $(OBJG)'
+ PIC_OBJC='$(PIC_OBJZ) $(PIC_OBJG)'
+ 
+@@ -213,14 +215,24 @@
+         LDSHARED=${LDSHARED-"$cc -shared -Wl,-soname,libz.so.1,--version-script,${SRCDIR}zlib.map"}
+         LDCONFIG="ldconfig -m" ;;
+   CYGWIN* | Cygwin* | cygwin* | OS/2*)
++        CFLAGS="${CFLAGS} -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64"
++        SFLAGS="${CFLAGS}"
++        LDFLAGS="-L. ${old_ldflags}"
++        shared_ext=".dll"
++        SHAREDLIB='cygz.dll'
++        IMPORTLIB='libz.dll.a'
++        LDSHARED=${LDSHARED-"$cc -shared -Wl,-export-all -Wl,--enable-auto-image-base -Wl,--out-implib=${IMPORTLIB}"}
++        LDSHAREDLIBC=''
+         EXE='.exe' ;;
+   MINGW* | mingw*)
+ # temporary bypass
+-        rm -f $test.[co] $test $test$shared_ext
+-        echo "Please use win32/Makefile.gcc instead." | tee -a configure.log
+-        leave 1
+-        LDSHARED=${LDSHARED-"$cc -shared"}
+-        LDSHAREDLIBC=""
++        SFLAGS="${CFLAGS}"
++        LDFLAGS="-L. ${old_ldflags}"
++        shared_ext=".dll"
++        SHAREDLIB='zlib1.dll'
++        IMPORTLIB='libz.dll.a'
++        LDSHARED=${LDSHARED-"$cc -shared -Wl,-export-all -Wl,--enable-auto-image-base -Wl,--out-implib=${IMPORTLIB}"}
++        LDSHAREDLIBC=''
+         EXE='.exe' ;;
+   QNX*)  # This is for QNX6. I suppose that the QNX rule below is for QNX2,QNX4
+          # (alain.bonnefoy@icbt.com)
+@@ -344,11 +356,32 @@
+   esac
+ fi
+ 
++case "$uname" in
++  *CYGWIN* | *Cygwin* | *cygwin* )
++    # On cygwin, we always build both shared and static libs
++    ALL="static shared"
++    SHAREDLIBPOST='/bin/true'
++    SHAREDTARGET=${SHAREDLIB}
++    TEST="all teststatic testshared"
++    ;;
++  *MINGW* | *Mingw* | *mingw* )
++    # On Mingw, we always build both shared and static libs
++    ALL="static shared"
++    SHAREDLIBPOST='/bin/true'
++    SHAREDTARGET=${SHAREDLIB}
++    TEST="all teststatic testshared"
++    ;;
++  *)
++
+ # destination names for shared library if not defined above
+ SHAREDLIB=${SHAREDLIB-"libz$shared_ext"}
+ SHAREDLIBV=${SHAREDLIBV-"libz$shared_ext.$VER"}
+ SHAREDLIBM=${SHAREDLIBM-"libz$shared_ext.$VER1"}
+-
++SHAREDLIBPOST='(rm -f $(SHAREDLIB) $(SHAREDLIBM); ln -s $@ $(SHAREDLIB) ; ln -s $@ $(SHAREDLIBM) )'
++SHAREDTARGET='$(SHAREDLIBV)'
++    ;;
++esac
++ 
+ echo >> configure.log
+ 
+ # define functions for testing compiler and library characteristics and logging the results
+@@ -847,6 +880,9 @@
+ echo SHAREDLIBM = $SHAREDLIBM >> configure.log
+ echo SHAREDLIBV = $SHAREDLIBV >> configure.log
+ echo STATICLIB = $STATICLIB >> configure.log
++echo IMPORTLIB = $IMPORTLIB >> configure.log
++echo SHAREDLIBPOST = $SHAREDLIBPOST >> configure.log
++echo SHAREDTARGET = $SHAREDTARGET >> configure.log
+ echo TEST = $TEST >> configure.log
+ echo VER = $VER >> configure.log
+ echo Z_U4 = $Z_U4 >> configure.log
+@@ -868,9 +904,12 @@
+ /^LDSHARED *=/s#=.*#=$LDSHARED#
+ /^CPP *=/s#=.*#=$CPP#
+ /^STATICLIB *=/s#=.*#=$STATICLIB#
++/^IMPORTLIB *=/s#=.*#=$IMPORTLIB#
+ /^SHAREDLIB *=/s#=.*#=$SHAREDLIB#
+ /^SHAREDLIBV *=/s#=.*#=$SHAREDLIBV#
+ /^SHAREDLIBM *=/s#=.*#=$SHAREDLIBM#
++/^SHAREDLIBPOST *=/s#=.*#=$SHAREDLIBPOST#
++/^SHAREDTARGET *=/s#=.*#=$SHAREDTARGET#
+ /^AR *=/s#=.*#=$AR#
+ /^ARFLAGS *=/s#=.*#=$ARFLAGS#
+ /^RANLIB *=/s#=.*#=$RANLIB#
+@@ -899,9 +938,12 @@
+ /^CPP *=/s#=.*#=$CPP#
+ /^LDSHARED *=/s#=.*#=$LDSHARED#
+ /^STATICLIB *=/s#=.*#=$STATICLIB#
++/^IMPORTLIB *=/s#=.*#=$IMPORTLIB#
+ /^SHAREDLIB *=/s#=.*#=$SHAREDLIB#
+ /^SHAREDLIBV *=/s#=.*#=$SHAREDLIBV#
+ /^SHAREDLIBM *=/s#=.*#=$SHAREDLIBM#
++/^SHAREDLIBPOST *=/s#=.*#=$SHAREDLIBPOST#
++/^SHAREDTARGET *=/s#=.*#=$SHAREDTARGET#
+ /^AR *=/s#=.*#=$AR#
+ /^ARFLAGS *=/s#=.*#=$ARFLAGS#
+ /^RANLIB *=/s#=.*#=$RANLIB#

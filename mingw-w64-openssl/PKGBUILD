@@ -63,7 +63,7 @@ build() {
   fi
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
-  #CC='clang' CXX='clang++'
+  CC='clang' CXX='clang++' \
   ./Configure \
     --prefix=/oth \
     ${_mingw} \

@@ -37,18 +37,17 @@ prepare() {
 build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${CARCH} && cd ${srcdir}/build-${CARCH}
-  ../${_realname}-${pkgver}/configure \
+    CC='clang' CXX='clang++' \
+    ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --disable-rpath \
-    --enable-assembler \
     --disable-debug \
     --disable-doc \
-    --disable-werror \
     --enable-threads \
-    --enable-silent-rules \
+    --disable-silent-rules \
+    --disable-rpath \
     --disable-lzma-links
 
   make
