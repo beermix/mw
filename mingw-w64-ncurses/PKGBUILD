@@ -4,8 +4,8 @@ _realname=ncurses
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 _base_ver=6.1
-_date_rev=20180407
-pkgver=${_base_ver}
+_date_rev=20200118
+pkgver=${_base_ver}.${_date_rev}
 pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library (mingw-w64)"
 arch=('any')
@@ -14,57 +14,33 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 url="https://www.gnu.org/software/ncurses/"
 license=('MIT')
 options=('staticlibs' 'strip')
-source=("${_realname}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/current/${_realname}-${_base_ver}.tgz"
+source=("${_realname}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/${_realname}-${_base_ver}.tar.gz"
         001-use-libsystre.patch)
 sha256sums=('85baae1a02f695cc8a9b966e8dceea457df183ece9229f8e6a20ec3c3d2ee6a9'
             'eb28949297a4c1eda67da49cfbed1d60f181b83101a0b3715552a4564bd90ff3')
-
-prepare() {
-  cd ${_realname}-${_base_ver}
-  patch -p1 -i ${srcdir}/001-use-libsystre.patch
-}
 
 build() {
   [[ -d build-${MINGW_CHOST} ]] && rm -rf build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST}
   cd build-${MINGW_CHOST}
 
-  CFLAGS+=" -fPIC" \
   ../${_realname}-${_base_ver}/configure \
     --prefix=${MINGW_PREFIX} \
+    --with-cxx \
     --without-ada \
-    --with-shared \
-    --with-cxx-shared \
-    --with-normal \
-    --without-debug \
-    --disable-relink \
-    --disable-rpath \
-    --with-ticlib \
-    --without-termlib \
-    --enable-widec \
-    --enable-ext-colors \
-    --enable-ext-mouse \
+    --enable-warnings \
+    --enable-assertions \
+    --disable-home-terminfo \
+    --enable-database \
     --enable-sp-funcs \
-    --with-wrap-prefix=ncwrap_ \
-    --enable-sigwinch \
-    --disable-term-driver \
-    --enable-colorfgbg \
-    --enable-tcap-names \
+    --enable-term-driver \
+    --enable-interop \
     --disable-termcap \
-    --disable-mixed-case \
-    --with-pkg-config \
-    --enable-pc-files \
-    --with-manpage-format=normal \
-    --with-manpage-aliases \
-    --with-default-terminfo-dir=/mingw64/share/terminfo \
-    --enable-echo \
-    --mandir=/mingw64/share/man \
-    --includedir=/mingw64/include/ncursesw \
-    --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
-    --with-pkg-config-libdir=/mingw64/lib/pkgconfig
-
-  make
-  make DESTDIR=${srcdir}/dest install
+    --with-progs \
+    --with-libtool \
+    --without-debug \
+    --without-manpages \
+    --enable-pc-files
 
   noti make
 }
@@ -72,6 +48,4 @@ build() {
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR=${pkgdir} install
-  cp -r ${pkgdir}${MINGW_PREFIX}/include/ncursesw ${pkgdir}${MINGW_PREFIX}/include/ncurses
-  cp ${pkgdir}${MINGW_PREFIX}/lib/libncursesw.a ${pkgdir}${MINGW_PREFIX}/lib/libncurses.a
 }
