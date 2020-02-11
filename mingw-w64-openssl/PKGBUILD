@@ -52,7 +52,7 @@ build() {
   # No support for out-of-source builds
   mkdir -p ${srcdir}/build-${CARCH}
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
-  
+
   # Use mingw cflags instead of hardcoded ones     enable-ec_nistp_64_gcc_128
 #  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -Wno-unknown-warning-option -Wno-unused-parameter -Wno-missing-field-initializers -Wno-language-extension-token  -Wno-extended-offsetof -Qunused-arguments/' ${srcdir}/build-${CARCH}/Configure
   sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -pipe -Qunused-arguments -D_REENTRANT -Wno-unknown-warning-option -Wno-unused-parameter -Wno-missing-field-initializers -Wno-language-extension-token -Wno-extended-offsetof -Qunused-arguments -fdiagnostics-color=always /' ${srcdir}/build-${CARCH}/Configure
@@ -67,7 +67,7 @@ build() {
   ./Configure \
     --prefix=/oth \
     ${_mingw} \
-    shared \
+    no-shared \
     threads \
     no-zlib \
     no-zlib-dynamic \

@@ -175,14 +175,11 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
-  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
-  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
+
 
   unset CFLAGS
   unset CXXFLAGS
+  unset LDLAGS
   export CFLAGS="-march=haswell -g1 -O2"
   export CXXFLAGS="-march=haswell -g1 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
@@ -209,7 +206,7 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -245,7 +242,7 @@ build() {
 
 #  noti nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
 
-  noti nice -n19 make V=1 all
+  noti nice -n 19 make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

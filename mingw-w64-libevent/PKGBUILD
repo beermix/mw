@@ -25,7 +25,7 @@ prepare() {
   # https://github.com/transmission/libevent/commit/72e50166aaa2c3b3c35e336039df7101bd418264
   patch -p1 -i ${srcdir}/event2-02-win32.patch
 
-  autoreconf -vfi
+#  autoreconf -vfi
 }
 
 build() {
@@ -33,14 +33,13 @@ build() {
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
   CC='clang' CXX='clang++' \
   ../${_realname}-${pkgver}-stable/configure \
-    --prefix=${MINGW_PREFIX} \
+    --prefix=/oth \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --sysconfdir=${MINGW_PREFIX}/etc \
+    --sysconfdir=/oth/etc \
     --disable-libevent-regress \
     --disable-debug-mode \
-    --disable-silent-rules \
     --disable-samples \
     --disable-silent-rules
 
@@ -51,5 +50,5 @@ package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make DESTDIR="${pkgdir}" install
 
-  sed -s "s|$(cygpath -m ${MINGW_PREFIX})|${MINGW_PREFIX}|g" -i "${pkgdir}${MINGW_PREFIX}/lib/pkgconfig/${_realname}_openssl.pc"
+  sed -s "s|$(cygpath -m /oth)|/oth|g" -i "${pkgdir}/oth/lib/pkgconfig/${_realname}_openssl.pc"
 }
