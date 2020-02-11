@@ -69675,3 +69675,17 @@ index c53c3fe5c63..129d6d19c37 100644
 +  else							\
 +    frames++;
 +#endif
+
+commit 92483696301368d028bc4b570dbba53cdfdce609
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Tue Feb 11 00:18:28 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 3907f3c0ba9..4e000ddb8e7 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200210
++20200211
