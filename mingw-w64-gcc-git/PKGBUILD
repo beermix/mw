@@ -6,8 +6,8 @@
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
 _enable_fortran=yes
-_enable_ada=no
-_enable_objc=no
+_enable_ada=yes
+_enable_objc=yes
 _realname=gcc
 _sourcedir=${_realname}-git
 pkgbase=mingw-w64-${_realname}-git
@@ -113,7 +113,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
-  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+#  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
 
 #  patch -p1 -i "${srcdir}"/010-documentation.patch
 #  patch -p1 -i "${srcdir}"/gomp-relax.patch
