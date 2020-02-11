@@ -50,11 +50,12 @@ build() {
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
 
-  CC='clang' CXX='clang++' \
+#  CC='clang' CXX='clang++'
+
   ./Configure \
     --prefix=/oth \
     ${_mingw} \
-    no-shared \
+    shared \
     threads \
     no-zlib \
     no-zlib-dynamic \
@@ -67,7 +68,8 @@ build() {
     enable-md2 \
     enable-rc5 \
     enable-tlsext \
-    enable-rfc3779
+    enable-rfc3779 \
+    enable-ec_nistp_64_gcc_128
 
     make
 }
