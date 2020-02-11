@@ -26,7 +26,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.0rc1
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0-rc1
-pkgrel=2
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -185,7 +185,7 @@ build() {
     export CXX='clang++'
   fi
 
-  
+
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
@@ -210,6 +210,7 @@ build() {
 #    -DLLVM_USE_SANITIZER=OFF
 #    -DLLVM_BUILD_TOOLS=OFF \
 #    -DLLVM_APPEND_VC_REV=OFF \     -DENABLE_CRASH_OVERRIDES=ON \
+#     -DLLVM_ENABLE_TERMINFO=OFF \
 # -DLLVM_OPTIMIZED_TABLEGEN=ON \
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -217,11 +218,9 @@ build() {
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_LIBXML2=OFF \
-    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-    -DLLVM_ENABLE_TERMINFO=ON \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_CCACHE_BUILD=OFF \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
@@ -248,7 +247,7 @@ build() {
   # sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   # sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j5
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
