@@ -1,0 +1,55 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Maintainer: Chilledheart <rwindz0@gmail.com>
+
+_realname=libevent
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=2.1.11
+pkgrel=33
+pkgdesc="An event notification library (mingw-w64)"
+arch=('any')
+url="https://libevent.org"
+license=('BSD')
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
+             "${MINGW_PACKAGE_PREFIX}-openssl")
+optdepends=("${MINGW_PACKAGE_PREFIX}-python3")
+source=(https://github.com/${_realname}/${_realname}/releases/download/release-${pkgver}-stable/${_realname}-${pkgver}-stable.tar.gz
+        'event2-02-win32.patch')
+sha256sums=('a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d'
+            'e572ed628daba12915aaa5867b35ef1b0ca3ed3eb6e9759f97136dd8eab32c08')
+
+prepare() {
+  cd "${srcdir}/${_realname}-${pkgver}-stable"
+
+  # to make transmission work, taken from:
+  # https://github.com/transmission/libevent/commit/72e50166aaa2c3b3c35e336039df7101bd418264
+  patch -p1 -i ${srcdir}/event2-02-win32.patch
+
+#  autoreconf -vfi
+}
+
+build() {
+  [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
+  mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
+  CC='clang' CXX='clang++' \
+  ../${_realname}-${pkgver}-stable/configure \
+    --prefix=/oth \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST} \
+    --sysconfdir=/oth/etc \
+    --disable-libevent-regress \
+    --disable-debug-mode \
+    --disable-samples \
+    --disable-shared \
+    --disable-silent-rules
+
+  make
+}
+
+package() {
+  cd "${srcdir}/build-${MINGW_CHOST}"
+  make DESTDIR="${pkgdir}" install
+
+  sed -s "s|$(cygpath -m /oth)|/oth|g" -i "${pkgdir}/oth/lib/pkgconfig/${_realname}_openssl.pc"
+}
