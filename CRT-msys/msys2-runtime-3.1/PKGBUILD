@@ -3,8 +3,8 @@
 
 pkgbase=msys2-runtime
 pkgname=('msys2-runtime' 'msys2-runtime-devel')
-pkgver=3.1.0
-pkgrel=0
+pkgver=3.1.2
+pkgrel=1
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('i686' 'x86_64')
 url="https://www.cygwin.com/"
@@ -215,7 +215,7 @@ build() {
     OPTIM="-O0"
     extra_config+=(--enable-debugging)
   else
-    OPTIM="-O2"
+    OPTIM="-march=haswell -g0 -O2"
   fi
 
   CFLAGS="$OPTIM -pipe -ggdb"
