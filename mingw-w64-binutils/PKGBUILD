@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=4
+pkgrel=6
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -15,7 +15,7 @@ groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
 depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 checkdepends=('dejagnu' 'bc')
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
+options=('staticlibs' '!distcc' 'strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0001-enable-gold-on.mingw32.patch
@@ -89,7 +89,6 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --enable-silent-rules \
     --with-system-zlib \
     --enable-targets=x86_64-pc-mingw64 \
     --enable-threads \
