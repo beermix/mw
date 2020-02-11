@@ -1,0 +1,69 @@
+From 1c26ea11b6cbb7f50e061c0c229cb9a7d4cb3b3d Mon Sep 17 00:00:00 2001
+From: Johannes Schindelin <johannes.schindelin@gmx.de>
+Date: Thu, 21 Nov 2019 12:30:12 +0100
+Subject: [PATCH 55/N] Fix compilation with GCC v9.x
+
+The `logwtmp()` fixes might very well fix real buffer overflows...
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/exec.cc        | 5 +++--
+ winsup/cygwin/libc/bsdlib.cc | 6 +++---
+ winsup/cygwin/posix_timer.cc | 2 +-
+ 3 files changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/winsup/cygwin/exec.cc b/winsup/cygwin/exec.cc
+index 6ed714d..529c3bb 100644
+--- a/winsup/cygwin/exec.cc
++++ b/winsup/cygwin/exec.cc
+@@ -81,11 +81,12 @@ execv (const char *path, char * const *argv)
+ }
+ 
+ extern "C" int
+-execve (const char *path, char *const argv[], char *const envp[])
++execve_1 (const char *path, char *const argv[], char *const envp[])
+ {
+   return spawnve (_P_OVERLAY, path, argv, envp);
+ }
+-EXPORT_ALIAS (execve, _execve)	/* For newlib */
++EXPORT_ALIAS (execve_1, _execve)	/* For newlib */
++EXPORT_ALIAS (execve_1, execve)
+ 
+ extern "C" int
+ execvp (const char *file, char * const *argv)
+diff --git a/winsup/cygwin/libc/bsdlib.cc b/winsup/cygwin/libc/bsdlib.cc
+index 8e10827..1fb1afa 100644
+--- a/winsup/cygwin/libc/bsdlib.cc
++++ b/winsup/cygwin/libc/bsdlib.cc
+@@ -265,12 +265,12 @@ logwtmp (const char *line, const char *user, const char *host)
+   ut.ut_type = USER_PROCESS;
+   ut.ut_pid = getpid ();
+   if (line)
+-    strncpy (ut.ut_line, line, sizeof ut.ut_line);
++    strlcpy (ut.ut_line, line, sizeof ut.ut_line);
+   time (&ut.ut_time);
+   if (user)
+-    strncpy (ut.ut_user, user, sizeof ut.ut_user);
++    strlcpy (ut.ut_user, user, sizeof ut.ut_user);
+   if (host)
+-    strncpy (ut.ut_host, host, sizeof ut.ut_host);
++    strlcpy (ut.ut_host, host, sizeof ut.ut_host);
+   updwtmp (_PATH_WTMP, &ut);
+ }
+ 
+diff --git a/winsup/cygwin/posix_timer.cc b/winsup/cygwin/posix_timer.cc
+index c0d548f..75cd4fa 100644
+--- a/winsup/cygwin/posix_timer.cc
++++ b/winsup/cygwin/posix_timer.cc
+@@ -81,7 +81,7 @@ timer_tracker::arm_overrun_event (LONG64 exp_cnt)
+ LONG
+ timer_tracker::disarm_overrun_event ()
+ {
+-  LONG ret;
++  LONG ret = 0;
+ 
+   AcquireSRWLockExclusive (&srwlock);
+   if (overrun_count != OVR_DISARMED)
+-- 
+2.9.0
+

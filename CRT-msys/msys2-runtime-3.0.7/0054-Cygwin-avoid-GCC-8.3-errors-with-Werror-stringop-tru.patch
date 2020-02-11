@@ -1,0 +1,61 @@
+From 5a9fa35ef58d098ad5d1fa195377661edbfa6bca Mon Sep 17 00:00:00 2001
+From: Ken Brown <kbrown@cornell.edu>
+Date: Mon, 15 Jul 2019 15:02:00 -0400
+Subject: [PATCH 54/N] Cygwin: avoid GCC 8.3 errors with
+ -Werror=stringop-truncation
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/environ.cc         | 2 +-
+ winsup/cygwin/include/sys/utmp.h | 6 +++---
+ winsup/cygwin/uname.cc           | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/winsup/cygwin/environ.cc b/winsup/cygwin/environ.cc
+index 0ec42c9..a493a3c 100644
+--- a/winsup/cygwin/environ.cc
++++ b/winsup/cygwin/environ.cc
+@@ -655,7 +655,7 @@ _addenv (const char *name, const char *value, int overwrite)
+ 	return -1;		/* Oops.  No more memory. */
+ 
+       /* Put name '=' value into current slot. */
+-      strncpy (envhere, name, namelen);
++      memcpy (envhere, name, namelen);
+       envhere[namelen] = '=';
+       strcpy (envhere + namelen + 1, value);
+     }
+diff --git a/winsup/cygwin/include/sys/utmp.h b/winsup/cygwin/include/sys/utmp.h
+index d90517c..acf804a 100644
+--- a/winsup/cygwin/include/sys/utmp.h
++++ b/winsup/cygwin/include/sys/utmp.h
+@@ -24,11 +24,11 @@ struct utmp
+ {
+  short	ut_type;
+  pid_t	ut_pid;
+- char	ut_line[UT_LINESIZE];
++ char	ut_line[UT_LINESIZE] __attribute__ ((nonstring));
+  char  ut_id[UT_IDLEN];
+  time_t ut_time;
+- char	ut_user[UT_NAMESIZE];
+- char	ut_host[UT_HOSTSIZE];
++ char	ut_user[UT_NAMESIZE] __attribute__ ((nonstring));
++ char	ut_host[UT_HOSTSIZE] __attribute__ ((nonstring));
+  long	ut_addr;
+ };
+ 
+diff --git a/winsup/cygwin/uname.cc b/winsup/cygwin/uname.cc
+index 4a2b41f..132aca2 100644
+--- a/winsup/cygwin/uname.cc
++++ b/winsup/cygwin/uname.cc
+@@ -25,7 +25,7 @@ uname_x (struct utsname *name)
+ {
+   __try
+     {
+-      char buf[NI_MAXHOST + 1];
++      char buf[NI_MAXHOST + 1] __attribute__ ((nonstring));
+       char *snp = strstr (cygwin_version.dll_build_date, "SNP");
+ 
+       memset (name, 0, sizeof (*name));
+-- 
+2.9.0
+

@@ -1,0 +1,43 @@
+From a8b607410ba353499702b3021420234c4ac78429 Mon Sep 17 00:00:00 2001
+From: Johannes Schindelin <johannes.schindelin@gmx.de>
+Date: Thu, 21 Nov 2019 23:01:00 +0100
+Subject: [PATCH 58/N] i686: no longer claim that %esp is clobbered
+
+GCC v9.x does not allow that any longer, as documented in
+https://gcc.gnu.org/onlinedocs/gcc/Extended-Asm.html#Clobbers-and-Scratch-Registers
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/crt0.c  | 2 +-
+ winsup/cygwin/init.cc | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/winsup/cygwin/crt0.c b/winsup/cygwin/crt0.c
+index cb28bd3..8664d3d 100644
+--- a/winsup/cygwin/crt0.c
++++ b/winsup/cygwin/crt0.c
+@@ -31,7 +31,7 @@ mainCRTStartup ()
+ #if __GNUC_PREREQ(6,0)
+ #pragma GCC diagnostic pop
+ #endif
+-  asm volatile ("andl $-16,%%esp" ::: "%esp");
++  asm volatile ("andl $-16,%esp");
+ #endif
+ 
+ #ifdef __MSYS__
+diff --git a/winsup/cygwin/init.cc b/winsup/cygwin/init.cc
+index aeeeac7..ef9ef29 100644
+--- a/winsup/cygwin/init.cc
++++ b/winsup/cygwin/init.cc
+@@ -30,7 +30,7 @@ threadfunc_fe (VOID *arg)
+ #if __GNUC_PREREQ(6,0)
+ #pragma GCC diagnostic pop
+ #endif
+-  asm volatile ("andl $-16,%%esp" ::: "%esp");
++  asm volatile ("andl $-16,%esp");
+ #endif
+   _cygtls::call ((DWORD (*)  (void *, void *)) TlsGetValue (_my_oldfunc), arg);
+ }
+-- 
+2.9.0
+

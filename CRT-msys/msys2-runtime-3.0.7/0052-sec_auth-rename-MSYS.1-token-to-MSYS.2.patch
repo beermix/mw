@@ -1,0 +1,31 @@
+From 53fb29ac4389b0e21956834c45b34915ba91bafc Mon Sep 17 00:00:00 2001
+From: Johannes Schindelin <johannes.schindelin@gmx.de>
+Date: Thu, 21 Nov 2019 12:27:50 +0100
+Subject: [PATCH 52/N] sec_auth: rename MSYS.1 token to MSYS.2
+
+While at it, fix the incorrect size: `MSYS.2` is shorter than
+`Cygwin.1` (which was pointed out by GCC v9.x).
+
+This patch should be squashed into "Rename dll from cygwin to msys".
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/sec_auth.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/winsup/cygwin/sec_auth.cc b/winsup/cygwin/sec_auth.cc
+index c93e822..b216634 100644
+--- a/winsup/cygwin/sec_auth.cc
++++ b/winsup/cygwin/sec_auth.cc
+@@ -1569,7 +1569,7 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
+   RtlInitAnsiString (&origin.str, origin.buf);
+ 
+   /* Create token source. */
+-  memcpy (ts.SourceName, "MSYS.1", 8);
++  memcpy (ts.SourceName, "MSYS.2", 6);
+   ts.SourceIdentifier.HighPart = 0;
+   ts.SourceIdentifier.LowPart = kerberos_auth ? 0x0105 : 0x0106;
+ 
+-- 
+2.9.0
+

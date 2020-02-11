@@ -1,0 +1,47 @@
+From c10b4185a35f494a2ff4ad2f5828540d93d56bec Mon Sep 17 00:00:00 2001
+From: Johannes Schindelin <johannes.schindelin@gmx.de>
+Date: Fri, 14 Jun 2019 19:07:26 +0200
+Subject: [PATCH 50/N] fixup! Pass environment variables with empty values
+
+The patch was incomplete. It resulted in settings like `SHELL=` to
+*skip* the variable name and the equal sign and instead insert a NUL,
+i.e. instead of putting `SHELL=\0` into the environment block, it would
+append `\0\0` which would be interpreted as the end of the environment
+block instead.
+
+Funnily enough, this was only noticed years later, when Git's `git
+rebase -i` progress was changed to clear the line differently depending
+on the `TERM` setting, and t/t3404-rebase-interactive.sh triggered the
+bug by setting `SHELL` to the empty value, which due to the bug fixed
+here would drop `TERM=dumb` by mistake.
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/environ.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/winsup/cygwin/environ.cc b/winsup/cygwin/environ.cc
+index ab3009f..0ec42c9 100644
+--- a/winsup/cygwin/environ.cc
++++ b/winsup/cygwin/environ.cc
+@@ -1323,7 +1323,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
+ 	    continue;
+ 
+ 	  /* See if this entry requires posix->win32 conversion. */
+-	  conv = getwinenv (*srcp, rest, &temp);
++	  conv = !*rest ? NULL : getwinenv (*srcp, rest, &temp);
+ 	  if (conv)
+ 	    {
+ 	      p = conv->native;	/* Use win32 path */
+@@ -1337,7 +1337,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
+ 		}
+ 	    }
+ #ifdef __MSYS__
+-	  else if (!keep_posix) {
++	  else if (!keep_posix && *rest) {
+ 	    char *win_arg = arg_heuristic_with_exclusions
+ 		   (*srcp, msys2_env_conv_excl_env, msys2_env_conv_excl_count);
+ 	    debug_printf("WIN32_PATH is %s", win_arg);
+-- 
+2.9.0
+

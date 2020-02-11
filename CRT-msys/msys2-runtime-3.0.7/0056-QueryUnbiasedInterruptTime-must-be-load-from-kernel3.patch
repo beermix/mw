@@ -1,0 +1,30 @@
+From 07c7daca2baae5f94f8c23f6466d70493a15e593 Mon Sep 17 00:00:00 2001
+From: Alexey Pavlov <alexpux@gmail.com>
+Date: Fri, 24 May 2019 13:41:47 +0300
+Subject: [PATCH 56/N] QueryUnbiasedInterruptTime must be load from
+ kernel32.dll
+
+This fixes https://github.com/git-for-windows/git/issues/2407
+
+Signed-off-by: Alexey Pavlov <alexpux@gmail.com>
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/autoload.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/winsup/cygwin/autoload.cc b/winsup/cygwin/autoload.cc
+index c4d9161..53d1ad3 100644
+--- a/winsup/cygwin/autoload.cc
++++ b/winsup/cygwin/autoload.cc
+@@ -593,7 +593,7 @@ LoadDLLfunc (SetThreadGroupAffinity, 12, kernel32)
+    available via KernelBase.dll. */
+ LoadDLLfunc (QueryInterruptTime, 4, KernelBase)
+ LoadDLLfunc (QueryInterruptTimePrecise, 4, KernelBase)
+-LoadDLLfunc (QueryUnbiasedInterruptTime, 4, KernelBase)
++LoadDLLfunc (QueryUnbiasedInterruptTime, 4, kernel32)
+ LoadDLLfunc (QueryUnbiasedInterruptTimePrecise, 4, KernelBase)
+ 
+ /* ldap functions are cdecl! */
+-- 
+2.9.0
+
