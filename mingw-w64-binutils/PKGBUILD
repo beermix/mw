@@ -26,7 +26,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0300-default-secure-pe-flags.patch
         0310-reproducible-import-libraries.patch
         binutils-add-LD_AS_NEEDED-global-env.patch
-        binutils-stable-34branch.patch)
+        binutils-stable-branch.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
