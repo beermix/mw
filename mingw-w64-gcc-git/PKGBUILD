@@ -43,7 +43,7 @@ options=('staticlibs' '!emptydirs')
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
-_commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
+#_commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
 
 _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
 
@@ -206,7 +206,8 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=no \
+    --enable-libstdcxx-filesystem-ts=yes \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -220,7 +221,6 @@ build() {
     --with-system-zlib \
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
-    --with-default-libstdcxx-abi=gcc4-compatible \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
