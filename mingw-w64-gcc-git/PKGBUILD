@@ -252,6 +252,8 @@ package_mingw-w64-gcc-libs-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
 
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
+
   cd ${srcdir}${MINGW_PREFIX}
   # libitm* and libvtv* are disbled until fixed
   cp bin/{libatomic*,libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
