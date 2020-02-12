@@ -41,7 +41,7 @@ build() {
     --disable-libevent-regress \
     --disable-debug-mode \
     --disable-samples \
-    --with-pic \
+    --with-libtool \
     --disable-silent-rules
 
   make

@@ -48,6 +48,7 @@ build() {
     --enable-threads \
     --disable-silent-rules \
     --disable-rpath \
+    --with-libtool \
     --disable-lzma-links
 
   make

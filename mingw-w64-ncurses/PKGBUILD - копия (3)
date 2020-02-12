@@ -6,7 +6,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 _base_ver=6.1
 _date_rev=20200118
 pkgver=${_base_ver}.${_date_rev}
-pkgrel=2
+pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library (mingw-w64)"
 arch=('any')
 depends=("${MINGW_PACKAGE_PREFIX}-libsystre")
@@ -24,12 +24,15 @@ build() {
   mkdir -p build-${MINGW_CHOST}
   cd build-${MINGW_CHOST}
 
+#  export CC='ccache gcc'
+#  export CXX='ccache g++'
+
   ../${_realname}-${_base_ver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --without-cxx \
+    --with-cxx \
     --without-ada \
     --enable-warnings \
     --enable-assertions \
@@ -43,7 +46,6 @@ build() {
     --with-libtool \
     --without-debug \
     --without-manpages \
-    --with-normal \
     --with-pkg-config-libdir=/mingw64/lib/pkgconfig \
     --enable-pc-files \
     --enable-widec
