@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=9.0.1
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
-pkgrel=3
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -266,7 +266,6 @@ build() {
 #    -Wwrite-strings -Wc++-compat -Wstrict-prototypes -Wshadow=local -pedantic -D_GNU_SOURCE
 #    -DLIBCLANG_BUILD_STATIC=ON \
 #    -DCLANG_LINK_CLANG_DYLIB=OFF \
-#    -DBUILD_SHARED_LIBS=ON \
 #    -DLLVM_COMPILER_IS_GCC_COMPATIBLE=ON \
 #    -DLLVM_USE_SANITIZER=OFF
 #    -DLLVM_BUILD_TOOLS=OFF \
@@ -274,10 +273,6 @@ build() {
 #    -DLLVM_ENABLE_TERMINFO=OFF \
 #    -DLLVM_OPTIMIZED_TABLEGEN=ON \      \     -DENABLE_CRASH_OVERRIDES=ON \
 #
-#    -DLLVM_ENABLE_PIC=ON \
-#    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
-#    -DLLVM_ENABLE_CXX1Y=OFF \
-#    -DLLVM_ENABLE_CXX1Z=OFF \     -DLLVM_ENABLE_ZLIB=ON \
 #-DBENCHMARK_ENABLE_LTO=OFF
 #-DBENCHMARK_ENABLE_TESTING=OFF
 #-DBUILD_STATIC_LIBS=ON
@@ -286,16 +281,21 @@ build() {
 #-DRUN_HAVE_STD_REGEX=0
 #-DRUN_HAVE_POSIX_REGEX=0     -DLLVM_ENABLE_Z3_SOLVER=ON \
 #-DRUN_HAVE_GNU_POSIX_REGEX=0
-#-DRUN_HAVE_STEADY_CLOCK=0     -DLLVM_ENABLE_RTTI=ON \     -DLLVM_TARGET_ARCH=X86 \
+#-DRUN_HAVE_STEADY_CLOCK=0          
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD=X86 \
-    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_ENABLE_RTTI=ON \
+    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+    -DLLVM_ENABLE_CXX1Y=OFF \
+    -DLLVM_ENABLE_CXX1Z=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
@@ -303,7 +303,7 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE -DNDEBUG" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
@@ -336,13 +336,13 @@ build() {
     ../llvm-${pkgver}.src
 
   # https://llvm.org/docs/CMake.html#llvm-specific-variables
-  # nice -n 19
+  # nice -n 19 
+  # CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-
-  CCACHE_SLOPPINESS=file_macro,time_macros,include_file_mtime,include_file_ctime /home/User/.go/bin/noti ${_make_cmd} -j7
+  /home/User/.go/bin/noti ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -354,13 +354,7 @@ build() {
   # fix the bad command line parameters, use unix style
 }
 
-#check() {
-#  cd "${srcdir}"/build-${CARCH}
-#  # Remove || true once testcase doesn't cause failures.
-#  make check || true
-#  make check-clang || true
-#  make check-polly || true
-#}
+
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
