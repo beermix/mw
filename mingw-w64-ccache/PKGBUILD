@@ -37,8 +37,8 @@ build() {
   #export LDFLAGS="-Wl,-z,now -Wl,-z,relro"
   #export CPPFLAGS="-D_FORTIFY_SOURCE=2"
 
-   export CC='clang'
-   export CXX='clang++'
+#   export CC='clang'
+#   export CXX='clang++'
 
   ../${_realname}-${pkgver}/configure \
       --prefix=${MINGW_PREFIX} \
@@ -46,7 +46,7 @@ build() {
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST} \
       --disable-man \
-      --with-bundled-zlib
+      --with-bundled-zlib=no
 
   make
 }
