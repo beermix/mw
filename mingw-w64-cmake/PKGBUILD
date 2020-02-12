@@ -83,7 +83,6 @@ build() {
     --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                   \
-    --enable-ccache					 \
     --parallel=7
   plain "Start building..."
   make
