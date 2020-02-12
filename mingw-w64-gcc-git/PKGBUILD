@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200211.c9.gf6e9ae4da8f
+pkgver=9.2.1.d20200212.c9.g541431facd4
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -217,7 +217,6 @@ build() {
     --enable-gnu-unique-object \
     --enable-linker-build-id \
     --enable-install-libiberty \
-    --with-linker-hash-style=gnu \
     --enable-gnu-indirect-function \
     ${_conf}
     #--enable-libitm
