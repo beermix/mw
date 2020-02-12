@@ -38,10 +38,16 @@ build() {
     --enable-interop \
     --with-libtool \
     --without-progs \
-    --disable-home-terminfo \
+    --without-cxx-binding \
+    --without-cxx-shared \
+    --disable-termcap \
+    --disable-wattr-macros \
+    --disable-relink \
+    --enable-overwrite \
     --without-debug \
     --without-manpages \
     --without-tests \
+    --with-ncursesw \
     --with-pkg-config-libdir=/mingw64/lib/pkgconfig \
     --enable-pc-files \
     --enable-widec
@@ -52,6 +58,6 @@ build() {
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR=${pkgdir} install
-  cp -r ${pkgdir}${MINGW_PREFIX}/include/ncursesw ${pkgdir}${MINGW_PREFIX}/include/ncurses
-  cp ${pkgdir}${MINGW_PREFIX}/lib/libncursesw.a ${pkgdir}${MINGW_PREFIX}/lib/libncurses.a
+#  cp -r ${pkgdir}${MINGW_PREFIX}/include/ncursesw ${pkgdir}${MINGW_PREFIX}/include/ncurses
+#  cp ${pkgdir}${MINGW_PREFIX}/lib/libncursesw.a ${pkgdir}${MINGW_PREFIX}/lib/libncurses.a
 }
