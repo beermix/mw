@@ -64,7 +64,7 @@ build() {
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
 
-  make V=s -j1
+  make V=sc -j1
 }
 
 check() {
