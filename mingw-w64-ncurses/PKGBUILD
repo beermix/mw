@@ -3,7 +3,7 @@
 _realname=ncurses
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-_base_ver=6.1
+_base_ver=6.2
 _date_rev=20200212
 pkgver=${_base_ver}.${_date_rev}
 pkgrel=1
@@ -14,7 +14,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 url="https://invisible-mirror.net/archives/ncurses/current/?C=M;O=D"
 license=('MIT')
 options=('staticlibs' 'strip')
-source=("${_realname}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/${_realname}-${_base_ver}.tar.gz"
+source=("${_realname}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/current/ncurses/${_realname}-${pkgver}.tgz"
         001-use-libsystre.patch)
 sha256sums=('85baae1a02f695cc8a9b966e8dceea457df183ece9229f8e6a20ec3c3d2ee6a9'
             'eb28949297a4c1eda67da49cfbed1d60f181b83101a0b3715552a4564bd90ff3')
