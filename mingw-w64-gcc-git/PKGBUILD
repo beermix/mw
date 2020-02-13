@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' 'emptydirs') # '!strip' 'debug')
+options=('staticlibs' 'emptydirs' 'strip')
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
@@ -235,10 +235,8 @@ build() {
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
-  if check_option "strip" "n"; then
-    sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
-    sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
-  fi
+  sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
+  sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
 
 #  noti nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
 
