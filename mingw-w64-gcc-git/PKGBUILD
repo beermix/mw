@@ -160,7 +160,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-
+  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
+  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -210,7 +211,8 @@ build() {
     --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
-    --with-gnu-as --with-gnu-ld \
+    --with-gnu-as \
+    --with-gnu-ld \
     --enable-plugin  \
     --disable-libunwind-exceptions \
     --enable-__cxa_atexit \
