@@ -100,7 +100,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
 #  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
 
-#  patch -p1 -i "${srcdir}"/010-documentation.patch
+  patch -p1 -i "${srcdir}"/010-documentation.patch
 #  patch -p1 -i "${srcdir}"/gomp-relax.patch
 #  patch -p1 -i "${srcdir}"/ipa-cp.patch
 #  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
@@ -160,14 +160,17 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
 #  unset LDLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 #  export FFLAGS_FOR_TARGET="$FFLAGS"
@@ -221,6 +224,9 @@ build() {
     --enable-install-libiberty \
     --enable-gnu-indirect-function \
     --without-included-gettext \
+    --enable-libitm \
+    --enable-libquadmath \
+    --enable-libquadmath-support \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -324,20 +330,20 @@ package_mingw-w64-gcc-git() {
   cp lib/libstdc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libsupc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
   #cp -r share/doc/gcc-${_realpkgver} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
   #cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python
-  cp -r share/gcc-${_realpkgver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python/
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python
+  #cp -r share/gcc-${_realpkgver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python/
 }
 
 package_mingw-w64-gcc-libgfortran-git() {
@@ -369,8 +375,8 @@ package_mingw-w64-gcc-fortran-git() {
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libgfortran*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  #cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada-git() {
@@ -390,10 +396,10 @@ package_mingw-w64-gcc-ada-git() {
   cp -r lib/gcc/${MINGW_CHOST}/${_realpkgver}/adainclude     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp -r lib/gcc/${MINGW_CHOST}/${_realpkgver}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-  cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
+  #cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
+  #cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc-git() {
