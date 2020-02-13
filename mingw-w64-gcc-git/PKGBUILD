@@ -224,9 +224,6 @@ build() {
     --enable-install-libiberty \
     --enable-gnu-indirect-function \
     --without-included-gettext \
-    --enable-libitm \
-    --enable-libquadmath \
-    --enable-libquadmath-support \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
