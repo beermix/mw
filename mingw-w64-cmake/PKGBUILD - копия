@@ -1,10 +1,11 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
+# https://cmake.org/download/
 
 _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.16.3
+pkgver=3.17.0
 pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
@@ -12,9 +13,7 @@ url="https://www.cmake.org/"
 license=("MIT")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
-             "${MINGW_PACKAGE_PREFIX}-emacs"
              "${MINGW_PACKAGE_PREFIX}-ncurses"
-             "${MINGW_PACKAGE_PREFIX}-qt5"
              "${MINGW_PACKAGE_PREFIX}-xz"
              "${MINGW_PACKAGE_PREFIX}-zstd")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
@@ -26,17 +25,16 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libuv"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
-optdepends=("${MINGW_PACKAGE_PREFIX}-qt5: CMake Qt GUI"
-            "${MINGW_PACKAGE_PREFIX}-emacs: for cmake emacs mode")
 options=('staticlibs') # '!strip' 'debug'
-source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
+source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}-rc1.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
         "0007-Do-not-generate-import-libs-for-exes.patch"
-        "0008-Output-line-numbers-in-callstacks.patch")
-sha256sums=('e54f16df9b53dac30fd626415833a6e75b0e47915393843da1825b096ee60668'
+        "0008-Output-line-numbers-in-callstacks.patch"
+        "100-disable_qt_tests.patch")
+sha256sums=('9bcc8c114d9da603af9512083ed7d4a39911d16105466beba165ba8fe939ac2c'
             '1b68fe64e1b389134db44dc34368713f6e28d3463ab1e7fc3d93857c0459beb7'
             '77763df03e8a9ca66c3f9368fe7e1fc36bb041455733258d73aeb40246a61354'
             '7eb60d12b610c70413412521dcc860d1948c169e721f3525d9be99b3913dc37e'
@@ -50,7 +48,7 @@ apply_patch_with_msg() {
   for _patch in "$@"
   do
     msg2 "Applying $_patch"
-    patch -Nbp1 -i "${srcdir}/$_patch"
+    patch -Np1 -i "${srcdir}/$_patch"
   done
 }
 
@@ -66,14 +64,14 @@ del_file_exists() {
 
 
 prepare() {
-  cd ${_realname}-${pkgver}
+  cd ${_realname}-${pkgver}-rc1
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
-    0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
-    0008-Output-line-numbers-in-callstacks.patch
+    0008-Output-line-numbers-in-callstacks.patch \
+    100-disable_qt_tests.patch
 }
 
 build() {
@@ -81,12 +79,12 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/configure  \
+    "${srcdir}"/${_realname}-${pkgver}-rc1/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
-    --qt-gui                                      \
-    --qt-qmake=${MINGW_PREFIX}/bin/qmake.exe      \
+    --no-qt-gui                                   \
+    --enable-ccache                               \
     --parallel=7
   plain "Start building..."
   make
@@ -97,11 +95,4 @@ package() {
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
-  install -d "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
-  ${MINGW_PREFIX}/bin/emacs -batch -f batch-byte-compile \
-    "${pkgdir}${MINGW_PREFIX}"/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el
-  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el \
-    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
-  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.elc \
-    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
 }
