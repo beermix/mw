@@ -213,13 +213,14 @@ build() {
     --enable-silent-rules \
     --with-gnu-as \
     --with-gnu-ld \
-    --enable-plugin  \
+    --enable-plugin \
     --disable-libunwind-exceptions \
     --enable-__cxa_atexit \
     --enable-gnu-unique-object \
     --enable-linker-build-id \
     --enable-install-libiberty \
     --enable-gnu-indirect-function \
+    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
