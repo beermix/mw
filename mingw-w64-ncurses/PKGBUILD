@@ -4,9 +4,9 @@ _realname=ncurses
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 _base_ver=6.1
-_date_rev=20200118
+_date_rev=20200212
 pkgver=${_base_ver}.${_date_rev}
-pkgrel=3
+pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library (mingw-w64)"
 arch=('any')
 depends=("${MINGW_PACKAGE_PREFIX}-libsystre")
@@ -36,8 +36,14 @@ build() {
     --enable-sp-funcs \
     --enable-term-driver \
     --enable-interop \
+    --enable-colorfgbg \
+    --disable-symlinks \
+    --enable-ext-colors \
+    --enable-ext-mouse \
+    --disable-rpath \
+    --without-cxx \
     --with-libtool \
-    --without-progs \
+    --with-progs \
     --disable-home-terminfo \
     --without-debug \
     --without-manpages \
