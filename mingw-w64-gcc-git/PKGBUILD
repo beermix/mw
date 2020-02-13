@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200212.c9.g541431facd4
+pkgver=9.2.1.d20200213.c9.g889cc2d87b0
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' '!strip' 'debug')
+options=('staticlibs' '!emptydirs' 'strip' '!debug')
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
