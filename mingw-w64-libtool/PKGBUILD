@@ -58,13 +58,14 @@ build() {
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
-  make
+
+  make -j1
 }
 
-#check() {
-#  cd ${srcdir}/build-${MINGW_CHOST}
-#  make check
-#}
+check() {
+  cd ${srcdir}/build-${MINGW_CHOST}
+  make check
+}
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
