@@ -1,0 +1,51 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Ray Donnelly <mingw.android@gmail.com>
+
+pkgname=make
+pkgver=4.3
+pkgrel=1
+pkgdesc="GNU make utility to maintain groups of programs"
+arch=('i686' 'x86_64')
+url="https://www.gnu.org/software/make"
+license=('GPL3')
+groups=('base-devel')
+depends=('msys2-runtime' 'libintl' 'sh')
+makedepends=('gettext' 'msys2-runtime-devel' 'procps')
+install=${pkgname}.install
+options=() # 'debug' '!strip')
+source=(https://ftp.gnu.org/gnu/make/${pkgname}-${pkgver}.tar.gz
+        make-3.82-011-noclock_gettime.patch
+        make-3.82-016-weird-shell.patch
+        make-4.2-j8k.patch)
+
+prepare() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  patch -p1 -i ${srcdir}/make-3.82-011-noclock_gettime.patch
+#  patch -p1 -i ${srcdir}/make-3.82-016-weird-shell.patch
+#  patch -p1 -i ${srcdir}/make-4.2-j8k.patch
+
+# autoreconf -fi
+}
+
+build() {
+  cd "${srcdir}"/${pkgname}-${pkgver}
+  ./configure \
+    --build=${CHOST} \
+    --prefix=/usr \
+    --without-libintl-prefix \
+    --without-libiconv-prefix \
+    --without-guile \
+    ac_cv_dos_paths=yes
+
+  make -j1 all
+}
+
+check() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make check
+}
+
+package() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
+}
