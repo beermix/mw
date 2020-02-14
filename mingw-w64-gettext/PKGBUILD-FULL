@@ -11,9 +11,11 @@ pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
+         "${MINGW_PACKAGE_PREFIX}-libcroco"
          "${MINGW_PACKAGE_PREFIX}-libunistring"
-         "${MINGW_PACKAGE_PREFIX}-libxml2")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2")
+         "${MINGW_PACKAGE_PREFIX}-libxml2"
+         "${MINGW_PACKAGE_PREFIX}-glib2")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libcroco" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-glib2")
 options=('strip' 'staticlibs')
 
 # GPL3 for the package as a whole and LGPL for some parts, see the license files
@@ -107,8 +109,10 @@ build() {
     --disable-openmp \
     --without-cvs \
     --without-git \
+    --without-included-libcroco \
     --without-included-libunistring \
     --without-included-libxml \
+    --without-included-glib \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
@@ -121,4 +125,15 @@ build() {
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
+
+  # Licenses
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING"                                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/COPYING"                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/COPYING"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/intl/COPYING.LIB"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/intl/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING.LIB" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/COPYING"                   "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/COPYING"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/gnulib-lib/libxml/COPYING" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/gnulib-lib/libxml/COPYING"
+  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gnulib-local/lib/libxml/COPYING"         "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gnulib-local/lib/libxml/COPYING"
+  rm "${pkgdir}${MINGW_PREFIX}/share/${_realname}/intl/COPYING.LIB"
 }
