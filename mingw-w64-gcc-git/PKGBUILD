@@ -178,12 +178,12 @@ build() {
 #  unset CFLAGS
 #  unset CXXFLAGS
 #  unset LDLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
-  export BOOT_CFLAGS="-march=haswell -g0 -O2"
-  export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export BOOT_CFLAGS="-march=haswell -g0 -O2"
+#  export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
+#  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+#  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \

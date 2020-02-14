@@ -41,7 +41,7 @@ build() {
   cp -a ${srcdir}/${_realname}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones     enable-ec_nistp_64_gcc_128
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3 -pipe/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3/' ${srcdir}/build-${CARCH}/Configure
   
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
