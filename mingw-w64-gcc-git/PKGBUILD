@@ -80,8 +80,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "gomp-relax.patch"
         "openmp-vectorize-v2.patch"
         "zero-regs-gcc8.patch"
-        "libiberty-sync.patch"
-         "mingw-w64-patch__alloca.patch")
+        "libiberty-sync.patch")
 
 _threads="posix"
 _git_base_commit=
@@ -167,8 +166,7 @@ prepare() {
     ipa-cp.patch \
     openmp-vectorize-v2.patch \
     optimize.patch \
-    optimize-at-least-some.patch \
-    mingw-w64-patch__alloca.patch
+    optimize-at-least-some.patch
 
 
   # do not expect $prefix/mingw symlink - this should be superceded by
