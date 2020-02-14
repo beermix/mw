@@ -81,8 +81,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "openmp-vectorize-v2.patch"
         "zero-regs-gcc8.patch"
         "libiberty-sync.patch"
-        "mingw-w64-patch_gcc_msformat.patch"
-        "mingw-w64-patch__alloca.patch")
+         "mingw-w64-patch__alloca.patch")
 
 _threads="posix"
 _git_base_commit=
@@ -169,7 +168,6 @@ prepare() {
     openmp-vectorize-v2.patch \
     optimize.patch \
     optimize-at-least-some.patch \
-    mingw-w64-patch_gcc_msformat.patch \
     mingw-w64-patch__alloca.patch
 
 
