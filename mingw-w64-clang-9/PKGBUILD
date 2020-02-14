@@ -221,6 +221,12 @@ build() {
 #-DRUN_HAVE_GNU_POSIX_REGEX=0
 #-DRUN_HAVE_STEADY_CLOCK=0            -DLLVM_OPTIMIZED_TABLEGEN=ON \     -DLLVM_ENABLE_ZLIB=ON \   
 
+  CFLAGS=${CFLAGS/-g0/}
+  CXXFLAGS=${CXXFLAGS/-g0/}
+  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
+  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
+
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
