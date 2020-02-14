@@ -16,6 +16,7 @@ makedepends=('cocom'
              'perl'
              'gcc'
              'make'
+             'mingw-w64-cross-crt-git'
              'mingw-w64-cross-gcc'
              'mingw-w64-cross-zlib'
              'zlib-devel'
@@ -218,8 +219,8 @@ build() {
     OPTIM="-march=haswell -g0 -O2"
   fi
 
-  CFLAGS="$OPTIM -pipe -ggdb"
-  CXXFLAGS="$OPTIM -pipe -ggdb"
+  CFLAGS="-march=haswell -g0 -O2 -pipe"
+  CXXFLAGS="-march=haswell -g0 -O2 -pipe"
 
   "${srcdir}"/msys2-runtime/configure \
     --prefix=/usr \
@@ -240,7 +241,7 @@ build() {
 package_msys2-runtime() {
   pkgdesc="Posix emulation engine for Windows"
   groups=('base')
-  options=('!strip')
+  options=('strip')
   conflicts=('catgets' 'libcatgets')
   replaces=('catgets' 'libcatgets')
   #install=msys2-runtime.install
@@ -252,7 +253,6 @@ package_msys2-runtime() {
   rm -f "${pkgdir}"/usr/bin/cyglsa.dll
   rm -f "${pkgdir}"/usr/bin/cyglsa64.dll
   rm -f "${pkgdir}"/usr/bin/cygserver-config
-  cp -rf "${srcdir}"/dest/usr/libexec "${pkgdir}"/usr/
   cp -rf "${srcdir}"/dest/usr/share "${pkgdir}"/usr/
 }
 
@@ -260,7 +260,7 @@ package_msys2-runtime-devel() {
   pkgdesc="MSYS2 headers and libraries"
   groups=('msys2-devel')
   depends=("msys2-runtime=${pkgver}")
-  options=('staticlibs' '!strip')
+  options=('staticlibs' 'strip')
   conflicts=('libcatgets-devel')
   replaces=('libcatgets-devel')
 
@@ -275,23 +275,3 @@ package_msys2-runtime-devel() {
   cp -rLf "${srcdir}"/dest/usr/${CHOST}/lib "${pkgdir}"/usr/
 }
 
-# return 0
-# To hack on this:
-# cd /c/repo-MSYS2/msys2-runtime/
-# pushd src/build-i686-pc-msys
-# LANG=C make && make -j1 DESTDIR=/c/repo-MSYS2/msys2-runtime/src/dest install
-# popd
-# makepkg -sRLf
-# pacman -U msys2-runtime*.xz
-
-# Quicker:
-# open cmd.exe
-# set "PATH=C:\\msys32\\usr\\bin;%PATH%"
-# E:
-# pushd E:\m2\repo-MSYS2\msys2-runtime\src\build-i686-pc-msys\i686-pc-msys\winsup\cygwin
-# C:/msys32/usr/bin/bash -c "LANG=C && make"
-# copy /y new-msys-2.0.dll C:\msys32\usr\bin\msys-2.0.dll
-# popd
-# C:
-# C:/msys32/usr/bin/strace ls / > C:/strace.txt 2>&1
-#

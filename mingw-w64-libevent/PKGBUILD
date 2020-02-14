@@ -38,10 +38,12 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --sysconfdir=${MINGW_PREFIX}/etc
+    --sysconfdir=${MINGW_PREFIX}/etc \
     --disable-libevent-regress \
     --disable-debug-mode \
     --disable-samples \
+    --enable-static \
+    --enable-shared \
     --disable-silent-rules
 
   make
