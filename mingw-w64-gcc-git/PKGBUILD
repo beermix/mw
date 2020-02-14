@@ -219,7 +219,6 @@ build() {
     --disable-symvers \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -232,14 +231,16 @@ build() {
     --enable-__cxa_atexit \
     --enable-gnu-unique-object \
     --enable-linker-build-id \
-    --enable-install-libiberty \
     --enable-gnu-indirect-function \
+    --disable-libitm \
+    --disable-libmpx \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
     #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
     #--enable-version-specific-runtime-libs \
     #     --without-included-gettext \
+    #     --disable-libstdcxx-verbose \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
