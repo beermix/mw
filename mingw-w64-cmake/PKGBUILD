@@ -6,7 +6,7 @@ _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=3.17.0
-pkgrel=3
+pkgrel=4
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -84,7 +84,7 @@ build() {
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
     "${srcdir}"/${_realname}-${pkgver}-rc1/configure  \
     --prefix=${MINGW_PREFIX}                      \
-    --no-system-libs                                 \
+    --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                   \
     --parallel=7
@@ -98,5 +98,6 @@ package() {
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
      -DBUILD_CursesDialog=0 \
      -DCMAKE_USE_OPENSSL=ON \
+     -DCMAKE_BUILD_TYPE=Release \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
 }
