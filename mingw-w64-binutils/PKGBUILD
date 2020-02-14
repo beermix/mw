@@ -101,6 +101,7 @@ build() {
     --enable-threads \
     --disable-shared
 
+  make MAKEINFO=true configure-host
   make MAKEINFO=true
 }
 
