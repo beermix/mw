@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.0.d20200214.c9.gf0a72494ea3
+pkgver=9.2.0.d20200214.c9.gc1379a1c645
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -45,11 +45,13 @@ _islver=0.16.1
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
-_tag=basepoints/gcc-10
+#_tag=basepoints/gcc-10
 
-_commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
+#_commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
 
-_realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
+#_realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
+
+_realpkgver=9.2.0
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
@@ -87,7 +89,7 @@ _gcc_date=
 
 pkgver() {
   cd ${srcdir}/${_sourcedir}
-  echo 9.2.0 > gcc/BASE-VER
+  echo ${_realpkgver} > gcc/BASE-VER
   _gcc_version=$(head -n 34 gcc/BASE-VER | sed -e 's/.* //' | tr -d '"\n')
   _gcc_date=$(head -n 34 gcc/DATESTAMP | sed -e 's/.* //' | tr -d '"\n')
   printf "%s.d%s.c%s.g%s" "$_gcc_version" "$_gcc_date" $(git rev-list --count ${_git_base_commit}..HEAD) $(git rev-parse --short ${_git_base_commit})
