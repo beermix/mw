@@ -223,7 +223,6 @@ build() {
 
   CFLAGS=${CFLAGS/-g0/}
   CXXFLAGS=${CXXFLAGS/-g0/}
-  LDLAGS=${LDLAGS/-pipe/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
