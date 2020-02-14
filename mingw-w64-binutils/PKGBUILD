@@ -74,10 +74,10 @@ build() {
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
-  unset CPPFLAGS
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDFLAGS
+#  unset CPPFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
@@ -101,7 +101,7 @@ build() {
     --enable-threads \
     --disable-shared
 
-  make MAKEINFO=true configure-host
+#  make MAKEINFO=true configure-host
   make MAKEINFO=true
 }
 
