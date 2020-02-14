@@ -67,12 +67,13 @@ build() {
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
 #  GCC_IGNORE_WERROR=1
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
-
-#  CFLAGS=${CFLAGS/-O2/-O3}
-#  CXXFLAGS=${CXXFLAGS/-O2/-O3}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-g0/}
+  CXXFLAGS=${CXXFLAGS/-g0/}
+  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
+  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
