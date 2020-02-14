@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' 'emptydirs' 'strip')
+options=('staticlibs' '!emptydirs' 'strip')
 
 _islver=0.16.1
 
@@ -289,7 +289,7 @@ package_mingw-w64-gcc-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/cpp.exe                                        ${pkgdir}${MINGW_PREFIX}/bin/
@@ -337,17 +337,6 @@ package_mingw-w64-gcc-git() {
   cp lib/libstdc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libsupc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
 
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
-  #cp -r share/doc/gcc-${_realpkgver} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python
   #cp -r share/gcc-${_realpkgver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_realpkgver}/python/
@@ -382,8 +371,6 @@ package_mingw-w64-gcc-fortran-git() {
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/f951.exe          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/libcaf_single.a   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/libgfortran*                                        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  #cp share/info/gfortran.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-ada-git() {
@@ -392,7 +379,7 @@ package_mingw-w64-gcc-ada-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
@@ -403,10 +390,6 @@ package_mingw-w64-gcc-ada-git() {
   cp -r lib/gcc/${MINGW_CHOST}/${_realpkgver}/adainclude     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp -r lib/gcc/${MINGW_CHOST}/${_realpkgver}/adalib         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
   cp lib/gcc/${MINGW_CHOST}/${_realpkgver}/gnat1.exe         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_realpkgver}/
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  #cp share/info/gnat-style.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gnat_rm.info*                           ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gnat_ugn.info*                          ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 package_mingw-w64-gcc-objc-git() {
