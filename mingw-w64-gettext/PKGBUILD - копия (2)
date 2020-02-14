@@ -5,17 +5,14 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=15
+pkgrel=12
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
-         "${MINGW_PACKAGE_PREFIX}-libcroco"
-         "${MINGW_PACKAGE_PREFIX}-libunistring"
-         "${MINGW_PACKAGE_PREFIX}-libxml2"
-         "${MINGW_PACKAGE_PREFIX}-glib")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libcroco" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-glib")
+        )
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git")
 options=('strip' 'staticlibs')
 
 # GPL3 for the package as a whole and LGPL for some parts, see the license files
@@ -107,16 +104,17 @@ build() {
     --disable-native-java \
     --disable-csharp \
     --enable-static \
-    --enable-threads=windows \
+    --enable-threads=win32 \
     --enable-relocatable \
     --without-emacs \
     --disable-openmp \
     --without-cvs \
     --without-git \
-    --without-included-libcroco \
-    --without-included-libunistring \
-    --without-included-libxml \
-    --without-included-glib \
+    --with-included-libcroco \
+    --with-included-libunistring \
+    --with-included-libxml \
+    --with-included-glib \
+    --disable-curses \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 

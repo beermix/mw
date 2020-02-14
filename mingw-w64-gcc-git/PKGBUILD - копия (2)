@@ -229,6 +229,9 @@ build() {
     --enable-plugin \
     --disable-libunwind-exceptions \
     --enable-__cxa_atexit \
+    --enable-gnu-unique-object \
+    --enable-linker-build-id \
+    --enable-gnu-indirect-function \
     --disable-libitm \
     --disable-libmpx \
     ${_conf}
