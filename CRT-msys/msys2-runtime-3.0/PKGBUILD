@@ -4,7 +4,7 @@
 pkgbase=msys2-runtime
 pkgname=('msys2-runtime' 'msys2-runtime-devel')
 pkgver=3.0.7
-pkgrel=8
+pkgrel=9
 pkgdesc="Cygwin POSIX emulation engine"
 arch=('i686' 'x86_64')
 url="https://www.cygwin.com/"
@@ -224,8 +224,8 @@ build() {
   # Gives more verbose compile output when debugging.
   local -a extra_config
 
-  CFLAGS="-march=haswell -g0 -O2 -pipe"
-  CXXFLAGS="-march=haswell -g0 -O2 -pipe"
+  CFLAGS="-march=haswell -O2 -pipe"
+  CXXFLAGS="-march=haswell -O2 -pipe"
 
   "${srcdir}"/msys2-runtime/configure \
     --prefix=/usr \

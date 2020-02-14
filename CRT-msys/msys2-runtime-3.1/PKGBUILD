@@ -216,11 +216,11 @@ build() {
     OPTIM="-O0"
     extra_config+=(--enable-debugging)
   else
-    OPTIM="-march=haswell -g0 -O2"
+    OPTIM="-march=haswell -O2"
   fi
 
-  CFLAGS="-march=haswell -g0 -O2 -pipe"
-  CXXFLAGS="-march=haswell -g0 -O2 -pipe"
+  CFLAGS="-march=haswell -O2 -pipe"
+  CXXFLAGS="-march=haswell -O2 -pipe"
 
   "${srcdir}"/msys2-runtime/configure \
     --prefix=/usr \
