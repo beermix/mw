@@ -110,12 +110,12 @@ prepare() {
   patch -p1 -i "${srcdir}"/libiberty-sync.patch
   patch -p1 -i "${srcdir}"/010-documentation.patch
   patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
-#  patch -p1 -i "${srcdir}"/gomp-relax.patch
-#  patch -p1 -i "${srcdir}"/ipa-cp.patch
-#  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
+  patch -p1 -i "${srcdir}"/gomp-relax.patch
+  patch -p1 -i "${srcdir}"/ipa-cp.patch
+  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
 
-#  patch -p1 -i "${srcdir}"/optimize.patch
-#  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
+  patch -p1 -i "${srcdir}"/optimize.patch
+  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
 
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
@@ -171,6 +171,8 @@ build() {
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-g0/}
+  CXXFLAGS=${CXXFLAGS/-g0/}
   LDLAGS=${LDLAGS/-pipe/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
