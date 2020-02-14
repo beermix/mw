@@ -136,22 +136,34 @@ prepare() {
     gcc-*/gcc/testsuite/o* \
     gcc/ada/*.ad*
 
-  apply_patch_with_msg \
-    0002-Relocate-libintl.patch \
-    0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
-    0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
-    0005-Windows-Don-t-ignore-native-system-header-dir.patch \
-    0006-Windows-New-feature-to-allow-overriding.patch \
-    0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
-    0008-Prettify-linking-no-undefined.patch \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+
+  _git_base_commit=$(git rev-parse HEAD)
+  GIT_AM="git am --committer-date-is-author-date"
+  ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
+  ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
+  ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
+  ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
+  ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
+  #${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
+  ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
+ # ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+  if [ "${_branch}" != "releases/gcc-9" ]; then
+    ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  else
+    ${GIT_AM} ${srcdir}/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  fi
+  if [ "${_branch}" == "releases/gcc-7" ]; then
+    ${GIT_AM} ${srcdir}/0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
+    ${GIT_AM} ${srcdir}/0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
+    ${GIT_AM} ${srcdir}/0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
+  fi
+  if [ "${_branch}" == "releases/gcc-8" ]; then
+    ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
+  fi
 
   apply_patch_with_msg \
-    0130-libstdc++-in-out.patch \
     libiberty-sync.patch \
     010-documentation.patch \
     zero-regs-gcc8.patch \
@@ -159,15 +171,11 @@ prepare() {
     ipa-cp.patch \
     openmp-vectorize-v2.patch \
     optimize.patch \
-    optimize-at-least-some.patch
+    optimize-at-least-some.patch \
+    0130-libstdc++-in-out.patch
 
-  # Enable diagnostic color under mintty
-  # Вячеслав Петрищев <vyachemail@gmail.com>
-  apply_patch_with_msg \
-    0140-gcc-8.2.0-diagnostic-color.patch
-
-  # do not expect ${prefix}/mingw symlink - this should be superceded by
-  # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+  # do not expect $prefix/mingw symlink - this should be superceded by
+  # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
@@ -242,7 +250,6 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
@@ -255,16 +262,16 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
-    --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
-    --with-gnu-as --with-gnu-ld \
+    --enable-silent-rules \
+    --with-gnu-as \
+    --with-gnu-ld \
+    --enable-plugin \
     --disable-libunwind-exceptions \
     --disable-vtable-verify
     --enable-__cxa_atexit \
