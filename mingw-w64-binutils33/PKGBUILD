@@ -5,8 +5,8 @@
 _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=2.34
-pkgrel=10
+pkgver=2.33.1
+pkgrel=7
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -18,6 +18,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' '!distcc' 'strip')
 #install=binutils.install
 source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
+        binutils-stable-branch.patch
         0001-enable-gold-on.mingw32.patch
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -25,13 +26,18 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0110-binutils-mingw-gnu-print.patch
         0300-default-secure-pe-flags.patch
         0310-reproducible-import-libraries.patch
-        binutils-add-LD_AS_NEEDED-global-env.patch
-        binutils-stable-34branch.patch)
+        CVE-2019-17450.patch
+        CVE-2019-17451.patch
+        0001-gas-Add-md_cons_worker.patch
+        0002-gas-Add-md_generic_table_relax_frag.patch
+        0003-i386-Align-branches-within-a-fixed-boundary.patch
+        0004-i386-Add-mbranches-within-32B-boundaries.patch
+        0005-Don-t-add-prefix-to-instructions-with-TLS-relocation.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i "${srcdir}"/binutils-stable-34branch.patch
+  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch

@@ -96,7 +96,6 @@ package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_BUILD_TYPE=Release \
      -DBUILD_CursesDialog=0 \
      -DCMAKE_USE_OPENSSL=ON \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake

@@ -75,11 +75,12 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "optimize-at-least-some.patch"
         "gomp-relax.patch"
         "openmp-vectorize-v2.patch"
-        "zero-regs-gcc8.patch")
+        "zero-regs-gcc8.patch"
+        "libiberty-sync.patch")
 
 _threads="posix"
 _git_base_commit=
-_gcc_version=
+_gcc_version=9.2.0
 _gcc_date=
 
 pkgver() {
@@ -106,11 +107,13 @@ prepare() {
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
 #  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
 
+  patch -p1 -i "${srcdir}"/libiberty-sync.patch
   patch -p1 -i "${srcdir}"/010-documentation.patch
+  patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
 #  patch -p1 -i "${srcdir}"/gomp-relax.patch
 #  patch -p1 -i "${srcdir}"/ipa-cp.patch
 #  patch -p1 -i "${srcdir}"/openmp-vectorize-v2.patch
-#  patch -p1 -i "${srcdir}"/zero-regs-gcc8.patch
+
 #  patch -p1 -i "${srcdir}"/optimize.patch
 #  patch -p1 -i "${srcdir}"/optimize-at-least-some.patch
 
@@ -179,8 +182,8 @@ build() {
   export CXXFLAGS="-march=haswell -g0 -O2"
   export BOOT_CFLAGS="-march=haswell -g0 -O2"
   export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="-g0 $CFLAGS"
-  export CXXFLAGS_FOR_TARGET="-g0 $CXXFLAGS"
+  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -203,7 +206,6 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-libstdcxx-filesystem-ts=yes \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -218,7 +220,7 @@ build() {
     --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
     --with-gnu-as \
@@ -230,12 +232,12 @@ build() {
     --enable-linker-build-id \
     --enable-install-libiberty \
     --enable-gnu-indirect-function \
-    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
     #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
     #--enable-version-specific-runtime-libs \
+    #     --without-included-gettext \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
