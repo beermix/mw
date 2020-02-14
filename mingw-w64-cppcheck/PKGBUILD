@@ -1,0 +1,69 @@
+# Maintainer: Yusuke Sasaki <yusuke.sasaki.nuem@gmail.com>
+
+_realname=cppcheck
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=1.90
+pkgrel=1
+pkgdesc="static analysis of C/C++ code (mingw-w64)"
+arch=('any')
+url="https://cppcheck.sourceforge.io/"
+license=('GPL3')
+depends=("${MINGW_PACKAGE_PREFIX}-pcre")
+makedepends=("${MINGW_PACKAGE_PREFIX}-python3")
+optdepends=("${MINGW_PACKAGE_PREFIX}-python3-pygments: cppcheck-htmlreport")
+source=(${_realname}-${pkgver}.tar.gz::"https://github.com/danmar/cppcheck/archive/${pkgver}.tar.gz"
+        '0010-change-language-files-path.patch'
+        '0020-change-cfg-path.patch')
+sha256sums=('c4864d3e09359214efdd503b52e241f4f56ba7ce26f8c11939fd9dcfac1fd105'
+            '574b040179c29a3eac19e7abd121f5d9c13c72a5dfdb66f4d903357da1e3944d'
+            '3d54eb5abb99f88846e0d2a1e21793904efbe7179464631ca05985d03642d134')
+
+prepare() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+  patch -p1 -i "${srcdir}/0010-change-language-files-path.patch"
+  patch -p1 -i "${srcdir}/0020-change-cfg-path.patch"
+}
+
+build() {
+  [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
+  cp -r "${srcdir}/${_realname}-${pkgver}" "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
+
+  LANG='en_US.UTF-8' make \
+    PREFIX=${MINGW_PREFIX} \
+    CXX=${MINGW_PREFIX}/bin/g++ \
+    LD=${MINGW_PREFIX}/bin/ld \
+    MATCHCOMPILER=yes \
+    FILESDIR=${MINGW_PREFIX}/share/cppcheck \
+    HAVE_RULES=yes \
+    LDFLAGS=-lshlwapi RDYNAMIC=
+}
+
+check() {
+  cd "${srcdir}"/build-${CARCH}
+   LANG='en_US.UTF-8' make test \
+     MATCHCOMPILER=yes \
+     CXX=${MINGW_PREFIX}/bin/g++ \
+     LD=${MINGW_PREFIX}/bin/ld \
+     PREFIX="${MINGW_PREFIX}" \
+     FILESDIR=${MINGW_PREFIX}/share/cppcheck \
+     HAVE_RULES=yes \
+     HAVE_QCHART=yes \
+     LDFLAGS=-lshlwapi RDYNAMIC=
+}
+
+package() {
+  cd "${srcdir}"/build-${CARCH}
+
+  LANG='en_US.UTF-8' make install \
+    DESTDIR="${pkgdir}" \
+    CXX=${MINGW_PREFIX}/bin/g++ \
+    LD=${MINGW_PREFIX}/bin/ld \
+    PREFIX="${MINGW_PREFIX}" \
+    MATCHCOMPILER=yes \
+    FILESDIR=${MINGW_PREFIX}/share/cppcheck \
+    HAVE_QCHART=yes \
+    HAVE_RULES=yes
+}
+
+# vim: set ft=sh ts=2 sw=2 et :
