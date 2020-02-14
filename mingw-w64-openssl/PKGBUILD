@@ -26,7 +26,10 @@ source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz
         'ssl3-test-failure.patch')
 
 prepare() {
-  cd ${srcdir}/${_realname}
+  # Clean up old sources so re-patching doesn't fail.
+  [[ -d ${srcdir}/${_realname}-${_ver} ]] && rm -rf ${srcdir}/${_realname}-${_ver}
+  tar -xzvf ${_realname}-${_ver}.tar.gz -C ${srcdir} || true
+  cd ${srcdir}/${_realname}-${_ver}
 
   patch -p1 -i ${srcdir}/openssl-1.0.0a-ldflags.patch
   patch -p1 -i ${srcdir}/000-parallellez.patch
@@ -39,7 +42,7 @@ prepare() {
 build() {
   # No support for out-of-source builds
   mkdir -p ${srcdir}/build-${CARCH}
-  cp -a ${srcdir}/${_realname}/* ${srcdir}/build-${CARCH}
+  cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones     enable-ec_nistp_64_gcc_128
   sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -O3/' ${srcdir}/build-${CARCH}/Configure
@@ -73,6 +76,8 @@ build() {
     enable-ec_nistp_64_gcc_128
 
     make
+   # make depend
+   # make
 }
 
 package() {
