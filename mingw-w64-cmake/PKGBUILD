@@ -98,6 +98,5 @@ package() {
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
      -DBUILD_CursesDialog=0 \
      -DCMAKE_USE_OPENSSL=ON \
-     -DCMAKE_BUILD_TYPE=Release \
-     -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
+     -DCMAKE_BUILD_TYPE=Release -P cmake_install.cmake
 }

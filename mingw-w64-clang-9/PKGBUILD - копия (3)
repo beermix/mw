@@ -26,7 +26,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=9.0.1
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
-pkgrel=5
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -231,7 +231,9 @@ build() {
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_ENABLE_RTTI=ON \
-    -DLLVM_BUILD_TESTS=ON \
+    -DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=ON \
+    -DLLVM_ENABLE_CXX1Y=OFF \
+    -DLLVM_ENABLE_CXX1Z=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
@@ -248,6 +250,7 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
