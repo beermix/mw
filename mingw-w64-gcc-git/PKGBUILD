@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.0.d20200214.c9.gc1379a1c645
+pkgver=9.2.0.d20200214.c0.g
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -266,7 +266,7 @@ build() {
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
-    --disable-vtable-verify
+    --disable-vtable-verify \
     --enable-__cxa_atexit \
     --enable-gnu-unique-object \
     --enable-linker-build-id \
