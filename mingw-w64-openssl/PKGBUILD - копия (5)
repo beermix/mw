@@ -3,10 +3,10 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-1.0")
-_ver=1.0.2u
+_ver=1.0.2
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=10
+pkgrel=133
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -14,8 +14,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('strip' '!buildflags' 'staticlibs')
 license=('BSD')
 url="https://www.openssl.org"
-noextract=(${_realname}-${_ver}.tar.gz)
-source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz
+source=("${_realname}"::"git+https://github.com/openssl/${_realname}#branch=OpenSSL_1_0_2-stable"
         'openssl-1.0.0a-ldflags.patch'
         'openssl-1.0.2a-parallel-build.patch'
         'openssl-1.0.1-x32.patch'

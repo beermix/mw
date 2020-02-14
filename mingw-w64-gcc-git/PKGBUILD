@@ -80,7 +80,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
 
 _threads="posix"
 _git_base_commit=
-_gcc_version=9.2.0
+_gcc_version=
 _gcc_date=
 
 pkgver() {
