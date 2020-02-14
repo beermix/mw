@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=15
+pkgrel=17
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -36,7 +36,8 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0014-dont-link-binutils-to-libiberty.mingw.patch
         0015-dont-link-ld-to-libiberty.mingw.patch
         0017-fix-iconv-linking.all.patch
-        0200-remove-provide-qualifiers.patch)
+        0200-remove-provide-qualifiers.patch
+        0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
@@ -47,6 +48,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
+  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
 
 #  rm -rf gdb libdecnumber readline sim
 

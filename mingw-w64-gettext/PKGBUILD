@@ -32,7 +32,6 @@ source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         122-Use-LF-as-newline-in-envsubst.patch
         200-tools-gnulib-define-installdir.patch
         gettext-dont_build_docs_and_examples.patch
-        0000-Fix-linker-error-redefinition-of-vasprintf.patch
         0002-Fix-static-Cygwin-x86_64-build-environ-is-always-dllimport.patch)
 
 prepare() {
@@ -64,8 +63,7 @@ prepare() {
   patch -p1 -i ${srcdir}/122-Use-LF-as-newline-in-envsubst.patch
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
-  patch -p1 -i ${srcdir}/0000-Fix-linker-error-redefinition-of-vasprintf.patch
-  patch -p1 -i ${srcdir}/0002-Fix-static-Cygwin-x86_64-build-environ-is-always-dllimport.patch
+#  patch -p1 -i ${srcdir}/0002-Fix-static-Cygwin-x86_64-build-environ-is-always-dllimport.patch
 
   #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' ./gettext-tools/Makefile.in
   #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' ./gettext-runtime/Makefile.in
