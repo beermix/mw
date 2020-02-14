@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200214.c9.g0f7b7aeb71d
+pkgver=9.2.0.d20200214.c9.gf0a72494ea3
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -62,6 +62,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0006-Windows-New-feature-to-allow-overriding.patch"
         "0007-Build-EXTRA_GNATTOOLS-for-Ada.patch"
         "0008-Prettify-linking-no-undefined.patch"
+        "0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch"
         "0010-Fix-using-large-PCH.patch"
         "0011-Enable-shared-gnat-implib.patch"
         "0014-clone_function_name_1-Retain-any-stdcall-suffix.patch"
@@ -86,6 +87,7 @@ _gcc_date=
 
 pkgver() {
   cd ${srcdir}/${_sourcedir}
+  echo 9.2.0 > gcc/BASE-VER
   _gcc_version=$(head -n 34 gcc/BASE-VER | sed -e 's/.* //' | tr -d '"\n')
   _gcc_date=$(head -n 34 gcc/DATESTAMP | sed -e 's/.* //' | tr -d '"\n')
   printf "%s.d%s.c%s.g%s" "$_gcc_version" "$_gcc_date" $(git rev-list --count ${_git_base_commit}..HEAD) $(git rev-parse --short ${_git_base_commit})
@@ -115,7 +117,18 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-  ln -s ../isl-${_islver} isl
+  del_file_exists \
+    gcc-*/gcc/testsuite/ada \
+    gcc-*/gcc/testsuite/brig.dg \
+    gcc-*/gcc/testsuite/c-c++-common \
+    gcc-*/gcc/testsuite/ChangeLog* \
+    gcc-*/gcc/testsuite/config \
+    gcc-*/gcc/testsuite/g* \
+    gcc-*/gcc/testsuite/jit.dg \
+    gcc-*/gcc/testsuite/lib \
+    gcc-*/gcc/testsuite/o* \
+    gcc/ada/*.ad*
+
 
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
@@ -124,21 +137,11 @@ prepare() {
   ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
   ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
   ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
-  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  #${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
-#  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
-
-  apply_patch_with_msg \
-     libiberty-sync.patch \
-    010-documentation.patch \
-    zero-regs-gcc8.patch \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
-
+ # ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
   else
@@ -153,6 +156,16 @@ prepare() {
     ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
   fi
 
+  apply_patch_with_msg \
+    libiberty-sync.patch \
+    010-documentation.patch \
+    zero-regs-gcc8.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    openmp-vectorize-v2.patch \
+    optimize.patch \
+    optimize-at-least-some.patch
+
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -161,6 +174,8 @@ prepare() {
   # it might work at build time and could be important there but beyond that?!
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
+
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -193,9 +208,9 @@ build() {
 
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
   CFLAGS=${CFLAGS/-g0/}
   CXXFLAGS=${CXXFLAGS/-g0/}
-  LDLAGS=${LDLAGS/-pipe/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
@@ -229,7 +244,6 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -246,16 +260,11 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
-    --with-gnu-as \
-    --with-gnu-ld \
+    --with-gnu-as --with-gnu-ld \
     --enable-plugin \
     --disable-libunwind-exceptions \
     --enable-__cxa_atexit \
-    --enable-gnu-unique-object \
-    --enable-linker-build-id \
-    --enable-gnu-indirect-function \
     --disable-libmpx \
-    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -271,7 +280,7 @@ build() {
 
 #  noti nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
 
-  noti nice -n 19 make V=1 all
+  noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
