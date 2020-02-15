@@ -9,7 +9,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=clang
+_compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -189,7 +189,7 @@ build() {
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_OPTIMIZED_TABLEGEN=ON \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
-    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_ENABLE_RTTI=ON \
     -DCLANG_INCLUDE_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
