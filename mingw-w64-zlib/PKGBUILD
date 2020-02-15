@@ -45,7 +45,7 @@ prepare() {
     patch -p2 -i ${srcdir}/06-add-64bit-functions-and-fix-typos.patch
     cd ${srcdir}/${_realname}-${pkgver}/contrib/minizip
     patch -p1 -i ${srcdir}/07-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
-    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch  
+    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch
     patch -p1 -i ${srcdir}/011-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
     patch -p1 -i ${srcdir}/012-Add-bzip2-library-to-pkg-config-file.patch
     patch -p1 -i ${srcdir}/010-unzip-add-function-unzOpenBuffer.patch
@@ -55,9 +55,9 @@ prepare() {
 build() {
   cd ${srcdir}/${_realname}-${pkgver}
   CFLAGS=${CFLAGS/-O2/-O3}
-  CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
+  CHOST=${MINGW_CHOST} CC='clang' CXX='clang++' ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
- 
+
   # build minizip
   if [ "${_external_minizip}" != "yes" ]; then
     pushd contrib/minizip > /dev/null
