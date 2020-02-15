@@ -143,6 +143,7 @@ prepare() {
       "0010-mbig-obj-for-all.patch" \
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
+      "0014-winpthreads-workaround.patch" \
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
