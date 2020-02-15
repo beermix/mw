@@ -216,8 +216,8 @@ build() {
     ../llvm-${pkgver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
-  sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
-  sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
   /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j7
 
