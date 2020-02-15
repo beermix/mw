@@ -1,0 +1,38 @@
+From e46236315aea3580bde272284ab5dbe377a6a499 Mon Sep 17 00:00:00 2001
+From: Johannes Schindelin <johannes.schindelin@gmx.de>
+Date: Mon, 15 Apr 2019 10:04:56 +0200
+Subject: [PATCH 17/N] fixup??? Add MSYS triplets.
+
+This patch contains a forgotten change in a comment, and a fix where
+instead of ".msys", we would append ".smym".
+
+Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
+---
+ winsup/cygwin/syscalls.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/winsup/cygwin/syscalls.cc b/winsup/cygwin/syscalls.cc
+index b4f522e..ae74f50 100644
+--- a/winsup/cygwin/syscalls.cc
++++ b/winsup/cygwin/syscalls.cc
+@@ -327,7 +327,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
+     }
+   else
+     {
+-      /* Create unique filename.  Start with a dot, followed by "cyg"
++      /* Create unique filename.  Start with a dot, followed by "msys"
+ 	 transposed into the Unicode low surrogate area (U+dc00) on file
+ 	 systems supporting Unicode (except Samba), followed by the inode
+ 	 number in hex, followed by a path hash in hex.  The combination
+@@ -335,7 +335,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
+       RtlAppendUnicodeToString (&recycler,
+ 				(pc.fs_flags () & FILE_UNICODE_ON_DISK
+ 				 && !pc.fs_is_samba ())
+-				? L".\xdc73\xdc6d\xdc79\xdc6d" : L".msys");
++			        ? L".\xdc6d\xdc73\xdc79\xdc73" : L".msys");
+       pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
+       status = NtQueryInformationFile (fh, &io, pfii, sizeof *pfii,
+ 				       FileInternalInformation);
+-- 
+2.9.0
+

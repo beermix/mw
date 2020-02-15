@@ -5,7 +5,7 @@
 _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.17.0
+pkgver=3.16.4
 pkgrel=4
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
@@ -26,7 +26,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs') # '!strip' 'debug'
-source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}-rc1.tar.gz"
+source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
@@ -65,7 +65,7 @@ del_file_exists() {
 
 
 prepare() {
-  cd ${_realname}-${pkgver}-rc1
+  cd ${_realname}-${pkgver}
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
@@ -82,7 +82,7 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}-rc1/configure  \
+    "${srcdir}"/${_realname}-${pkgver}/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
