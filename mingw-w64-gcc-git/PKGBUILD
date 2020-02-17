@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
+options=('staticlibs' 'emptydirs' 'strip') # '!strip' 'debug')
 
 _islver=0.16.1
 
@@ -53,8 +53,9 @@ _commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
 
 _realpkgver=9.2.0
 
-# git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
-source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
+#"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
+#source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
+source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
         "0002-Relocate-libintl.patch"
