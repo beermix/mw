@@ -11,7 +11,6 @@ pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
-         #"${MINGW_PACKAGE_PREFIX}-termcap"
         )
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git")
 options=('strip' 'staticlibs')
@@ -64,8 +63,8 @@ prepare() {
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
 
-  #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' ./gettext-tools/Makefile.in
-  #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' ./gettext-runtime/Makefile.in
+  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' gettext-tools/Makefile.in
+  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' gettext-runtime/Makefile.in
 
   libtoolize --automake --copy --force
   WANT_AUTOMAKE=latest ./autogen.sh --skip-gnulib
@@ -87,7 +86,7 @@ build() {
     --disable-native-java \
     --disable-csharp \
     --enable-static \
-    --enable-threads=win32 \
+    --enable-threads=windows \
     --enable-relocatable \
     --without-emacs \
     --disable-openmp \
