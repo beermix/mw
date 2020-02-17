@@ -3,7 +3,7 @@
 pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
 _basever=6.2
-_date=20200212
+_date=20200215
 pkgver=${_basever}.${_date}
 pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
@@ -67,11 +67,6 @@ package_ncurses() {
   mkdir -p ${pkgdir}/usr/lib
   cp -rf $srcdir/dest/usr/lib/terminfo ${pkgdir}/usr/lib/
   cp -rf $srcdir/dest/usr/share ${pkgdir}/usr/
-
-  # install license, rip it from the readme
-  cd ${srcdir}/$pkgname-${_basever}-${_date}
-  install -dm755 ${pkgdir}/usr/share/licenses/$pkgname
-  grep -B 100 '$Id' README > ${pkgdir}/usr/share/licenses/${pkgname}/license.txt
 }
 
 package_ncurses-devel() {

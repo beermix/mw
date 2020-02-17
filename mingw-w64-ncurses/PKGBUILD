@@ -46,6 +46,7 @@ build() {
     --without-manpages \
     --without-tests \
     --with-pkg-config-libdir=/mingw64/lib/pkgconfig \
+    --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --enable-pc-files \
     --enable-widec
 
