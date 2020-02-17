@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200217.c0.g0692bc0ca7f
+pkgver=9.2.0.d20200217.c0.g
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
+options=('staticlibs' 'emptydirs' 'strip') # '!strip' 'debug')
 
 _islver=0.16.1
 
@@ -49,9 +49,9 @@ _branch=releases/gcc-9
 
 _commit=6957d3e4eef1f4243eb23ff62aea06139ef4415a
 
-_realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
+#_realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_branch}:gcc/ BASE-VER | tar -xO)"
 
-#_realpkgver=9.2.0
+_realpkgver=9.2.0
 
 #"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
 #source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
@@ -122,8 +122,6 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-  _git_base_commit=$(git rev-parse HEAD)
-  GIT_AM="git am --committer-date-is-author-date"
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
@@ -268,6 +266,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
@@ -276,7 +275,6 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --enable-plugin \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
     --enable-__cxa_atexit \
@@ -345,7 +343,7 @@ package_mingw-w64-gcc-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/cpp.exe                                        ${pkgdir}${MINGW_PREFIX}/bin/
@@ -435,7 +433,7 @@ package_mingw-w64-gcc-ada-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
