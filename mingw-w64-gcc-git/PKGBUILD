@@ -282,7 +282,6 @@ build() {
     --enable-gnu-indirect-function \
     --enable-linker-build-id \
     --enable-gnu-unique-object \
-    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
