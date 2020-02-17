@@ -26,7 +26,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.0rc2
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0-rc2
-pkgrel=3
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -134,7 +134,6 @@ prepare() {
       "0201-mingw-w64-__udivdi3-mangle-hack.patch"
 
 
-
   # At the present, clang must reside inside the LLVM source code tree to build
   # See https://bugs.llvm.org/show_bug.cgi?id=4840
 
@@ -144,6 +143,7 @@ prepare() {
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
+  #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
 }
 
 build() {
@@ -180,7 +180,6 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
@@ -201,8 +200,9 @@ build() {
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DCMAKE_C_FLAGS="${CFLAGS} -fomit-frame-pointer" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -fomit-frame-pointer" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DCLANG_ANALYZER_BUILD_Z3=OFF \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
@@ -219,7 +219,7 @@ build() {
   #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -230,6 +230,14 @@ build() {
   sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
+
+#check() {
+#  cd "${srcdir}"/build-${CARCH}
+#  # Remove || true once testcase doesn't cause failures.
+#  make check || true
+#  make check-clang || true
+#  make check-polly || true
+#}
 
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
@@ -264,7 +272,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -307,7 +314,6 @@ package_llvm() {
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
   sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
 }
-
 
 # Wrappers
 package_mingw-w64-i686-clang(){
