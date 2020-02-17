@@ -101,8 +101,6 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --enable-ld=default \
-    --enable-targets=x86_64-pc-mingw64 \
     --disable-shared
 
   make MAKEINFO=true

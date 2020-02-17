@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
+options=('staticlibs' 'emptydirs' 'strip') # '!strip' 'debug')
 
 _islver=0.16.1
 
@@ -57,7 +57,6 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 #source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
-        "gdbinit"
         "0002-Relocate-libintl.patch"
         "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
         "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
@@ -94,7 +93,6 @@ _gcc_date=
 
 pkgver() {
   cd ${srcdir}/${_sourcedir}
-  echo ${_realpkgver} > gcc/BASE-VER
   _gcc_version=$(head -n 34 gcc/BASE-VER | sed -e 's/.* //' | tr -d '"\n')
   _gcc_date=$(head -n 34 gcc/DATESTAMP | sed -e 's/.* //' | tr -d '"\n')
   printf "%s.d%s.c%s.g%s" "$_gcc_version" "$_gcc_date" $(git rev-list --count ${_git_base_commit}..HEAD) $(git rev-parse --short ${_git_base_commit})
@@ -124,61 +122,31 @@ prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
+  ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
+  ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
+  ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
+  ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
+  ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
+  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
+  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+  if [ "${_branch}" != "releases/gcc-9" ]; then
+    ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  else
+    ${GIT_AM} ${srcdir}/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  fi
+  if [ "${_branch}" == "releases/gcc-7" ]; then
+    ${GIT_AM} ${srcdir}/0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
+    ${GIT_AM} ${srcdir}/0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
+    ${GIT_AM} ${srcdir}/0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
+  fi
+  if [ "${_branch}" == "releases/gcc-8" ]; then
+    ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
+  fi
 
-  rm -rf ${srcdir}/gcc-git/intl/canonicalize.c
-  rm -rf ${srcdir}/gcc-git/intl/canonicalize.h
-  rm -rf ${srcdir}/gcc-git/intl/relocatex.c
-  rm -rf ${srcdir}/gcc-git/intl/relocatex.h
-
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/ada
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/brig.dg
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/c-c++-common
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/ChangeLog*
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/config
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/g*
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/jit.dg
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/lib
-  rm -rf ${srcdir}/gcc-git/gcc/testsuite/o*
-  rm -rf ${srcdir}/gcc-git/gcc/ada/*.ad*
-
-  apply_patch_with_msg \
-    0002-Relocate-libintl.patch \
-    0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
-    0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
-    0005-Windows-Don-t-ignore-native-system-header-dir.patch \
-    0006-Windows-New-feature-to-allow-overriding.patch \
-    0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
-    0008-Prettify-linking-no-undefined.patch \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
-
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch \
-    010-documentation.patch
-
-#  apply_patch_with_msg \
-#    010-documentation.patch \
-#    0130-libstdc++-in-out.patch \
-#    libiberty-sync.patch \
-#    zero-regs-gcc8.patch \
-#    gomp-relax.patch \
-#    ipa-cp.patch \
-#    openmp-vectorize-v2.patch \
-#    optimize.patch \
-#   optimize-at-least-some.patch
-
-  # Enable diagnostic color under mintty
-  # Вячеслав Петрищев <vyachemail@gmail.com>
-  apply_patch_with_msg \
-    0140-gcc-8.2.0-diagnostic-color.patch
-
-  # do not expect ${prefix}/mingw symlink - this should be superceded by
-  # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+  # do not expect $prefix/mingw symlink - this should be superceded by
+  # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
@@ -258,8 +226,6 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-lto \
-    --enable-gold \
-    --enable-ld=default \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \
@@ -279,12 +245,6 @@ build() {
     --enable-plugin \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
-    --enable-__cxa_atexit \
-    --enable-clocale=gnu \
-    --enable-long-long \
-    --enable-c99 \
-    --enable-decimal-float \
-    --enable-tls \
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libstdcxx-verbose \
@@ -295,6 +255,12 @@ build() {
     #--enable-version-specific-runtime-libs \     --enable-gnu-unique-object \
     #     --without-included-gettext \
     #     --disable-libstdcxx-verbose \     --enable-linker-build-id \     --enable-gnu-indirect-function \
+    #--enable-__cxa_atexit \
+    #--enable-clocale=gnu \
+    #--enable-long-long \
+    #--enable-c99 \
+    #--enable-decimal-float \
+    #--enable-tls \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
