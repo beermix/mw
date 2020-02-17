@@ -152,15 +152,18 @@ prepare() {
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
-    0130-libstdc++-in-out.patch \
-    libiberty-sync.patch \
-    010-documentation.patch \
-    zero-regs-gcc8.patch \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    010-documentation.patch
+
+#  apply_patch_with_msg \
+#    010-documentation.patch \
+#    0130-libstdc++-in-out.patch \
+#    libiberty-sync.patch \
+#    zero-regs-gcc8.patch \
+#    gomp-relax.patch \
+#    ipa-cp.patch \
+#    openmp-vectorize-v2.patch \
+#    optimize.patch \
+#   optimize-at-least-some.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
@@ -215,9 +218,10 @@ build() {
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDLAGS
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDLAGS
+
   export CFLAGS="-march=haswell -g0 -O2"
   export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
@@ -273,6 +277,7 @@ build() {
     --enable-gnu-indirect-function \
     --enable-linker-build-id \
     --enable-gnu-unique-object \
+    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
