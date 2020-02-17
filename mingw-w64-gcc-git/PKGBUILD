@@ -126,15 +126,15 @@ prepare() {
     intl/relocatex.c intl/relocatex.h
 
   del_file_exists \
-    gcc-*/gcc/testsuite/ada \
-    gcc-*/gcc/testsuite/brig.dg \
-    gcc-*/gcc/testsuite/c-c++-common \
-    gcc-*/gcc/testsuite/ChangeLog* \
-    gcc-*/gcc/testsuite/config \
-    gcc-*/gcc/testsuite/g* \
-    gcc-*/gcc/testsuite/jit.dg \
-    gcc-*/gcc/testsuite/lib \
-    gcc-*/gcc/testsuite/o* \
+    gcc/testsuite/ada \
+    gcc/testsuite/brig.dg \
+    gcc/testsuite/c-c++-common \
+    gcc/testsuite/ChangeLog* \
+    gcc/testsuite/config \
+    gcc/testsuite/g* \
+    gcc/testsuite/jit.dg \
+    gcc/testsuite/lib \
+    gcc/testsuite/o* \
     gcc/ada/*.ad*
 
   apply_patch_with_msg \
