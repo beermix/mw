@@ -42,8 +42,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc"
-         "${MINGW_PACKAGE_PREFIX}-uasm")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
@@ -174,17 +173,12 @@ build() {
     export CC='clang'
     export CXX='clang++'
   fi
-  
-  export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
-  if [ "${CARCH}" == "x86_64" ]; then
-    export ASM_COMPILER_FLAGS=-win64
-  fi
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_OPTIMIZED_TABLEGEN=ON \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
@@ -197,7 +191,6 @@ build() {
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_GO_TESTS=OFF \
-    -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_C_FLAGS="${CFLAGS} -fomit-frame-pointer" \
