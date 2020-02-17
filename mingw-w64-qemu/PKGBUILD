@@ -22,16 +22,12 @@ depends=("${MINGW_PACKAGE_PREFIX}-capstone"
          "${MINGW_PACKAGE_PREFIX}-gtk3"
          "${MINGW_PACKAGE_PREFIX}-libjpeg"
          "${MINGW_PACKAGE_PREFIX}-libpng"
-         "${MINGW_PACKAGE_PREFIX}-libssh"
          "${MINGW_PACKAGE_PREFIX}-libtasn1"
          "${MINGW_PACKAGE_PREFIX}-libusb"
          "${MINGW_PACKAGE_PREFIX}-libxml2"
          "${MINGW_PACKAGE_PREFIX}-lzo2"
          "${MINGW_PACKAGE_PREFIX}-nettle"
          "${MINGW_PACKAGE_PREFIX}-pixman"
-         "${MINGW_PACKAGE_PREFIX}-snappy"
-         "${MINGW_PACKAGE_PREFIX}-SDL2"
-         "${MINGW_PACKAGE_PREFIX}-SDL2_image"
          "${MINGW_PACKAGE_PREFIX}-usbredir")
 source=(https://download.qemu.org/${_realname}-${pkgver}.tar.xz
         001-iovec-sasl-conflict.patch)
@@ -56,12 +52,11 @@ build() {
         --disable-bluez \
         --disable-spice \
         --disable-libnfs \
-        --enable-libssh \
+        --disable-libssh \
         --enable-lzo \
-        --enable-snappy \
+        --disable-snappy \
         --enable-hax \
         --enable-gtk \
-        --enable-sdl \
         --prefix=${MINGW_PREFIX} \
         --bindir=${MINGW_PREFIX}/bin \
         --datadir=${MINGW_PREFIX}/bin \
@@ -69,7 +64,7 @@ build() {
         --python=${MINGW_PREFIX}/bin/python3 \
         --mandir=${MINGW_PREFIX}/share/qemu \
         --docdir=${MINGW_PREFIX}/share/qemu
-   make
+   make -j7
 }
 
 package() {
