@@ -41,7 +41,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 optdepends=()
 options=('staticlibs' 'emptydirs' 'strip') # '!strip' 'debug')
 
-_islver=0.16.1
+_islver=0.21
 
 #_branch=releases/gcc-7
 _branch=releases/gcc-9
