@@ -256,6 +256,8 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-lto \
+    --enable-gold \
+    --enable-ld=default \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \
@@ -272,7 +274,6 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \

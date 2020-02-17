@@ -101,6 +101,7 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --enable-ld=default \
     --disable-shared
 
   make MAKEINFO=true
