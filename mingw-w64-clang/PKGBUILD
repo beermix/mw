@@ -43,7 +43,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
-#options=('!debug' 'strip')
+options=('!debug' 'strip')
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
@@ -153,13 +153,6 @@ build() {
 
   local -a extra_config
 
-  if check_option "debug" "y"; then
-    extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
-    VERBOSE="VERBOSE=1"
-  else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
-  fi
-
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
   FFI_INCLUDE_DIR=$(echo $FFI_INCLUDE_DIR | sed 's|-I||g')
@@ -206,6 +199,7 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DCMAKE_BUILD_TYPE=Release \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
