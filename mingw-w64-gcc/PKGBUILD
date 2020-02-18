@@ -164,7 +164,8 @@ prepare() {
     gomp-relax.patch \
     optimize.patch \
     ipa-cp.patch \
-    optimize-at-least-some.patch
+    optimize-at-least-some.patch \
+    zero-regs-gcc8.patch 
 
 #    0001-Fix-stack-protection-issues.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \

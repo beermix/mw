@@ -1,1 +1,2 @@
-# dummy
+libsrc/lib64_libmingwthrd_a-mingwthrd_mt.o: \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/libsrc/mingwthrd_mt.c
