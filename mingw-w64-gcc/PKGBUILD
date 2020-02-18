@@ -263,6 +263,10 @@ build() {
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --enable-silent-rules \
     --with-gnu-as --with-gnu-ld \
+    --disable-libunwind-exceptions \
+    --disable-vtable-verify \
+    --disable-libmpx \
+    --disable-libmudflap \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
