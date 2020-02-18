@@ -1,0 +1,32 @@
+math/lib64_libmingwex_a-tgammaf.o: \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/tgammaf.c \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/cephes_mconf.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/math.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h
+
+G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/cephes_mconf.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/math.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/crtdefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/corecrt.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_secapi.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/vadefs.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h:
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/errno.h:

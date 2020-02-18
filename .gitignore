@@ -10,7 +10,7 @@
 *.log
 *.log.[0-9]*
 */src/
-*/*/src/
+/*/src/
 */pkg/
 *~
 *.swp

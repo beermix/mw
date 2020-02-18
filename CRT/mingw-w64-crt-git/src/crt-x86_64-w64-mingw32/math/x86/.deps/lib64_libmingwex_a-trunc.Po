@@ -1,0 +1,5 @@
+math/x86/lib64_libmingwex_a-trunc.o: \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/x86/trunc.S \
+ G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h
+
+G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:

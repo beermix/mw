@@ -1,0 +1,2 @@
+stdio/lib64_libmingwex_a-scanf.o: \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/stdio/scanf.S

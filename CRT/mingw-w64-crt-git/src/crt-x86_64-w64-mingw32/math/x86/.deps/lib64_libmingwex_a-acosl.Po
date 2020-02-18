@@ -1,0 +1,2 @@
+math/x86/lib64_libmingwex_a-acosl.o: \
+ G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/math/x86/acosl.c
