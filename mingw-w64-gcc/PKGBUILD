@@ -121,6 +121,10 @@ prepare() {
 #    gcc/testsuite/o* \
 #    gcc/ada/*.ad*
 
+#    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
+#     0011-Enable-shared-gnat-implib.patch \
+#     0012-Handle-spaces-in-path-for-default-manifest.patch \
+
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -129,10 +133,8 @@ prepare() {
     0006-Windows-New-feature-to-allow-overriding.patch \
     0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
     0008-Prettify-linking-no-undefined.patch \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
     0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
+    0014-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
@@ -179,13 +181,6 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
 
-  declare -a extra_config
-  if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
-  else
-    extra_config+=("--enable-libstdcxx-debug")
-  fi
-
   case "${CARCH}" in
     i686)
       local _conf="--disable-sjlj-exceptions --with-dwarf2"
@@ -219,7 +214,6 @@ build() {
   export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -236,12 +230,12 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    ${extra_config} \
-    --disable-isl-version-check \
+    --disable-libstdcxx-debug \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -254,17 +248,19 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libstdcxx-verbose \
     --with-diagnostics-color=always \
+    --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --enable-silent-rules \
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
     --disable-libmpx \
     --disable-libmudflap \
+    --disable-libstdcxx-verbose \
+    --enable-__cxa_atexit \
+    --enable-gnu-indirect-function \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
