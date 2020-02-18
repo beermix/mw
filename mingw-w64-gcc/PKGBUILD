@@ -250,7 +250,7 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=yes \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
@@ -271,16 +271,12 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libstdcxx-verbose \
-    --enable-__cxa_atexit \
-    --enable-gnu-indirect-function \
-    --enable-linker-build-id \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.     --without-included-gettext \

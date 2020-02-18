@@ -145,6 +145,15 @@ prepare() {
     ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
   fi
 
+  # Enable clear linux patches
+  apply_patch_with_msg \
+    libiberty-sync.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    zero-regs-gcc8.patch 
+
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -188,21 +197,16 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
-  CFLAGS=${CFLAGS/-g0/}
-  CXXFLAGS=${CXXFLAGS/-g0/}
+
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
-#  unset LDLAGS
-
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
-#  export BOOT_CFLAGS="-march=haswell -g0 -O2"
-#  export BOOT_CXXFLAGS="-march=haswell -g0 -O2"
+#  export CFLAGS="-march=haswell -g0 -O3"
+#  export CXXFLAGS="-march=haswell -g0 -O3"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -269,9 +273,11 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-#  noti nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
+#  /home/User/.go/bin/noti.exe nice -n 19 make CFLAGS="-march=haswell -g0 -O3" CXXFLAGS="-march=haswell -g0 -O3" CFLAGS_FOR_TARGET="-march=haswell -g0 -O3" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O3" BOOT_CFLAGS="-march=haswell -g0 -O3" BOOT_CXXFLAGS="-march=haswell -g0 -O3" all
+  
+  /home/User/.go/bin/noti.exe nice -n 19 make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
 
-  /home/User/.go/bin/noti nice -n 19 make all
+#  /home/User/.go/bin/noti.exe nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
