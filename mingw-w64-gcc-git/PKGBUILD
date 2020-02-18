@@ -318,7 +318,7 @@ package_mingw-w64-gcc-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/cpp.exe                                        ${pkgdir}${MINGW_PREFIX}/bin/
@@ -408,7 +408,7 @@ package_mingw-w64-gcc-ada-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
