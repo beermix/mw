@@ -110,11 +110,8 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-
-  ln -s ../isl-${_islver} isl
-
-#  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-#    intl/relocatex.c intl/relocatex.h
+  del_file_exists intl/canonicalize.c intl/canonicalize.h \
+    intl/relocatex.c intl/relocatex.h
 
 #  del_file_exists \
 #    gcc/testsuite/ada \
@@ -184,6 +181,8 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
+
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -270,6 +269,7 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
+    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
@@ -279,10 +279,9 @@ build() {
     --enable-__cxa_atexit \
     --enable-gnu-indirect-function \
     --enable-linker-build-id \
-    --without-included-gettext \
     ${_conf}
 
-  # While we're debugging -fopenmp problems at least.
+  # While we're debugging -fopenmp problems at least.     --without-included-gettext \
   # .. we may as well not strip anything.
   if check_option "strip" "n"; then
     sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
@@ -291,7 +290,7 @@ build() {
 
 #  /home/User/.go/bin/noti.exe nice -n 19 make CFLAGS="-march=haswell -g0 -O3" CXXFLAGS="-march=haswell -g0 -O3" CFLAGS_FOR_TARGET="-march=haswell -g0 -O3" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O3" BOOT_CFLAGS="-march=haswell -g0 -O3" BOOT_CXXFLAGS="-march=haswell -g0 -O3" all
   
-  /home/User/.go/bin/noti.exe nice -n 19 make bootstrap "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
+  /home/User/.go/bin/noti.exe nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3" all
 
 #  /home/User/.go/bin/noti.exe nice -n 19 make all
 

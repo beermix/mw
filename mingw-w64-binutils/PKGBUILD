@@ -70,7 +70,8 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-#  GCC_IGNORE_WERROR=1
+
+export  GCC_IGNORE_WERROR=1
 #  CFLAGS=${CFLAGS/-pipe/}
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDLAGS=${LDLAGS/-pipe/}
@@ -80,10 +81,10 @@ build() {
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
-  unset CPPFLAGS
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDFLAGS
+#  unset CPPFLAGS
 
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
