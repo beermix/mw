@@ -64,11 +64,9 @@ source=(${_sourcedir}::"git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0006-Windows-New-feature-to-allow-overriding.patch"
         "0007-Build-EXTRA_GNATTOOLS-for-Ada.patch"
         "0008-Prettify-linking-no-undefined.patch"
-        "0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch"
         "0010-Fix-using-large-PCH.patch"
         "0011-Enable-shared-gnat-implib.patch"
         "0014-clone_function_name_1-Retain-any-stdcall-suffix.patch"
-        "0012-Handle-spaces-in-path-for-default-manifest.patch"
         "0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch"
         "0140-gcc-8.2.0-diagnostic-color.patch"
         "0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch"
@@ -228,10 +226,10 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -248,6 +246,7 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
+    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin \
     --disable-libunwind-exceptions \
