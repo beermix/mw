@@ -70,7 +70,6 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0014-clone_function_name_1-Retain-any-stdcall-suffix.patch"
         "0012-Handle-spaces-in-path-for-default-manifest.patch"
         "0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch"
-        "0130-libstdc++-in-out.patch"
         "0140-gcc-8.2.0-diagnostic-color.patch"
         "0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch"
         "0017-gcc-7-branch-Enable-std-experimental-filesystem.patch"
@@ -84,7 +83,8 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "openmp-vectorize-v2.patch"
         "zero-regs-gcc8.patch"
         "libiberty-sync.patch"
-        "0130-libstdc++-in-out.patch")
+        "0130-libstdc++-in-out.patch"
+        "fortran-vector-v2.patch")
 
 _threads="posix"
 _git_base_commit=
