@@ -70,8 +70,6 @@ build() {
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
 
-
-export  GCC_IGNORE_WERROR=1
 #  CFLAGS=${CFLAGS/-pipe/}
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDLAGS=${LDLAGS/-pipe/}
@@ -80,6 +78,8 @@ export  GCC_IGNORE_WERROR=1
   CXXFLAGS=${CXXFLAGS/-g0/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
+
+  export GCC_IGNORE_WERROR=1
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -104,6 +104,7 @@ export  GCC_IGNORE_WERROR=1
     --enable-gold \
     --with-system-zlib \
     --enable-targets=x86_64-pc-mingw64 \
+    --enable-silent-rules \
     --disable-shared
 
   make MAKEINFO=true
