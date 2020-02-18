@@ -2,19 +2,20 @@
 
 pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
-_basever=6.1
-_date=20191019
+_basever=6.2
+_date=20200215
 pkgver=${_basever}.${_date}
 pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/ncurses/"
 license=('MIT')
-source=("${pkgbase}-${pkgver}.tar.xz"::"https://dl.dropboxusercontent.com/s/4k5byataxcie6a1/ncurses-6.1-20191019.tar.xz"
-	02-debian-backspace.diff
-	02-debian-drop-rin-from-screen-256color.diff
-	03-debian-ncursesconfig-omit-L.diff)
+source=("${pkgbase}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/current/${pkgbase}-${_basever}-${_date}.tgz")
 sha256sums=('28fea34e8f61ffd355b87c3195d20686c3a0a3f07be3b21cdd7294092dedd9cd')
+
+prepare() {
+  cd ${srcdir}/${pkgbase}-${_basever}-${_date}
+}
 
 build() {
   cd ${srcdir}/${pkgbase}-${_basever}-${_date}
