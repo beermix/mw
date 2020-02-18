@@ -84,8 +84,7 @@ source=(${_sourcedir}::"git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "zero-regs-gcc8.patch"
         "libiberty-sync.patch"
         "0130-libstdc++-in-out.patch"
-        "fortran-vector-v2.patch"
-        )
+        "fortran-vector-v2.patch")
 
 _threads="posix"
 _git_base_commit=
@@ -200,7 +199,8 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
-
+  CFLAGS=${CFLAGS/-g0/}
+  CXXFLAGS=${CXXFLAGS/-g0/}
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
@@ -233,6 +233,7 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-lto \
+    --enable-gold \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \
@@ -252,6 +253,12 @@ build() {
     --enable-plugin \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
+    --enable-__cxa_atexit \
+    --enable-clocale=gnu \
+    --enable-long-long \
+    --enable-c99 \
+    --enable-decimal-float \
+    --enable-tls \
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libstdcxx-verbose \
@@ -321,7 +328,7 @@ package_mingw-w64-gcc-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/cpp.exe                                        ${pkgdir}${MINGW_PREFIX}/bin/
@@ -411,7 +418,7 @@ package_mingw-w64-gcc-ada-git() {
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib,share}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
   cd ${srcdir}${MINGW_PREFIX}
   cp bin/gnat*.exe ${pkgdir}${MINGW_PREFIX}/bin/
