@@ -252,6 +252,7 @@ build() {
     --disable-libmpx \
     --disable-libmudflap \
     --disable-libstdcxx-verbose \
+    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
