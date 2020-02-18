@@ -122,15 +122,18 @@ prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
+  del_file_exists intl/canonicalize.c intl/canonicalize.h \
+    intl/relocatex.c intl/relocatex.h
   ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
   ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
   ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
   ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
   ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
-  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  #${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
-  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+ # ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
   else
@@ -147,14 +150,16 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
+    010-documentation.patch \
     libiberty-sync.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
-    ipa-cp.patch \
-    zero-regs-gcc8.patch \
     optimize.patch \
     optimize-at-least-some.patch
+
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    gomp-relax.patch \
+#    ipa-cp.patch \
+#    zero-regs-gcc8.patch \
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -233,7 +238,6 @@ build() {
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
     --enable-lto \
-    --enable-gold \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \
@@ -253,16 +257,8 @@ build() {
     --enable-plugin \
     --disable-libunwind-exceptions \
     --disable-vtable-verify \
-    --enable-__cxa_atexit \
-    --enable-clocale=gnu \
-    --enable-long-long \
-    --enable-c99 \
-    --enable-decimal-float \
-    --enable-tls \
     --disable-libmpx \
-    --disable-libmudflap \
     --disable-libstdcxx-verbose \
-    --without-included-gettext \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
