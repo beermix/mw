@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=9.2.1.d20200218.c10.g2408b93a10c
+pkgver=9.2.1.d20200218.c9.g2408b93a10c
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' 'emptydirs' 'strip') # '!strip' 'debug')
+options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
 
 _islver=0.16.1
 
@@ -122,18 +122,18 @@ prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
+
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
+
   ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
   ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
   ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
   ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
   ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
-  #${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
   ${GIT_AM} ${srcdir}/0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
- # ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
   if [ "${_branch}" != "releases/gcc-9" ]; then
     ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
   else
@@ -153,7 +153,8 @@ prepare() {
     010-documentation.patch \
     libiberty-sync.patch \
     optimize.patch \
-    optimize-at-least-some.patch
+    optimize-at-least-some.patch \
+    0140-gcc-8.2.0-diagnostic-color.patch
 
 #    openmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
