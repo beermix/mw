@@ -55,7 +55,7 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 
 #"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
 #source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-source=(${_sourcedir}::"git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}"
+source=(${_sourcedir}::"git+https://gcc.gnu.org/git/gcc.git#commit=${commit}"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "0002-Relocate-libintl.patch"
         "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
