@@ -102,6 +102,12 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --with-system-zlib \
+    --enable-targets=x86_64-pc-mingw64 \
+    --enable-silent-rules \
+    --disable-sim \
+    --disable-gdb \
+    --disable-ada \
     --disable-shared
 
   make MAKEINFO=true
