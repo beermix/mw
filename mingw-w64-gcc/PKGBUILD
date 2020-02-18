@@ -204,15 +204,16 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
+
   CFLAGS=${CFLAGS/-fomit-frame-pointer/}
   CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export CFLAGS="-march=haswell -g0 -O2"
+#  export CXXFLAGS="-march=haswell -g0 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -231,7 +232,7 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=no \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
@@ -260,6 +261,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-__cxa_atexit \
     --enable-gnu-indirect-function \
+    --enable-linker-build-id \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
