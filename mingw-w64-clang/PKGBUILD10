@@ -26,7 +26,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.0rc2
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0-rc2
-pkgrel=6
+pkgrel=7
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -36,6 +36,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
+             "${MINGW_PACKAGE_PREFIX}-python2"
+             "${MINGW_PACKAGE_PREFIX}-bzip2"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
@@ -48,7 +50,6 @@ options=('!debug' 'strip')
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/test-suite-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
         "0001-mingw-w64-use-MSVC-style-ByteAlignment.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
@@ -85,9 +86,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch")
-
-noextract=(clang-${pkgver}.src.tar.xz
-           test-suite-${pkgver}.src.tar.xz)
+noextract=(clang-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -178,8 +177,6 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
-    -DLLVM_ENABLE_TERMINFO=ON \
-    -DCOMPILER_RT_HAS_TERMINFO_NCURSESW=1 \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_ENABLE_RTTI=ON \
     -DCLANG_INCLUDE_DOCS=OFF \
@@ -208,7 +205,7 @@ build() {
   #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -220,13 +217,6 @@ build() {
   # fix the bad command line parameters, use unix style
 }
 
-#check() {
-#  cd "${srcdir}"/build-${CARCH}
-#  # Remove || true once testcase doesn't cause failures.
-#  make check || true
-#  make check-clang || true
-#  make check-polly || true
-#}
 
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
