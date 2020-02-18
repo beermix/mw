@@ -22,13 +22,18 @@ source=("https://github.com/jtkukunas/zlib/archive/v${pkgver}.tar.gz"
         04-fix-largefile-support.patch
         06-add-64bit-functions-and-fix-typos.patch
         07-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
+        011-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
+        012-Add-bzip2-library-to-pkg-config-file.patch
+        010-unzip-add-function-unzOpenBuffer.patch
+        08-Add-bzip2-library-to-pkg-config-file.patch
         08-Add-bzip2-library-to-pkg-config-file.patch
         07-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
         0001-fix-fizzle-check.patch
         0001-temporarily-workaround-JIRA-801.patch
         configure.patch
         disable-level1.patch
-        lto.patch)
+        lto.patch
+        14.patch)
 sha256sums=('c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1'
             'ac91f905b695d71f6c9c471ac98c14a3ed989a1e2b2a3b1171b3f6dc6bfc31b4'
             '3d039f42194aade91dadf4174f55fd6db349fd8044db93875bed1042dcfe1f31'
@@ -44,23 +49,26 @@ prepare() {
   patch -p1 -i ${srcdir}/01-zlib-1.2.11-1-buildsys.mingw.patch
   patch -p2 -i ${srcdir}/03-dont-put-sodir-into-L.mingw.patch
   patch -p1 -i ${srcdir}/04-fix-largefile-support.patch
-  #patch -p1 -i ${srcdir}/lto.patch
-  patch -p1 -i ${srcdir}/configure.patch
+#  patch -p1 -i ${srcdir}/14.patch
+#  patch -p1 -i ${srcdir}/configure.patch
 
   if [ "${_external_minizip}" != "yes" ]; then
     patch -p2 -i ${srcdir}/06-add-64bit-functions-and-fix-typos.patch
     cd ${srcdir}/${_realname}-${pkgver}/contrib/minizip
     patch -p1 -i ${srcdir}/07-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
-    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch  
+    patch -p1 -i ${srcdir}/08-Add-bzip2-library-to-pkg-config-file.patch
+    patch -p1 -i ${srcdir}/011-Add-no-undefined-to-link-to-enable-build-shared-vers.patch
+    patch -p1 -i ${srcdir}/012-Add-bzip2-library-to-pkg-config-file.patch
+    patch -p1 -i ${srcdir}/010-unzip-add-function-unzOpenBuffer.patch
   fi
 }
 
 build() {
   cd ${srcdir}/${_realname}-*
   CFLAGS=${CFLAGS/-O2/-O3}
-  CHOST=${MINGW_CHOST} CXX=clang++ CC=clang ./configure --prefix=${MINGW_PREFIX} --shared
+  CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
- 
+
   # build minizip
   if [ "${_external_minizip}" != "yes" ]; then
     pushd contrib/minizip > /dev/null

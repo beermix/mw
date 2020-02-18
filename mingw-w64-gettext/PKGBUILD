@@ -63,8 +63,8 @@ prepare() {
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
 
-  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' gettext-tools/Makefile.in
-  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' gettext-runtime/Makefile.in
+#  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' gettext-tools/Makefile.in
+#  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' gettext-runtime/Makefile.in
 
   libtoolize --automake --copy --force
   WANT_AUTOMAKE=latest ./autogen.sh --skip-gnulib
@@ -108,15 +108,4 @@ build() {
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
-
-  # Licenses
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING"                                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/COPYING"                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/intl/COPYING.LIB"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/intl/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING.LIB" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/COPYING"                   "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/gnulib-lib/libxml/COPYING" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/gnulib-lib/libxml/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gnulib-local/lib/libxml/COPYING"         "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gnulib-local/lib/libxml/COPYING"
-  rm "${pkgdir}${MINGW_PREFIX}/share/${_realname}/intl/COPYING.LIB"
 }

@@ -18,21 +18,17 @@ options=('staticlibs')
 depends=("${MINGW_PACKAGE_PREFIX}-gmp")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp" "autoconf-archive")
 source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz{,.sig}
-        #https://www.mpfr.org/mpfr-current/${_realname}-${_pkgver}.tar.xz{,.asc}
-        #mpfr-${_pkgver}-${_patchlevel}.patch
-        )
+        001-only_src.patch.txt)
 sha256sums=('1d3be708604eae0e42d578ba93b390c2a145f17743a744d8f3f8c2ad5855a38a'
             'SKIP')
 validpgpkeys=('07F3DBBECC1A39605078094D980C197698C3739D')
 
 prepare() {
   cd "${srcdir}/${_realname}-${_pkgver}"
+  
+  patch -p1 -i ${srcdir}/001-only_src.patch.txt
 
-  if [ -n "${_patchlevel}" ]; then
-    patch -p1 -i ${srcdir}/${_realname}-${_pkgver}-${_patchlevel}.patch
-  fi
-
-  autoreconf -fiv
+  autoreconf -fi
 }
 
 build() {
@@ -44,6 +40,7 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --enable-static \
     --disable-shared \
+    --enable-thread-safe \
     --with-gmp=${MINGW_PREFIX}
 
   make

@@ -4,18 +4,18 @@
 _realname=ccache
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.7.7
-pkgrel=4
+pkgver=20696244d13f745a32006c4927b5a1013bbef289
+pkgrel=1
 pkgdesc="Compiler cache that speeds up recompilation by caching previous compilations (mingw-w64)"
 arch=('any')
-url="https://github.com/ccache/ccache/releases"
+url="https://github.com/ccache/ccache"
 license=("GPL3")
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-git")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
-source=("https://github.com/ccache/ccache/releases/download/v${pkgver}/${_realname}-${pkgver}.tar.xz"{,.asc}
+source=("https://github.com/ccache/ccache/archive/${pkgver}.tar.gz"
         "01-directory-separator.patch")
 sha256sums=('e51c611a3da865754cb0ff1ddd95bd7a6acac603576c0bd39583f8cc30af28d2'
             'SKIP'
@@ -24,9 +24,9 @@ validpgpkeys=('5A939A71A46792CF57866A51996DDA075594ADB8') # Joel Rosdahl <joel@r
 
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
-  patch -p1 -i "${srcdir}/01-directory-separator.patch"
+  #patch -p1 -i "${srcdir}/01-directory-separator.patch"
 
-# autoreconf -ifv
+ autoreconf -ifv
 }
 
 build() {
@@ -45,8 +45,9 @@ build() {
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST} \
-      --disable-man \
-      --with-bundled-zlib=no
+      --with-libb2-from-internet \
+      --with-libzstd-from-internet \
+      --disable-man
 
   make
 }

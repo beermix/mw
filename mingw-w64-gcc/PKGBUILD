@@ -106,8 +106,8 @@ prepare() {
 
   ln -s ../isl-${_islver} isl
 
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
+#  del_file_exists intl/canonicalize.c intl/canonicalize.h \
+#    intl/relocatex.c intl/relocatex.h
 
 #  del_file_exists \
 #    gcc/testsuite/ada \
@@ -134,7 +134,6 @@ prepare() {
     0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
     0008-Prettify-linking-no-undefined.patch \
     0010-Fix-using-large-PCH.patch \
-    0014-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \

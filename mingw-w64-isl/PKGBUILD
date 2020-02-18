@@ -39,6 +39,8 @@ build() {
     --enable-static \
     --disable-shared \
     --disable-silent-rules \
+    --with-clang=system \
+    --with-clang-prefix=${MINGW_PREFIX} \
     --with-gmp-prefix=${MINGW_PREFIX}
 
   make
