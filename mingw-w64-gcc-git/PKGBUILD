@@ -127,6 +127,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
   ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
   ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
+  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
   ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
   ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
   if [ "${_branch}" != "releases/gcc-9" ]; then
@@ -275,7 +276,7 @@ build() {
   fi
 
 #  /home/User/.go/bin/noti.exe nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
-  
+
   /home/User/.go/bin/noti.exe nice -n 19 make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
 
 #  /home/User/.go/bin/noti.exe nice -n 19 make all
