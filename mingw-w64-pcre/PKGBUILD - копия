@@ -10,7 +10,11 @@ arch=('any')
 url="https://pcre.org/"
 license=("BSD")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-pkg-config")
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
+         "${MINGW_PACKAGE_PREFIX}-bzip2"
+         #"${MINGW_PACKAGE_PREFIX}-readline"
+         "${MINGW_PACKAGE_PREFIX}-wineditline"
+         "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs' 'strip')
 source=(https://ftp.pcre.org/pub/pcre/${_realname}-${pkgver}.tar.bz2{,.sig})
 sha256sums=('91e762520003013834ac1adb4a938d53b22a216341c061b0cf05603b290faf6b'
@@ -26,8 +30,12 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
+    --enable-unicode-properties \
     --disable-cpp \
-    --enable-unicode-properties
+    --enable-utf \
+    --enable-pcre8 \
+    --enable-pcre16 \
+    --enable-pcre32
 
   make
 }
@@ -44,4 +52,6 @@ package() {
   # License files
   cd "${pkgdir}${MINGW_PREFIX}/share"
   mkdir -p licenses/${_realname}
+  mv doc/${_realname}/COPYING licenses/${_realname}
+  mv doc/${_realname}/LICENCE licenses/${_realname}
 }
