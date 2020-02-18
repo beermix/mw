@@ -62,7 +62,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0011-different-name-for-static-libraries.patch"
         "0012-fix-testplugin-linking.patch"
         "0013-set-cxx-version.patch"
-        "0014-winpthreads-workaround.patch"
+        "0014-winpthreads-workaround2.patch"
         "0101-Allow-build-static-clang-library-for-mingw.patch"
         "0102-fix-libclang-name-for-mingw.patch"
         "0103-Set-the-x86-arch-name-to-i686-for-mingw-w64.patch"
@@ -111,7 +111,7 @@ prepare() {
       "0010-mbig-obj-for-all.patch" \
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
-      "0014-winpthreads-workaround.patch" \
+      "0014-winpthreads-workaround2.patch" \
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
