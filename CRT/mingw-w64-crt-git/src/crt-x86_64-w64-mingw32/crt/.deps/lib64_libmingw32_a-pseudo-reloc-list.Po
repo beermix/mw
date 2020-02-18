@@ -1,2 +1,0 @@
-crt/lib64_libmingw32_a-pseudo-reloc-list.o: \
- G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/crt/pseudo-reloc-list.c

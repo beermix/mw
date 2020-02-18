@@ -1,5 +1,0 @@
-profile/lib64_libgmon_a-mcountFunc.o: \
- G:/.DEV/mingw/home/User/mw-my/CRT/mingw-w64-crt-git/src/mingw-w64/mingw-w64-crt/profile/mcountFunc.S \
- G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h
-
-G:/.DEV/mingw/mingw64/x86_64-w64-mingw32/include/_mingw_mac.h:
