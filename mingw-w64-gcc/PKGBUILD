@@ -117,10 +117,6 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-#    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-#     0011-Enable-shared-gnat-implib.patch \
-#     0012-Handle-spaces-in-path-for-default-manifest.patch \
-
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -131,7 +127,6 @@ prepare() {
     0008-Prettify-linking-no-undefined.patch \
     0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
     0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
@@ -268,6 +263,7 @@ build() {
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --enable-__cxa_atexit \
+    --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -300,7 +296,7 @@ build() {
 
   make -j1 DESTDIR=${srcdir} install
   if [ "$_enable_ada" == "yes" ]; then
-    mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
+    cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
 }
 
