@@ -301,7 +301,7 @@ build() {
 
   make -j1 DESTDIR=${srcdir} install
   if [ "$_enable_ada" == "yes" ]; then
-    cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
+    mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
 }
 
