@@ -145,13 +145,12 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     libiberty-sync.patch \
-    0140-gcc-8.2.0-diagnostic-color.patch
-
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    gomp-relax.patch \
-#    ipa-cp.patch \
-#    zero-regs-gcc8.patch \
+    0140-gcc-8.2.0-diagnostic-color.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    gomp-relax.patch \
+    ipa-cp.patch \
+    zero-regs-gcc8.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -162,7 +161,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -223,12 +222,11 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -243,11 +241,15 @@ build() {
     --with-diagnostics-color=always \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin \
     --disable-libunwind-exceptions \
+    --enable-linker-build-id \
+    --enable-gnu-indirect-function \
+    --enable-gnu-unique-object \
+    --enable-__cxa_atexit \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
