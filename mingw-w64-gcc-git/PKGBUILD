@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip' '!debug')
+options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
 
 _islver=0.16.1
 
