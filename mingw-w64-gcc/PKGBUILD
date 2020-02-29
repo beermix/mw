@@ -194,7 +194,7 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -249,7 +249,7 @@ build() {
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=yes \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -268,7 +268,7 @@ build() {
     --with-diagnostics-color=always \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     --enable-plugin \
