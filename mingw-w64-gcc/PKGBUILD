@@ -260,7 +260,7 @@ build() {
     --with-gnu-as --with-gnu-ld \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
-    --enable-__cxa_atexit \
+    --disable-vtable-verify \
     --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     ${_conf}
     #--enable-libitm
