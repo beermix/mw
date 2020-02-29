@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=3
+pkgrel=4
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -188,8 +188,6 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
-
-#  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -270,10 +268,11 @@ build() {
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --enable-__cxa_atexit \
+    --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
+    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     #--enable-version-specific-runtime-libs \     --enable-gnu-unique-object \
     #     --without-included-gettext \
     #     --disable-libstdcxx-verbose \     --enable-linker-build-id \     --enable-gnu-indirect-function \
