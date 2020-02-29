@@ -6,6 +6,7 @@
 # Contributor: Yuui Tanabe <yuuitanabe@163.com>
 # Contributor: Oscar Fuentes <ofv@wanadoo.es>
 # Contributor: Adrian Pop <adrian.pop@liu.se>
+# https://github.com/llvm/llvm-project/releases
 
 
 # We can switch to clang when it fully works with mingw-w64
