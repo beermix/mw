@@ -77,7 +77,6 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "optimize.patch"
         "optimize-at-least-some.patch"
         "0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch"
-        "memcpy-avx2.patch"
         "avx512-when-we-ask-for-it.patch"
         "icelake.patch"
         "gomp-relax.patch"
@@ -156,7 +155,6 @@ prepare() {
     ipa-cp.patch \
     optimize-at-least-some.patch \
     gomp-relax.patch \
-    memcpy-avx2.patch \
     avx512-when-we-ask-for-it.patch \
     0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
     icelake.patch \
