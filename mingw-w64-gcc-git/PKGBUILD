@@ -202,8 +202,8 @@ build() {
 
 #  unset CFLAGS
 #  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g0 -O2"
-#  export CXXFLAGS="-march=haswell -g0 -O2"
+#  export CFLAGS="-march=core-avx2 -g0 -O2"
+#  export CXXFLAGS="-march=core-avx2 -g0 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -217,7 +217,7 @@ build() {
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
     --with-arch=${_arch} \
-    --with-tune=haswell \
+    --with-tune=core-avx2 \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
@@ -271,9 +271,9 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-#  /home/User/.go/bin/noti.exe nice -n 19 make CFLAGS="-march=haswell -g0 -O2" CXXFLAGS="-march=haswell -g0 -O2" CFLAGS_FOR_TARGET="-march=haswell -g0 -O2" CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2" BOOT_CFLAGS="-march=haswell -g0 -O2" BOOT_CXXFLAGS="-march=haswell -g0 -O2" all
+#  /home/User/.go/bin/noti.exe nice -n 19 make CFLAGS="-march=core-avx2 -g0 -O2" CXXFLAGS="-march=core-avx2 -g0 -O2" CFLAGS_FOR_TARGET="-march=core-avx2 -g0 -O2" CXXFLAGS_FOR_TARGET="-march=core-avx2 -g0 -O2" BOOT_CFLAGS="-march=core-avx2 -g0 -O2" BOOT_CXXFLAGS="-march=core-avx2 -g0 -O2" all
 
-#  /home/User/.go/bin/noti.exe nice -n 19 make "CFLAGS=-march=haswell -g0 -O3" "CXXFLAGS=-march=haswell -g0 -O3" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O3" "BOOT_CFLAGS=-march=haswell -g0 -O3" "BOOT_CXXFLAGS=-march=haswell -g0 -O3" all
+#  /home/User/.go/bin/noti.exe nice -n 19 make "CFLAGS=-march=core-avx2 -g0 -O3" "CXXFLAGS=-march=core-avx2 -g0 -O3" "CFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "BOOT_CFLAGS=-march=core-avx2 -g0 -O3" "BOOT_CXXFLAGS=-march=core-avx2 -g0 -O3" all
 
   /home/User/.go/bin/noti.exe nice -n 19 make all
 
