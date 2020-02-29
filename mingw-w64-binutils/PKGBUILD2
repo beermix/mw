@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=23
+pkgrel=22
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -83,7 +83,7 @@ build() {
 #  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
 #  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
 
-#  export GCC_IGNORE_WERROR=1
+  export GCC_IGNORE_WERROR=1
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -106,6 +106,8 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --with-system-zlib \
+    --enable-targets=x86_64-*-mingw* \
     --enable-silent-rules \
     --disable-shared
 
