@@ -268,7 +268,6 @@ build() {
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --enable-__cxa_atexit \
-    --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
