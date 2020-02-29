@@ -76,6 +76,10 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "ipa-cp.patch"
         "optimize.patch"
         "optimize-at-least-some.patch"
+        "0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch"
+        "memcpy-avx2.patch"
+        "avx512-when-we-ask-for-it.patch"
+        "icelake.patch"
         "gomp-relax.patch"
         "openmp-vectorize-v2.patch"
         "zero-regs-gcc8.patch"
@@ -144,13 +148,19 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    libiberty-sync.patch \
     0140-gcc-8.2.0-diagnostic-color.patch \
+    zero-regs-gcc8.patch \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
-    gomp-relax.patch \
+    optimize.patch \
     ipa-cp.patch \
-    zero-regs-gcc8.patch
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
+    memcpy-avx2.patch \
+    avx512-when-we-ask-for-it.patch \
+    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+    icelake.patch \
+    libiberty-sync.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
