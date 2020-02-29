@@ -257,6 +257,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
@@ -265,11 +266,8 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --enable-plugin \
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
-    --enable-gnu-indirect-function \
-    --enable-gnu-unique-object \
     --enable-__cxa_atexit \
     ${_conf}
     #--enable-libitm
@@ -283,7 +281,7 @@ build() {
     #--enable-long-long \
     #--enable-c99 \
     #--enable-decimal-float \
-    #--enable-tls \
+    #--enable-tls \    --enable-gnu-indirect-function \    --enable-gnu-unique-object \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
