@@ -38,7 +38,7 @@ build() {
     --build=${MINGW_CHOST} \
     --enable-static \
     --disable-shared \
-    --with-gcc-arch=haswell \
+    --with-gcc-arch=core-avx2 \
     --disable-silent-rules \
     --with-gmp-prefix=${MINGW_PREFIX}
 
