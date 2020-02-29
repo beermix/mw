@@ -171,17 +171,16 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-  del_file_exists \
-    gcc/testsuite/ada \
-    gcc/testsuite/brig.dg \
-    gcc/testsuite/c-c++-common \
-    gcc/testsuite/ChangeLog* \
-    gcc/testsuite/config \
-    gcc/testsuite/g* \
-    gcc/testsuite/jit.dg \
-    gcc/testsuite/lib \
-    gcc/testsuite/o* \
-    gcc/ada/*.ad*
+rm -rf gcc/testsuite/ada
+rm -rf gcc/testsuite/brig.dg
+rm -rf gcc/testsuite/c-c++-common
+rm -rf gcc/testsuite/ChangeLog*
+rm -rf gcc/testsuite/config
+rm -rf gcc/testsuite/g*
+rm -rf gcc/testsuite/jit.dg
+rm -rf gcc/testsuite/lib
+rm -rf gcc/testsuite/o*
+rm -rf gcc/ada/*.ad*
 }
 
 build() {
