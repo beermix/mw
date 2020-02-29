@@ -25,8 +25,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=9.0.1
-_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1
-pkgrel=2
+pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -37,7 +36,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-python2"
-             "${MINGW_PACKAGE_PREFIX}-bzip2"
+             "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
@@ -47,6 +46,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
+#_url=https://releases.llvm.org
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
@@ -109,10 +110,6 @@ prepare() {
 #  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
 #  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
-#  plain "Extracting test-suite-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-#  [[ -d ${srcdir}/test-suite-${pkgver} ]] && rm -rf ${srcdir}/test-suite-${pkgver}
-#  [[ -d ${srcdir}/test-suite-${pkgver} ]] || tar -xJvf ${srcdir}/test-suite-${pkgver}.src.tar.xz -C ${srcdir} || true
-
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
@@ -173,6 +170,13 @@ build() {
 
   local -a extra_config
 
+  if check_option "debug" "y"; then
+    extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
+    VERBOSE="VERBOSE=1"
+  else
+    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
+  fi
+
   # Include location of libffi headers in CPPFLAGS
   FFI_INCLUDE_DIR="$(pkg-config --cflags libffi)"
   FFI_INCLUDE_DIR=$(echo $FFI_INCLUDE_DIR | sed 's|-I||g')
@@ -186,14 +190,15 @@ build() {
     export CC='clang'
     export CXX='clang++'
   fi
-
-#    -DLLVM_OPTIMIZED_TABLEGEN=ON \
-#    -DLLVM_ENABLE_ZLIB=ON \
+  
+  export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
+  if [ "${CARCH}" == "x86_64" ]; then
+    export ASM_COMPILER_FLAGS=-win64
+  fi
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
@@ -239,6 +244,13 @@ build() {
   # fix the bad command line parameters, use unix style
 }
 
+#check() {
+#  cd "${srcdir}"/build-${CARCH}
+#  # Remove || true once testcase doesn't cause failures.
+#  make check || true
+#  make check-clang || true
+#  make check-polly || true
+#}
 
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"

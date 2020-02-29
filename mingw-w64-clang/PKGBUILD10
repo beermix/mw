@@ -37,7 +37,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-python2"
-             "${MINGW_PACKAGE_PREFIX}-bzip2"
+             "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
@@ -47,6 +47,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
+#_url=https://releases.llvm.org
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
