@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=4
+pkgrel=5
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -117,18 +117,6 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-#  del_file_exists \
-#    gcc/testsuite/ada \
-#    gcc/testsuite/brig.dg \
-#    gcc/testsuite/c-c++-common \
-#    gcc/testsuite/ChangeLog* \
-#    gcc/testsuite/config \
-#    gcc/testsuite/g* \
-#    gcc/testsuite/jit.dg \
-#    gcc/testsuite/lib \
-#    gcc/testsuite/o* \
-#    gcc/ada/*.ad*
-
 #    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
 #     0011-Enable-shared-gnat-implib.patch \
 #     0012-Handle-spaces-in-path-for-default-manifest.patch \
@@ -188,6 +176,18 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
+
+  del_file_exists \
+    gcc/testsuite/ada \
+    gcc/testsuite/brig.dg \
+    gcc/testsuite/c-c++-common \
+    gcc/testsuite/ChangeLog* \
+    gcc/testsuite/config \
+    gcc/testsuite/g* \
+    gcc/testsuite/jit.dg \
+    gcc/testsuite/lib \
+    gcc/testsuite/o* \
+    gcc/ada/*.ad*
 }
 
 build() {
