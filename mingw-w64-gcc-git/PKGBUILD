@@ -203,17 +203,6 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
-  CFLAGS=${CFLAGS/-g0/}
-  CXXFLAGS=${CXXFLAGS/-g0/}
-  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
-  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
-
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=core-avx2 -g0 -O2"
-#  export CXXFLAGS="-march=core-avx2 -g0 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
