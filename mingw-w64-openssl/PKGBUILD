@@ -45,7 +45,7 @@ build() {
   cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
 
   # Use mingw cflags instead of hardcoded ones     enable-ec_nistp_64_gcc_128
-  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=haswell -g0 -O3/' ${srcdir}/build-${CARCH}/Configure
+  sed -i -e '/^"mingw64"/ s/-DL_ENDIAN -O3/-DL_ENDIAN -march=core-avx2 -O3 -pipe/' ${srcdir}/build-${CARCH}/Configure
 
   _mingw=mingw
   if $(echo ${CARCH} | grep -q x86_64); then
@@ -54,7 +54,7 @@ build() {
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
 
-  CC=clang CXX=clang++ \
+  CC=clang CXX=clang++
   ./Configure \
     --prefix=/oth \
     ${_mingw} \
