@@ -7,7 +7,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=8.0.0.5652.699903dc
+pkgver=8.0.0.5653.d5fa66cc
 pkgrel=1
 pkgdesc="MinGW-w64 tools"
 arch=('any')
@@ -30,10 +30,10 @@ pkgver() {
   printf "%s.%s.%s.%s.%s" ${_major} ${_minor} ${_rev} "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-  cd "${srcdir}/mingw-w64"
-  patch -p1 -i "${srcdir}/0000-mingw64-malloc.patch"
-}
+#prepare() {
+#  cd "${srcdir}/mingw-w64"
+# patch -p1 -i "${srcdir}/0000-mingw64-malloc.patch"
+#}
 
 build() {
   local cur=
