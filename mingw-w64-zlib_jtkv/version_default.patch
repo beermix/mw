@@ -1,0 +1,13 @@
+diff --git a/zlib.h b/zlib.h
+index ddd0b47..839fa36 100644
+--- a/zlib.h
++++ b/zlib.h
+@@ -37,7 +37,7 @@
+ extern "C" {
+ #endif
+ 
+-#define ZLIB_VERSION "1.2.11.1-motley"
++#define ZLIB_VERSION "1.2.11.1"
+ #define ZLIB_VERNUM 0x12b1
+ #define ZLIB_VER_MAJOR 1
+ #define ZLIB_VER_MINOR 2

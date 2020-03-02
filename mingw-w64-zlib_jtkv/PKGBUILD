@@ -32,7 +32,9 @@ source=("https://github.com/jtkukunas/zlib/archive/v${pkgver}.tar.gz"
         0001-temporarily-workaround-JIRA-801.patch
         configure.patch
         disable-level1.patch
+        version_default.patch
         lto.patch
+        configure.patch
         14.patch)
 sha256sums=('c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1'
             'ac91f905b695d71f6c9c471ac98c14a3ed989a1e2b2a3b1171b3f6dc6bfc31b4'
@@ -49,8 +51,9 @@ prepare() {
   patch -p1 -i ${srcdir}/01-zlib-1.2.11-1-buildsys.mingw.patch
   patch -p2 -i ${srcdir}/03-dont-put-sodir-into-L.mingw.patch
   patch -p1 -i ${srcdir}/04-fix-largefile-support.patch
-#  patch -p1 -i ${srcdir}/14.patch
-#  patch -p1 -i ${srcdir}/configure.patch
+  patch -p1 -i ${srcdir}/version_default.patch
+  patch -p1 -i ${srcdir}/lto.patch
+  patch -p1 -i ${srcdir}/configure.patch
 
   if [ "${_external_minizip}" != "yes" ]; then
     patch -p2 -i ${srcdir}/06-add-64bit-functions-and-fix-typos.patch
@@ -65,8 +68,20 @@ prepare() {
 
 build() {
   cd ${srcdir}/${_realname}-*
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
+
+  export CFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FFLAGS="$CFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -ffat-lto-objects -flto=4 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CFLAGS_GENERATE="$CFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
+export FCFLAGS_GENERATE="$FCFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
+export FFLAGS_GENERATE="$FFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
+export CXXFLAGS_GENERATE="$CXXFLAGS -fprofile-generate -fprofile-dir=/var/tmp/pgo -fprofile-update=atomic "
+export CFLAGS_USE="$CFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
+export FCFLAGS_USE="$FCFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
+export FFLAGS_USE="$FFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
+export CXXFLAGS_USE="$CXXFLAGS -fprofile-use -fprofile-dir=/var/tmp/pgo -fprofile-correction "
+CFLAGS="${CFLAGS_GENERATE}" CXXFLAGS="${CXXFLAGS_GENERATE}" FFLAGS="${FFLAGS_GENERATE}" FCFLAGS="${FCFLAGS_GENERATE}" CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
 
   # build minizip
