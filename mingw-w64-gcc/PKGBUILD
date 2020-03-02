@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=5
+pkgrel=6
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -43,7 +43,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs') # '!strip' 'debug')
+options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
@@ -154,11 +154,7 @@ prepare() {
     libiberty-sync.patch
 
 #    0001-Fix-stack-protection-issues.patch \
-#    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-#    zero-regs-gcc8.patch \
 #    arch-native-override.patch
-#    optimize.patch \
-#    optimize-at-least-some.patch \
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -171,16 +167,16 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-rm -rf gcc/testsuite/ada
-rm -rf gcc/testsuite/brig.dg
-rm -rf gcc/testsuite/c-c++-common
-rm -rf gcc/testsuite/ChangeLog*
-rm -rf gcc/testsuite/config
-rm -rf gcc/testsuite/g*
-rm -rf gcc/testsuite/jit.dg
-rm -rf gcc/testsuite/lib
-rm -rf gcc/testsuite/o*
-rm -rf gcc/ada/*.ad*
+#rm -rf gcc/testsuite/ada
+#rm -rf gcc/testsuite/brig.dg
+#rm -rf gcc/testsuite/c-c++-common
+#rm -rf gcc/testsuite/ChangeLog*
+#rm -rf gcc/testsuite/config
+#rm -rf gcc/testsuite/g*
+#rm -rf gcc/testsuite/jit.dg
+#rm -rf gcc/testsuite/lib
+#rm -rf gcc/testsuite/o*
+#rm -rf gcc/ada/*.ad*
 }
 
 build() {
@@ -261,7 +257,6 @@ build() {
     --disable-libunwind-exceptions \
     --enable-linker-build-id \
     --disable-vtable-verify \
-    --with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${pkgver} \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -284,11 +279,10 @@ build() {
   fi
 
 #  /home/User/.go/bin/noti nice -n 19 make CFLAGS="-march=core-avx2 -g0 -O2" CXXFLAGS="-march=core-avx2 -g0 -O2" CFLAGS_FOR_TARGET="-march=core-avx2 -g0 -O2" CXXFLAGS_FOR_TARGET="-march=core-avx2 -g0 -O2" BOOT_CFLAGS="-march=core-avx2 -g0 -O2" BOOT_CXXFLAGS="-march=core-avx2 -g0 -O2" all
-
 #  /home/User/.go/bin/noti nice -n 19 make "CFLAGS=-march=core-avx2 -g0 -O3" "CXXFLAGS=-march=core-avx2 -g0 -O3" "CFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "BOOT_CFLAGS=-march=core-avx2 -g0 -O3" "BOOT_CXXFLAGS=-march=core-avx2 -g0 -O3" all
+#  /home/User/.go/bin/noti nice -n 19 make all -j8
 
-# nice -n 19
-  /home/User/.go/bin/noti nice -n 19 make all -j8
+ noti make -j7 "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
