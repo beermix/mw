@@ -87,7 +87,8 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0701-disable-visibility-annotations.patch"
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
         "0901-openmp-kpm-lock.patch"
-        "0902-libomp-weak-mingw.patch")
+        "0902-libomp-weak-mingw.patch"
+        "no-z3.patch")
 noextract=(clang-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -114,6 +115,7 @@ prepare() {
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
       "0014-winpthreads-workaround.patch" \
+      "no-z3.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
