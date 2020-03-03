@@ -54,7 +54,7 @@ build() {
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
 
-  CC=clang CXX=clang++
+  CC=clang CXX=clang++ \
   ./Configure \
     --prefix=/oth \
     ${_mingw} \
@@ -71,8 +71,9 @@ build() {
     enable-md2 \
     enable-rc5 \
     enable-tlsext \
-    enable-rfc3779 \
-    enable-ec_nistp_64_gcc_128
+    enable-rfc3779
+
+#    enable-ec_nistp_64_gcc_128
 
     make
    # make depend
