@@ -10,7 +10,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=clang
+_compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -157,8 +157,9 @@ prepare() {
   cd "${srcdir}/libcxx-${pkgver}.src"
   apply_patch_with_msg \
       "0401-disable-visibility-annotations.patch" \
-      "0405-fix-conflict-win32-posix-threads.patch" \
-      "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
+      "0405-fix-conflict-win32-posix-threads.patch"
+      
+#      "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
 
 #  cd "${srcdir}/lldb-${pkgver}.src"
 #  apply_patch_with_msg \
