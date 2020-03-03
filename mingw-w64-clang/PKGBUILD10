@@ -10,7 +10,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -88,8 +88,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch"
-        "no-z3.patch"
-        "llvm-rc2-to-git.patch")
+        "no-z3.patch")
 noextract=(clang-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -116,8 +115,7 @@ prepare() {
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
       "0014-winpthreads-workaround.patch" \
-      "no-z3.patch" \
-      "llvm-rc2-to-git.patch"
+      "no-z3.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -191,7 +189,7 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD=X86 \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
-    -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_ENABLE_RTTI=ON \
     -DCLANG_INCLUDE_DOCS=OFF \
     -DLLVM_ENABLE_DOXYGEN=OFF \
