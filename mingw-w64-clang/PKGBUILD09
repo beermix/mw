@@ -28,6 +28,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-libc++abi"
          "${MINGW_PACKAGE_PREFIX}-libunwind"
          "${MINGW_PACKAGE_PREFIX}-lld"
+         "${MINGW_PACKAGE_PREFIX}-lldb"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
@@ -54,6 +55,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
+#_url=https://releases.llvm.org
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/openmp-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
@@ -63,6 +66,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/libcxxabi-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
         ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/lldb-${pkgver}.src.tar.xz{,.sig}
         ${_url}/libunwind-${pkgver}.src.tar.xz{,.sig}
         ${_url}/polly-${pkgver}.src.tar.xz{,.sig}
         "0001-mingw-w64-use-MSVC-style-ByteAlignment.patch"
@@ -86,11 +90,15 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0401-disable-visibility-annotations.patch"
         "0405-fix-conflict-win32-posix-threads.patch"
         "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
+        "0501-fixes-to-get-lldb-building.patch"
+        "0503-lldb-find-mingw-python.patch"
+        "0504-fix-lldb-library-name-mingw.patch"
         "0505-use-gnu-printf.patch"
         "0506-mingw-python-posix-like.patch"
         "0507-declare-exports-for-all-windows-platforms.patch"
         "0508-add-share-header.patch"
         "0509-include-crtdbg.patch"
+        "0510-fix-CMake-when-LLDB_DISABLE_PYTHON-if-ON-and-ep.patch"
         "0601-fix-static-assert-macro.patch"
         "0701-disable-visibility-annotations.patch"
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
@@ -99,6 +107,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "no-z3.patch")
 noextract=(clang-${pkgver}.src.tar.xz
            libcxx-${pkgver}.src.tar.xz
+           lldb-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -118,9 +127,9 @@ prepare() {
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
   [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
-#  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-#  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
-#  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
+  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
@@ -160,17 +169,17 @@ prepare() {
       "0405-fix-conflict-win32-posix-threads.patch" \
       "0406-fix-static_asserts-and-unique_ptr-for-libcxx.patch"
 
-#  cd "${srcdir}/lldb-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0501-fixes-to-get-lldb-building.patch" \
-#      "0503-lldb-find-mingw-python.patch" \
-#      "0504-fix-lldb-library-name-mingw.patch" \
-#      "0505-use-gnu-printf.patch" \
-#      "0506-mingw-python-posix-like.patch" \
-#      "0507-declare-exports-for-all-windows-platforms.patch" \
-#      "0508-add-share-header.patch" \
-#      "0509-include-crtdbg.patch" \
-#      "0510-fix-CMake-when-LLDB_DISABLE_PYTHON-if-ON-and-ep.patch"
+  cd "${srcdir}/lldb-${pkgver}.src"
+  apply_patch_with_msg \
+      "0501-fixes-to-get-lldb-building.patch" \
+      "0503-lldb-find-mingw-python.patch" \
+      "0504-fix-lldb-library-name-mingw.patch" \
+      "0505-use-gnu-printf.patch" \
+      "0506-mingw-python-posix-like.patch" \
+      "0507-declare-exports-for-all-windows-platforms.patch" \
+      "0508-add-share-header.patch" \
+      "0509-include-crtdbg.patch" \
+      "0510-fix-CMake-when-LLDB_DISABLE_PYTHON-if-ON-and-ep.patch"
 
   cd "${srcdir}/libunwind-${pkgver}.src"
   apply_patch_with_msg \
@@ -201,7 +210,7 @@ prepare() {
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
   mv "${srcdir}/lld-${pkgver}.src"               tools/lld
-  #mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
+  mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
   mv "${srcdir}/polly-${pkgver}.src"             tools/polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
   mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
@@ -280,6 +289,9 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
+    -DLLDB_RELOCATABLE_PYTHON=ON \
+    -DLLDB_USE_SYSTEM_SIX=ON \
+    -DLLDB_DISABLE_PYTHON=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
@@ -403,6 +415,27 @@ package_lld() {
   ${_make_cmd} -C ../build-${CARCH}/tools/lld -j1 DESTDIR="${pkgdir}" install
 }
 
+package_lldb() {
+  pkgdesc="Next generation, high-performance debugger (mingw-w64)"
+  url="https://lldb.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-libxml2"
+           "${MINGW_PACKAGE_PREFIX}-llvm"
+           "${MINGW_PACKAGE_PREFIX}-python"
+           "${MINGW_PACKAGE_PREFIX}-readline"
+           "${MINGW_PACKAGE_PREFIX}-swig")
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+
+  ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
+
+  # Compile Python scripts
+   local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
+  ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+  ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+
+  install -Dm644 tools/lldb/LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
+}
+
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
@@ -477,6 +510,10 @@ package_mingw-w64-i686-lld(){
   package_lld
 }
 
+package_mingw-w64-i686-lldb(){
+  package_lldb
+}
+
 package_mingw-w64-i686-libunwind(){
   package_libunwind
 }
@@ -520,6 +557,10 @@ package_mingw-w64-x86_64-openmp(){
 
 package_mingw-w64-x86_64-lld(){
   package_lld
+}
+
+package_mingw-w64-x86_64-lldb(){
+  package_lldb
 }
 
 package_mingw-w64-x86_64-libunwind(){
