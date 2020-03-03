@@ -255,9 +255,6 @@ build() {
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --disable-libunwind-exceptions \
-    --enable-linker-build-id \
-    --disable-vtable-verify \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -271,6 +268,9 @@ build() {
     #--enable-c99 \
     #--enable-decimal-float \
     #--enable-tls \    --enable-gnu-indirect-function \    --enable-gnu-unique-object \
+#        --disable-libunwind-exceptions \
+#    --enable-linker-build-id \
+#    --disable-vtable-verify \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
