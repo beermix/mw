@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=6
+pkgrel=7
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -141,18 +141,19 @@ prepare() {
   apply_patch_with_msg \
     gcc-stable-branch.patch \
     010-documentation.patch \
-    zero-regs-gcc8.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    optimize.patch \
-    ipa-cp.patch \
-    optimize-at-least-some.patch \
-    gomp-relax.patch \
-    avx512-when-we-ask-for-it.patch \
-    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-    icelake.patch \
     libiberty-sync.patch
 
+#    zero-regs-gcc8.patch \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    optimize.patch \
+#    ipa-cp.patch \
+#    optimize-at-least-some.patch \
+#    gomp-relax.patch \
+#    avx512-when-we-ask-for-it.patch \
+#    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
+#    icelake.patch \
+    
 #    0001-Fix-stack-protection-issues.patch \
 #    arch-native-override.patch
 

@@ -27,7 +27,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.0rc2
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0-rc2
-pkgrel=8
+pkgrel=9
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -88,7 +88,8 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch"
-        "no-z3.patch")
+        "no-z3.patch"
+        "llvm-rc2-to-git.patch")
 noextract=(clang-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -115,7 +116,8 @@ prepare() {
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
       "0014-winpthreads-workaround.patch" \
-      "no-z3.patch"
+      "no-z3.patch" \
+      "llvm-rc2-to-git.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -198,8 +200,6 @@ build() {
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_GO_TESTS=OFF \
-    -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
@@ -219,7 +219,7 @@ build() {
   #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
