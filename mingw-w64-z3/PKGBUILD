@@ -3,7 +3,7 @@
 _realname=z3
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=559c3ca0123f4702b19c95f810f76518ee40c4c3
+pkgver=fcbf660592c9cf7cd594a73d8b9f4a7d4057fe32
 pkgrel=1
 pkgdesc="Z3 is a high-performance theorem prover being developed at Microsoft Research (mingw-w64)"
 arch=('any')
