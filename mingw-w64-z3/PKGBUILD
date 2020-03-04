@@ -40,13 +40,6 @@ prepare() {
 build() {
   local -a extra_config
 
-  if check_option "debug" "y"; then
-    extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
-    VERBOSE="VERBOSE=1"
-  else
-    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
-  fi
-
   [[ -d "${srcdir}"/build-${CARCH}-static ]] && rm -rf "${srcdir}"/build-${CARCH}-static
   mkdir -p "${srcdir}"/build-${CARCH}-static && cd "${srcdir}"/build-${CARCH}-static
 
@@ -57,6 +50,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
+    -DCMAKE_BUILD_TYPE=None \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
