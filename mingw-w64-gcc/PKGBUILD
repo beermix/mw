@@ -34,6 +34,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
              "${MINGW_PACKAGE_PREFIX}-gmp"
+             "${MINGW_PACKAGE_PREFIX}-isl"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-mpc"
              "${MINGW_PACKAGE_PREFIX}-mpfr"
@@ -167,16 +168,16 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-#rm -rf gcc/testsuite/ada
-#rm -rf gcc/testsuite/brig.dg
-#rm -rf gcc/testsuite/c-c++-common
-#rm -rf gcc/testsuite/ChangeLog*
-#rm -rf gcc/testsuite/config
-#rm -rf gcc/testsuite/g*
-#rm -rf gcc/testsuite/jit.dg
-#rm -rf gcc/testsuite/lib
-#rm -rf gcc/testsuite/o*
-#rm -rf gcc/ada/*.ad*
+rm -rf gcc/testsuite/ada
+rm -rf gcc/testsuite/brig.dg
+rm -rf gcc/testsuite/c-c++-common
+rm -rf gcc/testsuite/ChangeLog*
+rm -rf gcc/testsuite/config
+rm -rf gcc/testsuite/g*
+rm -rf gcc/testsuite/jit.dg
+rm -rf gcc/testsuite/lib
+rm -rf gcc/testsuite/o*
+rm -rf gcc/ada/*.ad*
 }
 
 build() {
@@ -280,8 +281,8 @@ build() {
 #  /home/User/.go/bin/noti nice -n 19 make "CFLAGS=-march=core-avx2 -g0 -O3" "CXXFLAGS=-march=core-avx2 -g0 -O3" "CFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "CXXFLAGS_FOR_TARGET=-march=core-avx2 -g0 -O3" "BOOT_CFLAGS=-march=core-avx2 -g0 -O3" "BOOT_CXXFLAGS=-march=core-avx2 -g0 -O3" all
 #  /home/User/.go/bin/noti nice -n 19 make all -j8
 
-# noti make -j7 "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
-  noti make V=1 all
+# noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
+  noti nice -n 19 make
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
