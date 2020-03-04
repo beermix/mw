@@ -86,6 +86,8 @@ build() {
     _mingw=mingw64
   fi
   cd "${srcdir}/build-${CARCH}"
+  #export CC='clang'
+  #export CXX='clang++'
   export MSYS2_ARG_CONV_EXCL="--prefix="
   ${srcdir}/${_realname}-${_ver}/Configure \
     --prefix=${MINGW_PREFIX} \
