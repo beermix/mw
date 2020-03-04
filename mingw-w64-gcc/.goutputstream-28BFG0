@@ -266,9 +266,9 @@ build() {
     #--enable-c99 \
     #--enable-decimal-float \
     #--enable-tls \    --enable-gnu-indirect-function \    --enable-gnu-unique-object \
-    #--disable-libunwind-exceptions \
-    #--enable-linker-build-id \
-    #--disable-vtable-verify \
+#        --disable-libunwind-exceptions \
+#    --enable-linker-build-id \
+#    --disable-vtable-verify \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
