@@ -143,16 +143,17 @@ prepare() {
     010-documentation.patch \
     libiberty-sync.patch
 
-#    zero-regs-gcc8.patch \
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    optimize.patch \
-#    ipa-cp.patch \
-#    optimize-at-least-some.patch \
-#    gomp-relax.patch \
-#    avx512-when-we-ask-for-it.patch \
-#    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch \
-#    icelake.patch \
+  # Enable clear linux patches
+  apply_patch_with_msg \
+    zero-regs-gcc8.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
+    avx512-when-we-ask-for-it.patch \
+    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
     
 #    0001-Fix-stack-protection-issues.patch \
 #    arch-native-override.patch
@@ -168,16 +169,16 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-rm -rf gcc/testsuite/ada
-rm -rf gcc/testsuite/brig.dg
-rm -rf gcc/testsuite/c-c++-common
-rm -rf gcc/testsuite/ChangeLog*
-rm -rf gcc/testsuite/config
-rm -rf gcc/testsuite/g*
-rm -rf gcc/testsuite/jit.dg
-rm -rf gcc/testsuite/lib
-rm -rf gcc/testsuite/o*
-rm -rf gcc/ada/*.ad*
+#rm -rf gcc/testsuite/ada
+#rm -rf gcc/testsuite/brig.dg
+#rm -rf gcc/testsuite/c-c++-common
+#rm -rf gcc/testsuite/ChangeLog*
+#rm -rf gcc/testsuite/config
+#rm -rf gcc/testsuite/g*
+#rm -rf gcc/testsuite/jit.dg
+#rm -rf gcc/testsuite/lib
+#rm -rf gcc/testsuite/o*
+#rm -rf gcc/ada/*.ad*
 }
 
 build() {
@@ -232,7 +233,6 @@ build() {
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -252,7 +252,10 @@ build() {
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-gnu-as --with-gnu-ld \
+     --with-gnu-as --with-gnu-ld \
+     --disable-libunwind-exceptions \
+     --enable-linker-build-id \
+     --disable-vtable-verify \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -282,7 +285,7 @@ build() {
 #  /home/User/.go/bin/noti nice -n 19 make all -j8
 
 # noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3"
-  noti nice -n 19 make
+  noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
