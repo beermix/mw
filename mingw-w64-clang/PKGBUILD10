@@ -39,10 +39,10 @@ arch=('any')
 url="https://llvm.org/"
 license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
-             "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
+             "${MINGW_PACKAGE_PREFIX}-python2"
              "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
              "groff"
@@ -125,9 +125,8 @@ prepare() {
       "0010-mbig-obj-for-all.patch" \
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
-      "0014-winpthreads-workaround2.patch"
-
-#      "no-z3.patch"
+      "0014-winpthreads-workaround2.patch" \
+      "no-z3.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -230,7 +229,7 @@ build() {
     -G"$_generator" \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DLLVM_ENABLE_Z3_SOLVER=ON \
+    -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_ENABLE_RTTI=ON \
     -DCLANG_INCLUDE_DOCS=OFF \
@@ -240,9 +239,21 @@ build() {
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_GO_TESTS=OFF \
+    -DDCLANG_BUILD_EXAMPLES=OFF \
+    -DCLANG_PLUGIN_SUPPORT=ON \
+    -DCLANG_INCLUDE_TESTS=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
+    -DCMAKE_C_FLAGS_RELEASE_INIT="$CFLAGS" \
+    -DCMAKE_CXX_FLAGS_RELEASE_INIT="$CXXFLAGS" \
+    -DCMAKE_EXE_LINKER_FLAGS_RELEASE_INIT="$LDFLAGS" \
+    -DLLVM_ENABLE_CXX1Y=ON \
+    -DLLVM_ENABLE_PIC=ON \
+    -DLLVM_ENABLE_TERMINFO=ON \
+    -DLLVM_ENABLE_ZLIB=ON \
+    -DLLVM_INCLUDE_EXAMPLES=OFF \
+    -DLLVM_BUILD_EXTERNAL_COMPILER_RT=ON \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
@@ -260,6 +271,7 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
+    -DBUILD_SHARED_LIBS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
@@ -268,7 +280,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j6
+  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -292,8 +304,7 @@ package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
-           "${MINGW_PACKAGE_PREFIX}-gcc"
-           "${MINGW_PACKAGE_PREFIX}-z3")
+           "${MINGW_PACKAGE_PREFIX}-gcc")
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
@@ -387,7 +398,6 @@ package_lld() {
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
-           "${MINGW_PACKAGE_PREFIX}-z3"
            "${MINGW_PACKAGE_PREFIX}-gcc-libs") # "compiler-rt"
 
   cd "${srcdir}"/llvm-${pkgver}.src
