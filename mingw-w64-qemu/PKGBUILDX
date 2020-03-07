@@ -22,12 +22,14 @@ depends=("${MINGW_PACKAGE_PREFIX}-capstone"
          "${MINGW_PACKAGE_PREFIX}-gtk3"
          "${MINGW_PACKAGE_PREFIX}-libjpeg"
          "${MINGW_PACKAGE_PREFIX}-libpng"
+         "${MINGW_PACKAGE_PREFIX}-libssh"
          "${MINGW_PACKAGE_PREFIX}-libtasn1"
          "${MINGW_PACKAGE_PREFIX}-libusb"
          "${MINGW_PACKAGE_PREFIX}-libxml2"
          "${MINGW_PACKAGE_PREFIX}-lzo2"
          "${MINGW_PACKAGE_PREFIX}-nettle"
          "${MINGW_PACKAGE_PREFIX}-pixman"
+         "${MINGW_PACKAGE_PREFIX}-snappy"
          "${MINGW_PACKAGE_PREFIX}-SDL2"
          "${MINGW_PACKAGE_PREFIX}-SDL2_image"
          "${MINGW_PACKAGE_PREFIX}-usbredir")
@@ -50,29 +52,64 @@ build() {
 
   cd "${srcdir}/${_realname}-${pkgver}"
   ./configure \
-      --disable-werror \
-      --disable-kvm \
-      --disable-bluez \
-      --disable-spice \
-      --disable-libnfs \
-      --disable-libssh \
-      --enable-lzo \
-      --disable-snappy \
-      --enable-hax \
-      --enable-gtk \
-      --enable-sdl \
-      --prefix=${MINGW_PREFIX} \
-      --bindir=${MINGW_PREFIX}/bin \
-      --datadir=${MINGW_PREFIX}/bin \
-      --firmwarepath=${MINGW_PREFIX}/etc/qemu \
-      --python=${MINGW_PREFIX}/bin/python \
-      --mandir=${MINGW_PREFIX}/share/qemu \
-      --docdir=${MINGW_PREFIX}/share/qemu
+        --enable-system \
+        --enable-tools \
+        --disable-slirp \
+        --disable-seccomp \
+        --enable-nettle \
+        --disable-numa \
+        --disable-werror \
+        --disable-kvm \
+        --disable-bluez \
+        --disable-spice \
+        --disable-libnfs \
+        --enable-libssh \
+        --enable-lzo \
+        --disable-snappy \
+        --disable-hax \
+        --enable-gtk \
+        --disable-bsd-user \
+        --disable-xen \
+        --disable-vnc \
+        --disable-virtfs \
+        --disable-brlapi \
+        --disable-curses \
+        --enable-curl \
+        --disable-bluez \
+        --disable-vde \
+        --disable-linux-aio \
+        --disable-cap-ng \
+        --disable-docs \
+        --disable-spice \
+        --disable-rbd \
+        --disable-libiscsi \
+        --disable-usb-redir \
+        --disable-strip \
+        --disable-sparse \
+        --disable-mpath \
+        --disable-sanitizers \
+        --disable-hvf \
+        --disable-whpx \
+        --disable-malloc-trim \
+        --disable-membarrier \
+        --disable-vhost-crypto \
+        --disable-libxml2 \
+        --disable-capstone \
+        --disable-git-update \
+        --disable-opengl \
+        --audio-drv-list= \
+        --prefix=${MINGW_PREFIX} \
+        --bindir=${MINGW_PREFIX}/bin \
+        --datadir=${MINGW_PREFIX}/bin \
+        --firmwarepath=${MINGW_PREFIX}/etc/qemu \
+        --python=${MINGW_PREFIX}/bin/python3 \
+        --mandir=${MINGW_PREFIX}/share/qemu \
+        --docdir=${MINGW_PREFIX}/share/qemu
 
    /home/User/.go/bin/noti nice -n 19 make -j7
 }
 
 package() {
-  cd "${srcdir}/${_realname}-${pkgver}"
-  make DESTDIR="${pkgdir}/" install
+    cd "${srcdir}/${_realname}-${pkgver}"
+    make DESTDIR="${pkgdir}/" install
 }
