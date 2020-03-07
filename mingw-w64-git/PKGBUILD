@@ -3,10 +3,7 @@
 
 _realname=git
 pkgbase="mingw-w64-${_realname}"
-pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
-	 "${MINGW_PACKAGE_PREFIX}-${_realname}-doc-html"
-	 "${MINGW_PACKAGE_PREFIX}-${_realname}-doc-man"
-	 "${MINGW_PACKAGE_PREFIX}-${_realname}-test-artifacts")
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 tag=2.25.1.windows.1
 pkgver=2.25.1.1.cceb69da75
 pkgrel=1
@@ -17,7 +14,7 @@ license=('GPL2')
 
 options=()
 makedepends=('python2' 'less' 'openssh' 'patch' 'make' 'tar' 'diffutils'
-	'ca-certificates' 'asciidoc' 'xmlto'
+	'ca-certificates'
 	"${MINGW_PACKAGE_PREFIX}-asciidoctor-extensions")
 
 case "$(printf "%s\n%s\n" "$pkgver" "2.18.0" | sort -V)" in
@@ -53,8 +50,7 @@ source=("${_realname}"::"git+https://github.com/git-for-windows/git.git#tag=v$ta
 	'git-wrapper.rc'
 	'gitk.rc'
 	'compat-bash.rc'
-	'mingw-w64-git.mak'
-	'cv2pdb-strip')
+	'mingw-w64-git.mak')
 
 sha256sums=('SKIP'
             '62f455747f33953a723ff7b070d43f0ed03c1d8d0749d7bb06288e14d356b637'
@@ -70,14 +66,7 @@ sha256sums=('SKIP'
             'c9d82a0bbe2c2dbd22de8478899e7f159a96c3c97a99a1470c3cbc29c4ee09ac'
             '79bb4745063bc3e67831da1f694be0e98998b653a3e334e24db57500b1fee108')
 
-if test -z "$WITHOUT_PDBS"
-then
-	pkgname+=("${MINGW_PACKAGE_PREFIX}-${_realname}-pdb")
-	makedepends+=("${MINGW_PACKAGE_PREFIX}-cv2pdb")
-	options+=('!strip')
-else
-	options+=('strip')
-fi
+options+=('strip')
 
 pkgver() {
   cd "$srcdir/git"
@@ -96,31 +85,6 @@ x86_64)
   SHAREDIR=/mingw64/share/git
   ;;
 esac
-
-prepare () {
-	cd "$srcdir/git" &&
-
-	cat >config.mak <<-EOF
-	USE_ASCIIDOCTOR = YesPlease
-	EOF
-
-	cp ../git-bash.txt Documentation/
-
-	# Slightly dirty workaround for missing docbook-xsl-ns
-	grep -q http://docbook.sourceforge.net/release/xsl-ns/current /etc/xml/catalog || {
-		(cd /usr/share/xml/ &&
-		 test -d docbook-xsl-ns-1.78.1 ||
-		 curl -L https://sourceforge.net/projects/docbook/files/docbook-xsl-ns/1.78.1/docbook-xsl-ns-1.78.1.tar.bz2/download |
-		 tar xjf -)
-		for rewrite in System URI
-		do
-			xmlcatalog --noout --add "rewrite$rewrite" \
-				http://docbook.sourceforge.net/release/xsl-ns/current \
-				/usr/share/xml/docbook-xsl-ns-1.78.1 \
-				/etc/xml/catalog
-		done
-	}
-}
 
 build() {
   test -z "$PARALLEL_BUILD" || {
@@ -156,8 +120,6 @@ build() {
 
   targets=
   case "${pkgname[@]}" in ''|*-git|*-git\ *) targets="$targets all";; esac
-  case "${pkgname[@]}" in ''|*html*) targets="$targets html";; esac
-  case "${pkgname[@]}" in ''|*man*) targets="$targets man";; esac
 
   counter=0
   while ! make $targets
@@ -215,72 +177,25 @@ package_git () {
   install -m644 builtins.txt $pkgdir$SHAREDIR
 }
 
-package_git-doc-html () {
-  cd "$srcdir"/git
-
-  make DESTDIR="$pkgdir" install-html
-
-  # subtree, for backwards-compatibility with MSys2's Git package
-  make -C contrib/subtree prefix="$pkgdir/$PREFIX" install-html
-}
-
-package_git-doc-man () {
-  cd "$srcdir"/git
-
-  make DESTDIR="$pkgdir" install-man
-
-  # subtree, for backwards-compatibility with MSys2's Git package
-  make -C contrib/subtree prefix="$pkgdir/$PREFIX" install-man
-}
-
 package_git-test-artifacts () {
   cd "$srcdir"/git
 
   make DESTDIR="$pkgdir" install-mingit-test-artifacts
 }
 
-package_git-pdb () {
-  cd "$srcdir"/git
-
-  make -f ../mingw-w64-git.mak DESTDIR="$pkgdir" install-pdbs
-}
-
 package_mingw-w64-i686-git () {
   package_git
 }
 
-package_mingw-w64-i686-git-doc-html () {
-  package_git-doc-html
-}
-
-package_mingw-w64-i686-git-doc-man () {
-  package_git-doc-man
-}
 
 package_mingw-w64-i686-git-test-artifacts () {
   package_git-test-artifacts
-}
-
-package_mingw-w64-i686-git-pdb () {
-	package_git-pdb
 }
 
 package_mingw-w64-x86_64-git () {
   package_git
 }
 
-package_mingw-w64-x86_64-git-doc-html () {
-  package_git-doc-html
-}
-
-package_mingw-w64-x86_64-git-doc-man () {
-  package_git-doc-man
-}
-
 package_mingw-w64-x86_64-git-test-artifacts () {
   package_git-test-artifacts
-}
-
-package_mingw-w64-x86_64-git-pdb () {
-	package_git-pdb
 }
