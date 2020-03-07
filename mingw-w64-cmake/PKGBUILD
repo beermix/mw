@@ -26,6 +26,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libuv"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
+optdepends=("${MINGW_PACKAGE_PREFIX}-emacs: for cmake emacs mode")
 options=('staticlibs') # '!strip' 'debug'
 source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
@@ -34,9 +35,7 @@ source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
         "0007-Do-not-generate-import-libs-for-exes.patch"
         "0008-Output-line-numbers-in-callstacks.patch"
-        "100-disable_qt_tests.patch"
-        "cmake-000-disable-sslv3.patch"
-        "cmake-001-disable-free-comp-methods.patch")
+        "100-disable_qt_tests.patch")
 sha256sums=('9bcc8c114d9da603af9512083ed7d4a39911d16105466beba165ba8fe939ac2c'
             '1b68fe64e1b389134db44dc34368713f6e28d3463ab1e7fc3d93857c0459beb7'
             '77763df03e8a9ca66c3f9368fe7e1fc36bb041455733258d73aeb40246a61354'
@@ -75,9 +74,7 @@ prepare() {
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
     0008-Output-line-numbers-in-callstacks.patch \
-    100-disable_qt_tests.patch \
-    cmake-000-disable-sslv3.patch \
-    cmake-001-disable-free-comp-methods.patch
+    100-disable_qt_tests.patch
 }
 
 build() {
@@ -89,7 +86,7 @@ build() {
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
-    --no-qt-gui                                   \
+    --no-qt-gui                                      \
     --parallel=7
   plain "Start building..."
   make
