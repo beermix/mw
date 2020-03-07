@@ -253,6 +253,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --enable-gold \
     --with-diagnostics-color=always \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
