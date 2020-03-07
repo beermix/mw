@@ -42,7 +42,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs') # '!strip' 'debug')
+options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
         "https://gcc.gnu.org/pub/gcc/infrastructure/isl-0.16.1.tar.bz2"
         "gdbinit"
