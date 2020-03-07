@@ -140,7 +140,7 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     libiberty-sync.patch
-    
+
 #    gcc-stable-branch.patch \
 
 #  Enable clear linux patches
@@ -154,7 +154,7 @@ prepare() {
 #    gomp-relax.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-    
+
 #    0001-Fix-stack-protection-issues.patch \
 #    arch-native-override.patch
 
