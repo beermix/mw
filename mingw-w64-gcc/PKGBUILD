@@ -257,8 +257,7 @@ build() {
     --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --disable-vtable-verify \
-    --disable-libunwind-exceptions \
+    --with-linker-hash-style=gnu \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
