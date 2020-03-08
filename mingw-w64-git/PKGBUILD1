@@ -6,7 +6,7 @@ pkgbase="mingw-w64-${_realname}"
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 tag=2.25.1.windows.1
 pkgver=2.25.1.1.cceb69da75
-pkgrel=2
+pkgrel=1
 pkgdesc="The fast distributed version control system (mingw-w64)"
 arch=('any')
 url="https://git-for-windows.github.io/"
@@ -50,8 +50,7 @@ source=("${_realname}"::"git+https://github.com/git-for-windows/git.git#tag=v$ta
 	'git-wrapper.rc'
 	'gitk.rc'
 	'compat-bash.rc'
-	'mingw-w64-git.mak'
-	'cv2pdb-strip')
+	'mingw-w64-git.mak')
 
 sha256sums=('SKIP'
             '62f455747f33953a723ff7b070d43f0ed03c1d8d0749d7bb06288e14d356b637'
@@ -86,14 +85,6 @@ x86_64)
   SHAREDIR=/mingw64/share/git
   ;;
 esac
-
-prepare () {
-	cd "$srcdir/git" &&
-
-	cat >config.mak <<-EOF
-	NO_INSTALL_HARDLINKS = yes
-	EOF
-}
 
 build() {
   test -z "$PARALLEL_BUILD" || {
@@ -195,6 +186,7 @@ package_git-test-artifacts () {
 package_mingw-w64-i686-git () {
   package_git
 }
+
 
 package_mingw-w64-i686-git-test-artifacts () {
   package_git-test-artifacts

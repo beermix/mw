@@ -41,6 +41,7 @@ build() {
     --build=${MINGW_CHOST} \
     --prefix=${MINGW_PREFIX} \
     --enable-cxx \
+    --enable-fat \
     --enable-static \
     --disable-shared
   make
@@ -50,6 +51,7 @@ build() {
   ../${_realname}-${pkgver}/configure --build=${MINGW_CHOST} \
     --prefix=${MINGW_PREFIX} \
     --enable-cxx \
+    --enable-fat \
     --disable-static \
     --enable-shared
   make
