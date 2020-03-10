@@ -128,7 +128,7 @@ prepare() {
       "0012-fix-testplugin-linking.patch" \
       "0013-set-cxx-version.patch" \
       "0014-winpthreads-workaround2.patch" \
-      "no-z3.patch" \
+      "no-z3.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -243,11 +243,10 @@ build() {
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
-    -DCMAKE_C_FLAGS_RELEASE_INIT="$CFLAGS" \
-    -DCMAKE_CXX_FLAGS_RELEASE_INIT="$CXXFLAGS" \
-    -DCMAKE_EXE_LINKER_FLAGS_RELEASE_INIT="$LDFLAGS" \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DCMAKE_C_FLAGS="${CFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_SHARED=OFF \
@@ -261,8 +260,6 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
-    -DLLVM_ENABLE_TERMINFO=OFF \
-    -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
