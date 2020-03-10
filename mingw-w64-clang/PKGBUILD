@@ -55,7 +55,6 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/openmp-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/test-suite-${pkgver}.src.tar.xz{,.sig}
         ${_url}/libcxx-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
         ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
@@ -97,8 +96,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         "0902-libomp-weak-mingw.patch"
         "no-z3.patch")
 noextract=(clang-${pkgver}.src.tar.xz
-           libcxx-${pkgver}.src.tar.xz
-           test-suite-${pkgver}.src.tar.xz)
+           libcxx-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -187,7 +185,6 @@ prepare() {
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
   mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
   mv "${srcdir}/openmp-${pkgver}.src"            projects/openmp
-  #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
 }
 
 build() {
