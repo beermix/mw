@@ -124,6 +124,9 @@ prepare() {
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
   [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
+#  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+#  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
+#  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting test-suite-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/test-suite-${pkgver} ]] && rm -rf ${srcdir}/test-suite-${pkgver}
@@ -242,7 +245,7 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -DLLVM_ENABLE_LIBXML2=OFF \
+    -DLLVM_ENABLE_LIBXML2=ON \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_ZLIB=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
