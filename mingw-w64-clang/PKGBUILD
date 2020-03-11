@@ -476,6 +476,10 @@ package_mingw-w64-i686-openmp(){
   package_openmp
 }
 
+package_mingw-w64-i686-lld(){
+  package_lld
+}
+
 package_mingw-w64-i686-libunwind(){
   package_libunwind
 }
@@ -516,6 +520,10 @@ package_mingw-w64-x86_64-openmp(){
   package_openmp
 }
 
+
+package_mingw-w64-x86_64-lld(){
+  package_lld
+}
 
 package_mingw-w64-x86_64-libunwind(){
   package_libunwind
