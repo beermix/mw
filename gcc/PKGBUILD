@@ -199,6 +199,7 @@ build() {
     --without-libintl-prefix \
     --with-system-zlib \
     --enable-linker-build-id \
+    --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
   make
