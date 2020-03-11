@@ -4,7 +4,7 @@
 _realname=c-ares
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.14.0
+pkgver=65d0878870f4b9a90efdd84f1b5335a7e6b66f49
 pkgrel=1
 pkgdesc="C library that performs DNS requests and name resolves asynchronously (mingw-w64)"
 arch=('any')
@@ -14,15 +14,15 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
 "${MINGW_PACKAGE_PREFIX}-pkg-config" "${MINGW_PACKAGE_PREFIX}-cmake")
 options=('strip' 'staticlibs')
 source=(#"https://c-ares.haxx.se/download/${_realname}-${pkgver}.tar.gz"{,.asc}
-        https://github.com/c-ares/c-ares/archive/cares-${pkgver//./_}.tar.gz
+        https://github.com/c-ares/c-ares/archive/${pkgver}.tar.gz
         0001-Use-RPM-compiler-options.patch
         0002-Add-static-pkg-config.patch
         0003-fix-cmake-targets.patch)
 validpgpkeys=('914C533DF9B2ADA2204F586D78E11C6B279D5C91'
               '27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2')
-sha256sums=('62dd12f0557918f89ad6f5b759f0bf4727174ae9979499f5452c02be38d9d3e8'
+sha256sums=('7deb7872cbd876c29036d5f37e30c4cbc3cc068d59d8b749ef85bb0736649f04'
             'f00faa8723fd530b027f96b987ef19138628a49afdf52ffb0554b36156fc9d74'
-            'dc785a9786172ca64aea3c90b3b491089bf952dae1317be0d757f2dcc5645996'
+            'f181a2556cf28a0cbc948cd58a7bcf0c3c3cef01370d0f0fa6b3915f62d05d56'
             '5810001abdd4acb8ae725dedb4d67874c3e2935775ecba30469a2a79c76fd6a0')
 
 # Helper macros to help make tasks easier #
@@ -45,7 +45,7 @@ del_file_exists() {
 # =========================================== #
 
 prepare() {
-  cd "${srcdir}"/${_realname}-cares-${pkgver//./_}
+  cd "${srcdir}"/${_realname}-${pkgver}
   del_file_exists libcares-static.pc.in
   apply_patch_with_msg 0001-Use-RPM-compiler-options.patch \
     0002-Add-static-pkg-config.patch \
@@ -58,7 +58,7 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
   
-  ../${_realname}-cares-${pkgver//./_}/configure \
+  ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
@@ -73,7 +73,7 @@ build() {
       -DCMAKE_BUILD_TYPE="Release" \
       -DCARES_STATIC=ON \
       -DCARES_SHARED=ON \
-      ../${_realname}-cares-${pkgver//./_}
+      ../${_realname}-${pkgver}
 }
 
 package() {
@@ -81,7 +81,7 @@ package() {
   make DESTDIR="${pkgdir}" install
 
   # msys2-runtime-devel provide nameser.h but mingw-w64 don't have it
-  cp ${srcdir}/${_realname}-cares-${pkgver//./_}/nameser.h ${pkgdir}${MINGW_PREFIX}/include
+  cp ${srcdir}/${_realname}-${pkgver}/nameser.h ${pkgdir}${MINGW_PREFIX}/include
   
   # provide pkgconfig files
   sed -i -e "s|Version: -|Version: ${pkgver}|g" libcares.pc libcares-static.pc
