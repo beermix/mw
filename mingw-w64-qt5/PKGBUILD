@@ -619,7 +619,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+  /home/User/.go/bin/noti nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
   # ${_make} module-qtwebengine
