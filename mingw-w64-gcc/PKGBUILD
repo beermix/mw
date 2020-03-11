@@ -22,7 +22,7 @@ pkgver=9.2.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=15
+pkgrel=16
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -220,6 +220,14 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O3 -mtune=haswell"
+  export CXXFLAGS="-march=haswell -g1 -O3 -mtune=haswell"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
+
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -252,7 +260,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --enable-gold \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
@@ -260,6 +267,7 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
+    --disable-libunwind-exceptions \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -276,6 +284,7 @@ build() {
     #--disable-libunwind-exceptions \
     #--enable-linker-build-id \
     #--disable-vtable-verify \
+    #--enable-gold \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.

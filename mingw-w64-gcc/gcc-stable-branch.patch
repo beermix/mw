@@ -84998,3 +84998,17 @@ index cda0f3d350b..ea9a50ccb27 100644
  # Return 1 if we're generating 32-bit code using default options, 0
  # otherwise.
  
+
+commit 3b0babc396b0af5b6f13898c605f675755fd0d1a
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Wed Mar 11 00:17:22 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 966f032a1ba..6b5fa9106eb 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200310
++20200311
