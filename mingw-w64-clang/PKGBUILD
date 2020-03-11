@@ -25,6 +25,8 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-tools-extra"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
          "${MINGW_PACKAGE_PREFIX}-libc++"
+         "${MINGW_PACKAGE_PREFIX}-libc++abi"
+         "${MINGW_PACKAGE_PREFIX}-libunwind"
          "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-openmp"
@@ -56,8 +58,10 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
         ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
         ${_url}/libcxx-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/libcxxabi-${pkgver}.src.tar.xz{,.sig}
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz{,.sig}
         ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/libunwind-${pkgver}.src.tar.xz{,.sig}
         ${_url}/polly-${pkgver}.src.tar.xz{,.sig}
         "0001-mingw-w64-use-MSVC-style-ByteAlignment.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
@@ -152,13 +156,13 @@ prepare() {
       "0401-disable-visibility-annotations.patch" \
       "0405-fix-conflict-win32-posix-threads.patch"
 
-#  cd "${srcdir}/libunwind-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0601-fix-static-assert-macro.patch"
+  cd "${srcdir}/libunwind-${pkgver}.src"
+  apply_patch_with_msg \
+      "0601-fix-static-assert-macro.patch"
 
-#  cd "${srcdir}/libcxxabi-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0701-disable-visibility-annotations.patch"
+  cd "${srcdir}/libcxxabi-${pkgver}.src"
+  apply_patch_with_msg \
+      "0701-disable-visibility-annotations.patch"
 
   cd "${srcdir}/polly-${pkgver}.src"
   # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
@@ -183,7 +187,9 @@ prepare() {
   mv "${srcdir}/lld-${pkgver}.src"               tools/lld
   mv "${srcdir}/polly-${pkgver}.src"             tools/polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
+  mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
   mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
+  mv "${srcdir}/libunwind-${pkgver}.src"         projects/libunwind
   mv "${srcdir}/openmp-${pkgver}.src"            projects/openmp
 }
 
@@ -249,6 +255,8 @@ build() {
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
     -DLIBCXX_HAS_WIN32_THREAD_API=ON \
+    -DLIBCXXABI_ENABLE_SHARED=OFF \
+    -DLIBUNWIND_ENABLE_SHARED=OFF \
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_LINK_LLVM_DYLIB=ON \
@@ -355,6 +363,24 @@ package_openmp() {
   ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
 }
 
+package_libcxxabi() {
+  pkgdesc="C++ Standard Library Support (mingw-w64)"
+  url="https://libcxxabi.llvm.org/"
+  # Don't depend on libunwind until it actually works as installing it breaks some packages
+  #depends="${MINGW_PACKAGE_PREFIX}-libunwind"
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/projects/libcxxabi -j1 DESTDIR="${pkgdir}" install
+}
+
+package_libunwind() {
+  pkgdesc='A new implementation of a stack unwinder for C++ exceptions (mingw-w64)'
+  url='https://llvm.org/'
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/projects/libunwind -j1 DESTDIR="${pkgdir}" install
+}
+
 package_lld() {
   pkgdesc="Linker tools for LLVM (mingw-w64)"
   url="https://lld.llvm.org/"
@@ -421,6 +447,10 @@ package_mingw-w64-i686-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-i686-libc++abi(){
+  package_libcxxabi
+}
+
 package_mingw-w64-i686-libc++(){
   package_libcxx
 }
@@ -431,6 +461,10 @@ package_mingw-w64-i686-openmp(){
 
 package_mingw-w64-i686-lld(){
   package_lld
+}
+
+package_mingw-w64-i686-libunwind(){
+  package_libunwind
 }
 
 package_mingw-w64-i686-llvm(){
@@ -457,6 +491,10 @@ package_mingw-w64-x86_64-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-x86_64-libc++abi(){
+  package_libcxxabi
+}
+
 package_mingw-w64-x86_64-libc++(){
   package_libcxx
 }
@@ -465,8 +503,12 @@ package_mingw-w64-x86_64-openmp(){
   package_openmp
 }
 
-package_mingw-w64-x86_64-lld(){
-  package_lld
+package_mingw-w64-x86_64-lldb(){
+  package_lldb
+}
+
+package_mingw-w64-x86_64-libunwind(){
+  package_libunwind
 }
 
 package_mingw-w64-x86_64-llvm(){
