@@ -25,7 +25,9 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
-    --target=${MINGW_CHOST} --disable-shared
+    --target=${MINGW_CHOST} \
+    --disable-shared \
+    --enable-static
 
   make
 }
