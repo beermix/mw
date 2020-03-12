@@ -8,14 +8,15 @@
 pkgbase=gcc
 pkgname=('gcc' 'gcc-libs' 'gcc-fortran')
 pkgver=9.2.0
-pkgrel=1
+pkgrel=2
+_islver=0.21
 pkgdesc="The GNU Compiler Collection"
 arch=('i686' 'x86_64')
 groups=('msys2-devel')
 license=('GPL' 'LGPL' 'FDL' 'custom')
 url="https://gcc.gnu.org/"
 makedepends=('binutils' 'mpc-devel' 'gmp-devel'
-             'mpfr-devel' 'isl-devel' 'zlib-devel'
+             'mpfr-devel' 'zlib-devel'
              'windows-default-manifest')
 STRIP_OPTION="strip"
 #STRIP_OPTION="!strip"
@@ -23,6 +24,7 @@ STRIP_OPTION="strip"
 DEBUG_OPTION="!debug"
 options=('!emptydirs' "$STRIP_OPTION" "$DEBUG_OPTION")
 source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
+        http://isl.gforge.inria.fr/isl-${_islver}.tar.xz
         0009-Cygwin-uses-sysv-ABI-on-x86_64-V2.patch
         0010-Do-not-version-lto-plugin-on-cygwin-mingw.patch
         0011-add-dummy-pthread-tsaware-and-large-address-aware-fo.patch
@@ -43,7 +45,9 @@ source=(https://ftp.gnu.org/gnu/gcc/gcc-${pkgver}/gcc-${pkgver}.tar.gz
         0130-libstdc++-in-out.patch
         0950-9.1.0-configure-msys2.patch
         0951-9.1.0-msys2-spec.patch
-        0953-9.1.0-testsuite-msys2.patch)
+        0953-9.1.0-testsuite-msys2.patch
+        gcc-stable-branch.patch
+        libiberty-sync.patch)
 sha256sums=('be303f7a8292982a35381489f5a9178603cbe9a4715ee4fa4a815d6bcd2b658d'
             '24bdd964c6479251af5a275965db42ed867599cd2d84ecb526397395e201cda4'
             '817361b4b301ca3f578d0d24b899691273a4ca9e20a91790a74efddc91c1130e'
@@ -98,6 +102,11 @@ prepare() {
         gcc/config/i386/msys-w64.h \
         gcc/config/i386/t-msys-w64 > /dev/null 2>&1 | true
 
+  # CLR Patches
+  apply_patch_with_msg \
+    gcc-stable-branch.patch \
+    libiberty-sync.patch
+
   # Cygwin patches
   apply_patch_with_msg \
      0009-Cygwin-uses-sysv-ABI-on-x86_64-V2.patch \
@@ -126,13 +135,15 @@ prepare() {
     0950-9.1.0-configure-msys2.patch \
     0951-9.1.0-msys2-spec.patch \
     0953-9.1.0-testsuite-msys2.patch
-  
+
   # Do not run fixincludes
   #sed -i 's@\./fixinc\.sh@-c true@' gcc/Makefile.in
   echo ${pkgver} > gcc/BASE-VER
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
   sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
-  
+
+  ln -s ../isl-${_islver} isl
+
   [[ -d ${srcdir}/build-$(arch) ]] && rm -rf ${srcdir}/build-$(arch)
   mkdir ${srcdir}/build-$(arch)
 }
@@ -161,11 +172,20 @@ build() {
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=48565
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
-  
+  LDLAGS=${LDLAGS/-pipe/}
+
   # use built-in SSP with Cygwin 2.10
   # FIXME: --disable-libssp should suffice in GCC 8
   export gcc_cv_libc_provides_ssp=yes
   # libssp: conflicts with builtin SSP
+
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ${srcdir}/gcc-${pkgver}/configure \
     --build=${CHOST} \
@@ -175,7 +195,7 @@ build() {
     --enable-shared --enable-shared-libgcc --enable-static \
     --enable-version-specific-runtime-libs \
     --with-arch=${_arch} \
-    --with-tune=generic \
+    --with-tune=haswell \
     --disable-multilib \
     ${_arch_conf} \
     --enable-__cxa_atexit \
@@ -193,13 +213,12 @@ build() {
     --disable-symvers \
     --with-gnu-ld \
     --with-gnu-as \
-    --disable-isl-version-check \
     --enable-checking=release \
     --without-libiconv-prefix \
     --without-libintl-prefix \
     --with-system-zlib \
+    --with-isl \
     --enable-linker-build-id \
-    --with-default-libstdcxx-abi=gcc4-compatible \
     --enable-libstdcxx-filesystem-ts
 
   make
@@ -256,7 +275,7 @@ package_gcc-libs()
 package_gcc()
 {
   pkgdesc="The GNU Compiler Collection - C and C++ frontends"
-  depends=("gcc-libs=${pkgver}-${pkgrel}" 'binutils' 'gmp' 'isl' 'mpc' 'mpfr' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime' 'windows-default-manifest')
+  depends=("gcc-libs=${pkgver}-${pkgrel}" 'binutils' 'gmp' 'mpc' 'mpfr' 'msys2-runtime-devel' 'msys2-w32api-headers' 'msys2-w32api-runtime' 'windows-default-manifest')
   options=('staticlibs' "$STRIP_OPTION" "$DEBUG_OPTION")
   install=gcc.install
 
@@ -352,7 +371,7 @@ package_gcc-fortran()
 
   make -j1 DESTDIR=${pkgdir} install-target-libgfortran
   make -j1 -C $CHOST/libgomp DESTDIR=${pkgdir} install-nodist_fincludeHEADERS
-  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-{common,man,info}
+  make -j1 -C gcc DESTDIR=${pkgdir} fortran.install-common
   install -Dm755 gcc/f951 ${pkgdir}/usr/lib/gcc/$CHOST/$pkgver/f951
 
   ln -s gfortran ${pkgdir}/usr/bin/f95
