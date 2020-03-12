@@ -266,7 +266,6 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --disable-libunwind-exceptions \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -297,7 +296,7 @@ build() {
 #  /home/User/.go/bin/noti nice -n 19 make all -j8
 
 # /home/User/.go/bin/noti nice -n 19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
-  /home/User/.go/bin/noti nice -n 19 make V=1 all
+  /home/User/.go/bin/noti nice -n 19 make
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
