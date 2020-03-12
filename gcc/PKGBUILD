@@ -144,6 +144,17 @@ prepare() {
 
   ln -s ../isl-${_islver} isl
 
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+
   [[ -d ${srcdir}/build-$(arch) ]] && rm -rf ${srcdir}/build-$(arch)
   mkdir ${srcdir}/build-$(arch)
 }
@@ -221,7 +232,7 @@ build() {
     --enable-linker-build-id \
     --enable-libstdcxx-filesystem-ts
 
-  make
+    /home/User/.go/bin/noti nice -n 19 make
 
   # make documentation
   #cd $CHOST/libstdc++-v3
