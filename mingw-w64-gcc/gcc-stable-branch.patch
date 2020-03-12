@@ -85012,3 +85012,181 @@ index 966f032a1ba..6b5fa9106eb 100644
 @@ -1 +1 @@
 -20200310
 +20200311
+
+commit c9858be2e710de82f7131564121149ba6b1089a6
+Author: Eric Botcazou <ebotcazou@gcc.gnu.org>
+Date:   Wed Mar 11 10:47:34 2020 +0100
+
+    Fix internal error on locally-defined subpools
+    
+    If the type is derived in the current compilation unit, and Allocate
+    is not overridden on derivation (as is typically the case with
+    Root_Storage_Pool_With_Subpools), the entity for Allocate of the
+    derived type is an alias for System.Storage_Pools.Subpools.Allocate.
+    
+    The main assertion in gnat_to_gnu_entity fails in this case, since
+    this is not a definition and Is_Public is false (since the entity
+    is nested in the same compilation unit).
+    
+    2020-03-11  Richard Wai  <richard@annexi-strayline.com>
+    
+            * gcc-interface/decl.c (gnat_to_gnu_entity): Also test Is_Public on
+            the Alias of the entitiy, if is present, in the main assertion.
+
+diff --git a/gcc/ada/ChangeLog b/gcc/ada/ChangeLog
+index 5464c6b3d68..d5cb3fb1f6f 100644
+--- a/gcc/ada/ChangeLog
++++ b/gcc/ada/ChangeLog
+@@ -1,3 +1,8 @@
++2020-03-11  Richard Wai  <richard@annexi-strayline.com>
++
++	* gcc-interface/decl.c (gnat_to_gnu_entity): Also test Is_Public on
++	the Alias of the entitiy, if it is present, in the main assertion.
++
+ 2019-11-29  Eric Botcazou  <ebotcazou@adacore.com>
+ 
+ 	PR ada/92489
+diff --git a/gcc/ada/gcc-interface/decl.c b/gcc/ada/gcc-interface/decl.c
+index a724ba693fd..8118d119bab 100644
+--- a/gcc/ada/gcc-interface/decl.c
++++ b/gcc/ada/gcc-interface/decl.c
+@@ -445,15 +445,22 @@ gnat_to_gnu_entity (Entity_Id gnat_entity, tree gnu_expr, bool definition)
+ 
+   /* If we get here, it means we have not yet done anything with this entity.
+      If we are not defining it, it must be a type or an entity that is defined
+-     elsewhere or externally, otherwise we should have defined it already.  */
++     elsewhere or externally, otherwise we should have defined it already.
++
++     One exception is for an entity, typically an inherited operation, which is
++     a local alias for the parent's operation.  It is neither defined, since it
++     is an inherited operation, nor public, since it is declared in the current
++     compilation unit, so we test Is_Public on the Alias entity instead.  */
+   gcc_assert (definition
+-	      || type_annotate_only
+ 	      || is_type
+ 	      || kind == E_Discriminant
+ 	      || kind == E_Component
+ 	      || kind == E_Label
+ 	      || (kind == E_Constant && Present (Full_View (gnat_entity)))
+-	      || Is_Public (gnat_entity));
++	      || Is_Public (gnat_entity)
++	      || (Present (Alias (gnat_entity))
++		  && Is_Public (Alias (gnat_entity)))
++	      || type_annotate_only);
+ 
+   /* Get the name of the entity and set up the line number and filename of
+      the original definition for use in any decl we make.  Make sure we do
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 38efe35997f..3a01188a810 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,7 @@
++2020-03-11  Richard Wai  <richard@annexi-strayline.com>
++
++	* gnat.dg/subpools1.adb: New test.
++
+ 2020-03-10  Luo Xiong Hu  <luoxhu@linux.ibm.com>
+ 
+ 	backport from master.
+diff --git a/gcc/testsuite/gnat.dg/subpools1.adb b/gcc/testsuite/gnat.dg/subpools1.adb
+new file mode 100644
+index 00000000000..b38a4ca232e
+--- /dev/null
++++ b/gcc/testsuite/gnat.dg/subpools1.adb
+@@ -0,0 +1,82 @@
++-- { dg-do compile }
++
++with System.Storage_Elements;
++with System.Storage_Pools.Subpools;
++
++procedure Subpools1 is
++
++   use System.Storage_Pools.Subpools;
++
++   package Local_Pools is
++
++      use System.Storage_Elements;
++
++      type Local_Pool is new Root_Storage_Pool_With_Subpools with null record;
++
++      overriding
++      function Create_Subpool (Pool: in out Local_Pool)
++                               return not null Subpool_Handle;
++
++      overriding
++      procedure Allocate_From_Subpool
++        (Pool                    : in out Local_Pool;
++         Storage_Address         :    out System.Address;
++         Size_In_Storage_Elements: in     Storage_Count;
++         Alignment               : in     Storage_Count;
++         Subpool                 : in     not null Subpool_Handle);
++
++      overriding
++      procedure Deallocate_Subpool
++        (Pool   : in out Local_Pool;
++         Subpool: in out Subpool_Handle) is null;
++
++   end Local_Pools;
++
++   package body Local_Pools is
++
++      type Local_Subpool is new Root_Subpool with null record;
++
++      Dummy_Subpool: aliased Local_Subpool;
++
++      overriding
++      function Create_Subpool (Pool: in out Local_Pool)
++                               return not null Subpool_Handle 
++      is 
++      begin 
++         return Result: not null Subpool_Handle 
++           := Dummy_Subpool'Unchecked_Access
++         do
++            Set_Pool_Of_Subpool (Result, Pool);
++         end return;
++      end;
++
++      overriding
++      procedure Allocate_From_Subpool
++        (Pool                    : in out Local_Pool;
++         Storage_Address         :    out System.Address;
++         Size_In_Storage_Elements: in     Storage_Count;
++         Alignment               : in     Storage_Count;
++         Subpool                 : in     not null Subpool_Handle)
++      is
++         type Storage_Array_Access is access Storage_Array;
++
++         New_Alloc: Storage_Array_Access
++           := new Storage_Array (1 .. Size_In_Storage_Elements + Alignment);
++      begin
++         for SE of New_Alloc.all loop
++            Storage_Address := SE'Address;
++            exit when Storage_Address mod Alignment = 0;
++         end loop;
++      end;
++
++   end Local_Pools;
++
++   A_Pool: Local_Pools.Local_Pool;
++
++   type Integer_Access is access Integer with Storage_Pool => A_Pool;
++
++   X: Integer_Access := new Integer; 
++
++begin
++   null;
++end;
+
+commit f7589b1c8b7045ee4f5bdf033e05af3fa607c2f2
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Thu Mar 12 00:17:18 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 6b5fa9106eb..e2b9f19d525 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200311
++20200312
