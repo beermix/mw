@@ -3,7 +3,6 @@
 *.tar.gz
 *.tar.bz2
 *.tgz
-*.zip
 *.rar
 *.sig
 *.asc
@@ -22,6 +21,7 @@
 */libtool/
 */gnulib/
 */gnulib-bootstrap/
+*/asciidoctor-extensions/
 */gcc/
 /mc/mc/
 /*/mingw-w64/

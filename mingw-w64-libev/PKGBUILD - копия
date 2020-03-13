@@ -1,23 +1,22 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
-_realname=libsodium
+_realname=libev
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=83bfae5bdb2de891c2dc603c20d806edd98913d7
+pkgver=4.31
 pkgrel=1
-pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
 arch=("any")
-url="https://github.com/jedisct1/libsodium/tree/stable"
+url="http://software.schmorp.de/pkg/libev.html"
 license=('custom:ISC')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
-source=("https://github.com/jedisct1/libsodium/archive/${pkgver}.tar.gz")
-sha256sums=('6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1')
+source=("http://dist.schmorp.de/libev/Attic/${_realname}-${pkgver}.tar.gz")
+sha256sums=('2d5526fc8da4f072dd5c73e18fbb1666f5ef8ed78b73bba12e195cfdd810344e')
 
-prepare() {
-  cd ${srcdir}/${_realname}-${pkgver}
+#prepare() {
+#  cd ${srcdir}/${_realname}-${pkgver}
 
-  ./autogen.sh
-}
+#  libtoolize --force && aclocal -I m4 && autoheader&&  autoconf && automake --add-missing
+#}
 
 build() {
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
@@ -27,20 +26,14 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --enable-minimal \
-    --with-pthreads \
-    --enable-shared \
+    --disable-shared \
     --enable-static
 
   make
 }
 
-check() {
-  cd ${srcdir}/build-${MINGW_CHOST}
-  make -k check || true
-}
-
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
+  rm "${pkgdir}"${MINGW_PREFIX}/include/event.h
 }

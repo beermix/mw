@@ -140,21 +140,18 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     libiberty-sync.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
     optimize.patch \
+    gomp-relax.patch \
     optimize-at-least-some.patch
 
 #  Enable clear linux patches
 #  apply_patch_with_msg \
 #    zero-regs-gcc8.patch \
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    optimize.patch \
 #    ipa-cp.patch \
-#    optimize-at-least-some.patch \
-#    gomp-relax.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-
 #    0001-Fix-stack-protection-issues.patch \
 #    arch-native-override.patch
 
@@ -221,8 +218,8 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
