@@ -44,6 +44,8 @@ prepare() {
   patch -p1 -i ${srcdir}/0012-Prefer-response-files-over-linker-scripts-for-mingw-.patch
   patch -p1 -i ${srcdir}/0013-Allow-statically-linking-compiler-support-libraries-.patch
 
+  patch -Np1 -i ${srcdir}/no_hostname.patch
+
   git submodule init
   git config --local submodule.gnulib.url "$srcdir/gnulib"
   git config --local submodule.gl-mod/bootstrap.url "$srcdir/gnulib-bootstrap"
@@ -51,7 +53,6 @@ prepare() {
 
   ./bootstrap
 
-  patch -Np1 -i ${srcdir}/no_hostname.patch
   patch -p1 -i ${srcdir}/0007-fix-cr-for-awk-in-configure.all.patch
 }
 

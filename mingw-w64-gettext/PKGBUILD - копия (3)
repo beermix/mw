@@ -5,16 +5,12 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=19
+pkgrel=18
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
-         "${MINGW_PACKAGE_PREFIX}-libcroco"
-         "${MINGW_PACKAGE_PREFIX}-libunistring"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
-         "${MINGW_PACKAGE_PREFIX}-libxml2"
-         "${MINGW_PACKAGE_PREFIX}-glib2"
         )
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git")
 options=('strip' 'staticlibs')
@@ -96,13 +92,17 @@ build() {
     --disable-openmp \
     --without-cvs \
     --without-git \
+    --with-included-libcroco \
+    --with-included-libunistring \
+    --with-included-libxml \
+    --with-included-glib \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
   # to make relocate() in gnulib-lib work
   sed -s "s|${MINGW_PREFIX}|$(cygpath -m ${MINGW_PREFIX})|g" -i gettext-tools/config.h
 
-  noti make
+  noti make V=1
 }
 
 package() {
