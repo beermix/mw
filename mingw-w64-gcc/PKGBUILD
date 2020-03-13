@@ -248,6 +248,7 @@ build() {
     --disable-libstdcxx-pch \
     ${extra_config} \
     --enable-lto \
+    --enable-gold \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \
