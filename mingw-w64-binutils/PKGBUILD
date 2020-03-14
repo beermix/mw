@@ -110,6 +110,8 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
+    --enable-gold \
+    --with-system-zlib \
     --enable-silent-rules \
     --disable-shared
 
