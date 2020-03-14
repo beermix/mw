@@ -22,7 +22,7 @@ pkgver=9.3.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=3
+pkgrel=2
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -169,6 +169,7 @@ prepare() {
 
   ln -s ../isl-${_islver} isl
 
+  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
 #  rm -rf gcc/testsuite/brig.dg
 #  rm -rf gcc/testsuite/c-c++-common
@@ -178,7 +179,6 @@ prepare() {
 #  rm -rf gcc/testsuite/jit.dg
 #  rm -rf gcc/testsuite/lib
 #  rm -rf gcc/testsuite/o*
-#  rm -rf gcc/ada/*.ad*
 }
 
 build() {
@@ -219,8 +219,8 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
