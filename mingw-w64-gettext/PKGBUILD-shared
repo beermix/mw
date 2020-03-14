@@ -5,17 +5,18 @@ _realname=gettext
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=0.19.8.1
-pkgrel=16
+pkgrel=19
 arch=('any')
 pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
-         "${MINGW_PACKAGE_PREFIX}-libiconv"
          "${MINGW_PACKAGE_PREFIX}-libcroco"
          "${MINGW_PACKAGE_PREFIX}-libunistring"
+         "${MINGW_PACKAGE_PREFIX}-libiconv"
          "${MINGW_PACKAGE_PREFIX}-libxml2"
-         "${MINGW_PACKAGE_PREFIX}-glib2")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libcroco" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-glib2")
+         "${MINGW_PACKAGE_PREFIX}-glib2"
+        )
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git")
 options=('strip' 'staticlibs')
 
 # GPL3 for the package as a whole and LGPL for some parts, see the license files
@@ -35,20 +36,6 @@ source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         122-Use-LF-as-newline-in-envsubst.patch
         200-tools-gnulib-define-installdir.patch
         gettext-dont_build_docs_and_examples.patch)
-sha256sums=('ff942af0e438ced4a8b0ea4b0b6e0d6d657157c5e2364de57baa279c1c125c43'
-            'SKIP'
-            '030987c317279c27eea503ef257c7c3cf4ff947de8ea71d84fdf5eea802ee587'
-            '8f51c320c104c94e1ab3c8630905185214ca0c7ecf5423f20001c8694ead454c'
-            'bebc791443a739f91ace5bca1dba3d45d50dff92706fae7629d150e197d2f411'
-            '51604823755d1ae669544bb9730c5a09b78b0f1b1978577c8604fbd6cafc073e'
-            '25aee9534c45772370ef5ca495da0d6a9f4d73e7a53d6ba91314883c6f3bb695'
-            '3b85e4d0b771b47a168c629a65463f5b87a5d5627b5f05000a45c3d2df96b66d'
-            '522715ac22936943a85b4b78274302a6058f4f5371439cf491193ed53d8fc729'
-            '2ffc73f1b8d66d88ff5ce640be211e5a927daba13788cb2319b97fc885444eac'
-            '051bf975687a92da8a5acc09a367632396570c2609c5ecc1eba06c60c7135ad6'
-            '2abfa598e1586abe14e982b867c8981790d8114e1ee575cb08b7ed49d4a46c74'
-            '71eb3554cbf37a8c866722e39c6102c3ae3a215b82e153000f61f2e80d3bfd1b')
-validpgpkeys=('462225C3B46F34879FC8496CD605848ED7E69871') #Daiki Ueno
 
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
@@ -80,8 +67,8 @@ prepare() {
   patch -p1 -i ${srcdir}/200-tools-gnulib-define-installdir.patch
   patch -p1 -i ${srcdir}/gettext-dont_build_docs_and_examples.patch
 
-  #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' ./gettext-tools/Makefile.in
-  #sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' ./gettext-runtime/Makefile.in
+#  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/examples$$//' gettext-tools/Makefile.in
+#  sed '/^SUBDIRS/s/ doc //;/^SUBDIRS/s/tests$$//' gettext-runtime/Makefile.in
 
   libtoolize --automake --copy --force
   WANT_AUTOMAKE=latest ./autogen.sh --skip-gnulib
@@ -103,37 +90,22 @@ build() {
     --disable-native-java \
     --disable-csharp \
     --enable-static \
-    --enable-threads=win32 \
+    --enable-threads=windows \
     --enable-relocatable \
     --without-emacs \
     --disable-openmp \
     --without-cvs \
     --without-git \
-    --without-included-libcroco \
-    --without-included-libunistring \
-    --without-included-libxml \
-    --without-included-glib \
     --with-libncurses-prefix=${MINGW_PREFIX} \
     --enable-silent-rules
 
   # to make relocate() in gnulib-lib work
   sed -s "s|${MINGW_PREFIX}|$(cygpath -m ${MINGW_PREFIX})|g" -i gettext-tools/config.h
 
-  make
+  noti make
 }
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR="${pkgdir}" install
-
-  # Licenses
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/COPYING"                                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/COPYING"                 "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/intl/COPYING.LIB"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/intl/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-runtime/libasprintf/COPYING.LIB" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-runtime/libasprintf/COPYING.LIB"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/COPYING"                   "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gettext-tools/gnulib-lib/libxml/COPYING" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gettext-tools/gnulib-lib/libxml/COPYING"
-  install -Dm644 "${srcdir}/${_realname}-${pkgver}/gnulib-local/lib/libxml/COPYING"         "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/gnulib-local/lib/libxml/COPYING"
-  rm "${pkgdir}${MINGW_PREFIX}/share/${_realname}/intl/COPYING.LIB"
 }
