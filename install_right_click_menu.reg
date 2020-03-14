@@ -9,7 +9,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2]
 @="[&M]SYS2 Zsh Here"
-"Icon"="\"F:\\msys64\\msys2.ico\""
+"Icon"="\"F:\\msys64\\msys64.ico\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2\command]
 @="F:\\msys64\\msys2_shell_zsh.cmd -msys -where \"%v\""
@@ -23,7 +23,7 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CLASSES_ROOT\Folder\shell\msys2]
 @="[&M]SYS2 Zsh Here"
-"Icon"="\"F:\\msys64\\msys2.ico\""
+"Icon"="\"F:\\msys64\\msys64.ico\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\msys2\command]
 @="F:\\msys64\\msys2_shell_zsh.cmd -msys -where \"%v\""
