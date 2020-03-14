@@ -218,8 +218,8 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g0 -O3"
-  export CXXFLAGS="-march=haswell -g0 -O3"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
