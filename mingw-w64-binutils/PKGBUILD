@@ -111,7 +111,7 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
+    --enable-ld=default \
     --enable-silent-rules \
     --disable-shared
 

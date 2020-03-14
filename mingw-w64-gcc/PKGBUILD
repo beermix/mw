@@ -246,6 +246,7 @@ build() {
     ${extra_config} \
     --enable-lto \
     --enable-gold \
+    --enable-ld=default \
     --enable-libgomp \
     --disable-multilib \
     --enable-checking=release \

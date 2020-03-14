@@ -46,7 +46,7 @@ prepare() {
 }
 
 build() {
-  #LDFLAGS+=" -fstack-protector"
+  LDFLAGS+=" -fstack-protector"
 
   cd "${srcdir}/${_realname}-${pkgver}"
   ./configure \
