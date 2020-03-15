@@ -5,14 +5,14 @@ Windows Registry Editor Version 5.00
 "Icon"="\"F:\\msys64\\mingw64.exe\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\mingw64\command]
-@="F:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
+@="F:\\msys64\\msys2_shell_zsh.cmd -mingw64 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2]
 @="MSYS2 Bash Here"
 "Icon"="\"F:\\msys64\\msys2.ico\""
 
 [HKEY_CLASSES_ROOT\Directory\Background\shell\msys2\command]
-@="F:\\msys64\\msys2_shell.cmd -msys -where \"%v\""
+@="F:\\msys64\\msys2_shell_zsh.cmd -msys -where \"%v\""
 
 
 
@@ -23,11 +23,11 @@ Windows Registry Editor Version 5.00
 "Icon"="\"F:\\msys64\\mingw64.exe\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\mingw64\command]
-@="F:\\msys64\\msys2_shell.cmd -mingw64 -where \"%v\""
+@="F:\\msys64\\msys2_shell_zsh.cmd -mingw64 -where \"%v\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\msys2]
 @="MSYS2 Bash Here"
 "Icon"="\"F:\\msys64\\msys2.ico\""
 
 [HKEY_CLASSES_ROOT\Folder\shell\msys2\command]
-@="F:\\msys64\\msys2_shell.cmd -msys -where \"%v\""
+@="F:\\msys64\\msys2_shell_zsh.cmd -msys -where \"%v\""
