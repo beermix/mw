@@ -1427,3 +1427,465 @@ index a30f6fc9796..3f10b5f6c1b 100644
 @@ -1 +1 @@
 -20200313
 +20200314
+
+commit 6c7e43f470285787cc9d0419976aab1e7b03415d
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sun Mar 15 00:17:26 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 3f10b5f6c1b..d1f8c596469 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200314
++20200315
+
+commit cb05d702a17476fb658a59a6661d1f69394da786
+Author: Jason Merrill <jason@redhat.com>
+Date:   Sat Mar 14 17:10:39 2020 -0400
+
+    c++: Fix CTAD with multiple-arg ctor template [93248].
+    
+    When cp_unevaluated_operand is set, tsubst_decl thinks that if it sees a
+    PARM_DECL that isn't already in local_specializations, we're in a decltype
+    in a trailing return type or some such, and so we only want a substitution
+    for a single PARM_DECL.  In this case, we want the whole chain, so make sure
+    cp_unevaluated_operand is cleared.
+    
+    gcc/cp/ChangeLog
+    2020-03-14  Jason Merrill  <jason@redhat.com>
+    
+            PR c++/93248
+            * pt.c (build_deduction_guide): Clear cp_unevaluated_operand for
+            substituting DECL_ARGUMENTS.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index 6441d647a54..0bc9e12014d 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,9 @@
++2020-03-14  Jason Merrill  <jason@redhat.com>
++
++	PR c++/93248
++	* pt.c (build_deduction_guide): Clear cp_unevaluated_operand for
++	substituting DECL_ARGUMENTS.
++
+ 2020-03-12  Release Manager
+ 
+ 	* GCC 9.3.0 released.
+diff --git a/gcc/cp/pt.c b/gcc/cp/pt.c
+index 4787747b6ff..a12da5ef866 100644
+--- a/gcc/cp/pt.c
++++ b/gcc/cp/pt.c
+@@ -27376,10 +27376,13 @@ build_deduction_guide (tree ctor, tree outer_args, tsubst_flags_t complain)
+ 				     complain, ctor);
+ 	  if (fparms == error_mark_node)
+ 	    ok = false;
+-	  fargs = tsubst (fargs, tsubst_args, complain, ctor);
+ 	  if (ci)
+ 	    ci = tsubst_constraint_info (ci, tsubst_args, complain, ctor);
+ 
++	  /* Parms are to have DECL_CHAIN tsubsted, which would be skipped if
++	     cp_unevaluated_operand.  */
++	  cp_evaluated ev;
++	  fargs = tsubst (fargs, tsubst_args, complain, ctor);
+ 	  current_template_parms = save_parms;
+ 	}
+ 
+diff --git a/gcc/testsuite/g++.dg/cpp1z/class-deduction71.C b/gcc/testsuite/g++.dg/cpp1z/class-deduction71.C
+new file mode 100644
+index 00000000000..2fc71de8d95
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/cpp1z/class-deduction71.C
+@@ -0,0 +1,6 @@
++// PR c++/93248
++// { dg-do compile { target c++17 } }
++
++template <typename T> struct S
++{ template <typename V> S (T, V, long = 0); };
++using U = decltype(S{0, 4u});
+
+commit 2fa5f9e380b794053a0dd8a8cc63f8bfab370d22
+Author: Jason Merrill <jason@redhat.com>
+Date:   Sat Mar 14 17:10:39 2020 -0400
+
+    c++: Fix ICE-after-error on partial spec [92068]
+    
+    Here the template arguments for the partial specialization are valid
+    arguments for the template, but not for a partial specialization, because
+    'd' can never be deduced to anything other than an empty pack.
+    
+    gcc/cp/ChangeLog
+    2020-03-14  Jason Merrill  <jason@redhat.com>
+    
+            PR c++/92068
+            * pt.c (process_partial_specialization): Error rather than crash on
+            extra pack expansion.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index 0bc9e12014d..e81e39d1770 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,9 @@
++2020-03-14  Jason Merrill  <jason@redhat.com>
++
++	PR c++/92068
++	* pt.c (process_partial_specialization): Error rather than crash on
++	extra pack expansion.
++
+ 2020-03-14  Jason Merrill  <jason@redhat.com>
+ 
+ 	PR c++/93248
+diff --git a/gcc/cp/pt.c b/gcc/cp/pt.c
+index a12da5ef866..2ceace5ea1a 100644
+--- a/gcc/cp/pt.c
++++ b/gcc/cp/pt.c
+@@ -4877,6 +4877,14 @@ process_partial_specialization (tree decl)
+       return decl;
+     }
+ 
++  else if (nargs > DECL_NTPARMS (maintmpl))
++    {
++      error ("too many arguments for partial specialization %qT", type);
++      inform (DECL_SOURCE_LOCATION (maintmpl), "primary template here");
++      /* Avoid crash below.  */
++      return decl;
++    }
++
+   /* If we aren't in a dependent class, we can actually try deduction.  */
+   else if (tpd.level == 1
+ 	   /* FIXME we should be able to handle a partial specialization of a
+@@ -4903,7 +4911,6 @@ process_partial_specialization (tree decl)
+ 
+      Also, we verify that pack expansions only occur at the
+      end of the argument list.  */
+-  gcc_assert (nargs == DECL_NTPARMS (maintmpl));
+   tpd2.parms = 0;
+   for (i = 0; i < nargs; ++i)
+     {
+diff --git a/gcc/testsuite/g++.dg/cpp0x/variadic178.C b/gcc/testsuite/g++.dg/cpp0x/variadic178.C
+new file mode 100644
+index 00000000000..f0e65958de3
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/cpp0x/variadic178.C
+@@ -0,0 +1,6 @@
++// PR c++/92068
++// { dg-do compile { target c++11 } }
++
++template <typename, typename> struct a;
++template <typename b, typename c, typename... d>
++struct a<b, c, d...> { };	// { dg-error "arguments" }
+
+commit c3747bca3849b1e06358db9cb2389d8089c49e3e
+Author: Jason Merrill <jason@redhat.com>
+Date:   Sat Mar 14 17:10:39 2020 -0400
+
+    c++: Find parameter pack in typedef in lambda [92909].
+    
+    find_parameter_packs_r doesn't look through typedefs, which is normally
+    correct, but that means we need to handle their declarations specially.
+    
+    gcc/cp/ChangeLog
+    2020-03-14  Jason Merrill  <jason@redhat.com>
+    
+            PR c++/92909
+            * pt.c (find_parameter_packs_r): [DECL_EXPR]: Walk
+            DECL_ORIGINAL_TYPE of a typedef.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index e81e39d1770..8edc445e70e 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,9 @@
++2020-03-14  Jason Merrill  <jason@redhat.com>
++
++	PR c++/92909
++	* pt.c (find_parameter_packs_r): [DECL_EXPR]: Walk
++	DECL_ORIGINAL_TYPE of a typedef.
++
+ 2020-03-14  Jason Merrill  <jason@redhat.com>
+ 
+ 	PR c++/92068
+diff --git a/gcc/cp/pt.c b/gcc/cp/pt.c
+index 2ceace5ea1a..3e4fc235f7a 100644
+--- a/gcc/cp/pt.c
++++ b/gcc/cp/pt.c
+@@ -3773,10 +3773,18 @@ find_parameter_packs_r (tree *tp, int *walk_subtrees, void* data)
+       return NULL_TREE;
+ 
+     case DECL_EXPR:
+-      /* Ignore the declaration of a capture proxy for a parameter pack.  */
+-      if (is_capture_proxy (DECL_EXPR_DECL (t)))
+-	*walk_subtrees = 0;
+-      return NULL_TREE;
++      {
++	tree decl = DECL_EXPR_DECL (t);
++	/* Ignore the declaration of a capture proxy for a parameter pack.  */
++	if (is_capture_proxy (decl))
++	  *walk_subtrees = 0;
++	if (is_typedef_decl (decl) && TYPE_ALIAS_P (TREE_TYPE (decl)))
++	  /* Since we stop at aliases above, we need to look through them at
++	     the point of the DECL_EXPR.  */
++	  cp_walk_tree (&DECL_ORIGINAL_TYPE (decl),
++			&find_parameter_packs_r, ppd, ppd->visited);
++	return NULL_TREE;
++      }
+ 
+     case RECORD_TYPE:
+       if (TYPE_PTRMEMFUNC_P (t))
+diff --git a/gcc/testsuite/g++.dg/cpp0x/lambda/lambda-variadic10.C b/gcc/testsuite/g++.dg/cpp0x/lambda/lambda-variadic10.C
+new file mode 100644
+index 00000000000..052283e6caa
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/cpp0x/lambda/lambda-variadic10.C
+@@ -0,0 +1,12 @@
++// PR c++/92909
++// { dg-do compile { target c++11 } }
++
++template <class ... Ts>
++void foo()
++{
++    []
++    {
++        using T = Ts;
++    }();			// { dg-error "not expanded" }
++}
++template void foo<>();
+
+commit a81912b0740ee887796e1345936a198085926f28
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Mon Mar 16 00:17:28 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index d1f8c596469..777d8efeebb 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200315
++20200316
+
+commit 31b204ace293b81fc51f76bf9faf459ab1cd7c50
+Author: Jonathan Wakely <jwakely@redhat.com>
+Date:   Mon Mar 16 22:55:48 2020 +0000
+
+    libstdc++: Add default constructor to net::service_already_exists (PR 94199)
+    
+    The service_already_exists exception type specified in the TS doesn't
+    have any constructors defined. Since its base class isn't default
+    constructible, that means has no usable constructors. This may be a
+    defect in the TS.
+    
+    This patch fixes it by adding a default constructor, but making it
+    private. The make_service function is declared as a friend to be able to
+    call that private constructor.
+    
+    Backport from mainline
+    2020-03-16  Jonathan Wakely  <jwakely@redhat.com>
+    
+            PR libstdc++/94199
+            * include/experimental/executor (service_already_exists): Add default
+            constructor. Declare make_service to be a friend.
+            * testsuite/experimental/net/execution_context/make_service.cc: New
+            test.
+
+diff --git a/libstdc++-v3/ChangeLog b/libstdc++-v3/ChangeLog
+index 0c39c30a484..8e11c6df5a7 100644
+--- a/libstdc++-v3/ChangeLog
++++ b/libstdc++-v3/ChangeLog
+@@ -1,3 +1,14 @@
++2020-03-16  Jonathan Wakely  <jwakely@redhat.com>
++
++	Backport from mainline
++	2020-03-16  Jonathan Wakely  <jwakely@redhat.com>
++
++	PR libstdc++/94199
++	* include/experimental/executor (service_already_exists): Add default
++	constructor. Declare make_service to be a friend.
++	* testsuite/experimental/net/execution_context/make_service.cc: New
++	test.
++
+ 2020-03-12  Jonathan Wakely  <jwakely@redhat.com>
+ 
+ 	Backport from mainline
+diff --git a/libstdc++-v3/include/experimental/executor b/libstdc++-v3/include/experimental/executor
+index 266a2487899..15f28de9b9d 100644
+--- a/libstdc++-v3/include/experimental/executor
++++ b/libstdc++-v3/include/experimental/executor
+@@ -127,7 +127,14 @@ inline namespace v1
+   /// An extensible, type-safe, polymorphic set of services.
+   class execution_context;
+ 
+-  class service_already_exists : public logic_error { };
++  class service_already_exists : public logic_error
++  {
++    template<typename _Service, typename... _Args>
++      friend _Service&
++      make_service(execution_context&, _Args&&...);
++
++    service_already_exists() : logic_error("service already exists") { }
++  };
+ 
+   template<typename _Tp> struct is_executor;
+ 
+diff --git a/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc b/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc
+new file mode 100644
+index 00000000000..f134add48b5
+--- /dev/null
++++ b/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc
+@@ -0,0 +1,36 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-do compile { target c++14 } }
++
++#include <experimental/executor>
++
++namespace net = std::experimental::net;
++
++struct S : net::execution_context::service
++{
++  using key_type = S;
++
++  S(net::execution_context&);
++
++  void shutdown() noexcept override { }
++};
++
++void test01(net::execution_context& c)
++{
++  net::make_service<S>(c);
++}
+
+commit 9a532a94e35008869dafc0e70301f1cff9700f20
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Tue Mar 17 00:17:21 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 777d8efeebb..c73081a5a12 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200316
++20200317
+
+commit 62960ccdefe60f29897f4bae8ea6a2f3f385fc47
+Author: Kewen Lin <linkw@linux.ibm.com>
+Date:   Sun Mar 8 21:34:13 2020 -0500
+
+    [testsuite] Fix PR94023 to guard case under vect_hw_misalign
+    
+    As PR94023 shows, the expected SLP requires misaligned vector access
+    support.  This patch is to guard the check under the target condition
+    vect_hw_misalign to ensure that.
+    
+    2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        Backport from master
+        2020-03-09  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        PR testsuite/94023
+        * gcc.dg/vect/slp-perm-12.c: Expect loop vectorized messages only on
+        vect_hw_misalign targets.
+
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index b96c9b9ab1c..9e2a34396ff 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
++
++	Backport from master
++	2020-03-09  Kewen Lin  <linkw@gcc.gnu.org>
++
++	PR testsuite/94023
++	* gcc.dg/vect/slp-perm-12.c: Expect loop vectorized messages only on
++	vect_hw_misalign targets.
++
+ 2020-03-12  Richard Earnshaw  <rearnsha@arm.com>
+ 
+ 	Backport from master
+diff --git a/gcc/testsuite/gcc.dg/vect/slp-perm-12.c b/gcc/testsuite/gcc.dg/vect/slp-perm-12.c
+index 4d4c5344402..113223ab0f9 100644
+--- a/gcc/testsuite/gcc.dg/vect/slp-perm-12.c
++++ b/gcc/testsuite/gcc.dg/vect/slp-perm-12.c
+@@ -49,4 +49,4 @@ int main()
+   return 0;
+ }
+ 
+-/* { dg-final { scan-tree-dump-times "vectorizing stmts using SLP" 1 "vect" { target vect_perm } } } */
++/* { dg-final { scan-tree-dump-times "vectorizing stmts using SLP" 1 "vect" { target { vect_perm && vect_hw_misalign } } } } */
+
+commit 05409a1edd80a96c26cead01d1b65dc9f25a22af
+Author: Kewen Lin <linkw@linux.ibm.com>
+Date:   Sun Mar 8 21:55:11 2020 -0500
+
+    [testsuite] Fix PR94019 to check vector char when vect_hw_misalign
+    
+    As PR94019 shows, without misaligned vector access support but with
+    realign load, the vectorized loop will end up with realign scheme.
+    It generates mask (control vector) with return type vector signed
+    char which breaks the not check.
+    
+    gcc/testsuite/ChangeLog
+    
+    2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        Backport from master
+        2020-03-09  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        PR testsuite/94019
+        * gcc.dg/vect/vect-over-widen-17.c: Don't expect vector char if it's
+        without misaligned vector access support.
+
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 9e2a34396ff..555d9965efd 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
++
++	Backport from master
++	2020-03-09  Kewen Lin  <linkw@gcc.gnu.org>
++
++	PR testsuite/94019
++	* gcc.dg/vect/vect-over-widen-17.c: Don't expect vector char if it's
++	without misaligned vector access support.
++
+ 2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
+ 
+ 	Backport from master
+diff --git a/gcc/testsuite/gcc.dg/vect/vect-over-widen-17.c b/gcc/testsuite/gcc.dg/vect/vect-over-widen-17.c
+index 04482607b04..333d74ac3e7 100644
+--- a/gcc/testsuite/gcc.dg/vect/vect-over-widen-17.c
++++ b/gcc/testsuite/gcc.dg/vect/vect-over-widen-17.c
+@@ -41,6 +41,9 @@ main (void)
+ }
+ 
+ /* { dg-final { scan-tree-dump-not {vect_recog_over_widening_pattern: detected} "vect" } } */
+-/* { dg-final { scan-tree-dump-not {vector[^\n]*char} "vect" } } */
++/* On Power, if there is no vect_hw_misalign support, unaligned vector access
++   adopts realign_load scheme.  It requires rs6000_builtin_mask_for_load to
++   generate mask whose return type is vector char.  */
++/* { dg-final { scan-tree-dump-not {vector[^\n]*char} "vect" { target vect_hw_misalign } } } */
+ /* { dg-final { scan-tree-dump-not {vector[^ ]* int} "vect" } } */
+ /* { dg-final { scan-tree-dump-times "vectorized 1 loop" 1 "vect" } } */
