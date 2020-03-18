@@ -40,7 +40,12 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0015-dont-link-ld-to-libiberty.mingw.patch
         0017-fix-iconv-linking.all.patch
         0200-remove-provide-qualifiers.patch
-        0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch)
+        0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
+        006_better_file_error.patch
+        013_bash_in_ld_testsuite.patch
+        130_gold_disable_testsuite_build.patch
+        135_bfd_soversion.patch
+        branch-version.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
@@ -52,6 +57,11 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
+  patch -p1 -i "${srcdir}"/006_better_file_error.patch
+  patch -p1 -i "${srcdir}"/013_bash_in_ld_testsuite.patch
+  patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
+  patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
+  patch -p1 -i "${srcdir}"/branch-version.patch
   #patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
   patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
