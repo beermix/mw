@@ -129,6 +129,7 @@ fi
 
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-qtbinpatcher"
+         "${MINGW_PACKAGE_PREFIX}-z3"
          $([[ "$_variant" == "-shared" ]] && echo \
             $([[ "$_system_assimp" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-assimp") \
             $([[ "$_system_doubleconversion" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-double-conversion") \
