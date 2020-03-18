@@ -1889,3 +1889,1599 @@ index 04482607b04..333d74ac3e7 100644
 +/* { dg-final { scan-tree-dump-not {vector[^\n]*char} "vect" { target vect_hw_misalign } } } */
  /* { dg-final { scan-tree-dump-not {vector[^ ]* int} "vect" } } */
  /* { dg-final { scan-tree-dump-times "vectorized 1 loop" 1 "vect" } } */
+
+commit 5de0dc84c75a43f78a03c7cdb7e7c443c641a7fa
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 4 09:01:59 2020 +0100
+
+    tailcall: Fix up process_assignment [PR94001]
+    
+    When a function returns void or the return value is ignored, ass_var
+    is NULL_TREE.  The tail recursion handling generally assumes DCE has been
+    performed and so doesn't expect to encounter useless assignments after the
+    call and expects them to be part of the return value adjustment that need
+    to be changed into tail recursion additions/multiplications.
+    process_assignment does some verification and has a way to tell the caller
+    to try to move dead or whatever other stmts that don't participate in the
+    return value modifications before it is returned.
+    For binary rhs assignments it is just fine, neither op0 nor op1 will be
+    NULL_TREE and thus if *ass_var is NULL_TREE, it will not match, but unary
+    rhs is handled by only setting op0 to rhs1 and setting op1 to NULL_TREE.
+    And at this point, NULL_TREE == NULL_TREE and thus we think e.g. the
+      c_2 = -e_3(D);
+    dead stmt is actually a return value modification, so we queue it as
+    multiplication and then create a void type SSA_NAME accumulator for it
+    and ICE shortly after.
+    
+    Fixed by making sure op1 == *ass_var comparison is done only if *ass_var.
+    
+    2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR tree-optimization/94001
+            * tree-tailcall.c (process_assignment): Before comparing op1 to
+            *ass_var, verify *ass_var is non-NULL.
+    
+            * gcc.dg/pr94001.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index ec0284ad8be..3e93b3ae62b 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94001
++	* tree-tailcall.c (process_assignment): Before comparing op1 to
++	*ass_var, verify *ass_var is non-NULL.
++
+ 2020-03-13  Richard Biener  <rguenther@suse.de>
+ 
+ 	PR tree-optimization/94163
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 555d9965efd..bbc3bef437f 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,11 @@
++2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94001
++	* gcc.dg/pr94001.c: New test.
++
+ 2020-03-17  Kewen Lin  <linkw@gcc.gnu.org>
+ 
+ 	Backport from master
+diff --git a/gcc/testsuite/gcc.dg/pr94001.c b/gcc/testsuite/gcc.dg/pr94001.c
+new file mode 100644
+index 00000000000..f83873fa2bd
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94001.c
+@@ -0,0 +1,11 @@
++/* PR tree-optimization/94001 */
++/* { dg-do compile } */
++/* { dg-options "-O2 -fno-tree-dce" } */
++
++void
++bar (int e)
++{
++  bar (3);
++  int c;
++  c = -e;
++}
+diff --git a/gcc/tree-tailcall.c b/gcc/tree-tailcall.c
+index 255575f1198..4f42817f7de 100644
+--- a/gcc/tree-tailcall.c
++++ b/gcc/tree-tailcall.c
+@@ -327,7 +327,8 @@ process_assignment (gassign *stmt,
+ 	   && (non_ass_var = independent_of_stmt_p (op1, stmt, call,
+ 						    to_move)))
+     ;
+-  else if (op1 == *ass_var
++  else if (*ass_var
++	   && op1 == *ass_var
+ 	   && (non_ass_var = independent_of_stmt_p (op0, stmt, call,
+ 						    to_move)))
+     ;
+
+commit d2a810ee83e2952bf351498cecf8f5db28860a24
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 4 12:59:04 2020 +0100
+
+    inliner: Copy DECL_BY_REFERENCE in copy_decl_to_var [PR93888]
+    
+    In the following testcase we emit wrong debug info for the karg
+    parameter in the DW_TAG_inlined_subroutine into main.
+    The problem is that the karg PARM_DECL is DECL_BY_REFERENCE and thus
+    in the IL has const K & type, but in the source just const K.
+    When the function is inlined, we create a VAR_DECL for it, but don't
+    set DECL_BY_REFERENCE, so when emitting DW_AT_location, we treat it like
+    a const K & typed variable, but it has DW_AT_abstract_origin which has
+    just the const K type and thus the debugger thinks the variable has
+    const K type.
+    
+    Fixed by copying the DECL_BY_REFERENCE flag.  Not doing it in
+    copy_decl_for_dup_finish, because copy_decl_no_change already copies
+    that flag through copy_node and in copy_result_decl_to_var it is
+    undesirable, as we handle DECL_BY_REFERENCE in that case instead
+    by changing the type.
+    
+    2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR debug/93888
+            * tree-inline.c (copy_decl_to_var): Copy DECL_BY_REFERENCE flag.
+    
+            * g++.dg/guality/pr93888.C: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 3e93b3ae62b..4b81a55064a 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -3,6 +3,9 @@
+ 	Backported from mainline
+ 	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR debug/93888
++	* tree-inline.c (copy_decl_to_var): Copy DECL_BY_REFERENCE flag.
++
+ 	PR tree-optimization/94001
+ 	* tree-tailcall.c (process_assignment): Before comparing op1 to
+ 	*ass_var, verify *ass_var is non-NULL.
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index bbc3bef437f..edce0bec2bb 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -3,6 +3,9 @@
+ 	Backported from mainline
+ 	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR debug/93888
++	* g++.dg/guality/pr93888.C: New test.
++
+ 	PR tree-optimization/94001
+ 	* gcc.dg/pr94001.c: New test.
+ 
+diff --git a/gcc/testsuite/g++.dg/guality/pr93888.C b/gcc/testsuite/g++.dg/guality/pr93888.C
+new file mode 100644
+index 00000000000..d54a4dcc8cc
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/guality/pr93888.C
+@@ -0,0 +1,24 @@
++// PR debug/93888
++// { dg-do run }
++// { dg-options "-g -fvar-tracking -fno-inline" }
++// { dg-skip-if "" { *-*-* }  { "*" } { "-O0" } }
++
++struct K
++{
++  K () {}
++  K (K const &rhs) { k[0] = 'C'; }
++  char k[8] = {'B','B','B','B','B','B','B','B'};
++};
++
++__attribute__((always_inline)) inline bool
++foo (const K karg)
++{
++  return karg.k[0] != 'C';	// { dg-final { gdb-test 16 "karg.k[0]" "'C'" } }
++}				// { dg-final { gdb-test 16 "karg.k[1]" "'B'" } }
++
++int
++main ()
++{
++  K x;
++  return foo (x);
++}
+diff --git a/gcc/tree-inline.c b/gcc/tree-inline.c
+index d115fcb1a5b..7ba2ebf3695 100644
+--- a/gcc/tree-inline.c
++++ b/gcc/tree-inline.c
+@@ -5698,6 +5698,7 @@ copy_decl_to_var (tree decl, copy_body_data *id)
+   TREE_READONLY (copy) = TREE_READONLY (decl);
+   TREE_THIS_VOLATILE (copy) = TREE_THIS_VOLATILE (decl);
+   DECL_GIMPLE_REG_P (copy) = DECL_GIMPLE_REG_P (decl);
++  DECL_BY_REFERENCE (copy) = DECL_BY_REFERENCE (decl);
+ 
+   return copy_decl_for_dup_finish (id, decl, copy);
+ }
+
+commit e0d6777cda966b04fc47d544c09839c4fa94343c
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu Mar 5 09:12:44 2020 +0100
+
+    print-rtl: Fix printing of CONST_STRING in DEBUG_INSNs [PR93399]
+    
+    The following testcase fails to assemble, as CONST_STRING in the DEBUG_INSNs
+    is printed as is, so if it contains \n and/or \r, we are in trouble:
+            .loc 1 14 3
+            # DEBUG haystack => [si]
+            # DEBUG needle => "
+    "
+    In the gimple dumps we print those (STRING_CSTs) as
+      # DEBUG haystack => D#1
+      # DEBUG needle => "\n"
+    so this patch uses what we use in tree printing for the CONST_STRINGs too.
+    
+    2020-03-05  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR middle-end/93399
+            * tree-pretty-print.h (pretty_print_string): Declare.
+            * tree-pretty-print.c (pretty_print_string): Remove forward
+            declaration, no longer static.  Change nbytes parameter type
+            from unsigned to size_t.
+            * print-rtl.c (print_value) <case CONST_STRING>: Use
+            pretty_print_string and for shrink way too long strings.
+    
+            * gcc.dg/pr93399.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 4b81a55064a..4f8c9052901 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,16 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-05  Jakub Jelinek  <jakub@redhat.com>
++
++	PR middle-end/93399
++	* tree-pretty-print.h (pretty_print_string): Declare.
++	* tree-pretty-print.c (pretty_print_string): Remove forward
++	declaration, no longer static.  Change nbytes parameter type
++	from unsigned to size_t.
++	* print-rtl.c (print_value) <case CONST_STRING>: Use
++	pretty_print_string and for shrink way too long strings.
++
+ 	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR debug/93888
+diff --git a/gcc/print-rtl.c b/gcc/print-rtl.c
+index fbb108568b3..819b8473d9d 100644
+--- a/gcc/print-rtl.c
++++ b/gcc/print-rtl.c
+@@ -1678,7 +1678,9 @@ print_value (pretty_printer *pp, const_rtx x, int verbose)
+       pp_string (pp, tmp);
+       break;
+     case CONST_STRING:
+-      pp_printf (pp, "\"%s\"", XSTR (x, 0));
++      pp_string (pp, "\"");
++      pretty_print_string (pp, XSTR (x, 0), strlen (XSTR (x, 0)));
++      pp_string (pp, "\"");
+       break;
+     case SYMBOL_REF:
+       pp_printf (pp, "`%s'", XSTR (x, 0));
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index edce0bec2bb..7ed5402e465 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,6 +1,11 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-05  Jakub Jelinek  <jakub@redhat.com>
++
++	PR middle-end/93399
++	* gcc.dg/pr93399.c: New test.
++
+ 	2020-03-04  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR debug/93888
+diff --git a/gcc/testsuite/gcc.dg/pr93399.c b/gcc/testsuite/gcc.dg/pr93399.c
+new file mode 100644
+index 00000000000..3d9299018be
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr93399.c
+@@ -0,0 +1,17 @@
++/* PR middle-end/93399 */
++/* { dg-do assemble } */
++/* { dg-options "-fverbose-asm -dA -g -O3" } */
++
++extern inline __attribute__ ((__always_inline__, __gnu_inline__)) char *
++strstr (const char *haystack, const char *needle)
++{
++  return __builtin_strstr (haystack, needle);
++}
++
++int
++main (int argc, const char **argv)
++{
++  char *substr = strstr (argv[0], "\n");
++  char *another = strstr (argv[0], "\r\n");
++  return 0;
++}
+diff --git a/gcc/tree-pretty-print.c b/gcc/tree-pretty-print.c
+index ae0a6c12072..b06b595d151 100644
+--- a/gcc/tree-pretty-print.c
++++ b/gcc/tree-pretty-print.c
+@@ -37,7 +37,6 @@ along with GCC; see the file COPYING3.  If not see
+ 
+ /* Local functions, macros and variables.  */
+ static const char *op_symbol (const_tree);
+-static void pretty_print_string (pretty_printer *, const char*, unsigned);
+ static void newline_and_indent (pretty_printer *, int);
+ static void maybe_init_pretty_print (FILE *);
+ static void print_struct_decl (pretty_printer *, const_tree, int, dump_flags_t);
+@@ -4021,8 +4020,8 @@ print_call_name (pretty_printer *pp, tree node, dump_flags_t flags)
+ /* Print the first N characters in the array STR, replacing non-printable
+    characters (including embedded nuls) with unambiguous escape sequences.  */
+ 
+-static void
+-pretty_print_string (pretty_printer *pp, const char *str, unsigned n)
++void
++pretty_print_string (pretty_printer *pp, const char *str, size_t n)
+ {
+   if (str == NULL)
+     return;
+diff --git a/gcc/tree-pretty-print.h b/gcc/tree-pretty-print.h
+index 9f593289666..41697e77994 100644
+--- a/gcc/tree-pretty-print.h
++++ b/gcc/tree-pretty-print.h
+@@ -47,6 +47,7 @@ extern void print_declaration (pretty_printer *, tree, int, dump_flags_t);
+ extern int op_code_prio (enum tree_code);
+ extern int op_prio (const_tree);
+ extern const char *op_symbol_code (enum tree_code);
++extern void pretty_print_string (pretty_printer *, const char *, size_t);
+ extern void print_call_name (pretty_printer *, tree, dump_flags_t);
+ extern void percent_K_format (text_info *, location_t, tree);
+ extern void pp_tree_identifier (pretty_printer *, tree);
+
+commit 2fd27691f213f2e808626c4cd492b00c801a00fa
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 11 09:32:22 2020 +0100
+
+    ldist: Further fixes for -ftrapv [PR94114]
+    
+    As the testcase shows, arithmetics that for -ftrapv would need multiple
+    basic blocks can show up not just in nb_bytes expressions where we
+    are calling rewrite_to_non_trapping_overflow for a while already,
+    but also in the pointer expression to the start of the region.
+    While the testcase covers just the first hunk and I've failed to create
+    a testcase for the latter, it is at least in theory possible too, so I've
+    adjusted that hunk too.
+    
+    2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR tree-optimization/94114
+            * tree-loop-distribution.c (generate_memset_builtin): Call
+            rewrite_to_non_trapping_overflow even on mem.
+            (generate_memcpy_builtin): Call rewrite_to_non_trapping_overflow even
+            on dest and src.
+    
+            * gcc.dg/pr94114.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 4f8c9052901..12bad2c010f 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,14 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94114
++	* tree-loop-distribution.c (generate_memset_builtin): Call
++	rewrite_to_non_trapping_overflow even on mem.
++	(generate_memcpy_builtin): Call rewrite_to_non_trapping_overflow even
++	on dest and src.
++
+ 	2020-03-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/93399
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 7ed5402e465..579919ecd10 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,6 +1,11 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94114
++	* gcc.dg/pr94114.c: New test.
++
+ 	2020-03-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/93399
+diff --git a/gcc/testsuite/gcc.dg/pr94114.c b/gcc/testsuite/gcc.dg/pr94114.c
+new file mode 100644
+index 00000000000..8d6d0eb5c2a
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94114.c
+@@ -0,0 +1,13 @@
++/* PR tree-optimization/94114 */
++/* { dg-do compile } */
++/* { dg-options "-O2 -ftree-loop-distribute-patterns -ftrapv" } */
++
++void
++foo (int *x, int *y, int *z, long int w)
++{
++  while (y + w > z)
++    {
++      x[w] = 0;
++      --w;
++    }
++}
+diff --git a/gcc/tree-loop-distribution.c b/gcc/tree-loop-distribution.c
+index 8959f52a67b..c07ac0d228c 100644
+--- a/gcc/tree-loop-distribution.c
++++ b/gcc/tree-loop-distribution.c
+@@ -1004,7 +1004,7 @@ generate_memset_builtin (struct loop *loop, partition *partition)
+   nb_bytes = rewrite_to_non_trapping_overflow (builtin->size);
+   nb_bytes = force_gimple_operand_gsi (&gsi, nb_bytes, true, NULL_TREE,
+ 				       false, GSI_CONTINUE_LINKING);
+-  mem = builtin->dst_base;
++  mem = rewrite_to_non_trapping_overflow (builtin->dst_base);
+   mem = force_gimple_operand_gsi (&gsi, mem, true, NULL_TREE,
+ 				  false, GSI_CONTINUE_LINKING);
+ 
+@@ -1056,8 +1056,8 @@ generate_memcpy_builtin (struct loop *loop, partition *partition)
+   nb_bytes = rewrite_to_non_trapping_overflow (builtin->size);
+   nb_bytes = force_gimple_operand_gsi (&gsi, nb_bytes, true, NULL_TREE,
+ 				       false, GSI_CONTINUE_LINKING);
+-  dest = builtin->dst_base;
+-  src = builtin->src_base;
++  dest = rewrite_to_non_trapping_overflow (builtin->dst_base);
++  src = rewrite_to_non_trapping_overflow (builtin->src_base);
+   if (partition->kind == PKIND_MEMCPY
+       || ! ptr_derefs_may_alias_p (dest, src))
+     kind = BUILT_IN_MEMCPY;
+
+commit 343c467ccdc24edb9acd7c60d54914d9656ab499
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 11 09:33:52 2020 +0100
+
+    dfp: Fix decimal_to_binary [PR94111]
+    
+    As e.g. decimal_from_decnumber shows, the REAL_VALUE_TYPE representation
+    contains a decimal128 embedded in ->sig only if it is rvc_normal, for
+    other kinds like rvc_inf or rvc_nan, ->sig is ignored and everything is
+    contained in the REAL_VALUE_TYPE flags (cl, sign, signalling and decimal).
+    decimal_to_binary which is used when folding a decimal{32,64,128} constant
+    to a binary floating point type ignores this and thus folds infinities and
+    NaNs into +0.0.
+    The following patch fixes that by only doing that for rvc_normal.
+    Similarly to the binary to decimal folding, it goes through a string, in
+    order to e.g. deal with canonical NaN mantissas, or binary float formats
+    that don't support infinities and/or NaNs.
+    
+    2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR middle-end/94111
+            * dfp.c (decimal_to_binary): Only use decimal128ToString if from->cl
+            is rvc_normal, otherwise use real_to_decimal to print the number to
+            string.
+    
+            * gcc.dg/dfp/pr94111.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 12bad2c010f..1ea3cf183ad 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -3,6 +3,11 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR middle-end/94111
++	* dfp.c (decimal_to_binary): Only use decimal128ToString if from->cl
++	is rvc_normal, otherwise use real_to_decimal to print the number to
++	string.
++
+ 	PR tree-optimization/94114
+ 	* tree-loop-distribution.c (generate_memset_builtin): Call
+ 	rewrite_to_non_trapping_overflow even on mem.
+diff --git a/gcc/dfp.c b/gcc/dfp.c
+index 65d5fcb0845..599f37ea9da 100644
+--- a/gcc/dfp.c
++++ b/gcc/dfp.c
+@@ -342,9 +342,13 @@ decimal_to_binary (REAL_VALUE_TYPE *to, const REAL_VALUE_TYPE *from,
+ 		   const real_format *fmt)
+ {
+   char string[256];
+-  const decimal128 *const d128 = (const decimal128 *) from->sig;
+-
+-  decimal128ToString (d128, string);
++  if (from->cl == rvc_normal)
++    {
++      const decimal128 *const d128 = (const decimal128 *) from->sig;
++      decimal128ToString (d128, string);
++    }
++  else
++    real_to_decimal (string, from, sizeof (string), 0, 1);
+   real_from_string3 (to, string, fmt);
+ }
+ 
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 579919ecd10..8fba81a3bdd 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -3,6 +3,9 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR middle-end/94111
++	* gcc.dg/dfp/pr94111.c: New test.
++
+ 	PR tree-optimization/94114
+ 	* gcc.dg/pr94114.c: New test.
+ 
+diff --git a/gcc/testsuite/gcc.dg/dfp/pr94111.c b/gcc/testsuite/gcc.dg/dfp/pr94111.c
+new file mode 100644
+index 00000000000..ea3a132270a
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/dfp/pr94111.c
+@@ -0,0 +1,12 @@
++/* PR middle-end/94111 */
++/* { dg-do run } */
++/* { dg-options "-O2" } */
++
++int
++main ()
++{
++  _Decimal32 d = (_Decimal32) __builtin_inff ();
++  if (!__builtin_isinf ((double) d))
++    __builtin_abort ();
++  return 0;
++}
+
+commit a644079a702a6228df2ffaace1d88a5f74e4bb9f
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 11 10:54:22 2020 +0100
+
+    aarch64: Fix ICE in aarch64_add_offset_1 [PR94121]
+    
+    abs_hwi asserts that the argument is not HOST_WIDE_INT_MIN and as the
+    (invalid) testcase shows, the function can be called with such an offset.
+    The following patch is IMHO minimal fix, absu_hwi unlike abs_hwi allows even
+    that value and will return (unsigned HOST_WIDE_INT) HOST_WIDE_INT_MIN
+    in that case.  The function then uses moffset in two spots which wouldn't
+    care if the value is (unsigned HOST_WIDE_INT) HOST_WIDE_INT_MIN or
+    HOST_WIDE_INT_MIN and wouldn't accept it (!moffset and
+    aarch64_uimm12_shift (moffset)), then in one spot where the signedness of
+    moffset does matter and using unsigned is the right thing -
+    moffset < 0x1000000 - and finally has code which will handle even this
+    value right; the assembler doesn't really care for DImode immediates if
+            mov     x1, -9223372036854775808
+    or
+            mov     x1, 9223372036854775808
+    is used and similarly it doesn't matter if we add or sub it in DImode.
+    
+    2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR target/94121
+            * config/aarch64/aarch64.c (aarch64_add_offset_1): Use absu_hwi
+            instead of abs_hwi, change moffset type to unsigned HOST_WIDE_INT.
+    
+            * gcc.dg/pr94121.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 1ea3cf183ad..441a0111bc4 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -3,6 +3,10 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR target/94121
++	* config/aarch64/aarch64.c (aarch64_add_offset_1): Use absu_hwi
++	instead of abs_hwi, change moffset type to unsigned HOST_WIDE_INT.
++
+ 	PR middle-end/94111
+ 	* dfp.c (decimal_to_binary): Only use decimal128ToString if from->cl
+ 	is rvc_normal, otherwise use real_to_decimal to print the number to
+diff --git a/gcc/config/aarch64/aarch64.c b/gcc/config/aarch64/aarch64.c
+index b452a53af99..5906b1492b8 100644
+--- a/gcc/config/aarch64/aarch64.c
++++ b/gcc/config/aarch64/aarch64.c
+@@ -2818,7 +2818,7 @@ aarch64_add_offset_1 (scalar_int_mode mode, rtx dest,
+   gcc_assert (emit_move_imm || temp1 != NULL_RTX);
+   gcc_assert (temp1 == NULL_RTX || !reg_overlap_mentioned_p (temp1, src));
+ 
+-  HOST_WIDE_INT moffset = abs_hwi (offset);
++  unsigned HOST_WIDE_INT moffset = absu_hwi (offset);
+   rtx_insn *insn;
+ 
+   if (!moffset)
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 8fba81a3bdd..685aa5718f6 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -3,6 +3,9 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR target/94121
++	* gcc.dg/pr94121.c: New test.
++
+ 	PR middle-end/94111
+ 	* gcc.dg/dfp/pr94111.c: New test.
+ 
+diff --git a/gcc/testsuite/gcc.dg/pr94121.c b/gcc/testsuite/gcc.dg/pr94121.c
+new file mode 100644
+index 00000000000..2a4261ae02d
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94121.c
+@@ -0,0 +1,16 @@
++/* PR target/94121 */
++/* { dg-do compile { target pie } } */
++/* { dg-options "-O2 -fpie -w" } */
++
++#define DIFF_MAX __PTRDIFF_MAX__
++#define DIFF_MIN (-DIFF_MAX - 1)
++
++extern void foo (char *);
++extern char v[];
++
++void
++bar (void)
++{
++  char *p = v;
++  foo (&p[DIFF_MIN]);
++}
+
+commit f1125cf88ac0c97d819e4f81d556fbcd1161270e
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed Mar 11 18:35:13 2020 +0100
+
+    pdp11: Fix handling of common (local and global) vars [PR94134]
+    
+    As mentioned in the PR, the generic code decides to put the a variable into
+    lcomm_section, which is a NOSWITCH section and thus the generic code doesn't
+    switch into a particular section before using
+    ASM_OUTPUT{_ALIGNED{,_DECL}_}_LOCAL, on many targets that results just in
+    .lcomm (or for non-local .comm) directives which don't need a switch to some
+    section, other targets put switch_to_section (bss_section) at the start of
+    that macro.
+    pdp11 doesn't do that (and doesn't have bss_section), and so emits the
+    lcomm/comm variables in whatever section is current (it has only .text/.data
+    and for DEC assembler rodata).
+    
+    The following patch fixes that by putting it always into data section, and
+    additionally avoids emitting an empty line in the assembly for the lcomm
+    vars.
+    
+    2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR target/94134
+            * config/pdp11/pdp11.c (pdp11_asm_output_var): Call switch_to_section
+            at the start to switch to data section.  Don't print extra newline if
+            .globl directive has not been emitted.
+    
+            * gcc.c-torture/execute/pr94134.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 441a0111bc4..57f959604f6 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -3,6 +3,11 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR target/94134
++	* config/pdp11/pdp11.c (pdp11_asm_output_var): Call switch_to_section
++	at the start to switch to data section.  Don't print extra newline if
++	.globl directive has not been emitted.
++
+ 	PR target/94121
+ 	* config/aarch64/aarch64.c (aarch64_add_offset_1): Use absu_hwi
+ 	instead of abs_hwi, change moffset type to unsigned HOST_WIDE_INT.
+diff --git a/gcc/config/pdp11/pdp11.c b/gcc/config/pdp11/pdp11.c
+index 5f530a43000..1be79e1964c 100644
+--- a/gcc/config/pdp11/pdp11.c
++++ b/gcc/config/pdp11/pdp11.c
+@@ -744,6 +744,7 @@ void
+ pdp11_asm_output_var (FILE *file, const char *name, int size,
+ 		      int align, bool global)
+ {
++  switch_to_section (data_section);
+   if (align > 8)
+     fprintf (file, "\t.even\n");
+   if (TARGET_DEC_ASM)
+@@ -764,8 +765,8 @@ pdp11_asm_output_var (FILE *file, const char *name, int size,
+ 	{
+ 	  fprintf (file, ".globl ");
+ 	  assemble_name (file, name);
++	  fprintf (file, "\n");
+ 	}
+-      fprintf (file, "\n");
+       assemble_name (file, name);
+       fputs (":", file);
+       ASM_OUTPUT_SKIP (file, size);
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 685aa5718f6..b2ae72c3c0c 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -3,6 +3,9 @@
+ 	Backported from mainline
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR target/94134
++	* gcc.c-torture/execute/pr94134.c: New test.
++
+ 	PR target/94121
+ 	* gcc.dg/pr94121.c: New test.
+ 
+diff --git a/gcc/testsuite/gcc.c-torture/execute/pr94134.c b/gcc/testsuite/gcc.c-torture/execute/pr94134.c
+new file mode 100644
+index 00000000000..b1b44c3b184
+--- /dev/null
++++ b/gcc/testsuite/gcc.c-torture/execute/pr94134.c
+@@ -0,0 +1,14 @@
++/* PR target/94134 */
++
++static volatile int a = 0;
++static volatile int b = 1;
++
++int
++main ()
++{
++  a++;
++  b++;
++  if (a != 1 || b != 2)
++    __builtin_abort ();
++  return 0;
++}
+
+commit a545ffafa380fa958393e1dfbf7f5f8f129bc5cf
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu Mar 12 09:34:00 2020 +0100
+
+    tree-dse: Fix mem* head trimming if call has lhs [PR94130]
+    
+    As the testcase shows, if DSE decides to head trim {mem{set,cpy,move},strncpy}
+    and the call has lhs, it is incorrect to leave the lhs as is, because it
+    will then point to the adjusted address (base + head_trim) instead of the
+    original base.
+    The following patch fixes that by dropping the lhs of the call and assigning
+    lhs the original base in a following statement.
+    
+    2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR tree-optimization/94130
+            * tree-ssa-dse.c: Include gimplify.h.
+            (increment_start_addr): If stmt has lhs, drop the lhs from call and
+            set it after the call to the original value of the first argument.
+            Formatting fixes.
+            (decrement_count): Formatting fix.
+    
+            * gcc.c-torture/execute/pr94130.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 57f959604f6..ec8d51f388c 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,15 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94130
++	* tree-ssa-dse.c: Include gimplify.h.
++	(increment_start_addr): If stmt has lhs, drop the lhs from call and
++	set it after the call to the original value of the first argument.
++	Formatting fixes.
++	(decrement_count): Formatting fix.
++
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94134
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index b2ae72c3c0c..10026d55a58 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,6 +1,11 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
++
++	PR tree-optimization/94130
++	* gcc.c-torture/execute/pr94130.c: New test.
++
+ 	2020-03-11  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94134
+diff --git a/gcc/testsuite/gcc.c-torture/execute/pr94130.c b/gcc/testsuite/gcc.c-torture/execute/pr94130.c
+new file mode 100644
+index 00000000000..044e578d373
+--- /dev/null
++++ b/gcc/testsuite/gcc.c-torture/execute/pr94130.c
+@@ -0,0 +1,16 @@
++/* PR tree-optimization/94130 */
++
++int
++main ()
++{
++  int a[8];
++  char *b = __builtin_memset (a, 0, sizeof (a));
++  a[0] = 1;
++  a[1] = 2;
++  a[2] = 3;
++  if (b != (char *) a)
++    __builtin_abort ();
++  else
++    asm volatile ("" : : "g" (a) : "memory");
++  return 0;
++}
+diff --git a/gcc/tree-ssa-dse.c b/gcc/tree-ssa-dse.c
+index efe5b31cc0a..26376ecf8de 100644
+--- a/gcc/tree-ssa-dse.c
++++ b/gcc/tree-ssa-dse.c
+@@ -36,6 +36,7 @@ along with GCC; see the file COPYING3.  If not see
+ #include "params.h"
+ #include "alias.h"
+ #include "tree-ssa-loop.h"
++#include "gimplify.h"
+ 
+ /* This file implements dead store elimination.
+ 
+@@ -394,29 +395,38 @@ decrement_count (gimple *stmt, int decrement)
+   gcc_assert (TREE_CODE (*countp) == INTEGER_CST);
+   *countp = wide_int_to_tree (TREE_TYPE (*countp), (TREE_INT_CST_LOW (*countp)
+ 						    - decrement));
+-
+ }
+ 
+ static void
+ increment_start_addr (gimple *stmt, tree *where, int increment)
+ {
++  if (tree lhs = gimple_call_lhs (stmt))
++    if (where == gimple_call_arg_ptr (stmt, 0))
++      {
++	gassign *newop = gimple_build_assign (lhs, unshare_expr (*where));
++	gimple_stmt_iterator gsi = gsi_for_stmt (stmt);
++	gsi_insert_after (&gsi, newop, GSI_SAME_STMT);
++	gimple_call_set_lhs (stmt, NULL_TREE);
++	update_stmt (stmt);
++      }
++
+   if (TREE_CODE (*where) == SSA_NAME)
+     {
+       tree tem = make_ssa_name (TREE_TYPE (*where));
+       gassign *newop
+-        = gimple_build_assign (tem, POINTER_PLUS_EXPR, *where,
++	= gimple_build_assign (tem, POINTER_PLUS_EXPR, *where,
+ 			       build_int_cst (sizetype, increment));
+       gimple_stmt_iterator gsi = gsi_for_stmt (stmt);
+       gsi_insert_before (&gsi, newop, GSI_SAME_STMT);
+       *where = tem;
+-      update_stmt (gsi_stmt (gsi));
++      update_stmt (stmt);
+       return;
+     }
+ 
+   *where = build_fold_addr_expr (fold_build2 (MEM_REF, char_type_node,
+-                                             *where,
+-                                             build_int_cst (ptr_type_node,
+-                                                            increment)));
++					      *where,
++					      build_int_cst (ptr_type_node,
++							     increment)));
+ }
+ 
+ /* STMT is builtin call that writes bytes in bitmap ORIG, some bytes are dead
+
+commit 9a8af207d7d03149a438185a2a0c50eeeb96a402
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu Mar 12 09:35:30 2020 +0100
+
+    doc: Fix up ASM_OUTPUT_ALIGNED_DECL_LOCAL description
+    
+    When looking into PR94134, I've noticed bugs in the
+    ASM_OUTPUT_ALIGNED_DECL_LOCAL documentation.  varasm.c has:
+      #if defined ASM_OUTPUT_ALIGNED_DECL_LOCAL
+        unsigned int align = symtab_node::get (decl)->definition_alignment ();
+        ASM_OUTPUT_ALIGNED_DECL_LOCAL (asm_out_file, decl, name,
+                                       size, align);
+        return true;
+      #elif defined ASM_OUTPUT_ALIGNED_LOCAL
+        unsigned int align = symtab_node::get (decl)->definition_alignment ();
+        ASM_OUTPUT_ALIGNED_LOCAL (asm_out_file, name, size, align);
+        return true;
+      #else
+        ASM_OUTPUT_LOCAL (asm_out_file, name, size, rounded);
+        return false;
+      #endif
+    and the ASM_OUTPUT_ALIGNED_LOCAL documentation properly mentions:
+    Like @code{ASM_OUTPUT_LOCAL} and mentions the same macro in another place.
+    The ASM_OUTPUT_ALIGNED_DECL_LOCAL description mentions non-existing macros
+    ASM_OUTPUT_ALIGNED_DECL and ASM_OUTPUT_DECL instead of the right ones
+    ASM_OUTPUT_ALIGNED_LOCAL and ASM_OUTPUT_LOCAL.
+    
+    2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+    
+            * doc/tm.texi.in (ASM_OUTPUT_ALIGNED_DECL_LOCAL): Change
+            ASM_OUTPUT_ALIGNED_DECL in description to ASM_OUTPUT_ALIGNED_LOCAL
+            and ASM_OUTPUT_DECL to ASM_OUTPUT_LOCAL.
+            * doc/tm.texi: Regenerated.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index ec8d51f388c..f3ea4382378 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -3,6 +3,11 @@
+ 	Backported from mainline
+ 	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+ 
++	* doc/tm.texi.in (ASM_OUTPUT_ALIGNED_DECL_LOCAL): Change
++	ASM_OUTPUT_ALIGNED_DECL in description to ASM_OUTPUT_ALIGNED_LOCAL
++	and ASM_OUTPUT_DECL to ASM_OUTPUT_LOCAL.
++	* doc/tm.texi: Regenerated.
++
+ 	PR tree-optimization/94130
+ 	* tree-ssa-dse.c: Include gimplify.h.
+ 	(increment_start_addr): If stmt has lhs, drop the lhs from call and
+diff --git a/gcc/doc/tm.texi b/gcc/doc/tm.texi
+index 8c8978bb13a..7f5c370d97a 100644
+--- a/gcc/doc/tm.texi
++++ b/gcc/doc/tm.texi
+@@ -8330,11 +8330,11 @@ as the number of bits.
+ @end defmac
+ 
+ @defmac ASM_OUTPUT_ALIGNED_DECL_LOCAL (@var{stream}, @var{decl}, @var{name}, @var{size}, @var{alignment})
+-Like @code{ASM_OUTPUT_ALIGNED_DECL} except that @var{decl} of the
++Like @code{ASM_OUTPUT_ALIGNED_LOCAL} except that @var{decl} of the
+ variable to be output, if there is one, or @code{NULL_TREE} if there
+ is no corresponding variable.  If you define this macro, GCC will use it
+-in place of both @code{ASM_OUTPUT_DECL} and
+-@code{ASM_OUTPUT_ALIGNED_DECL}.  Define this macro when you need to see
++in place of both @code{ASM_OUTPUT_LOCAL} and
++@code{ASM_OUTPUT_ALIGNED_LOCAL}.  Define this macro when you need to see
+ the variable's decl in order to chose what to output.
+ @end defmac
+ 
+diff --git a/gcc/doc/tm.texi.in b/gcc/doc/tm.texi.in
+index fe1194ef91a..44a15dda240 100644
+--- a/gcc/doc/tm.texi.in
++++ b/gcc/doc/tm.texi.in
+@@ -5403,11 +5403,11 @@ as the number of bits.
+ @end defmac
+ 
+ @defmac ASM_OUTPUT_ALIGNED_DECL_LOCAL (@var{stream}, @var{decl}, @var{name}, @var{size}, @var{alignment})
+-Like @code{ASM_OUTPUT_ALIGNED_DECL} except that @var{decl} of the
++Like @code{ASM_OUTPUT_ALIGNED_LOCAL} except that @var{decl} of the
+ variable to be output, if there is one, or @code{NULL_TREE} if there
+ is no corresponding variable.  If you define this macro, GCC will use it
+-in place of both @code{ASM_OUTPUT_DECL} and
+-@code{ASM_OUTPUT_ALIGNED_DECL}.  Define this macro when you need to see
++in place of both @code{ASM_OUTPUT_LOCAL} and
++@code{ASM_OUTPUT_ALIGNED_LOCAL}.  Define this macro when you need to see
+ the variable's decl in order to chose what to output.
+ @end defmac
+ 
+
+commit 3739894d0cfc88b6d84134b827f33b31d646d32a
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu Mar 12 18:30:16 2020 +0100
+
+    maintainer-scripts: Fix up gcc_release without -l, where mkdir was using umask 077 after migration
+    
+    2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+    
+            * gcc_release (upload_files): Without -l, pass -m 755 to the mkdir
+            command invoked through ssh.
+
+diff --git a/maintainer-scripts/ChangeLog b/maintainer-scripts/ChangeLog
+index b1a9be6f5b2..039f7381af5 100644
+--- a/maintainer-scripts/ChangeLog
++++ b/maintainer-scripts/ChangeLog
+@@ -1,3 +1,11 @@
++2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
++
++	* gcc_release (upload_files): Without -l, pass -m 755 to the mkdir
++	command invoked through ssh.
++
+ 2020-03-12  Release Manager
+ 
+ 	* GCC 9.3.0 released.
+diff --git a/maintainer-scripts/gcc_release b/maintainer-scripts/gcc_release
+index 74cce1af18d..2456908d716 100755
+--- a/maintainer-scripts/gcc_release
++++ b/maintainer-scripts/gcc_release
+@@ -398,7 +398,7 @@ upload_files() {
+   # Make sure the directory exists on the server.
+   if [ $LOCAL -eq 0 ]; then
+     ${SSH} -l ${GCC_USERNAME} ${GCC_HOSTNAME} \
+-      mkdir -p "${FTP_PATH}/diffs"
++      mkdir -m 755 -p "${FTP_PATH}/diffs"
+     UPLOAD_PATH="${GCC_USERNAME}@${GCC_HOSTNAME}:${FTP_PATH}"
+   else
+     mkdir -p "${FTP_PATH}/diffs" \
+
+commit c2f836c413b1e9ae45598338b4a2ecd33bd926fb
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Fri Mar 13 11:33:16 2020 +0100
+
+    aarch64: Fix another bug in aarch64_add_offset_1 [PR94121]
+    
+    > I'm getting this ICE with -mabi=ilp32:
+    >
+    > during RTL pass: fwprop1
+    > /opt/gcc/gcc-20200312/gcc/testsuite/gcc.dg/pr94121.c: In function 'bar':
+    > /opt/gcc/gcc-20200312/gcc/testsuite/gcc.dg/pr94121.c:16:1: internal compiler error: in decompose, at rtl.h:2279
+    
+    That is a preexisting issue, caused by another bug in the same function.
+    When mode is SImode and moffset is 0x80000000 (or anything else with the
+    bit 31 set), we need to sign-extend it.
+    
+    2020-03-13  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR target/94121
+            * config/aarch64/aarch64.c (aarch64_add_offset_1): Use gen_int_mode
+            instead of GEN_INT.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index f3ea4382378..52a760005d1 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,12 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-13  Jakub Jelinek  <jakub@redhat.com>
++
++	PR target/94121
++	* config/aarch64/aarch64.c (aarch64_add_offset_1): Use gen_int_mode
++	instead of GEN_INT.
++
+ 	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	* doc/tm.texi.in (ASM_OUTPUT_ALIGNED_DECL_LOCAL): Change
+diff --git a/gcc/config/aarch64/aarch64.c b/gcc/config/aarch64/aarch64.c
+index 5906b1492b8..2b09f317978 100644
+--- a/gcc/config/aarch64/aarch64.c
++++ b/gcc/config/aarch64/aarch64.c
+@@ -2862,7 +2862,8 @@ aarch64_add_offset_1 (scalar_int_mode mode, rtx dest,
+   if (emit_move_imm)
+     {
+       gcc_assert (temp1 != NULL_RTX || can_create_pseudo_p ());
+-      temp1 = aarch64_force_temporary (mode, temp1, GEN_INT (moffset));
++      temp1 = aarch64_force_temporary (mode, temp1,
++				       gen_int_mode (moffset, mode));
+     }
+   insn = emit_insn (offset < 0
+ 		    ? gen_sub3_insn (dest, src, temp1)
+
+commit a8fc40fd551a60a97efbfe3fee08721accd80964
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Sun Mar 15 01:27:40 2020 +0100
+
+    tree-nested: Fix handling of *reduction clauses with C array sections [PR93566]
+    
+    tree-nested.c didn't handle C array sections in {,task_,in_}reduction clauses.
+    
+    2020-03-14  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR middle-end/93566
+            * tree-nested.c (convert_nonlocal_omp_clauses,
+            convert_local_omp_clauses): Handle {,in_,task_}reduction clauses
+            with C/C++ array sections.
+    
+            * testsuite/libgomp.c/pr93566.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 52a760005d1..dfb83c5adf6 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,13 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-14  Jakub Jelinek  <jakub@redhat.com>
++
++	PR middle-end/93566
++	* tree-nested.c (convert_nonlocal_omp_clauses,
++	convert_local_omp_clauses): Handle {,in_,task_}reduction clauses
++	with C/C++ array sections.
++
+ 	2020-03-13  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94121
+diff --git a/gcc/tree-nested.c b/gcc/tree-nested.c
+index 3fe23cc2b22..e7c1026cf85 100644
+--- a/gcc/tree-nested.c
++++ b/gcc/tree-nested.c
+@@ -1178,7 +1178,7 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ {
+   struct nesting_info *const info = (struct nesting_info *) wi->info;
+   bool need_chain = false, need_stmts = false;
+-  tree clause, decl;
++  tree clause, decl, *pdecl;
+   int dummy;
+   bitmap new_suppress;
+ 
+@@ -1187,6 +1187,7 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 
+   for (clause = *pclauses; clause ; clause = OMP_CLAUSE_CHAIN (clause))
+     {
++      pdecl = NULL;
+       switch (OMP_CLAUSE_CODE (clause))
+ 	{
+ 	case OMP_CLAUSE_REDUCTION:
+@@ -1194,6 +1195,15 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 	case OMP_CLAUSE_TASK_REDUCTION:
+ 	  if (OMP_CLAUSE_REDUCTION_PLACEHOLDER (clause))
+ 	    need_stmts = true;
++	  if (TREE_CODE (OMP_CLAUSE_DECL (clause)) == MEM_REF)
++	    {
++	      pdecl = &TREE_OPERAND (OMP_CLAUSE_DECL (clause), 0);
++	      if (TREE_CODE (*pdecl) == POINTER_PLUS_EXPR)
++		pdecl = &TREE_OPERAND (*pdecl, 0);
++	      if (TREE_CODE (*pdecl) == INDIRECT_REF
++		  || TREE_CODE (*pdecl) == ADDR_EXPR)
++		pdecl = &TREE_OPERAND (*pdecl, 0);
++	    }
+ 	  goto do_decl_clause;
+ 
+ 	case OMP_CLAUSE_LASTPRIVATE:
+@@ -1219,7 +1229,9 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 	case OMP_CLAUSE_USE_DEVICE_PTR:
+ 	case OMP_CLAUSE_IS_DEVICE_PTR:
+ 	do_decl_clause:
+-	  decl = OMP_CLAUSE_DECL (clause);
++	  if (pdecl == NULL)
++	    pdecl = &OMP_CLAUSE_DECL (clause);
++	  decl = *pdecl;
+ 	  if (VAR_P (decl)
+ 	      && (TREE_STATIC (decl) || DECL_EXTERNAL (decl)))
+ 	    break;
+@@ -1228,7 +1240,7 @@ convert_nonlocal_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 	      if (OMP_CLAUSE_CODE (clause) == OMP_CLAUSE_SHARED)
+ 		OMP_CLAUSE_SHARED_READONLY (clause) = 0;
+ 	      bitmap_set_bit (new_suppress, DECL_UID (decl));
+-	      OMP_CLAUSE_DECL (clause) = get_nonlocal_debug_decl (info, decl);
++	      *pdecl = get_nonlocal_debug_decl (info, decl);
+ 	      if (OMP_CLAUSE_CODE (clause) != OMP_CLAUSE_PRIVATE)
+ 		need_chain = true;
+ 	    }
+@@ -1894,7 +1906,7 @@ convert_local_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ {
+   struct nesting_info *const info = (struct nesting_info *) wi->info;
+   bool need_frame = false, need_stmts = false;
+-  tree clause, decl;
++  tree clause, decl, *pdecl;
+   int dummy;
+   bitmap new_suppress;
+ 
+@@ -1903,6 +1915,7 @@ convert_local_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 
+   for (clause = *pclauses; clause ; clause = OMP_CLAUSE_CHAIN (clause))
+     {
++      pdecl = NULL;
+       switch (OMP_CLAUSE_CODE (clause))
+ 	{
+ 	case OMP_CLAUSE_REDUCTION:
+@@ -1910,6 +1923,15 @@ convert_local_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 	case OMP_CLAUSE_TASK_REDUCTION:
+ 	  if (OMP_CLAUSE_REDUCTION_PLACEHOLDER (clause))
+ 	    need_stmts = true;
++	  if (TREE_CODE (OMP_CLAUSE_DECL (clause)) == MEM_REF)
++	    {
++	      pdecl = &TREE_OPERAND (OMP_CLAUSE_DECL (clause), 0);
++	      if (TREE_CODE (*pdecl) == POINTER_PLUS_EXPR)
++		pdecl = &TREE_OPERAND (*pdecl, 0);
++	      if (TREE_CODE (*pdecl) == INDIRECT_REF
++		  || TREE_CODE (*pdecl) == ADDR_EXPR)
++		pdecl = &TREE_OPERAND (*pdecl, 0);
++	    }
+ 	  goto do_decl_clause;
+ 
+ 	case OMP_CLAUSE_LASTPRIVATE:
+@@ -1935,7 +1957,9 @@ convert_local_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 	case OMP_CLAUSE_USE_DEVICE_PTR:
+ 	case OMP_CLAUSE_IS_DEVICE_PTR:
+ 	do_decl_clause:
+-	  decl = OMP_CLAUSE_DECL (clause);
++	  if (pdecl == NULL)
++	    pdecl = &OMP_CLAUSE_DECL (clause);
++	  decl = *pdecl;
+ 	  if (VAR_P (decl)
+ 	      && (TREE_STATIC (decl) || DECL_EXTERNAL (decl)))
+ 	    break;
+@@ -1948,8 +1972,7 @@ convert_local_omp_clauses (tree *pclauses, struct walk_stmt_info *wi)
+ 		  if (OMP_CLAUSE_CODE (clause) == OMP_CLAUSE_SHARED)
+ 		    OMP_CLAUSE_SHARED_READONLY (clause) = 0;
+ 		  bitmap_set_bit (new_suppress, DECL_UID (decl));
+-		  OMP_CLAUSE_DECL (clause)
+-		    = get_local_debug_decl (info, decl, field);
++		  *pdecl = get_local_debug_decl (info, decl, field);
+ 		  need_frame = true;
+ 		}
+ 	    }
+diff --git a/libgomp/ChangeLog b/libgomp/ChangeLog
+index 0156d5f7bc9..f4aa8c63481 100644
+--- a/libgomp/ChangeLog
++++ b/libgomp/ChangeLog
+@@ -1,3 +1,11 @@
++2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-03-14  Jakub Jelinek  <jakub@redhat.com>
++
++	PR middle-end/93566
++	* testsuite/libgomp.c/pr93566.c: New test.
++
+ 2020-03-12  Release Manager
+ 
+ 	* GCC 9.3.0 released.
+diff --git a/libgomp/testsuite/libgomp.c/pr93566.c b/libgomp/testsuite/libgomp.c/pr93566.c
+new file mode 100644
+index 00000000000..3334bd571f6
+--- /dev/null
++++ b/libgomp/testsuite/libgomp.c/pr93566.c
+@@ -0,0 +1,113 @@
++/* PR middle-end/93566 */
++/* { dg-additional-options "-std=c99" } */
++
++extern void abort (void);
++
++void
++foo (int *x)
++{
++  void nest (void) {
++    #pragma omp parallel for reduction(+:x[:10])
++    for (int i = 0; i < 1024; i++)
++      for (int j = 0; j < 10; j++)
++	x[j] += j * i;
++  }
++  nest ();
++  for (int i = 0; i < 10; i++)
++    if (x[i] != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++void
++bar (void)
++{
++  int x[10] = {};
++  void nest (void) {
++    #pragma omp parallel for reduction(+:x[:10])
++    for (int i = 0; i < 1024; i++)
++      for (int j = 0; j < 10; j++)
++	x[j] += j * i;
++  }
++  nest ();
++  for (int i = 0; i < 10; i++)
++    if (x[i] != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++void
++baz (void)
++{
++  int x[10] = {};
++  void nest (void) {
++    #pragma omp parallel for reduction(+:x[2:5])
++    for (int i = 0; i < 1024; i++)
++      for (int j = 2; j < 7; j++)
++	x[j] += j * i;
++  }
++  nest ();
++  for (int i = 2; i < 7; i++)
++    if (x[i] != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++void
++qux (int *x)
++{
++  void nest (void) { x++; }
++  nest ();
++  #pragma omp parallel for reduction(+:x[:9])
++  for (int i = 0; i < 1024; i++)
++    for (int j = 0; j < 9; j++)
++      x[j] += j * i;
++  nest ();
++  for (int i = 0; i < 9; i++)
++    if (x[i - 1] != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++void
++quux (void)
++{
++  int x[10];
++  void nest (void) { for (int i = 0; i < 10; i++) x[i] = 0; }
++  int nest2 (int i) { return x[i]; }
++  nest ();
++  #pragma omp parallel for reduction(+:x[:7])
++  for (int i = 0; i < 1024; i++)
++    for (int j = 0; j < 7; j++)
++      x[j] += j * i;
++  for (int i = 0; i < 7; i++)
++    if (nest2 (i) != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++void
++corge (void)
++{
++  int x[10];
++  void nest (void) { for (int i = 0; i < 10; i++) x[i] = 0; }
++  int nest2 (int i) { return x[i]; }
++  nest ();
++  #pragma omp parallel for reduction(+:x[2:4])
++  for (int i = 0; i < 1024; i++)
++    for (int j = 2; j < 6; j++)
++      x[j] += j * i;
++  for (int i = 2; i < 6; i++)
++    if (nest2 (i) != 1023 * 1024 / 2 * i)
++      abort ();
++}
++
++int
++main ()
++{
++  int a[10] = {};
++  foo (a);
++  bar ();
++  baz ();
++  for (int i = 0; i < 10; i++)
++    a[i] = 0;
++  qux (a);
++  quux ();
++  corge ();
++  return 0;
++}
+
+commit 378e830538afd4a02e41674cc9161fa59b5e09a9
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Mon Mar 16 09:03:59 2020 +0100
+
+    tree-inline: Fix a -fcompare-debug issue in the inliner [PR94167]
+    
+    The following testcase fails with -fcompare-debug.  The problem is that
+    bar is marked as address_taken only with -g and not without.
+    I've tracked it down to insert_init_stmt calling gimple_regimplify_operands
+    even on DEBUG_STMTs.  That function will just insert normal stmts before
+    the DEBUG_STMT if the DEBUG_STMT operand isn't gimple val or invariant.
+    While DCE will turn those statements into debug temporaries, it can cause
+    differences in SSA_NAMEs and more importantly, the ipa references are
+    generated from those before the DCE happens.
+    On the testcase, the DEBUG_STMT value is (int)bar.
+    
+    We could generate DEBUG_STMTs with debug temporaries instead, but I fail to
+    see the reason to do that, DEBUG_STMTs allow other expressions and all we
+    want to ensure is that the expressions aren't too large (arbitrarily
+    complex), but during inlining/function versioning I don't see why something
+    would queue a DEBUG_STMT with arbitrarily complex expressions in there.
+    
+    2020-03-16  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR debug/94167
+            * tree-inline.c (insert_init_stmt): Don't gimple_regimplify_operands
+            DEBUG_STMTs.
+    
+            * gcc.dg/pr94167.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index dfb83c5adf6..6e05c969993 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,6 +1,12 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-16  Jakub Jelinek  <jakub@redhat.com>
++
++	PR debug/94167
++	* tree-inline.c (insert_init_stmt): Don't gimple_regimplify_operands
++	DEBUG_STMTs.
++
+ 	2020-03-14  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/93566
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 10026d55a58..522a7608203 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,6 +1,11 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
++	2020-03-16  Jakub Jelinek  <jakub@redhat.com>
++
++	PR debug/94167
++	* gcc.dg/pr94167.c: New test.
++
+ 	2020-03-12  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR tree-optimization/94130
+diff --git a/gcc/testsuite/gcc.dg/pr94167.c b/gcc/testsuite/gcc.dg/pr94167.c
+new file mode 100644
+index 00000000000..4b819d3a869
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94167.c
+@@ -0,0 +1,33 @@
++/* PR debug/94167 */
++/* { dg-do compile } */
++/* { dg-options "-O2 -fcompare-debug" } */
++
++struct S { int g, h; signed char i; int j; signed char k; int l[4]; } a, c;
++struct T { signed char g; } e;
++int *b, d;
++static void foo ();
++
++void
++bar (void)
++{
++  while (d)
++    {
++      int k;
++      struct T f[3];
++      foo (bar, a);
++      for (k = 0;; k++)
++	f[k] = e;
++    }
++}
++
++static inline void
++foo (int x, struct S y, struct T z)
++{
++  for (z.g = 2; z.g; z.g--)
++    {
++      c = a = y;
++      *b |= 6;
++      if (y.g)
++	break;
++    }
++}
+diff --git a/gcc/tree-inline.c b/gcc/tree-inline.c
+index 7ba2ebf3695..7a41f64bcc3 100644
+--- a/gcc/tree-inline.c
++++ b/gcc/tree-inline.c
+@@ -3213,10 +3213,10 @@ insert_init_stmt (copy_body_data *id, basic_block bb, gimple *init_stmt)
+ 	  gimple_assign_set_rhs1 (init_stmt, rhs);
+ 	}
+       gsi_insert_after (&si, init_stmt, GSI_NEW_STMT);
+-      gimple_regimplify_operands (init_stmt, &si);
+-
+       if (!is_gimple_debug (init_stmt))
+ 	{
++	  gimple_regimplify_operands (init_stmt, &si);
++
+ 	  tree def = gimple_assign_lhs (init_stmt);
+ 	  insert_init_debug_bind (id, bb, def, def, init_stmt);
+ 	}
+
+commit 65de83595faeccd83bc0fefbfb79768f8a3bb2b6
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Tue Mar 17 10:42:35 2020 +0100
+
+    expand: Don't depend on warning flags in code generation of strnlen [PR94189]
+    
+    The following testcase FAILs with -O2 -fcompare-debug, but the reason isn't
+    that we'd emit different code based on -g or non-debug, but rather that
+    we emit different code depending on whether -w is used or not (or e.g.
+    -Wno-stringop-overflow or whether some other pass emitted some other warning
+    already on the call).
+    
+    Code generation shouldn't depend on whether we emit a warning or not if at
+    all possible.
+    
+    The following patch punts (i.e. doesn't optimize the strnlen call to a
+    constant value) if we would emit the warning if it was enabled.
+    In the PR there is an alternate patch which does optimize the strnlen call
+    no matter if we emit the warning or not, though I think I prefer the version
+    below, e.g. the strnlen call might be crossing field boundaries, which is in
+    strict reading undefined, but I'd be afraid people do that in the real
+    world programs.
+    
+    2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR middle-end/94189
+            * builtins.c (expand_builtin_strnlen): Do return NULL_RTX if we would
+            emit a warning if it was enabled and don't depend on TREE_NO_WARNING
+            for code-generation.
+    
+            * gcc.dg/pr94189.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 6e05c969993..d443cb45ed4 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,5 +1,10 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR middle-end/94189
++	* builtins.c (expand_builtin_strnlen): Do return NULL_RTX if we would
++	emit a warning if it was enabled and don't depend on TREE_NO_WARNING
++	for code-generation.
++
+ 	Backported from mainline
+ 	2020-03-16  Jakub Jelinek  <jakub@redhat.com>
+ 
+diff --git a/gcc/builtins.c b/gcc/builtins.c
+index ed11f79ff0b..e8e43f53ec6 100644
+--- a/gcc/builtins.c
++++ b/gcc/builtins.c
+@@ -3112,27 +3112,25 @@ expand_builtin_strnlen (tree exp, rtx target, machine_mode target_mode)
+ 	    return NULL_RTX;
+ 	}
+ 
+-      if (lendata.decl
+-	  && !TREE_NO_WARNING (exp)
+-	  && ((tree_int_cst_lt (len, bound))
+-	      || !exact))
++      if (lendata.decl && (tree_int_cst_lt (len, bound) || !exact))
+ 	{
+ 	  location_t warnloc
+ 	    = expansion_point_location_if_in_system_header (loc);
+ 
+-	  if (warning_at (warnloc, OPT_Wstringop_overflow_,
+-			  exact
+-			  ? G_("%K%qD specified bound %E exceeds the size %E "
+-			       "of unterminated array")
+-			  : G_("%K%qD specified bound %E may exceed the size "
+-			       "of at most %E of unterminated array"),
+-			  exp, func, bound, len))
++	  if (!TREE_NO_WARNING (exp)
++	      && warning_at (warnloc, OPT_Wstringop_overflow_,
++			     exact
++			     ? G_("%K%qD specified bound %E exceeds the size "
++				  "%E of unterminated array")
++			     : G_("%K%qD specified bound %E may exceed the "
++				  "size of at most %E of unterminated array"),
++			     exp, func, bound, len))
+ 	    {
+ 	      inform (DECL_SOURCE_LOCATION (lendata.decl),
+ 		      "referenced argument declared here");
+ 	      TREE_NO_WARNING (exp) = true;
+-	      return NULL_RTX;
+ 	    }
++	  return NULL_RTX;
+ 	}
+ 
+       if (!len)
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 522a7608203..f982ee6a9ec 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,5 +1,8 @@
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
++	PR middle-end/94189
++	* gcc.dg/pr94189.c: New test.
++
+ 	Backported from mainline
+ 	2020-03-16  Jakub Jelinek  <jakub@redhat.com>
+ 
+diff --git a/gcc/testsuite/gcc.dg/pr94189.c b/gcc/testsuite/gcc.dg/pr94189.c
+new file mode 100644
+index 00000000000..f927d55279a
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94189.c
+@@ -0,0 +1,11 @@
++/* PR middle-end/94189 */
++/* { dg-do compile } */
++/* { dg-options "-O2 -fcompare-debug" } */
++
++const char a[] = { 'a', 'b', 'c', 'd' };/* { dg-message "declared here" } */
++
++int
++foo (void)
++{
++  return __builtin_strnlen (a, 5);	/* { dg-warning "specified bound 5 exceeds the size 4 of unterminated array" } */
++}
+
+commit c78b41b23b360e21a43bb161c7381c71680da8f3
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Wed Mar 18 00:17:30 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index c73081a5a12..584bf4bedcf 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200317
++20200318
