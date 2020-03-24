@@ -62,21 +62,21 @@ build() {
 
   make
 
-  [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
-  mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
-
-  msg "Build shared z3"
-  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
-  ${MINGW_PREFIX}/bin/cmake.exe \
-    -G"MSYS Makefiles" \
-    -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DZ3_BUILD_LIBZ3_SHARED=ON \
-    -DBUILD_PYTHON_BINDINGS=ON \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
-    "${extra_config[@]}" \
-    ../${_realname}-${pkgver}
-
-  make
+#  [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
+#  mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
+#
+#  msg "Build shared z3"
+#  MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+#  ${MINGW_PREFIX}/bin/cmake.exe \
+#    -G"MSYS Makefiles" \
+#    -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+#    -DZ3_BUILD_LIBZ3_SHARED=ON \
+#    -DBUILD_PYTHON_BINDINGS=ON \
+#    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
+#    "${extra_config[@]}" \
+#    ../${_realname}-${pkgver}
+#
+#  make
 }
 
 check() {
@@ -88,6 +88,6 @@ package() {
   cd "${srcdir}"/build-${CARCH}-static
   make install DESTDIR="${pkgdir}"
 
-  cd "${srcdir}"/build-${CARCH}-shared
-  make install DESTDIR="${pkgdir}"
+#  cd "${srcdir}"/build-${CARCH}-shared
+#  make install DESTDIR="${pkgdir}"
 }
