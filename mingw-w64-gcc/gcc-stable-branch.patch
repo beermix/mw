@@ -3485,3 +3485,677 @@ index c73081a5a12..584bf4bedcf 100644
 @@ -1 +1 @@
 -20200317
 +20200318
+
+commit 883465f79e71e401c15caff7c318ea8541fa8401
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Thu Mar 19 00:17:31 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 584bf4bedcf..2cdfff05e89 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200318
++20200319
+
+commit d01cb80e0fbe23510a861faab9909b76837faf98
+Author: Jiufu Guo <guojiufu@linux.ibm.com>
+Date:   Tue Mar 10 13:51:57 2020 +0800
+
+    rs6000: Check -+0 and NaN for smax/smin generation
+    
+    PR93709 mentioned regressions on maxlocval_4.f90 and minlocval_f.f90 which
+    relates to max of '-inf' and 'nan'. This regression occur on P9 because
+    P9 new instruction 'xsmaxcdp' is generated.
+    And for C code `a < b ? b : a` is also generated as `xsmaxcdp` under -O2
+    for P9. While this instruction behavior more like C/C++ semantic (a>b?a:b).
+    In GCC9, the issue also occur as the new test case shows.
+    
+    This generates prevents 'xsmaxcdp' to be generated for those cases.
+    'xsmincdp' also is handled in patch.
+    
+    gcc/
+    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+    
+            PR target/93709
+            * gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
+            NAN and SIGNED_ZEROR for smax/smin.
+    
+    gcc/testsuite
+    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+    
+            PR target/93709
+            * gcc.target/powerpc/p9-minmax-3.c: New test.
+
+diff --git a/a b/a
+new file mode 100644
+index 00000000000..a4f422403ef
+--- /dev/null
++++ b/a
+@@ -0,0 +1,81 @@
++commit 5b075372b47b87bde46e5acc58531c410fb65f8c
++Author:     Jiufu Guo <guojiufu@linux.ibm.com>
++AuthorDate: Tue Mar 10 13:51:57 2020 +0800
++Commit:     Jiufu Guo <guojiufu@linux.ibm.com>
++CommitDate: Thu Mar 19 10:04:00 2020 +0800
++
++    rs6000: Check -+0 and NaN for smax/smin generation
++    
++    PR93709 mentioned regressions on maxlocval_4.f90 and minlocval_f.f90 which
++    relates to max of '-inf' and 'nan'. This regression occur on P9 because
++    P9 new instruction 'xsmaxcdp' is generated.
++    And for C code `a < b ? b : a` is also generated as `xsmaxcdp` under -O2
++    for P9. While this instruction behavior more like C/C++ semantic (a>b?a:b).
++    The issue also occur as the new test case shows.
++    
++    This generates prevents 'xsmaxcdp' to be generated for those cases.
++    'xsmincdp' also is handled in patch.
++    
++    gcc/
++    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
++    
++            PR target/93709
++            * gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
++            NAN and SIGNED_ZEROR for smax/smin.
++    
++    gcc/testsuite
++    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
++    
++            PR target/93709
++            * gcc.target/powerpc/p9-minmax-3.c: New test.
++
++diff --git a/gcc/ChangeLog b/gcc/ChangeLog
++index d443cb45ed4..a7847fd00b9 100644
++--- a/gcc/ChangeLog
+++++ b/gcc/ChangeLog
++@@ -1,3 +1,9 @@
+++2020-03-10  Jiufu Guo  <guojiufu@linux.ibm.com>
+++
+++	PR target/93709
+++	* gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
+++	NAN and SIGNED_ZEROR for smax/smin.
+++
++ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++ 
++ 	PR middle-end/94189
++diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
++index f982ee6a9ec..b12d397eb93 100644
++--- a/gcc/testsuite/ChangeLog
+++++ b/gcc/testsuite/ChangeLog
++@@ -1,3 +1,8 @@
+++2020-03-10  Jiufu Guo  <guojiufu@linux.ibm.com>
+++
+++	PR target/93709
+++	* gcc.target/powerpc/p9-minmax-3.c: New test.
+++
++ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
++ 
++ 	PR middle-end/94189
++diff --git a/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
++new file mode 100644
++index 00000000000..141603e05b4
++--- /dev/null
+++++ b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
++@@ -0,0 +1,17 @@
+++/* { dg-do compile { target { powerpc*-*-* } } } */
+++/* { dg-require-effective-target powerpc_p9vector_ok } */
+++/* { dg-options "-mdejagnu-cpu=power9 -O2 -mpower9-minmax" } */
+++/* { dg-final { scan-assembler-not "xsmaxcdp"   } } */
+++/* { dg-final { scan-assembler-not "xsmincdp"   } } */
+++
+++double
+++dbl_max1 (double a, double b)
+++{
+++  return a < b ? b : a;
+++}
+++
+++double
+++dbl_min1 (double a, double b)
+++{
+++  return a > b ? b : a;
+++}
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index d443cb45ed4..90a5cf5c8d8 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
++
++	PR target/93709
++	* gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
++	NAN and SIGNED_ZEROR for smax/smin.
++
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/94189
+diff --git a/gcc/config/rs6000/rs6000.c b/gcc/config/rs6000/rs6000.c
+index 04324ab981a..5ec2b339df6 100644
+--- a/gcc/config/rs6000/rs6000.c
++++ b/gcc/config/rs6000/rs6000.c
+@@ -23087,7 +23087,11 @@ rs6000_emit_p9_fp_minmax (rtx dest, rtx op, rtx true_cond, rtx false_cond)
+   if (rtx_equal_p (op0, true_cond) && rtx_equal_p (op1, false_cond))
+     ;
+ 
+-  else if (rtx_equal_p (op1, true_cond) && rtx_equal_p (op0, false_cond))
++  /* Only when NaNs and signed-zeros are not in effect, smax could be
++     used for `op0 < op1 ? op1 : op0`, and smin could be used for
++     `op0 > op1 ? op1 : op0`.  */
++  else if (rtx_equal_p (op1, true_cond) && rtx_equal_p (op0, false_cond)
++	   && !HONOR_NANS (compare_mode) && !HONOR_SIGNED_ZEROS (compare_mode))
+     max_p = !max_p;
+ 
+   else
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index f982ee6a9ec..e99496f4a2b 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
++
++	PR target/93709
++	* gcc.target/powerpc/p9-minmax-3.c: New test.
++
+ 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/94189
+diff --git a/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
+new file mode 100644
+index 00000000000..141603e05b4
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
+@@ -0,0 +1,17 @@
++/* { dg-do compile { target { powerpc*-*-* } } } */
++/* { dg-require-effective-target powerpc_p9vector_ok } */
++/* { dg-options "-mdejagnu-cpu=power9 -O2 -mpower9-minmax" } */
++/* { dg-final { scan-assembler-not "xsmaxcdp"   } } */
++/* { dg-final { scan-assembler-not "xsmincdp"   } } */
++
++double
++dbl_max1 (double a, double b)
++{
++  return a < b ? b : a;
++}
++
++double
++dbl_min1 (double a, double b)
++{
++  return a > b ? b : a;
++}
+
+commit 337111a23499e597707f220662b2567e3f3bd6ea
+Author: Jonathan Wakely <jwakely@redhat.com>
+Date:   Thu Mar 19 15:33:02 2020 +0000
+
+    doc: Note that some warnings depend on optimizations (PR 92757)
+    
+    Backport from mainline
+    2020-01-13  Jonathan Wakely  <jwakely@redhat.com>
+    
+            PR driver/92757
+            * doc/invoke.texi (Warning Options): Add caveat about some warnings
+            depending on optimization settings.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 90a5cf5c8d8..91bcc48ceca 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-19  Jonathan Wakely  <jwakely@redhat.com>
++
++	Backport from mainline
++	2020-01-13  Jonathan Wakely  <jwakely@redhat.com>
++
++	PR driver/92757
++	* doc/invoke.texi (Warning Options): Add caveat about some warnings
++	depending on optimization settings.
++
+ 2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+ 
+ 	PR target/93709
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 0ab6c9c6449..0f6247caf51 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -4313,6 +4313,11 @@ are being produced.  This allows the use of new @option{-Wno-} options
+ with old compilers, but if something goes wrong, the compiler
+ warns that an unrecognized option is present.
+ 
++The effectiveness of some warnings depends on optimizations also being
++enabled. For example @option{-Wsuggest-final-types} is more effective
++with link-time optimization and @option{-Wmaybe-uninitialized} will not
++warn at all unless optimization is enabled.
++
+ @table @gcctabopt
+ @item -Wpedantic
+ @itemx -pedantic
+
+commit bf061b9a5f77bfda10bd5a82eb6db2cc5a71d271
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Fri Mar 20 00:17:30 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 2cdfff05e89..f4838bee578 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200319
++20200320
+
+commit ecce469d89e8943a021f128eca4e423d72e30c78
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sat Mar 21 00:17:31 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index f4838bee578..983af034e4c 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200320
++20200321
+
+commit 938de7cbb1c7030eb1d9e1972f23b6ae0b913132
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sun Mar 22 12:52:15 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 983af034e4c..97182ea4df8 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200321
++20200322
+
+commit a5ef37f868bf43f20ecb0b0a820ef7766c31e9f5
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Mon Mar 23 00:17:27 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 97182ea4df8..2ce2bd47475 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200322
++20200323
+
+commit 46de8b3eb1a537d75c85abfd9f85b7fb5f5b136c
+Author: Iain Sandoe <iain@sandoe.co.uk>
+Date:   Mon Mar 23 17:10:05 2020 +0000
+
+    Darwin: Fix i686 bootstrap when the assembler supports GOTOFF in data.
+    
+    When we use an assembler that supports " .long XX@GOTOFF", the current
+    combination of configuration parameters and conditional compilation
+    (when building an i686-darwin compiler with mdynamic-no-pic) assume that
+    it's OK to put jump tables in the .const section.
+    
+    However, when we encounter a weak function with a jump table, this
+    produces relocations that directly access the weak symbol section from
+    the .const section - which is deemed illegal by the linker (since that
+    would mean that the weak symbol could not be replaced).
+    
+    Arguably, this is a limitation (maybe even a bug) in the linker - but
+    it seems that we'd have to change the ABI to fix it - since it would
+    require some annotation (maybe just using a special section for the
+    jump tables) to tell the linker that this specific circumstance is OK
+    because the direct access to the weak symbol can only occur from that
+    symbol itself.
+    
+    The fix is to force jump tables into the text section for all X86 Darwin
+    versions (PIC code already had this change).
+    
+    gcc/ChangeLog:
+    
+    2020-03-23  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backport from master.
+            2020-03-22  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            * config/i386/darwin.h (JUMP_TABLES_IN_TEXT_SECTION): Remove
+            references to Darwin.
+            * config/i386/i386.h (JUMP_TABLES_IN_TEXT_SECTION): Define this
+            unconditionally and comment on why.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 91bcc48ceca..c19e3fd08e2 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,13 @@
++2020-03-23  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backport from master.
++	2020-03-22  Iain Sandoe  <iain@sandoe.co.uk>
++
++	* config/i386/darwin.h (JUMP_TABLES_IN_TEXT_SECTION): Remove
++	references to Darwin.
++	* config/i386/i386.h (JUMP_TABLES_IN_TEXT_SECTION): Define this
++	unconditionally and comment on why.
++
+ 2020-03-19  Jonathan Wakely  <jwakely@redhat.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/i386/darwin.h b/gcc/config/i386/darwin.h
+index bdb36f00959..c099a6238d8 100644
+--- a/gcc/config/i386/darwin.h
++++ b/gcc/config/i386/darwin.h
+@@ -239,6 +239,16 @@ along with GCC; see the file COPYING3.  If not see
+ #undef TARGET_ASM_OUTPUT_IDENT
+ #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
+ 
++/* We always want jump tables in the text section:
++   * for PIC code, we need the subtracted symbol to be defined at
++     assembly-time.
++   * for mdynamic-no-pic, we cannot support jump tables in the .const
++     section for weak functions, this looks to ld64 like direct access
++     to the weak symbol from an anonymous atom.  */
++
++#undef JUMP_TABLES_IN_TEXT_SECTION
++#define JUMP_TABLES_IN_TEXT_SECTION 1
++
+ /* Darwin profiling -- call mcount.  */
+ #undef FUNCTION_PROFILER
+ #define FUNCTION_PROFILER(FILE, LABELNO)				\
+diff --git a/gcc/config/i386/i386.h b/gcc/config/i386/i386.h
+index 14e5a392f62..441213eebb8 100644
+--- a/gcc/config/i386/i386.h
++++ b/gcc/config/i386/i386.h
+@@ -2232,11 +2232,10 @@ extern int const svr4_dbx_register_map[FIRST_PSEUDO_REGISTER];
+ 
+ /* Under some conditions we need jump tables in the text section,
+    because the assembler cannot handle label differences between
+-   sections.  This is the case for x86_64 on Mach-O for example.  */
++   sections.  */
+ 
+ #define JUMP_TABLES_IN_TEXT_SECTION \
+-  (flag_pic && ((TARGET_MACHO && TARGET_64BIT) \
+-   || (!TARGET_64BIT && !HAVE_AS_GOTOFF_IN_DATA)))
++  (flag_pic && !(TARGET_64BIT || HAVE_AS_GOTOFF_IN_DATA))
+ 
+ /* Switch to init or fini section via SECTION_OP, emit a call to FUNC,
+    and switch back.  For x86 we do this only to save a few bytes that
+
+commit 5c7bd28d1cb85c43c5d0f6d9ece953881cf99373
+Author: Will Schmidt <will_schmidt@vnet.ibm.com>
+Date:   Mon Mar 23 14:04:20 2020 -0500
+
+    backport PR90763: PowerPC vec_xl_len should take const argument.
+    
+        2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
+    
+        Backport from mainline.
+        2020-03-10  Will Schmidt  <will_schmidt@vnet.ibm.com>
+    
+        PR target/90763
+        * config/rs6000/rs6000-c.c (altivec_resolve_overloaded_builtin):
+        add clause to handle P9V_BUILTIN_VEC_LXVL with const arguments.
+    
+        * gcc.target/powerpc/pr90763.c: New.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index c19e3fd08e2..836833778da 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
++
++	Backport from mainline
++	2020-03-10  Will Schmidt  <will_schmidt@vnet.ibm.com>
++
++	PR target/90763
++	    * config/rs6000/rs6000-c.c (altivec_resolve_overloaded_builtin):
++	    Add clause to handle P9V_BUILTIN_VEC_LXVL with const arguments.
++
+ 2020-03-23  Iain Sandoe  <iain@sandoe.co.uk>
+ 
+ 	Backport from master.
+diff --git a/gcc/config/rs6000/rs6000-c.c b/gcc/config/rs6000/rs6000-c.c
+index 7c28d4d8176..1ec38db0908 100644
+--- a/gcc/config/rs6000/rs6000-c.c
++++ b/gcc/config/rs6000/rs6000-c.c
+@@ -6853,6 +6853,19 @@ altivec_resolve_overloaded_builtin (location_t loc, tree fndecl,
+ 	  arg = fold_convert (type, arg);
+ 	}
+ 
++      /* For P9V_BUILTIN_VEC_LXVL, convert any const * to its non constant
++	 equivalent to simplify the overload matching below.  */
++      if (fcode == P9V_BUILTIN_VEC_LXVL)
++	{
++	  if (POINTER_TYPE_P (type)
++	      && TYPE_READONLY (TREE_TYPE (type)))
++	    {
++	      type = build_pointer_type (build_qualified_type (
++						TREE_TYPE (type),0));
++	      arg = fold_convert (type, arg);
++	    }
++	}
++
+       args[n] = arg;
+       types[n] = type;
+     }
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index e99496f4a2b..7483f2f85d2 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,11 @@
++2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
++
++	Backport from mainline
++	2020-03-10  Will Schmidt  <will_schmidt@vnet.ibm.com>
++
++	PR target/90763
++	* gcc.target/powerpc/pr90763.c: New.
++
+ 2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+ 
+ 	PR target/93709
+diff --git a/gcc/testsuite/gcc.target/powerpc/pr90763.c b/gcc/testsuite/gcc.target/powerpc/pr90763.c
+new file mode 100644
+index 00000000000..55f1d461e82
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/powerpc/pr90763.c
+@@ -0,0 +1,88 @@
++/* { dg-do compile { target { powerpc*-*-* && lp64 } } } */
++/* { dg-require-effective-target powerpc_p9vector_ok } */
++/* { dg-options "-mcpu=power9 -O2" } */
++
++/* PR90763: PowerPC vec_xl_len should take const.
++*/
++
++#include <altivec.h>
++
++vector unsigned char vec_load_uc(unsigned char *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned char vec_load_const_uc(const unsigned char *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed char vec_load_sc(signed char *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed char vec_load_const_sc(const signed char *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector signed short vec_load_ss(signed short *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed short vec_load_const_ss(const signed short *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned short vec_load_us(unsigned short *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned short vec_load_const_us(const unsigned short *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector signed int vec_load_si(signed int *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed int vec_load_const_si(const signed int *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned int vec_load_ui(unsigned int *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned int vec_load_const_ui(const unsigned int *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector signed long long vec_load_sll(signed long long *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed long long vec_load_const_sll(const signed long long *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned long long vec_load_ull(unsigned long long *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned long long vec_load_const_ull(const unsigned long long *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector signed __int128 vec_load_si128(signed __int128 *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector signed __int128 vec_load_const_si128(const signed __int128 *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned __int128 vec_load_ui128(unsigned __int128 *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector unsigned __int128 vec_load_const_ui128(const unsigned __int128 *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector float vec_load_f(float *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector float vec_load_const_f(const float *p, int num) {
++    return vec_xl_len(p, num);
++}
++
++vector double vec_load_d(double *p, int num) {
++    return vec_xl_len(p, num);
++}
++vector double vec_load_const_d(const double *p, int num) {
++    return vec_xl_len(p, num);
++}
++
+
+commit c7bc3b656235604eae212515b8695c6cfdaa3675
+Author: Joseph Myers <joseph@codesourcery.com>
+Date:   Mon Mar 23 19:07:40 2020 +0000
+
+    Remove wrongly committed file.
+
+diff --git a/a b/a
+deleted file mode 100644
+index a4f422403ef..00000000000
+--- a/a
++++ /dev/null
+@@ -1,81 +0,0 @@
+-commit 5b075372b47b87bde46e5acc58531c410fb65f8c
+-Author:     Jiufu Guo <guojiufu@linux.ibm.com>
+-AuthorDate: Tue Mar 10 13:51:57 2020 +0800
+-Commit:     Jiufu Guo <guojiufu@linux.ibm.com>
+-CommitDate: Thu Mar 19 10:04:00 2020 +0800
+-
+-    rs6000: Check -+0 and NaN for smax/smin generation
+-    
+-    PR93709 mentioned regressions on maxlocval_4.f90 and minlocval_f.f90 which
+-    relates to max of '-inf' and 'nan'. This regression occur on P9 because
+-    P9 new instruction 'xsmaxcdp' is generated.
+-    And for C code `a < b ? b : a` is also generated as `xsmaxcdp` under -O2
+-    for P9. While this instruction behavior more like C/C++ semantic (a>b?a:b).
+-    The issue also occur as the new test case shows.
+-    
+-    This generates prevents 'xsmaxcdp' to be generated for those cases.
+-    'xsmincdp' also is handled in patch.
+-    
+-    gcc/
+-    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+-    
+-            PR target/93709
+-            * gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
+-            NAN and SIGNED_ZEROR for smax/smin.
+-    
+-    gcc/testsuite
+-    2020-03-19  Jiufu Guo  <guojiufu@linux.ibm.com>
+-    
+-            PR target/93709
+-            * gcc.target/powerpc/p9-minmax-3.c: New test.
+-
+-diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+-index d443cb45ed4..a7847fd00b9 100644
+---- a/gcc/ChangeLog
+-+++ b/gcc/ChangeLog
+-@@ -1,3 +1,9 @@
+-+2020-03-10  Jiufu Guo  <guojiufu@linux.ibm.com>
+-+
+-+	PR target/93709
+-+	* gcc/config/rs6000/rs6000.c (rs6000_emit_p9_fp_minmax): Check
+-+	NAN and SIGNED_ZEROR for smax/smin.
+-+
+- 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+- 
+- 	PR middle-end/94189
+-diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+-index f982ee6a9ec..b12d397eb93 100644
+---- a/gcc/testsuite/ChangeLog
+-+++ b/gcc/testsuite/ChangeLog
+-@@ -1,3 +1,8 @@
+-+2020-03-10  Jiufu Guo  <guojiufu@linux.ibm.com>
+-+
+-+	PR target/93709
+-+	* gcc.target/powerpc/p9-minmax-3.c: New test.
+-+
+- 2020-03-17  Jakub Jelinek  <jakub@redhat.com>
+- 
+- 	PR middle-end/94189
+-diff --git a/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
+-new file mode 100644
+-index 00000000000..141603e05b4
+---- /dev/null
+-+++ b/gcc/testsuite/gcc.target/powerpc/p9-minmax-3.c
+-@@ -0,0 +1,17 @@
+-+/* { dg-do compile { target { powerpc*-*-* } } } */
+-+/* { dg-require-effective-target powerpc_p9vector_ok } */
+-+/* { dg-options "-mdejagnu-cpu=power9 -O2 -mpower9-minmax" } */
+-+/* { dg-final { scan-assembler-not "xsmaxcdp"   } } */
+-+/* { dg-final { scan-assembler-not "xsmincdp"   } } */
+-+
+-+double
+-+dbl_max1 (double a, double b)
+-+{
+-+  return a < b ? b : a;
+-+}
+-+
+-+double
+-+dbl_min1 (double a, double b)
+-+{
+-+  return a > b ? b : a;
+-+}
+
+commit 2e432a9783988191766db032a1d7e7ade88ed98e
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Tue Mar 24 00:17:39 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 2ce2bd47475..a84a567c2e6 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200323
++20200324
