@@ -171,14 +171,14 @@ prepare() {
 
   rm -rf gcc/ada/*.ad*
   rm -rf gcc/testsuite/ada
-  rm -rf gcc/testsuite/brig.dg
-  rm -rf gcc/testsuite/c-c++-common
-  rm -rf gcc/testsuite/ChangeLog*
-  rm -rf gcc/testsuite/config
-  rm -rf gcc/testsuite/g*
-  rm -rf gcc/testsuite/jit.dg
-  rm -rf gcc/testsuite/lib
-  rm -rf gcc/testsuite/o*
+#  rm -rf gcc/testsuite/brig.dg
+#  rm -rf gcc/testsuite/c-c++-common
+#  rm -rf gcc/testsuite/ChangeLog*
+#  rm -rf gcc/testsuite/config
+#  rm -rf gcc/testsuite/g*
+#  rm -rf gcc/testsuite/jit.dg
+#  rm -rf gcc/testsuite/lib
+#  rm -rf gcc/testsuite/o*
 }
 
 build() {
@@ -242,7 +242,7 @@ build() {
     --enable-threads=${_threads} \
     --enable-graphite \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=yes \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
