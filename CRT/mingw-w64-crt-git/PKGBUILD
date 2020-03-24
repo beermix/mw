@@ -60,6 +60,7 @@ build() {
     --target=${MINGW_CHOST} \
     --with-sysroot=${MINGW_PREFIX}/${MINGW_CHOST} \
     --enable-wildcard \
+    --disable-dependency-tracking \
     ${_crt_configure_args}
   make
 }
