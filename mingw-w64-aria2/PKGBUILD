@@ -48,7 +48,7 @@ build() {
     --disable-nls \
     ARIA2_STATIC=yes
 
-  make
+  /home/User/.go/bin/noti.exe nice -n 19 make
 }
 
 package() {
