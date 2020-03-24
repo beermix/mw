@@ -145,12 +145,12 @@ prepare() {
     fortran-vector-v2.patch \
     optimize.patch \
     gomp-relax.patch \
+    ipa-cp.patch \
     optimize-at-least-some.patch
 
 #  Enable clear linux patches
 #  apply_patch_with_msg \
 #    zero-regs-gcc8.patch \
-#    ipa-cp.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
 #    0001-Fix-stack-protection-issues.patch \
