@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=31
+pkgrel=32
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -62,8 +62,9 @@ prepare() {
   patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
   patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
   patch -p1 -i "${srcdir}"/branch-version.patch
-  #patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
+  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
   patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
+
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
 
@@ -122,6 +123,7 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
+    --enable-targets=x86_64-*-mingw* \
     --enable-silent-rules \
     --disable-shared
 
