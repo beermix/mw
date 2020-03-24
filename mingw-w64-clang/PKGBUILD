@@ -199,6 +199,7 @@ prepare() {
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
   mv "${srcdir}/lld-${pkgver}.src"               tools/lld
+  #mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
   mv "${srcdir}/polly-${pkgver}.src"             tools/polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
   mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
@@ -345,7 +346,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -419,8 +419,6 @@ package_llvm() {
 
   # TODO: why CMake haven't included it?
   cp ../build-${CARCH}/lib/libLLVM.dll.a "${pkgdir}/${MINGW_PREFIX}/lib/"
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
