@@ -4159,3 +4159,129 @@ index 2ce2bd47475..a84a567c2e6 100644
 @@ -1 +1 @@
 -20200323
 +20200324
+
+commit 95c969e58f7905b14d3f2889cf41595eb2c13cbb
+Author: Bin Cheng <bin.cheng@linux.alibaba.com>
+Date:   Tue Mar 24 17:40:21 2020 +0800
+
+    backport PR94125: Update post order number for merged SCC.
+    
+    Function loop_distribution::break_alias_scc_partitions needs to compute
+    SCC with runtime alias edges skipped.  As a result, partitions could be
+    re-assigned larger post order number than SCC's precedent partition and
+    distributed before the precedent one.  This fixes the issue by updating
+    the merged partition to the minimal post order in SCC.
+    
+    Backport from mainline.
+        PR tree-optimization/94125
+        * tree-loop-distribution.c
+        (loop_distribution::break_alias_scc_partitions): Update post order
+        number for merged scc.
+    
+        * gcc.dg/tree-ssa/pr94125.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 836833778da..1d29aab40a5 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,13 @@
++2020-03-24  Bin Cheng  <bin.cheng@linux.alibaba.com>
++
++	Backport from mainline
++	2020-03-16  Bin Cheng  <bin.cheng@linux.alibaba.com>
++
++	PR tree-optimization/94125
++	* tree-loop-distribution.c
++	(loop_distribution::break_alias_scc_partitions): Update post order
++	number for merged scc.
++
+ 2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 7483f2f85d2..0c2bf3567d6 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,11 @@
++2020-03-24  Bin Cheng  <bin.cheng@linux.alibaba.com>
++
++	Backport from mainline
++	2020-03-16  Bin Cheng  <bin.cheng@linux.alibaba.com>
++
++	PR tree-optimization/94125
++	* gcc.dg/tree-ssa/pr94125.c: New test.
++
+ 2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/testsuite/gcc.dg/tree-ssa/pr94125.c b/gcc/testsuite/gcc.dg/tree-ssa/pr94125.c
+new file mode 100644
+index 00000000000..c339e51f482
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/tree-ssa/pr94125.c
+@@ -0,0 +1,41 @@
++/* { dg-do run } */
++/* { dg-options "-O3" } */
++
++unsigned char b, f;
++short d[1][8][1], *g = &d[0][3][0];
++
++void __attribute__((noinline)) foo ()
++{
++  int k[256] = { 0, 0, 0, 4, 0, 0 };
++  for (int c = 252; c >= 0; c--)
++    {
++      b = f;
++      *g = k[c + 3];
++      k[c + 1] = 0;
++    }
++  for (int i = 0; i < 8; i++)
++    if (d[0][i][0] != 0)
++      __builtin_abort ();
++}
++
++void __attribute__((noinline)) bar ()
++{
++  int k[256] = { 0, 0, 0, 4, 0, 0 };
++  k[255] = 4;
++  for (int c = 0; c <=252; c++)
++    {
++      b = f;
++      *g = k[c + 3];
++      k[c + 1] = 0;
++    }
++  for (int i = 0; i < 8; i++)
++    if ((i == 3 && d[0][i][0] != 4) || (i != 3 && d[0][i][0] != 0))
++      __builtin_abort ();
++}
++
++int main ()
++{
++  foo ();
++  bar ();
++  return 0;
++}
+diff --git a/gcc/tree-loop-distribution.c b/gcc/tree-loop-distribution.c
+index c07ac0d228c..3e9b220ffb7 100644
+--- a/gcc/tree-loop-distribution.c
++++ b/gcc/tree-loop-distribution.c
+@@ -2364,14 +2364,11 @@ break_alias_scc_partitions (struct graph *rdg,
+ 	      if (cbdata.vertices_component[k] != i)
+ 		continue;
+ 
+-	      /* Update postorder number so that merged reduction partition is
+-		 sorted after other partitions.  */
+-	      if (!partition_reduction_p (first)
+-		  && partition_reduction_p (partition))
+-		{
+-		  gcc_assert (pg->vertices[k].post < pg->vertices[j].post);
+-		  pg->vertices[j].post = pg->vertices[k].post;
+-		}
++	      /* Update to the minimal postordeer number of vertices in scc so
++		 that merged partition is sorted correctly against others.  */
++	      if (pg->vertices[j].post > pg->vertices[k].post)
++		pg->vertices[j].post = pg->vertices[k].post;
++
+ 	      partition_merge_into (NULL, first, partition, FUSE_SAME_SCC);
+ 	      (*partitions)[k] = NULL;
+ 	      partition_free (partition);
