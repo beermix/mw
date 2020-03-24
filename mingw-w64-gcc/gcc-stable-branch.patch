@@ -4285,3 +4285,287 @@ index c07ac0d228c..3e9b220ffb7 100644
  	      partition_merge_into (NULL, first, partition, FUSE_SAME_SCC);
  	      (*partitions)[k] = NULL;
  	      partition_free (partition);
+
+commit 8fa2081ca6288853f3b8ceecd7d57ddf5dba5e7a
+Author: Tamar Christina <tamar.christina@arm.com>
+Date:   Tue Mar 24 12:36:19 2020 +0000
+
+    AArch64: Break apart paradoxical subregs for VSTRUCT writes (PR target/94052)
+    
+    This works around an ICE in reload where from expand we get the following RTL
+    generated for VSTRUCT mode writes:
+    
+    (insn 446 354 445 2 (set (reg:CI 383)
+     (subreg:CI (reg:V4SI 291) 0)) "small.i":146:22 3408 {*aarch64_movci}
+     (nil))
+    
+    This sequence is trying to say two things:
+    
+    1) liveliness: It's trying to say that eventually the whole CI reg will be
+                   written to. It does this by generating the paradoxical subreg.
+    2) write data: It's trying to in the same instruction also write the V4SI mode
+                   component at offset 0 in the CI reg.
+    
+    This patch fixes it by in the backend when we see such a paradoxical
+    construction breaking it apart and issuing a clobber to correct the liveliness
+    information and then emitting a normal subreg write for the component that the
+    paradoxical subreg was trying to write to.
+    
+    Concretely we generate this:
+    
+    (insn 42 41 43 (clobber (reg/v:CI 122 [ diD.5226 ])) "small.i":121:23 -1
+         (nil))
+    
+    (insn 43 42 44 (set (subreg:V4SI (reg/v:CI 122 [ diD.5226 ]) 0)
+            (reg:V4SI 136)) "small.i":121:23 -1
+         (nil))
+    
+    gcc/ChangeLog:
+    
+            PR target/94052
+            * config/aarch64/aarch64-simd.md (mov<mode>): Remove paradoxical
+            subregs of VSTRUCT modes.
+    
+    gcc/testsuite/ChangeLog:
+    
+            PR target/94052
+            * g++.target/aarch64/pr94052.C: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 1d29aab40a5..cdf11147136 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-03-24  Tamar Christina  <tamar.christina@arm.com>
++
++	PR target/94052
++	* config/aarch64/aarch64-simd.md (mov<mode>): Remove paradoxical
++	subregs of VSTRUCT modes.
++
+ 2020-03-24  Bin Cheng  <bin.cheng@linux.alibaba.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/aarch64/aarch64-simd.md b/gcc/config/aarch64/aarch64-simd.md
+index e3852c5d182..0b09fd8320d 100644
+--- a/gcc/config/aarch64/aarch64-simd.md
++++ b/gcc/config/aarch64/aarch64-simd.md
+@@ -5214,6 +5214,26 @@
+       if (GET_CODE (operands[0]) != REG)
+ 	operands[1] = force_reg (<MODE>mode, operands[1]);
+     }
++
++  /* If we have a paradoxical subreg trying to write to <MODE> from and the
++     registers don't overlap then we need to break it apart.  What it's trying
++     to do is give two kind of information at the same time.  It's trying to
++     convey liveness information by saying that the entire register will be
++     written to eventually, but it also only wants to write a single part of the
++     register.  Hence the paradoxical subreg.
++
++     Instead of allowing this we will split the two concerns.  The liveness
++     information will be conveyed using a clobber and then we break apart the
++     paradoxical subreg into just a normal write of the part that it wanted to
++     write originally.  */
++
++  if (REG_P (operands[0]) && paradoxical_subreg_p (operands[1]))
++    {
++      if (!reg_overlap_mentioned_p (operands[0], operands[1]))
++	emit_clobber (operands[0]);
++      operands[1] = SUBREG_REG (operands[1]);
++      operands[0] = gen_lowpart (GET_MODE (operands[1]), operands[0]);
++    }
+ })
+ 
+ 
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 0c2bf3567d6..e1f77050d93 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-03-24  Tamar Christina  <tamar.christina@arm.com>
++
++	PR target/94052
++        * g++.target/aarch64/pr94052.C: New test.
++
+ 2020-03-24  Bin Cheng  <bin.cheng@linux.alibaba.com>
+ 
+ 	Backport from mainline
+diff --git a/gcc/testsuite/g++.target/aarch64/pr94052.C b/gcc/testsuite/g++.target/aarch64/pr94052.C
+new file mode 100644
+index 00000000000..d36c9bdc158
+--- /dev/null
++++ b/gcc/testsuite/g++.target/aarch64/pr94052.C
+@@ -0,0 +1,174 @@
++/* { dg-do compile } */
++/* { dg-additional-options "-O2 -std=gnu++11 -w" } */
++
++namespace c {
++typedef int d;
++template <typename e> struct f { typedef e g; };
++template <bool, typename> struct h;
++template <typename e> e aa(typename f<e>::g i) { return i; }
++template <typename, typename> struct j {};
++template <d, typename> struct k;
++template <class l, class m> struct k<1, j<l, m>> { typedef m g; };
++template <d n, class l, class m> typename k<n, j<l, m>>::g ab(j<l, m>);
++} // namespace c
++typedef long d;
++typedef char o;
++typedef int p;
++typedef char q;
++typedef int r;
++namespace {
++struct s;
++constexpr d t = 6;
++template <typename> class ad {
++public:
++  static constexpr d u = t;
++  d v();
++  d x();
++  d y();
++};
++class z : ad<int> {};
++struct ae {
++  p af;
++};
++class ag {
++public:
++  ae ah();
++};
++} // namespace
++typedef __Int32x4_t ai;
++typedef struct {
++  ai aj[2];
++} ak;
++typedef int al;
++void am(p *a, ai b) { __builtin_aarch64_st1v4si(a, b); }
++namespace an {
++class ao {
++public:
++  bool operator==(ao);
++  d v();
++  d x();
++};
++class ap : public ad<r> {};
++class aq {
++public:
++  c::j<int, int> ar();
++  int as();
++  int at();
++};
++class au {
++public:
++  virtual d av(d);
++  virtual ap aw();
++  virtual ag ax();
++};
++class ay {};
++class az {
++  virtual void ba(const ay &, const s &);
++};
++using bb = az;
++class bc;
++class bd : bb {
++  void ba(const ay &, const s &);
++  bc *be;
++  bc *bf;
++  bc *bg;
++  aq bh;
++  int bi;
++  int bj;
++  ao bk;
++};
++namespace bl {
++namespace bm {
++namespace bn {
++class bo;
++}
++} // namespace bm
++} // namespace bl
++namespace bn {
++template <typename ac = c::h<0, bl::bm ::bn::bo>>
++ai bp(ac *, ac *, ac *, al, al, al, d, p);
++template <typename ac = c::h<0, bl::bm ::bn::bo>>
++ak bq(ac *br, ac *bs, ac *bt, al bu, al bv, al bw, d bx, int, int by) {
++  ak{bp(br, bs, bt, bu, bv, bw, bx, by), bp(br, bs, bt, bu, bv, bw, bx, by)};
++}
++template <typename ac = c::h<0, bl::bm ::bn::bo>>
++ak bz(ac *, ac *, ac *, al, al, al &, int, p);
++template <int> void ca(p *, const ak &);
++template <> void ca<1>(p *buffer, const ak &cb) {
++  am(buffer, cb.aj[0]);
++  am(buffer + 4, cb.aj[1]);
++}
++int cc(int, int);
++} // namespace bn
++class bc {
++public:
++  virtual au *cd();
++};
++class ce {
++public:
++  q *cf();
++};
++template <d> struct cg {
++  template <typename ch> static void ci(ay, z cj, ch ck) { ck(cj); }
++};
++template <typename ch> void cl(ay w, ch ck) {
++  z cj;
++  cg<z::u>::ci(w, cj, c::aa<ch>(ck));
++}
++namespace {
++template <typename T1, typename cm, int cn> class co {
++public:
++  static void convolve(ay, int cs, bc *cp, bc *cq, bc *cr, aq cw, int, ao ct) {
++    int by = cp->cd()->ax().ah().af;
++    int cu = cq->cd()->ax().ah().af;
++    cp->cd()->aw().v();
++    int cv = cp->cd()->aw().x();
++    cp->cd()->aw().y();
++    cp->cd()->aw();
++    int da = cr->cd()->aw().x();
++    int cx = cq->cd()->aw().x();
++    cq->cd()->aw().y();
++    int cy = cr->cd()->av(0);
++    int cz = cr->cd()->av(1);
++    bn::cc(cs, cn);
++    int de = c::ab<1>(cw.ar());
++    cw.as();
++    cw.at();
++    ay db;
++    ce dc;
++    ce dd;
++    ce w;
++    q *di = w.cf();
++    cl(db, [&](z) {
++      int df;
++      dc;
++      di;
++      cx;
++      auto dg(cu);
++      auto dh(cu);
++      auto dl(cu);
++      for (; cz; df += de) {
++        auto br = reinterpret_cast<T1 *>(cv);
++        auto bs = reinterpret_cast<T1 *>(cv);
++        auto bt = reinterpret_cast<T1 *>(df * ct.x());
++        auto dj = reinterpret_cast<cm *>(dd.cf() + da);
++        for (int dk; dk < cy; dk += cs, dj += cs)
++          if (ct == ao()) {
++            auto vres = bn::bz(br, bs, bt, dg, dh, dl, cn, by);
++            bn::ca<cn>(dj, vres);
++          } else
++            bn::bq(br, bs, bt, dg, dh, dl, ct.v(), cn, by);
++      }
++    });
++  }
++};
++template <typename T1, typename cm>
++void bz(ay dm, int cs, bc *cp, bc *cq, bc *cr, aq cw, int dn, ao ct) {
++  co<T1, cm, 1>::convolve(dm, cs, cp, cq, cr, cw, dn, ct);
++  co<T1, cm, 2>::convolve(dm, cs, cp, cq, cr, cw, dn, ct);
++}
++} // namespace
++void bd::ba(const ay &dm, const s &) {
++  bz<o, p>(dm, bi, be, bg, bf, bh, bj, bk);
++}
++} // namespace an
