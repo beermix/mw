@@ -4569,3 +4569,220 @@ index 00000000000..d36c9bdc158
 +  bz<o, p>(dm, bi, be, bg, bf, bh, bj, bk);
 +}
 +} // namespace an
+
+commit 366f69fdf42854f76b90ce81394e3685f2990988
+Author: John David Anglin <danglin@gcc.gnu.org>
+Date:   Tue Mar 24 17:07:23 2020 +0000
+
+    Define __BIG_ENDIAN__
+    
+            2020-03-24  John David Anglin  <danglin@gcc.gnu.org>
+    
+            PR lto/94249
+            * config/pa/pa.h (TARGET_CPU_CPP_BUILTINS): Define __BIG_ENDIAN__.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index cdf11147136..040c48d0829 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,8 @@
++2020-03-24  John David Anglin  <danglin@gcc.gnu.org>
++
++	PR lto/94249
++	* config/pa/pa.h (TARGET_CPU_CPP_BUILTINS): Define __BIG_ENDIAN__.
++
+ 2020-03-24  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	PR target/94052
+diff --git a/gcc/config/pa/pa.h b/gcc/config/pa/pa.h
+index 24739e56f97..3c9f249c920 100644
+--- a/gcc/config/pa/pa.h
++++ b/gcc/config/pa/pa.h
+@@ -171,6 +171,7 @@ do {								\
+      builtin_assert("machine=hppa");				\
+      builtin_define("__hppa");					\
+      builtin_define("__hppa__");				\
++     builtin_define("__BIG_ENDIAN__");				\
+      if (TARGET_PA_20)						\
+        builtin_define("_PA_RISC2_0");				\
+      else if (TARGET_PA_11)					\
+
+commit 76f7f2f96518eb06d6eb7d0bef8a2195b619d15f
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Wed Mar 25 00:17:25 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index a84a567c2e6..4e2e6c730e5 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200324
++20200325
+
+commit 768779dd1165edf49e148bca425321093c7dc15b
+Author: Kewen Lin <linkw@linux.ibm.com>
+Date:   Fri Mar 13 05:51:21 2020 -0500
+
+    [testsuite] Fix PR93935 to guard case under vect_hw_misalign
+    
+    This patch is to apply the same fix as r267528 to another similar case
+    bb-slp-over-widen-2.c which requires misaligned vector access.
+    
+    gcc/testsuite/ChangeLog
+    
+    2020-03-25  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        Backport from master
+        2020-03-13  Kewen Lin  <linkw@gcc.gnu.org>
+    
+        PR testsuite/93935
+        * gcc.dg/vect/bb-slp-over-widen-2.c: Expect basic block vectorized
+        messages only on vect_hw_misalign targets.
+
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index e1f77050d93..23fc1178346 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-25  Kewen Lin  <linkw@gcc.gnu.org>
++
++	Backport from master
++	2020-03-13  Kewen Lin  <linkw@gcc.gnu.org>
++
++	PR testsuite/93935
++	* gcc.dg/vect/bb-slp-over-widen-2.c: Expect basic block vectorized
++	messages only on vect_hw_misalign targets.
++
+ 2020-03-24  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	PR target/94052
+diff --git a/gcc/testsuite/gcc.dg/vect/bb-slp-over-widen-2.c b/gcc/testsuite/gcc.dg/vect/bb-slp-over-widen-2.c
+index 3750fb79c12..042b7e9ea1b 100644
+--- a/gcc/testsuite/gcc.dg/vect/bb-slp-over-widen-2.c
++++ b/gcc/testsuite/gcc.dg/vect/bb-slp-over-widen-2.c
+@@ -63,4 +63,4 @@ main (void)
+ /* { dg-final { scan-tree-dump "demoting int to signed short" "slp2" { target { ! vect_widen_shift } } } } */
+ /* { dg-final { scan-tree-dump "demoting int to unsigned short" "slp2" { target { ! vect_widen_shift } } } } */
+ /* { dg-final { scan-tree-dump {\.AVG_FLOOR} "slp2" { target vect_avg_qi } } } */
+-/* { dg-final { scan-tree-dump-times "basic block vectorized" 2 "slp2" } } */
++/* { dg-final { scan-tree-dump-times "basic block vectorized" 2 "slp2" { target vect_hw_misalign } } } */
+
+commit dff885cdc00bbdccb5bb6277e4711093e3bbad1e
+Author: Mark Eggleston <markeggleston@gcc.gnu.org>
+Date:   Wed Mar 25 13:43:23 2020 +0000
+
+    fortran: ICE using undeclared symbol in array constructor PR93484
+    
+    Using undeclared symbol k in an expression in the following
+    array constructor results in an ICE:
+    
+        print *, [real(x(k))]
+    
+    If the call to the intrinsic is not in a constructor a no IMPLICIT
+    type error is reported and the ICE does not occur.
+    
+    Matching on an expression instead of an initialisation express an
+    and not converting a MATCH_ERROR return value into MATCH_NO results
+    in the no IMPLICIT error and no ICE.
+    
+    Note: Steven G. Kargl  <kargl@gcc.gnu.org> is the author of the
+    changes except for the test cases.
+    
+    gcc/fortran/ChangeLog:
+    
+            Backport from master
+            2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
+    
+            PR fortran/93484
+            * match.c (gfc_match_type_spec): Replace gfc_match_init_expr with
+            gfc_match_expr. Return m if m is MATCH_NO or MATCH_ERROR.
+    
+    gcc/testsuite
+    
+            Backport from master
+            2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
+    
+            PR fortran/93484
+            * gfortran.dg/pr93484_1.f90: New test.
+            * gfortran.dg/pr93484_2.f90: New test.
+
+diff --git a/gcc/fortran/ChangeLog b/gcc/fortran/ChangeLog
+index 8fefea2b63d..503b385d79c 100644
+--- a/gcc/fortran/ChangeLog
++++ b/gcc/fortran/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
++
++	Backport from master
++	2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
++
++	PR fortran/93484
++	* match.c (gfc_match_type_spec): Replace gfc_match_init_expr with
++	gfc_match_expr. Return m if m is MATCH_NO or MATCH_ERROR.
++
+ 2020-03-12  Release Manager
+ 
+ 	* GCC 9.3.0 released.
+diff --git a/gcc/fortran/match.c b/gcc/fortran/match.c
+index 088b69f8ec9..f4ae9e9dfe7 100644
+--- a/gcc/fortran/match.c
++++ b/gcc/fortran/match.c
+@@ -2200,9 +2200,9 @@ gfc_match_type_spec (gfc_typespec *ts)
+ 
+ found:
+ 
+-      m = gfc_match_init_expr (&e);
++      m = gfc_match_expr (&e);
+       if (m == MATCH_NO || m == MATCH_ERROR)
+-	return MATCH_NO;
++	return m;
+ 
+       /* If a comma appears, it is an intrinsic subprogram. */
+       gfc_gobble_whitespace ();
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 23fc1178346..e4d99050bcf 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,12 @@
++2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
++
++	Backport from master
++	2020-03-25  Mark Eggleston <markeggleston@gcc.gnu.org>
++
++	PR fortran/93484
++	* gfortran.dg/pr93484_1.f90: New test.
++	* gfortran.dg/pr93484_2.f90: New test.
++
+ 2020-03-25  Kewen Lin  <linkw@gcc.gnu.org>
+ 
+ 	Backport from master
+diff --git a/gcc/testsuite/gfortran.dg/pr93484_1.f90 b/gcc/testsuite/gfortran.dg/pr93484_1.f90
+new file mode 100644
+index 00000000000..3b6dbc9ad79
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/pr93484_1.f90
+@@ -0,0 +1,8 @@
++! { dg-do compile }
++!
++program p
++  implicit none
++  integer :: x(4) = [1,2,3,4]
++  print *, [real(x(k))] ! { dg-error "Symbol 'k' at .1. has no IMPLICIT type" } 
++end
++
+diff --git a/gcc/testsuite/gfortran.dg/pr93484_2.f90 b/gcc/testsuite/gfortran.dg/pr93484_2.f90
+new file mode 100644
+index 00000000000..4a7f4330ed9
+--- /dev/null
++++ b/gcc/testsuite/gfortran.dg/pr93484_2.f90
+@@ -0,0 +1,8 @@
++! { dg-do compile }
++!
++program p
++  implicit none
++  integer, parameter :: x(4) = [1,2,3,4]
++  print *, [real(x(k))] ! { dg-error "Symbol 'k' at .1. has no IMPLICIT type" }
++end
++
