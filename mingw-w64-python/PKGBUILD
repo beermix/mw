@@ -136,7 +136,13 @@ source=("https://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz
         3000-importlib-bootstrap-path-sep.patch
         3001-pathlib-path-sep.patch
         5000-warnings-fixes.patch
-        smoketests.py)
+        smoketests.py
+        0001-Add-pybench-for-pgo-optimization.patch
+        0001-AVX2-and-AVX512-support.patch
+        0001-use-pybench-to-optimize-python.patch
+        0002-Skip-tests-TODO-fix-skips.patch
+        0004-Build-avx2-and-avx512-versions-of-the-math-library.patch
+        0006-test_socket.py-remove-testPeek-test.test_socket.RDST.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -309,6 +315,12 @@ prepare() {
   apply_patch_with_msg 3001-pathlib-path-sep.patch
 
   apply_patch_with_msg 5000-warnings-fixes.patch
+  
+  apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
+#  apply_patch_with_msg 0001-AVX2-and-AVX512-support.patch
+  apply_patch_with_msg 0001-use-pybench-to-optimize-python.patch
+#  apply_patch_with_msg 0002-Skip-tests-TODO-fix-skips.patch
+#  apply_patch_with_msg 0004-Build-avx2-and-avx512-versions-of-the-math-library.patch
 
   autoreconf -vfi
 
@@ -357,8 +369,8 @@ build() {
   if check_option "debug" "n"; then
     CFLAGS+=" -DNDEBUG "
     CXXFLAGS+=" -DNDEBUG "
-   # _extra_config+=("--enable-optimizations")
-   #_extra_config+=("--with-lto=4")
+   _extra_config+=("--enable-optimizations")
+   _extra_config+=("--with-lto=8")
   else
     plain " -DDEBUG -DPy_DEBUG -D_DEBUG does not work unfortunately .."
     #    CFLAGS+=" -DDEBUG -DPy_DEBUG -D_DEBUG "
@@ -392,15 +404,17 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --host=${MINGW_CHOST} \
     --build=${MINGW_CHOST} \
-    --enable-shared \
+    ac_cv_header_bluetooth_bluetooth_h=no  \
+    ac_cv_header_bluetooth_h=no \
+    --with-pymalloc \
+    --without-cxx-main \
     --with-nt-threads \
     --with-system-expat \
     --with-system-ffi \
     --with-system-libmpdec \
     --without-ensurepip \
     --with-computed-gotos \
-    ax_cv_c_float_words_bigendian=no \
-    "${_extra_config[@]}" \
+     "${_extra_config[@]}" \
     OPT=""
 
   # We patch importlib which is embedded in C headers, so regenerate them
