@@ -316,10 +316,10 @@ prepare() {
 
   apply_patch_with_msg 5000-warnings-fixes.patch
   
-#  apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
-#  apply_patch_with_msg 0001-AVX2-and-AVX512-support.patch
-#  apply_patch_with_msg 0001-use-pybench-to-optimize-python.patch
-#  apply_patch_with_msg 0002-Skip-tests-TODO-fix-skips.patch
+  apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
+  apply_patch_with_msg 0001-AVX2-and-AVX512-support.patch
+  apply_patch_with_msg 0001-use-pybench-to-optimize-python.patch
+  apply_patch_with_msg 0002-Skip-tests-TODO-fix-skips.patch
 #  apply_patch_with_msg 0004-Build-avx2-and-avx512-versions-of-the-math-library.patch
 
   autoreconf -vfi
@@ -370,7 +370,7 @@ build() {
     CFLAGS+=" -DNDEBUG "
     CXXFLAGS+=" -DNDEBUG "
    _extra_config+=("--enable-optimizations")
-   _extra_config+=("--with-lto")
+   _extra_config+=("--with-lto=8")
   else
     plain " -DDEBUG -DPy_DEBUG -D_DEBUG does not work unfortunately .."
     #    CFLAGS+=" -DDEBUG -DPy_DEBUG -D_DEBUG "
@@ -404,12 +404,15 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --host=${MINGW_CHOST} \
     --build=${MINGW_CHOST} \
+    --with-pymalloc \
+    --without-cxx-main \
     --enable-shared \
     --with-nt-threads \
     --with-system-expat \
     --with-system-ffi \
     --with-system-libmpdec \
     --without-ensurepip \
+    --with-computed-gotos \
     "${_extra_config[@]}" \
     OPT=""
 
