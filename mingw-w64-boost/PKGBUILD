@@ -140,9 +140,9 @@ build() {
 
   ./b2 \
     address-model=${_model} \
-    link=shared,static \
+    link=static \
     pch=off \
-    runtime-link=shared \
+    runtime-link=static \
     threading=multi \
     threadapi=win32 \
     toolset=gcc \
@@ -193,8 +193,8 @@ package() {
 
   ./b2 \
       address-model=${_model} \
-      link=shared,static \
-      runtime-link=shared \
+      link=static \
+      runtime-link=static \
       threading=multi \
       threadapi=win32 \
       toolset=gcc \
@@ -222,7 +222,7 @@ package() {
       install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
-  mv ${pkgdir}${MINGW_PREFIX}/lib/*.dll ${pkgdir}${MINGW_PREFIX}/bin
+  #mv ${pkgdir}${MINGW_PREFIX}/lib/*.dll ${pkgdir}${MINGW_PREFIX}/bin
   
   # install b2 and bjam
   install -Dm755 b2.exe "${pkgdir}${MINGW_PREFIX}"/bin/b2.exe

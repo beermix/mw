@@ -4786,3 +4786,17 @@ index 00000000000..4a7f4330ed9
 +  print *, [real(x(k))] ! { dg-error "Symbol 'k' at .1. has no IMPLICIT type" }
 +end
 +
+
+commit 9b9d9fd072846173413c67e83c60a475a40849ce
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Thu Mar 26 00:17:37 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 4e2e6c730e5..2024abddc58 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200325
++20200326

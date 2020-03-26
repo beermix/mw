@@ -167,7 +167,7 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
   rm -rf gcc/ada/*.ad*
   rm -rf gcc/testsuite/ada
@@ -262,7 +262,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
     #--enable-libitm
