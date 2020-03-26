@@ -317,9 +317,9 @@ prepare() {
   apply_patch_with_msg 5000-warnings-fixes.patch
   
   apply_patch_with_msg 0001-Add-pybench-for-pgo-optimization.patch
-#  apply_patch_with_msg 0001-AVX2-and-AVX512-support.patch
+  apply_patch_with_msg 0001-AVX2-and-AVX512-support.patch
   apply_patch_with_msg 0001-use-pybench-to-optimize-python.patch
-#  apply_patch_with_msg 0002-Skip-tests-TODO-fix-skips.patch
+  apply_patch_with_msg 0002-Skip-tests-TODO-fix-skips.patch
 #  apply_patch_with_msg 0004-Build-avx2-and-avx512-versions-of-the-math-library.patch
 
   autoreconf -vfi
@@ -404,8 +404,7 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --host=${MINGW_CHOST} \
     --build=${MINGW_CHOST} \
-    ac_cv_header_bluetooth_bluetooth_h=no  \
-    ac_cv_header_bluetooth_h=no \
+    --enable-shared \
     --with-pymalloc \
     --without-cxx-main \
     --with-nt-threads \
@@ -414,7 +413,7 @@ build() {
     --with-system-libmpdec \
     --without-ensurepip \
     --with-computed-gotos \
-     "${_extra_config[@]}" \
+    "${_extra_config[@]}" \
     OPT=""
 
   # We patch importlib which is embedded in C headers, so regenerate them
