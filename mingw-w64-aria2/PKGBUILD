@@ -7,7 +7,7 @@ pkgver=9d0a48ac8147c5e56402706d5c17efa8bf6340f2
 pkgrel=1
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
-url="https://aria2.sourceforge.io/"
+url="https://github.com/aria2/aria2"
 license=('GPL2')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-pkg-config")
