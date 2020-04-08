@@ -60,8 +60,9 @@ build() {
     ${_mingw} \
     shared \
     threads \
-    zlib \
-    zlib-dynamic
+    no-zlib \
+    no-zlib-dynamic \
+    enable-ec_nistp_64_gcc_128
 
 #    enable-ec_nistp_64_gcc_128
 
