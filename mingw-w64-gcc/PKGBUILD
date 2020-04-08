@@ -21,8 +21,8 @@ pkgver=9.3.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-_islver=0.21
-pkgrel=4
+_islver=0.16.1
+pkgrel=2
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -125,6 +125,7 @@ prepare() {
     0008-Prettify-linking-no-undefined.patch \
     0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
     0010-Fix-using-large-PCH.patch \
+    0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
@@ -167,7 +168,7 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
   rm -rf gcc/ada/*.ad*
   rm -rf gcc/testsuite/ada
@@ -262,7 +263,8 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
+    --with-isl \
+    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
     #--enable-libitm
@@ -294,7 +296,7 @@ build() {
 #  /home/User/.go/bin/noti nice -n 19 make all -j8
 
 # /home/User/.go/bin/noti nice -n 19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
-  /home/User/.go/bin/noti nice -n 19 make
+  noti nice -n 19 make
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
