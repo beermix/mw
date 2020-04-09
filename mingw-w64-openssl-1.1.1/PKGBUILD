@@ -3,10 +3,10 @@
 _realname=openssl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-_ver=1.1.1e
+_ver=1.1.1f
 # use a pacman compatible version scheme
 pkgver=${_ver/[a-z]/.${_ver//[0-9.]/}}
-pkgrel=2
+pkgrel=1
 arch=('any')
 pkgdesc="The Open Source toolkit for Secure Sockets Layer and Transport Layer Security (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-ca-certificates" "${MINGW_PACKAGE_PREFIX}-gcc-libs" "${MINGW_PACKAGE_PREFIX}-zlib")
@@ -53,11 +53,6 @@ prepare() {
   tar -xzvf ${_realname}-${_ver}.tar.gz -C ${srcdir} || true
   cd ${srcdir}/${_realname}-${_ver}
 
-# openssl-1.0.0a-ldflags.patch
-# openssl-1.0.2a-parallel-build.patch
-# openssl-1.0.1-x32.patch
-#  openssl-0.9.6-x509.patch
-# openssl-1.0.1i-relocation.patch
   apply_patch_with_msg \
      openssl-1.1.1-relocation.patch \
      0001-tests-work-around-the-MSYS-vs-Windows-paths-problem.patch \
@@ -109,14 +104,6 @@ check() {
 
 package() {
   cd "${srcdir}/build-${CARCH}"
-  test pdb != "$1" || {
-    install -d -m 755 "${pkgdir}${MINGW_PREFIX}/bin"
-    install -d -m 755 "${pkgdir}${MINGW_PREFIX}/lib/engines"
-    install -m 755 *.pdb "${pkgdir}${MINGW_PREFIX}/bin"
-    install -m 755 apps/openssl.pdb "${pkgdir}${MINGW_PREFIX}/bin"
-    install -m 755 engines/*.pdb "${pkgdir}${MINGW_PREFIX}/lib/engines"
-    return
-  }
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/include/openssl
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/lib/engines-1_1
@@ -124,8 +111,6 @@ package() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/share/licenses/${_realname}
 
   make -j1 DESTDIR="${pkgdir}" MANSUFFIX=ssl install_sw
-#  install -D -m644 "${srcdir}/${_realname}-${_ver}/LICENSE" \
-#         "${pkgdir}${MINGW_PREFIX}"/share/licenses/${_realname}/LICENSE
 
   chmod -R 777 "${pkgdir}${MINGW_PREFIX}"/bin
   chmod -R 777 "${pkgdir}${MINGW_PREFIX}"/lib
