@@ -62,7 +62,6 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
-        gcc-stable-branch.patch
         010-documentation.patch
         zero-regs-gcc8.patch
         openmp-vectorize-v2.patch
@@ -158,7 +157,6 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-stable-branch.patch \
     010-documentation.patch \
     gcc10-isl-dl.patch
 

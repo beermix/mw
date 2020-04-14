@@ -44,7 +44,11 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         013_bash_in_ld_testsuite.patch
         130_gold_disable_testsuite_build.patch
         135_bfd_soversion.patch
-        branch-version.patch)
+        branch-version.patch
+        binutils-2.22.52.0.4-no-config-h-check.patch
+        binutils-2.29-filename-in-error-messages.patch
+        binutils-export-demangle.h.patch
+        binutils-readelf-other-sym-info.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
@@ -52,6 +56,11 @@ prepare() {
   patch -p1 -i "${srcdir}"/nodocs.patch
 
 #  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+
+  patch -p1 -i "${srcdir}"/binutils-2.22.52.0.4-no-config-h-check.patch
+  patch -p1 -i "${srcdir}"/binutils-2.29-filename-in-error-messages.patch
+  patch -p1 -i "${srcdir}"/binutils-export-demangle.h.patch
+  patch -p1 -i "${srcdir}"/binutils-readelf-other-sym-info.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
