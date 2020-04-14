@@ -53,7 +53,7 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
-#  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/binutils-stable-34branch.patch
 
 #  patch -p1 -i "${srcdir}"/binutils-2.22.52.0.4-no-config-h-check.patch
   patch -p1 -i "${srcdir}"/binutils-2.29-filename-in-error-messages.patch
@@ -70,7 +70,7 @@ prepare() {
 
 #  patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
 #  patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
-#  patch -p1 -i "${srcdir}"/branch-version.patch
+  patch -p1 -i "${srcdir}"/branch-version.patch
 #  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
 #  patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
 
