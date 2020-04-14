@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=32
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -49,8 +49,10 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
+
+#  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -58,18 +60,15 @@ prepare() {
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
   patch -p1 -i "${srcdir}"/006_better_file_error.patch
   patch -p1 -i "${srcdir}"/013_bash_in_ld_testsuite.patch
-  patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
-  patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
-  patch -p1 -i "${srcdir}"/branch-version.patch
-  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
-  patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
+
+#  patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
+#  patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
+#  patch -p1 -i "${srcdir}"/branch-version.patch
+#  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
+#  patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
 
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
   #patch -p2 -i "${srcdir}"/0310-reproducible-import-libraries.patch
-
-#  rm -rf gdb libdecnumber readline sim
-
-#  sed -i -e "s/#define BFD_VERSION_DATE.*/#define BFD_VERSION_DATE 20190203/g" bfd/version.h
 }
 
 build() {
@@ -86,25 +85,6 @@ build() {
 
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
-
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
-
-#  CFLAGS=${CFLAGS/-g0/}
-#  CXXFLAGS=${CXXFLAGS/-g0/}
-#  CFLAGS=${CFLAGS/-fomit-frame-pointer/}
-#  CXXFLAGS=${CXXFLAGS/-fomit-frame-pointer/}
-
-#  export GCC_IGNORE_WERROR=1
-#    --with-system-zlib \
-#    --enable-targets=x86_64-*-mingw* \
-
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  unset LDFLAGS
-#  unset CPPFLAGS
-
   ../${_realname}-${pkgver}/configure \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \

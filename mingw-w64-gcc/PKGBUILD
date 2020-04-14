@@ -69,6 +69,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize-at-least-some.patch
         gomp-relax.patch 
         avx512-when-we-ask-for-it.patch
+        gcc10-isl-dl.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
@@ -142,8 +143,9 @@ prepare() {
   apply_patch_with_msg \
     gcc-stable-branch.patch \
     010-documentation.patch \
-    libiberty-sync.patch
+    gcc10-isl-dl.patch
 
+#    libiberty-sync.patch 
 #    openmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
 #    optimize.patch \
@@ -220,13 +222,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
