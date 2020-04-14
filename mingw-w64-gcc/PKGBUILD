@@ -1,18 +1,20 @@
-# Maintainer:  Alexey Pavlov <alexpux@gmail.com>
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Maintainer: Ray Donnelly <mingw.android@gmail.com>
 # Contributor: Alexey Borzenkov <snaury@gmail.com>
-# Contributor: Ray Donnelly <mingw.android@gmail.com>
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
-# Contributor: wirx6 <wirx654@gmail.com>
+# Contributor: Liu Hao <lh_mouse@126.com>
+# Contributor: Tim Stahlhut <stahta01@gmail.com>
 
-_enable_ada=no
-_enable_objc=no
-_threads="posix"
+_enable_fortran=yes
+_enable_ada=yes
+_enable_objc=yes
 _realname=gcc
+_sourcedir=${_realname}-git
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran"
-         "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran"
+         $([[ "$_enable_fortran" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran")
+         $([[ "$_enable_fortran" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran")
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
@@ -93,6 +95,7 @@ sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'a526cfab91a1499be92c824c7f2185a013a38dbdfbeabe63ecbe84451e07b021'
             'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376')
 
+_threads="posix"
 _git_base_commit=
 _gcc_version=
 _gcc_date=
@@ -184,7 +187,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+  echo 9.3.0 > gcc/BASE-VER
 
   ln -s ../isl-${_islver} isl
 
