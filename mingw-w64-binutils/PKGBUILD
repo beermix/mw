@@ -44,6 +44,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         013_bash_in_ld_testsuite.patch
         130_gold_disable_testsuite_build.patch
         135_bfd_soversion.patch
+        binutils-stable-34branch.patch
         branch-version.patch
         binutils-2.29-filename-in-error-messages.patch
         binutils-export-demangle.h.patch)
