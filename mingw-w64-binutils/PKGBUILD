@@ -108,7 +108,6 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
     --enable-targets=x86_64-*-mingw* \
     --disable-shared
 
