@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip' '!debug') # '!strip' '!debug')
+options=('staticlibs' '!emptydirs' 'strip') # '!strip' '!debug')
 
 _gccver=9.3.0
 _islver=0.16.1
@@ -161,15 +161,16 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     libiberty-sync.patch \
-    optimize-at-least-some.patch \
-    optimize.patch \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
     gomp-relax.patch \
     ipa-cp.patch
 
-#  Enable clear linux patches
-#  apply_patch_with_msg \
+#    optimize-at-least-some.patch \
+#    optimize.patch \
+
+#   Enable clear linux patches
+#   apply_patch_with_msg \
 #    zero-regs-gcc8.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
@@ -189,16 +190,16 @@ prepare() {
 
 #  ln -s ../isl-${_islver} isl
 
-#  rm -rf gcc/ada/*.ad*
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
 }
 
 build() {
@@ -238,13 +239,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -261,7 +262,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=no \
     --enable-libstdcxx-time=yes \
@@ -272,6 +272,7 @@ build() {
     --disable-multilib \
     --disable-rpath \
     --disable-win32-registry \
+    --enable-checking=release \
     --disable-nls \
     --disable-werror \
     --disable-symvers \
@@ -282,7 +283,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
+    --without-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
