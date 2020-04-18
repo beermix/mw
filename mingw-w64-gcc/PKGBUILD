@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip') # '!strip' 'debug')
+options=('staticlibs' '!emptydirs' 'strip' '!debug') # '!strip' '!debug')
 
 _gccver=9.3.0
 _islver=0.16.1
@@ -190,16 +190,16 @@ prepare() {
 
   ln -s ../isl-${_islver} isl
 
-#  rm -rf gcc/ada/*.ad*
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
 }
 
 build() {
@@ -234,14 +234,15 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
+
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
   export FFLAGS_FOR_TARGET="$FFLAGS"
@@ -297,7 +298,7 @@ build() {
 
   noti nice -n 19 make all
 
-  # noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3" all
+   # noti nice -n 19 make "CFLAGS=-g0 -O3" "CXXFLAGS=-g0 -O3" "CFLAGS_FOR_TARGET=-g0 -O3" "CXXFLAGS_FOR_TARGET=-g0 -O3" "BOOT_CFLAGS=-g0 -O3" "BOOT_CXXFLAGS=-g0 -O3" all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
