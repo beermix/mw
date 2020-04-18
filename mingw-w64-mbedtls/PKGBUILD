@@ -3,7 +3,7 @@
 _realname=mbedtls
 pkgbase="mingw-w64-${_realname}"
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.16.5
+pkgver=2.16.6
 pkgrel=1
 arch=('any')
 url='https://tls.mbed.org/'
