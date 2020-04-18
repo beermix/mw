@@ -162,12 +162,11 @@ prepare() {
     010-documentation.patch \
     libiberty-sync.patch \
     optimize-at-least-some.patch \
-    optimize.patch
-
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    gomp-relax.patch \
-#    ipa-cp.patch \
+    optimize.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    gomp-relax.patch \
+    ipa-cp.patch
 
 #  Enable clear linux patches
 #  apply_patch_with_msg \
@@ -188,18 +187,18 @@ prepare() {
 
   echo ${_gccver} > gcc/BASE-VER
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
-  rm -rf gcc/ada/*.ad*
-  rm -rf gcc/testsuite/ada
-  rm -rf gcc/testsuite/brig.dg
-  rm -rf gcc/testsuite/c-c++-common
-  rm -rf gcc/testsuite/ChangeLog*
-  rm -rf gcc/testsuite/config
-  rm -rf gcc/testsuite/g*
-  rm -rf gcc/testsuite/jit.dg
-  rm -rf gcc/testsuite/lib
-  rm -rf gcc/testsuite/o*
+#  rm -rf gcc/ada/*.ad*
+#  rm -rf gcc/testsuite/ada
+#  rm -rf gcc/testsuite/brig.dg
+#  rm -rf gcc/testsuite/c-c++-common
+#  rm -rf gcc/testsuite/ChangeLog*
+#  rm -rf gcc/testsuite/config
+#  rm -rf gcc/testsuite/g*
+#  rm -rf gcc/testsuite/jit.dg
+#  rm -rf gcc/testsuite/lib
+#  rm -rf gcc/testsuite/o*
 }
 
 build() {
@@ -239,13 +238,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -271,7 +270,6 @@ build() {
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
-    --enable-checking=release \
     --disable-rpath \
     --disable-win32-registry \
     --disable-nls \
@@ -284,7 +282,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
@@ -384,28 +382,8 @@ package_mingw-w64-gcc() {
   cp lib/libstdc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/libsupc++*                                           ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{info,locale}
-  #cp -r share/doc/gcc-${_gccver} ${pkgdir}${MINGW_PREFIX}/share/doc/
-  #cp share/info/cpp.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/cppinternals.info*                       ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gcc.info*                                ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccinstall.info*                         ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/gccint.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libitm.info*                             ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libgomp.info*                            ${pkgdir}${MINGW_PREFIX}/share/info/
-  #cp share/info/libquadmath.info*                        ${pkgdir}${MINGW_PREFIX}/share/info/
-
-  #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_gccver}/python
   cp -r share/gcc-${_gccver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_gccver}/python/
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/man/man1
-  #cp share/man/man1/cpp.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/gcc.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/gcov.1*                              ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/fsf-funding.7*                       ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/gfdl.7*                              ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man7/gpl.7*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
-  #cp share/man/man1/g++.1*                               ${pkgdir}${MINGW_PREFIX}/share/man/man1/
 }
 
 package_mingw-w64-gcc-libgfortran() {
