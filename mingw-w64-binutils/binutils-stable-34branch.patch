@@ -42467,3 +42467,211 @@ index 9d667152b2..32a9d19e4f 100644
  #define BFD_VERSION @bfd_version@
  #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
  #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 10424538d542341f8096c4726d987163930b9e80
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sun Apr 19 00:00:21 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 32a9d19e4f..9687ac7fa2 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200418
++#define BFD_VERSION_DATE 20200419
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 539a1fd720279e75eb97dd9a422c466a9a81b365
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Mon Apr 20 00:00:23 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 9687ac7fa2..40191c5458 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200419
++#define BFD_VERSION_DATE 20200420
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 99bcb57453769278569b0139c16236200d3c457e
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Tue Apr 21 00:00:31 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 40191c5458..e95a408c9b 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200420
++#define BFD_VERSION_DATE 20200421
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 9f57ab49b32bc14c0ff3834876a185af0a4c6e6b
+Author: Tamar Christina <tamar.christina@arm.com>
+Date:   Tue Apr 21 15:16:21 2020 +0100
+
+    BFD: Exclude sections with no content from compress check.
+    
+    The check in bfd_get_full_section_contents is trying to check that we don't
+    allocate more space for a section than the size of the section is on disk.
+    
+    Previously we excluded linker created sections since they didn't have a size on
+    disk.  However we also need to exclude sections with no content as well such as
+    the BSS section.  Space for these would not have been allocated by the assembler
+    and so the check would incorrectly fail.
+    
+    bfd/ChangeLog:
+    
+            PR binutils/24753
+            * compress.c (bfd_get_full_section_contents): Exclude sections with no
+            content.
+    
+    gas/ChangeLog:
+    
+            PR binutils/24753
+            * testsuite/gas/arm/pr24753.d: New test.
+            * testsuite/gas/arm/pr24753.s: New test.
+    
+    (cherry picked from commit c36876fe5b5bac1c404ab2ca82bfbfb2ed9a2717)
+
+diff --git a/bfd/ChangeLog b/bfd/ChangeLog
+index 1b57d6b071..ca87f744a3 100644
+--- a/bfd/ChangeLog
++++ b/bfd/ChangeLog
+@@ -1,3 +1,12 @@
++2020-04-21  Tamar Christina  <tamar.christina@arm.com>
++
++	Backport from mainline.
++	2020-04-21  Tamar Christina  <tamar.christina@arm.com>
++
++	PR binutils/24753
++	* compress.c (bfd_get_full_section_contents): Exclude sections with no
++	content.
++
+ 2020-04-08  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	Backport from mainline.
+diff --git a/bfd/compress.c b/bfd/compress.c
+index ce6bb2beae..728ba39dfb 100644
+--- a/bfd/compress.c
++++ b/bfd/compress.c
+@@ -255,6 +255,9 @@ bfd_get_full_section_contents (bfd *abfd, sec_ptr sec, bfd_byte **ptr)
+ 	      /* PR 24753: Linker created sections can be larger than
+ 		 the file size, eg if they are being used to hold stubs.  */
+ 	      && (bfd_section_flags (sec) & SEC_LINKER_CREATED) == 0
++	      /* PR 24753: Sections which have no content should also be
++		 excluded as they contain no size on disk.  */
++	      && (bfd_section_flags (sec) & SEC_HAS_CONTENTS) != 0
+ 	      /* The MMO file format supports its own special compression
+ 		 technique, but it uses COMPRESS_SECTION_NONE when loading
+ 		 a section's contents.  */
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 4ad599ae79..3ebb0aa53e 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,12 @@
++2020-04-21  Tamar Christina  <tamar.christina@arm.com>
++
++	Backport from mainline.
++	2020-04-21  Tamar Christina  <tamar.christina@arm.com>
++
++	PR binutils/24753
++	* testsuite/gas/arm/pr24753.d: New test.
++	* testsuite/gas/arm/pr24753.s: New test.
++
+ 2020-03-13  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+ 
+ 	Backport from mainline.
+diff --git a/gas/testsuite/gas/arm/pr24753.d b/gas/testsuite/gas/arm/pr24753.d
+new file mode 100644
+index 0000000000..01990d1ff5
+--- /dev/null
++++ b/gas/testsuite/gas/arm/pr24753.d
+@@ -0,0 +1,7 @@
++#skip: *-*-pe *-*-wince *-*-vxworks
++#objdump: -d
++#name: PR24753: Don't error on sections with no content size mismatch with file
++
++.*: +file format .*arm.*
++
++#...
+diff --git a/gas/testsuite/gas/arm/pr24753.s b/gas/testsuite/gas/arm/pr24753.s
+new file mode 100644
+index 0000000000..5ba33fd29c
+--- /dev/null
++++ b/gas/testsuite/gas/arm/pr24753.s
+@@ -0,0 +1,12 @@
++.text
++.global _start
++_start:
++	nop
++
++.section .text2, "ax", %progbits
++_func:
++	nop
++
++.bss
++.fill 0x8000
++
+
+commit c5f59d881bdbc098f8870839c8f684198a89e793
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Wed Apr 22 00:00:25 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index e95a408c9b..0fb333fca7 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200421
++#define BFD_VERSION_DATE 20200422
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 9a5665f06016300d2e718ceb74f0bdbe572ec21b
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Thu Apr 23 00:00:26 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 0fb333fca7..971efd461b 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200422
++#define BFD_VERSION_DATE 20200423
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
