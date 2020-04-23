@@ -188,7 +188,7 @@ prepare() {
 
   echo ${_gccver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
 #  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
@@ -263,7 +263,7 @@ build() {
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=no \
+    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -283,7 +283,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
