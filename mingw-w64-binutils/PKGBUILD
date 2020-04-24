@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=1
+pkgrel=2
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -89,6 +89,15 @@ build() {
   if check_option "debug" "y"; then
     CFLAGS+=" -O0"
   fi
+
+#  export GCC_IGNORE_WERROR=1
+#  export AR=gcc-ar
+#  export RANLIB=gcc-ranlib
+#  export NM=gcc-nm
+#  export CFLAGS="$CFLAGS -fcf-protection=full"
+#  export FCFLAGS="$CFLAGS -fcf-protection=full"
+#  export FFLAGS="$CFLAGS -fcf-protection=full"
+#  export CXXFLAGS="$CXXFLAGS -fcf-protection=full"
 
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
