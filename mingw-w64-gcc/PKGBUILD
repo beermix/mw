@@ -77,6 +77,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
+        gcc-g1.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
@@ -164,7 +165,8 @@ prepare() {
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
     gomp-relax.patch \
-    ipa-cp.patch
+    ipa-cp.patch \
+    gcc-g1.patch
 
 #    optimize-at-least-some.patch \
 #    optimize.patch \
@@ -235,17 +237,17 @@ build() {
   fi
 
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
