@@ -109,11 +109,11 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
-    --enable-deterministic-archives \
+    --disable-deterministic-archives \
     --enable-plugins \
     --enable-gold \
     --enable-secureplt \
-    --enable-targets=x86_64-w64-mingw32 \
+    --enable-targets=x86_64-w64-mingw32,i686-w64-mingw32 \
     --disable-shared
 
   make
