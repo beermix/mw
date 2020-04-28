@@ -58,13 +58,12 @@ build() {
       --build=${MINGW_CHOST} \
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST}
-
   make
 }
 
 #check() {
 #  cd ${srcdir}/build-${MINGW_CHOST}
-#  make check -j5
+#  make check
 #}
 
 package() {
