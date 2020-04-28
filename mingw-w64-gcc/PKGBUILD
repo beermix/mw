@@ -144,9 +144,9 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    010-documentation.patch \
-    gcc-g1.patch
+    010-documentation.patch
 
+#     gcc-g1.patch
 #    libiberty-sync.patch \
 #    optimize-at-least-some.patch \
 #    optimize.patch \
@@ -219,18 +219,14 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
+  export CXXFLAGS="-march=haswell -g1 -O3"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
