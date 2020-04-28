@@ -62,10 +62,10 @@ build() {
   make
 }
 
-check() {
-  cd ${srcdir}/build-${MINGW_CHOST}
-  make check -j5
-}
+#check() {
+#  cd ${srcdir}/build-${MINGW_CHOST}
+#  make check -j5
+#}
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"

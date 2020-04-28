@@ -189,7 +189,7 @@ prepare() {
 
   echo ${_gccver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
 #  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
@@ -236,9 +236,9 @@ build() {
   fi
 
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -284,7 +284,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
