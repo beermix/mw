@@ -56,6 +56,8 @@ prepare() {
   patch -p1 -i "${srcdir}"/nodocs.patch
 
   patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/branch-version.patch
+
   patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
  #patch -p1 -i "${srcdir}"/binutils-2.22.52.0.4-no-config-h-check.patch
