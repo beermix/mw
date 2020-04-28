@@ -225,8 +225,8 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
-  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS="-march=haswell -g1 -O2 -fno-stack-protector"
+  export CXXFLAGS="-march=haswell -g1 -O2"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
