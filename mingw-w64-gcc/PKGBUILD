@@ -257,8 +257,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=${_arch} \
     --with-tune=haswell \
+    --with-arch=westmere \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
@@ -280,6 +280,10 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libunwind-exceptions \
+    --disable-cet \
+    --disable-libmpx \
+    --with-gcc-major-version-only \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \

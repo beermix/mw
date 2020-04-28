@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=2
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -47,18 +47,19 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         binutils-stable-34branch.patch
         branch-version.patch
         binutils-2.29-filename-in-error-messages.patch
-        binutils-export-demangle.h.patch)
+        binutils-export-demangle.h.patch
+        binutils-add-LD_AS_NEEDED-global-env.patch)
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
- #patch -p1 -i "${srcdir}"/binutils-stable-34branch.patch
   patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
  #patch -p1 -i "${srcdir}"/binutils-2.22.52.0.4-no-config-h-check.patch
-  patch -p1 -i "${srcdir}"/binutils-2.29-filename-in-error-messages.patch
+ #patch -p1 -i "${srcdir}"/binutils-2.29-filename-in-error-messages.patch
  #patch -p1 -i "${srcdir}"/binutils-export-demangle.h.patch
  #patch -p1 -i "${srcdir}"/binutils-readelf-other-sym-info.patch
 
@@ -67,12 +68,13 @@ prepare() {
   patch -p1 -i "${srcdir}"/0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
-  patch -p1 -i "${srcdir}"/006_better_file_error.patch
+
+ #patch -p1 -i "${srcdir}"/006_better_file_error.patch
 
  #patch -p1 -i "${srcdir}"/130_gold_disable_testsuite_build.patch
  #patch -p1 -i "${srcdir}"/135_bfd_soversion.patch
-  patch -p1 -i "${srcdir}"/branch-version.patch
-  patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
+ #patch -p1 -i "${srcdir}"/branch-version.patch
+ #patch -p1 -i "${srcdir}"/0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
  #patch -p1 -i "${srcdir}"/0015-bfd-install-config.h.patch
 
   #patch -p2 -i "${srcdir}"/0300-default-secure-pe-flags.patch
@@ -91,15 +93,6 @@ build() {
     CFLAGS+=" -O0"
   fi
 
-#  export GCC_IGNORE_WERROR=1
-#  export AR=gcc-ar
-#  export RANLIB=gcc-ranlib
-#  export NM=gcc-nm
-#  export CFLAGS="$CFLAGS -fcf-protection=full"
-#  export FCFLAGS="$CFLAGS -fcf-protection=full"
-#  export FFLAGS="$CFLAGS -fcf-protection=full"
-#  export CXXFLAGS="$CXXFLAGS -fcf-protection=full"
-
   [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
   mkdir -p build-${MINGW_CHOST} && cd build-${MINGW_CHOST}
   ../${_realname}-${pkgver}/configure \
@@ -116,8 +109,11 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
+    --enable-deterministic-archives \
     --enable-plugins \
     --enable-gold \
+    --enable-secureplt \
+    --enable-targets=x86_64-w64-mingw32 \
     --disable-shared
 
   make
