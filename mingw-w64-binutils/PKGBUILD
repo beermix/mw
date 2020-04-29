@@ -58,7 +58,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/branch-version.patch
 
-  patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
+  #patch -p1 -i "${srcdir}"/binutils-add-LD_AS_NEEDED-global-env.patch
 
  #patch -p1 -i "${srcdir}"/binutils-2.22.52.0.4-no-config-h-check.patch
  #patch -p1 -i "${srcdir}"/binutils-2.29-filename-in-error-messages.patch
@@ -114,7 +114,6 @@ build() {
     --disable-deterministic-archives \
     --enable-plugins \
     --enable-gold \
-    --enable-secureplt \
     --enable-targets=x86_64-w64-mingw32,i686-w64-mingw32 \
     --disable-shared
 
