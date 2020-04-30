@@ -74,8 +74,9 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
-        git-updates.diff
+        git-updates.patch
         997-g.patch
+        997-g1.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 
 # Helper macros to help make tasks easier #
@@ -128,7 +129,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    git-updates.diff \
+    git-updates.patch \
     997-g1.patch
 
 #    gcc-stable-branch.patch \
