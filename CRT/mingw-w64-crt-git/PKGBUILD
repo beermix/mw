@@ -4,7 +4,7 @@ _realname=crt
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
-pkgver=8.0.0.5831.7f13c2d3
+pkgver=8.0.0.5835.de42567a
 pkgrel=1
 pkgdesc='MinGW-w64 CRT for Windows'
 arch=('any')
@@ -60,7 +60,6 @@ build() {
     --target=${MINGW_CHOST} \
     --with-sysroot=${MINGW_PREFIX}/${MINGW_CHOST} \
     --enable-wildcard \
-    --disable-dependency-tracking \
     ${_crt_configure_args}
   make
 }
