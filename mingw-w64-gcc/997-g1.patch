@@ -6,7 +6,7 @@ index abd93a990..fe4f94b8f 100755
  # CFLAGS_FOR_TARGET and CXXFLAGS_FOR_TARGET.
  if test "x$CFLAGS_FOR_TARGET" = x; then
    if test "x${is_cross_compiler}" = xyes; then
--    CFLAGS_FOR_TARGET="-g1 -O2"
+-    CFLAGS_FOR_TARGET="-g -O2"
 +    CFLAGS_FOR_TARGET="-g1 -O2"
    else
      CFLAGS_FOR_TARGET=$CFLAGS

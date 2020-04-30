@@ -77,7 +77,8 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
-        gcc-g1.patch
+        997-g1.patch
+        997-g.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
@@ -162,7 +163,7 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     libiberty-sync.patch \
-    gcc-g1.patch
+    997-g.patch
 
 #    optimize-at-least-some.patch \
 #    optimize.patch \
@@ -257,8 +258,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
+    --with-arch=${_arch} \
     --with-tune=haswell \
-    --with-arch=westmere \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \

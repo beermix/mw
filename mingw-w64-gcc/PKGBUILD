@@ -206,9 +206,10 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -247,6 +248,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libunwind-exceptions \
     --disable-cet \
     --disable-libmpx \
     --with-gcc-major-version-only \
