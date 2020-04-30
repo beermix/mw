@@ -6,7 +6,7 @@
 
 _enable_ada=no
 _enable_objc=no
-_threads="posix"
+_threads="win32"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
@@ -129,7 +129,7 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     git-updates.diff \
-    997-g.patch
+    997-g1.patch
 
 #    gcc-stable-branch.patch \
 #     gcc-g1.patch
@@ -159,7 +159,7 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 
 #  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
@@ -205,9 +205,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -223,8 +223,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
+    --with-arch=${_arch} \
     --with-tune=haswell \
-    --with-arch=westmere \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
@@ -246,7 +246,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libunwind-exceptions \
     --disable-cet \
     --disable-libmpx \
     --with-gcc-major-version-only \
@@ -254,7 +253,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --without-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
