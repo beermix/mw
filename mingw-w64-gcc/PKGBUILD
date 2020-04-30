@@ -6,7 +6,7 @@
 
 _enable_ada=no
 _enable_objc=no
-_threads="win32"
+_threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
