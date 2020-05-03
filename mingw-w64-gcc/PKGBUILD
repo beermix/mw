@@ -60,6 +60,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
+        0140-gcc-8.2.0-diagnostic-color.patch
         gcc-stable-branch.patch
         010-documentation.patch
         zero-regs-gcc8.patch
@@ -76,8 +77,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         libiberty-sync.patch
         git-updates.patch
         997-g.patch
-        997-g1.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
+        997-g1.patch)
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -130,10 +130,10 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     git-updates.patch \
-    997-g1.patch
+    libiberty-sync.patch 
 
 #    gcc-stable-branch.patch \
-#     gcc-g1.patch
+#    gcc-g1.patch
 #    libiberty-sync.patch \
 #    optimize-at-least-some.patch \
 #    optimize.patch \
@@ -141,8 +141,8 @@ prepare() {
 #    fortran-vector-v2.patch \
 #    gomp-relax.patch \
 #    ipa-cp.patch \
-#   Enable clear linux patches
-#   apply_patch_with_msg \
+#    Enable clear linux patches
+#    apply_patch_with_msg \
 #    zero-regs-gcc8.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
@@ -160,7 +160,7 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
 #  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
@@ -211,10 +211,10 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2 -fno-stack-protector"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -251,12 +251,11 @@ build() {
     --disable-libunwind-exceptions \
     --disable-cet \
     --disable-libmpx \
-    --with-gcc-major-version-only \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
