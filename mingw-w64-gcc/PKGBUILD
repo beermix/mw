@@ -129,7 +129,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-stable-branch.patch \
+    git-updates.patch \
     libiberty-sync.patch 
 
 #    gcc-stable-branch.patch \
