@@ -138,31 +138,22 @@ prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
-  ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
-  ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
-  ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
-  ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
-  ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
-  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
-  ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
-  ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
-  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
-  if [ "${_branch}" != "releases/gcc-9" ]; then
-    ${GIT_AM} ${srcdir}/0014-clone_function_name_1-Retain-any-stdcall-suffix.patch
-  else
-    ${GIT_AM} ${srcdir}/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
-  fi
-  if [ "${_branch}" == "releases/gcc-7" ]; then
-    ${GIT_AM} ${srcdir}/0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
-    ${GIT_AM} ${srcdir}/0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
-    ${GIT_AM} ${srcdir}/0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
-  fi
-  if [ "${_branch}" == "releases/gcc-8" ]; then
-    ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
-  fi
+  del_file_exists intl/canonicalize.c intl/canonicalize.h \
+    intl/relocatex.c intl/relocatex.h
 
-  # do not expect $prefix/mingw symlink - this should be superceded by
-  # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+  apply_patch_with_msg \
+    0002-Relocate-libintl.patch \
+    0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
+    0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
+    0005-Windows-Don-t-ignore-native-system-header-dir.patch \
+    0006-Windows-New-feature-to-allow-overriding.patch \
+    0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
+    0008-Prettify-linking-no-undefined.patch \
+    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
+    0010-Fix-using-large-PCH.patch \
+    0011-Enable-shared-gnat-implib.patch \
+    0012-Handle-spaces-in-path-for-default-manifest.patch \
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -240,10 +231,7 @@ build() {
     ;;
   esac
 
-  local _languages="c,lto,c++"
-  if [ "$_enable_fortran" == "yes" ]; then
-    _languages+=",fortran"
-  fi
+  local _languages="c,lto,c++,fortran"
   if [ "$_enable_ada" == "yes" ]; then
     _languages+=",ada"
   fi
@@ -283,20 +271,21 @@ build() {
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
-    --disable-isl-version-check \
+    ${extra_config} \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
-    --enable-checking=release \
     --disable-rpath \
     --disable-win32-registry \
+    --enable-checking=release \
     --disable-nls \
     --disable-werror \
     --disable-symvers \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-cet \
+    --disable-libmpx \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
@@ -304,12 +293,7 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --enable-plugin  \
     ${_conf}
-    #--enable-libitm
-    #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
-    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
