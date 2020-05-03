@@ -1,3 +1,6 @@
+Alan Modra (1):
+      [RS6000] PR94145, make PLT loads volatile
+
 Andre Vieira (1):
       aarch64: Fix bootstrap with old binutils [PR93053]
 
@@ -10,9 +13,10 @@ Bill Schmidt (1):
 Bin Cheng (1):
       backport PR94125: Update post order number for merged SCC.
 
-Carl Love (2):
+Carl Love (3):
       rs6000: Add command line and builtin compatibility check
       rs6000: vec_rlnm fix to make builtin work according to ABI
+      rs6000, Fix header comment for intrinsic function _mm_movemask_epi8
 
 Claudiu Zissulescu (1):
       arc: Allow more ABIs in GLIBC_DYNAMIC_LINKER
@@ -25,7 +29,16 @@ Fritz Reese (2):
       Fix fortran/85982 ICE in resolve_component.
       Fix fortran/93686 -- ICE matching data statements with derived-type pointers.
 
-GCC Administrator (41):
+GCC Administrator (50):
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
+      Daily bump.
       Daily bump.
       Daily bump.
       Daily bump.
@@ -68,15 +81,18 @@ GCC Administrator (41):
       Daily bump.
       Daily bump.
 
-H.J. Lu (2):
+H.J. Lu (3):
       x86: Insert ENDBR if function will be called indirectly
       x86: Restore the frame pointer in word_mode
+      x86: Allow -fcf-protection with external thunk
 
 Harald Anlauf (1):
       PR fortran/93364 - ICE in gfc_set_array_spec, at fortran/array.c:879
 
-Iain Buclaw (1):
+Iain Buclaw (3):
       d: Fix ICE in add_symbol_to_partition_1, at lto/lto-partition.c:215
+      libphobos: Fix struct layout of stat32_t on sparc-*-solaris*
+      libphobos: Fix struct layout of addrinfo on sparc-*-solaris*
 
 Iain Sandoe (1):
       Darwin: Fix i686 bootstrap when the assembler supports GOTOFF in data.
@@ -121,7 +137,7 @@ Jakub Jelinek (38):
       openmp: Fix parallel master error recovery [PR94512]
       i386: Fix V{64QI,32HI}mode constant permutations [PR94509]
 
-Jason Merrill (7):
+Jason Merrill (8):
       c++: Fix CTAD with multiple-arg ctor template [93248].
       c++: Fix ICE-after-error on partial spec [92068]
       c++: Find parameter pack in typedef in lambda [92909].
@@ -129,6 +145,7 @@ Jason Merrill (7):
       c++: alias template and parameter packs (PR91966).
       c++: Fix reuse of class constants [PR94453]
       c++: Mangling of dependent conversions [PR91377]
+      c++: Avoid ICE with dependent attribute on type.
 
 Jiufu Guo (1):
       rs6000: Check -+0 and NaN for smax/smin generation
@@ -136,7 +153,7 @@ Jiufu Guo (1):
 John David Anglin (1):
       Define __BIG_ENDIAN__
 
-Jonathan Wakely (11):
+Jonathan Wakely (22):
       libstdc++: Ensure root-dir converted to forward slash (PR93244)
       libstdc++: Fix FS-dependent filesystem tests
       libstdc++: Fix test failure due to -Wnonnull warnings
@@ -148,6 +165,17 @@ Jonathan Wakely (11):
       libstdc++: Document correct feature test macro, __cpp_lib_is_invocable
       libstdc++: Update __cpp_lib_erase_if macro (P1115R3)
       libstdc++: Improve C++14 status docs
+      libstdc++: Add __cpp_lib_unwrap_ref feature test macro
+      libstdc++: Fix some missing/incorrect feature test macros
+      Fix <version> header for freestanding
+      libstdc++: Define __cpp_lib_constexpr_complex macro
+      libstdc++: Define missing __cpp_lib_int_pow2 macro
+      libstdc++: Add comments to non-standard feature test macros
+      libstdc++: Add missing feature test macros
+      libstdc++: Update __cpp_lib_array_constexpr and __cpp_lib_string_view
+      libstdc++: Define __cpp_lib_execution feature test
+      libstdc++: Make net::service_already_exists default constructible
+      libstdc++: Fix type-erasure in experimental::net::executor (PR 94203)
 
 Joseph Myers (1):
       Remove wrongly committed file.
@@ -219,8 +247,17 @@ Tamar Christina (2):
       AArch64: Break apart paradoxical subregs for VSTRUCT writes (PR target/94052)
       AArch64: Fix options canonicanization for assembler
 
-Thomas König (1):
+Thomas Koenig (1):
+      Revert patch for PR fortran/93956.
+
+Thomas König (2):
       Backport from trunk of the fix for PR 94270.
+      Fix PR 93956, wrong pointer when returned via function.
+
+Thomas Rodgers (3):
+      libstdc++: Fix PSTL tests to run correctly with newer Thread Building Blocks
+      libstdc++: Fix date of changelog entry
+      libstdc++: Mark experimental::net::system_context ctor deleted
 
 Thomas Schwinge (1):
       Rename 'libgomp.oacc-c-c++-common/static-dynamic-lifetimes-*' to 'libgomp.oacc-c-c++-common/structured-dynamic-lifetimes-*' [PR92843]
@@ -267,10 +304,38 @@ index b13d146a7b0..3b74042132a 100644
 -9.3.0
 +9.3.1
 diff --git a/gcc/ChangeLog b/gcc/ChangeLog
-index d8e53874e68..4cb1497a61f 100644
+index d8e53874e68..e8b3131e7df 100644
 --- a/gcc/ChangeLog
 +++ b/gcc/ChangeLog
-@@ -1,3 +1,609 @@
+@@ -1,3 +1,637 @@
++2020-05-01  Alan Modra	 <amodra@gmail.com>
++
++	PR target/94145
++	Backport from master
++	2020-03-27  Alan Modra	 <amodra@gmail.com>
++
++	* config/rs6000/rs6000.c (rs6000_longcall_ref): Use unspec_volatile
++	for PLT16_LO.
++	* config/rs6000/rs6000.md (UNSPEC_PLT16_LO): Remove.
++	(UNSPECV_PLT16_LO): Define.
++	(pltseq_plt16_lo_): Use unspec_volatile.
++
++2020-04-30  Carl Love  <cel@us.ibm.com>
++
++	* config/rs6000/emmintrin.h (_mm_movemask_epi8): Fix comment.
++
++2020-04-29  H.J. Lu  <hongjiu.lu@intel.com>
++
++	Backport from master
++	2020-04-29  H.J. Lu  <hongjiu.lu@intel.com>
++
++	PR target/93654
++	* config/i386/i386.c (ix86_set_indirect_branch_type): Allow
++	-fcf-protection with -mindirect-branch=thunk-extern and
++	-mfunction-return=thunk-extern.
++	* doc/invoke.texi: Update notes for -fcf-protection=branch with
++	-mindirect-branch=thunk-extern and -mindirect-return=thunk-extern.
++
 +2020-04-21  Martin Jambor  <mjambor@suse.cz>
 +
 +	Backport from master
@@ -426,7 +491,7 @@ index d8e53874e68..4cb1497a61f 100644
 +
 +2020-04-07  Will Schmidt  <will_schmidt@vnet.ibm.com>
 +
-+Backport from mainline.
++	Backport from mainline.
 +	2020-03-23  Will Schmidt  <will_schmidt@vnet.ibm.com>
 +
 +	* config/rs6000/rs6000-call.c altivec_init_builtins(): Remove
@@ -2335,7 +2400,7 @@ index 5dedeb2d18b..2f57d19bea2 100644
  /* SSE2 MMX */
  BDESC (OPTION_MASK_ISA_SSE2 | OPTION_MASK_ISA_MMX, 0, CODE_FOR_mmx_addv1di3, "__builtin_ia32_paddq", IX86_BUILTIN_PADDQ, UNKNOWN, (int) V1DI_FTYPE_V1DI_V1DI)
 diff --git a/gcc/config/i386/i386.c b/gcc/config/i386/i386.c
-index 1bca5a7eea6..efe32f3975e 100644
+index 1bca5a7eea6..ae5046ee6a0 100644
 --- a/gcc/config/i386/i386.c
 +++ b/gcc/config/i386/i386.c
 @@ -2535,7 +2535,12 @@ rest_of_insert_endbranch (void)
@@ -2352,7 +2417,25 @@ index 1bca5a7eea6..efe32f3975e 100644
      {
        /* Queue ENDBR insertion to x86_function_profiler.  */
        if (crtl->profile && flag_fentry)
-@@ -14347,8 +14352,13 @@ ix86_expand_epilogue (int style)
+@@ -5802,6 +5807,8 @@ ix86_set_indirect_branch_type (tree fndecl)
+ 		? "thunk-extern" : "thunk"));
+ 
+       if (cfun->machine->indirect_branch_type != indirect_branch_keep
++	  && (cfun->machine->indirect_branch_type
++	      != indirect_branch_thunk_extern)
+ 	  && (flag_cf_protection & CF_RETURN))
+ 	error ("%<-mindirect-branch%> and %<-fcf-protection%> are not "
+ 	       "compatible");
+@@ -5845,6 +5852,8 @@ ix86_set_indirect_branch_type (tree fndecl)
+ 		? "thunk-extern" : "thunk"));
+ 
+       if (cfun->machine->function_return_type != indirect_branch_keep
++	  && (cfun->machine->function_return_type
++	      != indirect_branch_thunk_extern)
+ 	  && (flag_cf_protection & CF_RETURN))
+ 	error ("%<-mfunction-return%> and %<-fcf-protection%> are not "
+ 	       "compatible");
+@@ -14347,8 +14356,13 @@ ix86_expand_epilogue (int style)
  	      t = plus_constant (Pmode, t, m->fs.fp_offset - UNITS_PER_WORD);
  	      emit_insn (gen_rtx_SET (sa, t));
  
@@ -2368,7 +2451,7 @@ index 1bca5a7eea6..efe32f3975e 100644
  
  	      /* Note that we use SA as a temporary CFA, as the return
  		 address is at the proper place relative to it.  We
-@@ -14363,7 +14373,7 @@ ix86_expand_epilogue (int style)
+@@ -14363,7 +14377,7 @@ ix86_expand_epilogue (int style)
  	      add_reg_note (insn, REG_CFA_DEF_CFA,
  			    plus_constant (Pmode, sa, UNITS_PER_WORD));
  	      ix86_add_queued_cfa_restore_notes (insn);
@@ -2377,7 +2460,7 @@ index 1bca5a7eea6..efe32f3975e 100644
  	      RTX_FRAME_RELATED_P (insn) = 1;
  
  	      m->fs.cfa_reg = sa;
-@@ -44150,43 +44160,51 @@ emit_reduc_half (rtx dest, rtx src, int i)
+@@ -44150,43 +44164,51 @@ emit_reduc_half (rtx dest, rtx src, int i)
        break;
      case E_V64QImode:
      case E_V32HImode:
@@ -2458,7 +2541,7 @@ index 1bca5a7eea6..efe32f3975e 100644
        break;
      default:
        gcc_unreachable ();
-@@ -46667,7 +46685,7 @@ expand_vec_perm_pshufb (struct expand_vec_perm_d *d)
+@@ -46667,7 +46689,7 @@ expand_vec_perm_pshufb (struct expand_vec_perm_d *d)
  	      /* vpshufb only works intra lanes, it is not
  		 possible to shuffle bytes in between the lanes.  */
  	      for (i = 0; i < nelt; ++i)
@@ -2656,6 +2739,20 @@ index d66ae7ca2c7..dbe5b7a1909 100644
  #define vec_rsqrt __builtin_vec_rsqrt
  #define vec_rsqrte __builtin_vec_rsqrte
  #define vec_signed __builtin_vec_vsigned
+diff --git a/gcc/config/rs6000/emmintrin.h b/gcc/config/rs6000/emmintrin.h
+index 30975090a2d..32c5fa0cb08 100644
+--- a/gcc/config/rs6000/emmintrin.h
++++ b/gcc/config/rs6000/emmintrin.h
+@@ -2033,7 +2033,8 @@ _mm_min_epu8 (__m128i __A, __m128i __B)
+ #ifdef _ARCH_PWR8
+ /* Intrinsic functions that require PowerISA 2.07 minimum.  */
+ 
+-/* Creates a 4-bit mask from the most significant bits of the SPFP values.  */
++/* Return a mask created from the most significant bit of each 8-bit
++   element in A.  */
+ extern __inline int __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+ _mm_movemask_epi8 (__m128i __A)
+ {
 diff --git a/gcc/config/rs6000/rs6000-c.c b/gcc/config/rs6000/rs6000-c.c
 index 7c28d4d8176..1ec38db0908 100644
 --- a/gcc/config/rs6000/rs6000-c.c
@@ -2696,7 +2793,7 @@ index d0d69beafd4..47a5d0576d0 100644
  
  /* Deal with ports that do not have -mstrict-align.  */
 diff --git a/gcc/config/rs6000/rs6000.c b/gcc/config/rs6000/rs6000.c
-index 87d60078bb0..f7c538c4d54 100644
+index 87d60078bb0..8043cbc8752 100644
 --- a/gcc/config/rs6000/rs6000.c
 +++ b/gcc/config/rs6000/rs6000.c
 @@ -4099,6 +4099,14 @@ rs6000_option_override_internal (bool global_init_p)
@@ -2826,7 +2923,19 @@ index 87d60078bb0..f7c538c4d54 100644
      max_p = !max_p;
  
    else
-@@ -37399,6 +37385,7 @@ rs6000_disable_incompatible_switches (void)
+@@ -33063,8 +33049,9 @@ rs6000_longcall_ref (rtx call_ref, rtx arg)
+       rtx reg = gen_rtx_REG (Pmode, regno);
+       rtx hi = gen_rtx_UNSPEC (Pmode, gen_rtvec (3, base, call_ref, arg),
+ 			       UNSPEC_PLT16_HA);
+-      rtx lo = gen_rtx_UNSPEC (Pmode, gen_rtvec (3, reg, call_ref, arg),
+-			       UNSPEC_PLT16_LO);
++      rtx lo = gen_rtx_UNSPEC_VOLATILE (Pmode,
++					gen_rtvec (3, reg, call_ref, arg),
++					UNSPECV_PLT16_LO);
+       emit_insn (gen_rtx_SET (reg, hi));
+       emit_insn (gen_rtx_SET (reg, lo));
+       return reg;
+@@ -37399,6 +37386,7 @@ rs6000_disable_incompatible_switches (void)
      { OPTION_MASK_P9_VECTOR,	OTHER_P9_VECTOR_MASKS,	"power9-vector"	},
      { OPTION_MASK_P8_VECTOR,	OTHER_P8_VECTOR_MASKS,	"power8-vector"	},
      { OPTION_MASK_VSX,		OTHER_VSX_VECTOR_MASKS,	"vsx"		},
@@ -2834,6 +2943,41 @@ index 87d60078bb0..f7c538c4d54 100644
    };
  
    for (i = 0; i < ARRAY_SIZE (flags); i++)
+diff --git a/gcc/config/rs6000/rs6000.md b/gcc/config/rs6000/rs6000.md
+index a768f5dd511..c8740bfdee8 100644
+--- a/gcc/config/rs6000/rs6000.md
++++ b/gcc/config/rs6000/rs6000.md
+@@ -152,7 +152,6 @@
+    UNSPEC_SI_FROM_SF
+    UNSPEC_PLTSEQ
+    UNSPEC_PLT16_HA
+-   UNSPEC_PLT16_LO
+   ])
+ 
+ ;;
+@@ -181,6 +180,7 @@
+    UNSPECV_MTFSB1		; Set FPSCR Field bit to 1
+    UNSPECV_SPLIT_STACK_RETURN   ; A camouflaged return
+    UNSPECV_SPEC_BARRIER         ; Speculation barrier
++   UNSPECV_PLT16_LO
+   ])
+ 
+ 
+@@ -10162,10 +10162,10 @@
+ 
+ (define_insn "*pltseq_plt16_lo_<mode>"
+   [(set (match_operand:P 0 "gpc_reg_operand" "=r")
+-	(unspec:P [(match_operand:P 1 "gpc_reg_operand" "b")
+-		   (match_operand:P 2 "symbol_ref_operand" "s")
+-		   (match_operand:P 3 "" "")]
+-		  UNSPEC_PLT16_LO))]
++	(unspec_volatile:P [(match_operand:P 1 "gpc_reg_operand" "b")
++			    (match_operand:P 2 "symbol_ref_operand" "s")
++			    (match_operand:P 3 "" "")]
++			   UNSPECV_PLT16_LO))]
+   "TARGET_PLTSEQ"
+ {
+   return rs6000_pltseq_template (operands, 2);
 diff --git a/gcc/config/rs6000/vsx.md b/gcc/config/rs6000/vsx.md
 index 607c0cd33f2..43dd3cba641 100644
 --- a/gcc/config/rs6000/vsx.md
@@ -3067,10 +3211,17 @@ index 1ffefd5f482..9be446a862d 100644
    memcpy (da_file_name + prefix_len, filename, len);
    strcpy (da_file_name + prefix_len + len, GCOV_DATA_SUFFIX);
 diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
-index 6441d647a54..f8070a55055 100644
+index 6441d647a54..fe53cc0c0bd 100644
 --- a/gcc/cp/ChangeLog
 +++ b/gcc/cp/ChangeLog
-@@ -1,3 +1,119 @@
+@@ -1,3 +1,126 @@
++2020-04-27  Jason Merrill  <jason@redhat.com>
++
++	PR c++/90750
++	PR c++/79585
++	* decl.c (grokdeclarator): Move dependent attribute to decl.
++	* decl2.c (splice_template_attributes): No longer static.
++
 +2020-04-21  Martin Sebor  <msebor@redhat.com>
 +	    Jason Merrill  <jason@redhat.com>
 +
@@ -3232,10 +3383,18 @@ index 4be45abca88..0e15b1c8147 100644
  
  /* Fold expression X which is used as an rvalue if RVAL is true.  */
 diff --git a/gcc/cp/cp-tree.h b/gcc/cp/cp-tree.h
-index f7c3eea4cdf..0e0efd749bc 100644
+index f7c3eea4cdf..1f013c172ce 100644
 --- a/gcc/cp/cp-tree.h
 +++ b/gcc/cp/cp-tree.h
-@@ -6844,6 +6844,7 @@ extern bool alias_type_or_template_p            (tree);
+@@ -6492,6 +6492,7 @@ extern tree grokfield (const cp_declarator *, cp_decl_specifier_seq *,
+ 		       tree, bool, tree, tree);
+ extern tree grokbitfield (const cp_declarator *, cp_decl_specifier_seq *,
+ 			  tree, tree, tree);
++extern tree splice_template_attributes		(tree *, tree);
+ extern bool any_dependent_type_attributes_p	(tree);
+ extern tree cp_reconstruct_complex_type		(tree, tree);
+ extern bool attributes_naming_typedef_ok	(tree);
+@@ -6844,6 +6845,7 @@ extern bool alias_type_or_template_p            (tree);
  extern bool alias_template_specialization_p     (const_tree);
  extern bool dependent_alias_template_spec_p     (const_tree);
  extern bool template_parm_object_p		(const_tree);
@@ -3243,7 +3402,7 @@ index f7c3eea4cdf..0e0efd749bc 100644
  extern bool explicit_class_specialization_p     (tree);
  extern bool push_tinst_level                    (tree);
  extern bool push_tinst_level_loc                (tree, location_t);
-@@ -7216,6 +7217,7 @@ extern bool type_has_nontrivial_copy_init	(const_tree);
+@@ -7216,6 +7218,7 @@ extern bool type_has_nontrivial_copy_init	(const_tree);
  extern void maybe_warn_parm_abi			(tree, location_t);
  extern bool class_tmpl_impl_spec_p		(const_tree);
  extern int zero_init_p				(const_tree);
@@ -3251,7 +3410,7 @@ index f7c3eea4cdf..0e0efd749bc 100644
  extern bool check_abi_tag_redeclaration		(const_tree, const_tree,
  						 const_tree);
  extern bool check_abi_tag_args			(tree, tree);
-@@ -7327,11 +7329,6 @@ extern tree cxx_copy_lang_qualifiers		(const_tree, const_tree);
+@@ -7327,11 +7330,6 @@ extern tree cxx_copy_lang_qualifiers		(const_tree, const_tree);
  
  extern void cxx_print_statistics		(void);
  extern bool maybe_warn_zero_as_null_pointer_constant (tree, location_t);
@@ -3264,7 +3423,7 @@ index f7c3eea4cdf..0e0efd749bc 100644
  /* in ptree.c */
  extern void cxx_print_xnode			(FILE *, tree, int);
 diff --git a/gcc/cp/decl.c b/gcc/cp/decl.c
-index 39d55589ef3..04d0b38ddf0 100644
+index 39d55589ef3..79f61dfe064 100644
 --- a/gcc/cp/decl.c
 +++ b/gcc/cp/decl.c
 @@ -5826,9 +5826,6 @@ reshape_init_array_1 (tree elt_type, tree max_index, reshape_iter *d,
@@ -3310,6 +3469,33 @@ index 39d55589ef3..04d0b38ddf0 100644
    return new_init;
  }
  
+@@ -11283,9 +11259,13 @@ grokdeclarator (const cp_declarator *declarator,
+ 	    attr_flags |= (int) ATTR_FLAG_FUNCTION_NEXT;
+ 	  if (declarator->kind == cdk_array)
+ 	    attr_flags |= (int) ATTR_FLAG_ARRAY_NEXT;
++	  /* Assume that any attributes that get applied late to templates will
++	     DTRT when applied to the declaration as a whole.  */
++	  tree late_attrs = splice_template_attributes (&attrs, type);
+ 	  returned_attrs = decl_attributes (&type,
+ 					    chainon (returned_attrs, attrs),
+ 					    attr_flags);
++	  returned_attrs = chainon (late_attrs, returned_attrs);
+ 	}
+ 
+       inner_declarator = declarator->declarator;
+diff --git a/gcc/cp/decl2.c b/gcc/cp/decl2.c
+index a46cbce08f4..a15bb3c45cc 100644
+--- a/gcc/cp/decl2.c
++++ b/gcc/cp/decl2.c
+@@ -1208,7 +1208,7 @@ is_late_template_attribute (tree attr, tree decl)
+    the declaration itself is dependent, so all attributes should be applied
+    at instantiation time.  */
+ 
+-static tree
++tree
+ splice_template_attributes (tree *attr_p, tree decl)
+ {
+   tree *p = attr_p;
 diff --git a/gcc/cp/expr.c b/gcc/cp/expr.c
 index 9160043ed11..5a60da36025 100644
 --- a/gcc/cp/expr.c
@@ -4068,7 +4254,7 @@ index f5becf988d2..51ebb90e32d 100644
      __attribute__ ((alias (#TargetFunc), copy (TargetFunc)));
  
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index 0ab6c9c6449..b18e9124b4e 100644
+index 0ab6c9c6449..5e6d240dc5d 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
 @@ -637,7 +637,8 @@ Objective-C and Objective-C++ Dialects}.
@@ -4125,6 +4311,30 @@ index 0ab6c9c6449..b18e9124b4e 100644
  @item -march=@var{name}
  @opindex march
  Specify the name of the target architecture and, optionally, one or
+@@ -28711,9 +28735,9 @@ Note that @option{-mcmodel=large} is incompatible with
+ @option{-mindirect-branch=thunk-extern} since the thunk function may
+ not be reachable in the large code model.
+ 
+-Note that @option{-mindirect-branch=thunk-extern} is incompatible with
+-@option{-fcf-protection=branch} since the external thunk cannot be modified
+-to disable control-flow check.
++Note that @option{-mindirect-branch=thunk-extern} is compatible with
++@option{-fcf-protection=branch} since the external thunk can be made
++to enable control-flow check.
+ 
+ @item -mfunction-return=@var{choice}
+ @opindex mfunction-return
+@@ -28726,6 +28750,10 @@ object file.  You can control this behavior for a specific function by
+ using the function attribute @code{function_return}.
+ @xref{Function Attributes}.
+ 
++Note that @option{-mindirect-return=thunk-extern} is compatible with
++@option{-fcf-protection=branch} since the external thunk can be made
++to enable control-flow check.
++
+ Note that @option{-mcmodel=large} is incompatible with
+ @option{-mfunction-return=thunk} and
+ @option{-mfunction-return=thunk-extern} since the thunk function may
 diff --git a/gcc/doc/tm.texi b/gcc/doc/tm.texi
 index 8c8978bb13a..7f5c370d97a 100644
 --- a/gcc/doc/tm.texi
@@ -4225,10 +4435,26 @@ index c717f24501e..64273c1c6bc 100644
  				    "when distributing negation across "
  				    "division"),
 diff --git a/gcc/fortran/ChangeLog b/gcc/fortran/ChangeLog
-index 8fefea2b63d..03193c2f9d7 100644
+index 8fefea2b63d..c2032eccac9 100644
 --- a/gcc/fortran/ChangeLog
 +++ b/gcc/fortran/ChangeLog
-@@ -1,3 +1,65 @@
+@@ -1,3 +1,81 @@
++2020-04-27  Thomas Koenig  <tkoenig@gcc.gnu.org>
++
++	PR fortran/93956
++	PR fortran/94788
++	* expr.c (gfc_check_pointer_assign): Revert patch for PR 93956.
++	* interface.c: Likewise.
++
++2020-04-24  Thomas Koenig  <tkoenig@gcc.gnu.org>
++
++	Backport from trunk
++	PR fortran/93956
++	* expr.c (gfc_check_pointer_assign): Also set subref_array_pointer
++	when a function returns a pointer.
++	* interface.c (gfc_set_subref_array_pointer_arg): New function.
++	(gfc_procedure_use): Call it.
++
 +2020-04-20  Harald Anlauf  <anlauf@gmx.de>
 +
 +	Backport from mainline.
@@ -4679,10 +4905,38 @@ index 7916344c584..3e969e52176 100644
  extern void mark_end_of_function_resources (rtx, bool);
  extern void init_resource_info (rtx_insn *);
 diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
-index e132f2657ef..4bfeef9ea6b 100644
+index e132f2657ef..52ca2715aff 100644
 --- a/gcc/testsuite/ChangeLog
 +++ b/gcc/testsuite/ChangeLog
-@@ -1,3 +1,456 @@
+@@ -1,3 +1,484 @@
++2020-05-01  Thomas Koenig  <tkoenig@gcc.gnu.org>
++
++	PR fortran/93956
++	PR fortran/94788
++	* gfortran.dg/pointer_assign_13.f90: Remove.
++
++2020-04-29  H.J. Lu  <hongjiu.lu@intel.com>
++
++	Backport from master
++	2020-04-29  H.J. Lu  <hongjiu.lu@intel.com>
++
++	PR target/93654
++	* gcc.target/i386/pr93654.c: New test.
++
++2020-04-24  Thomas Koenig  <tkoenig@gcc.gnu.org>
++
++	Backport from trunk
++	PR fortran/93956
++	* gfortran.dg/pointer_assign_13.f90: New test.
++
++2020-04-23 Iain Sandoe <iain@sandoe.co.uk>
++
++	* g++.dg/coroutines/coro-bad-alloc-00-bad-op-new.C: Adjust for
++	changed inline namespace.
++	* g++.dg/coroutines/coro-bad-alloc-01-bad-op-del.C: Likewise.
++	* g++.dg/coroutines/coro-bad-alloc-02-no-op-new-nt.C: Likewise
++	* g++.dg/coroutines/coro.h: Likewise
++
 +2020-04-21  Martin Sebor  <msebor@redhat.com>
 +
 +	PR c++/94510
@@ -5732,6 +5986,31 @@ index 00000000000..ebc0cf45cc6
 +{
 +  return foo ();
 +}
+diff --git a/gcc/testsuite/g++.dg/ext/attr-type1.C b/gcc/testsuite/g++.dg/ext/attr-type1.C
+new file mode 100644
+index 00000000000..6e84cccea1f
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/ext/attr-type1.C
+@@ -0,0 +1,19 @@
++// PR c++/90750
++// { dg-do compile { target c++11 } }
++
++template <typename> struct S
++{
++  static const int b = 64;
++};
++
++template <typename a> struct T: S<a>
++{
++  using A = S<a>;
++  using A::b;
++  char* __attribute__((aligned(b))) c;
++};
++
++T<int> t;
++
++#define SA(X) static_assert (X,#X)
++SA (alignof(T<int>) == S<int>::b);
 diff --git a/gcc/testsuite/g++.dg/gomp/pr94477.C b/gcc/testsuite/g++.dg/gomp/pr94477.C
 new file mode 100644
 index 00000000000..e7fdc23d6d3
@@ -5984,6 +6263,23 @@ index 00000000000..45b90a2249d
 +{
 +  a[2].foo ();
 +}
+diff --git a/gcc/testsuite/g++.dg/warn/Wunused-var-26.C b/gcc/testsuite/g++.dg/warn/Wunused-var-26.C
+index b3e020b6007..89c53de88a4 100644
+--- a/gcc/testsuite/g++.dg/warn/Wunused-var-26.C
++++ b/gcc/testsuite/g++.dg/warn/Wunused-var-26.C
+@@ -47,10 +47,10 @@ template <class T>
+ void f_var_type_unused ()
+ {
+   // The variable's type is marked unused.
+-  T* UNUSED t = new T;   // { dg-bogus "unused variable" "bug 79585" { xfail *-*-* } }
++  T* UNUSED t = new T;   // { dg-bogus "unused variable" "bug 79585" }
+ 
+   typedef T U;
+-  U* UNUSED u = new U;   // { dg-bogus "unused variable" "bug 79585" { xfail *-*-* } }
++  U* UNUSED u = new U;   // { dg-bogus "unused variable" "bug 79585" }
+ 
+   typedef T UNUSED U;
+   U v = U ();   // { dg-bogus "unused variable" "bug 79585" }
 diff --git a/gcc/testsuite/g++.target/aarch64/pr94052.C b/gcc/testsuite/g++.target/aarch64/pr94052.C
 new file mode 100644
 index 00000000000..d36c9bdc158
@@ -7691,6 +7987,21 @@ index 00000000000..b38b5ad32bb
 +foo (int x, int y)
 +{
 +  return x == 0 ? x : y;
++}
+diff --git a/gcc/testsuite/gcc.target/i386/pr93654.c b/gcc/testsuite/gcc.target/i386/pr93654.c
+new file mode 100644
+index 00000000000..ec5bdce86a6
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/pr93654.c
+@@ -0,0 +1,9 @@
++/* { dg-do compile } */
++/* { dg-options "-O2 -fcf-protection -mfunction-return=thunk-extern -mindirect-branch=thunk-extern" } */
++
++int
++bar (void (*foo) (void))
++{
++  foo (); 
++  return 0;
 +}
 diff --git a/gcc/testsuite/gcc.target/i386/pr94103.c b/gcc/testsuite/gcc.target/i386/pr94103.c
 new file mode 100644
@@ -11577,11 +11888,198 @@ index 00000000000..919ee02b725
 +
 +  return 0;
 +}
+diff --git a/libphobos/ChangeLog b/libphobos/ChangeLog
+index 569a3c91ab2..67d02036def 100644
+--- a/libphobos/ChangeLog
++++ b/libphobos/ChangeLog
+@@ -1,3 +1,15 @@
++2020-04-27  Iain Buclaw  <ibuclaw@gdcproject.org>
++
++	PR d/90718
++	* libdruntime/core/sys/posix/netdb.d (Solaris): Include _ai_pad member
++	in struct addrinfo only when targeting SPARC64.
++
++2020-04-27  Iain Buclaw  <ibuclaw@gdcproject.org>
++
++	PR d/90719
++	* libdruntime/core/sys/posix/sys/stat.d (Solaris): Remove st_pad3 from
++	struct stat32_t.
++
+ 2020-03-12  Release Manager
+ 
+ 	* GCC 9.3.0 released.
+diff --git a/libphobos/libdruntime/core/sys/posix/netdb.d b/libphobos/libdruntime/core/sys/posix/netdb.d
+index 327387f68ea..f1251839b16 100644
+--- a/libphobos/libdruntime/core/sys/posix/netdb.d
++++ b/libphobos/libdruntime/core/sys/posix/netdb.d
+@@ -743,9 +743,7 @@ else version (Solaris)
+         int ai_socktype;
+         int ai_protocol;
+ 
+-        version (SPARC)
+-            int _ai_pad;
+-        else version (SPARC64)
++        version (SPARC64)
+             int _ai_pad;
+ 
+         socklen_t ai_addrlen;
+diff --git a/libphobos/libdruntime/core/sys/posix/sys/stat.d b/libphobos/libdruntime/core/sys/posix/sys/stat.d
+index 76e4460550d..9fc89270d48 100644
+--- a/libphobos/libdruntime/core/sys/posix/sys/stat.d
++++ b/libphobos/libdruntime/core/sys/posix/sys/stat.d
+@@ -1314,7 +1314,6 @@ else version (Solaris)
+             dev_t st_rdev;
+             c_long[2] st_pad2;
+             off_t st_size;
+-            c_long st_pad3;
+             union
+             {
+                 timestruc_t st_atim;
 diff --git a/libstdc++-v3/ChangeLog b/libstdc++-v3/ChangeLog
-index 45847172291..616b154e866 100644
+index 45847172291..ceadacbba8d 100644
 --- a/libstdc++-v3/ChangeLog
 +++ b/libstdc++-v3/ChangeLog
-@@ -1,3 +1,104 @@
+@@ -1,3 +1,244 @@
++2020-04-24  Jonathan Wakely  <jwakely@redhat.com>
++
++	Backport from mainline
++	2020-03-18  Jonathan Wakely  <jwakely@redhat.com>
++
++	PR libstdc++/94203
++	* include/experimental/executor (executor::executor(Executor)): Call
++	make_shared directly instead of _M_create. Create _Tgt1 object.
++	(executor::executor(allocator_arg_t, const ProtoAlloc&, Executor)):
++	Call allocate_shared directly instead of _M_create. Create _Tgt2
++	object.
++	(executor::target_type): Add cast needed for new _Tgt interface.
++	(executor::target): Define when RTTI is disabled. Use _Tgt::_M_func.
++	(executor::_Tgt): Define the same interface whether RTTI is enabled or
++	not.
++	(executor::_Tgt::target_type, executor::_Tgt::target): Do not use
++	std::type_info in the interface.
++	(executor::_Tgt::_M_func): Add data member.
++	(executor::_TgtImpl): Replace with _Tgt1 and _Tgt2 class templates.
++	(executor::_Tgt1::_S_func): Define function to access target without
++	depending on RTTI.
++	(executor::_M_create): Remove.
++	(operator==, operator!=): Simplify comparisons for executor.
++	* include/experimental/socket (is_error_code_enum<socket_errc>):
++	Define specialization before use.
++
++	Backport from mainline
++	2020-04-24  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/experimental/executor (service_already_exists): Make default
++	constructor public (LWG 3414).
++	* testsuite/experimental/net/execution_context/make_service.cc: Check
++	the service_already_exists can be default constructed.
++
++2020-04-23  Thomas Rodgers  <rodgert@appliantology.com>
++
++	Backport from mainline
++	2020-04-23  Thomas Rodgers  <rodgert@appliantology.com>
++	* include/experimental/net/executor (system_context): Mark
++	system_context::system_context() = delete.
++	* testsuite/experimental/net/executor/1.cc: Add new
++	test to check system_context is not default constructible.
++
++2020-04-23  Thomas Rodgers  <trodgers@redhat.com>
++
++	Backport from mainline
++	2020-04-20  Thomas Rodgers  <trodgers@redhat.com>
++	* testsuite/lib/libstdc++.exp: Add additional_flags=
++	-DTBB_SUPRESS_DEPRECATED_MESSAGES=1 to suppress warnings when
++	compiling with a newer Thread Building Blocks.
++
++2020-04-23  Jonathan Wakely  <jwakely@redhat.com>
++
++	Backport from mainline
++	2020-04-22  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/std/execution (__cpp_lib_execution): Define to indicate
++	support for P0024R2 and P1001R2.
++	* include/std/version (__cpp_lib_execution): Define.
++	* testsuite/25_algorithms/pstl/feature_test.cc: Only test macro
++	defined by <algorithm>, move other tests to new tests ...
++	* testsuite/25_algorithms/pstl/feature_test-2.cc: New test.
++	* testsuite/25_algorithms/pstl/feature_test-3.cc: New test.
++	* testsuite/25_algorithms/pstl/feature_test-4.cc: New test.
++	* testsuite/25_algorithms/pstl/feature_test-5.cc: New test.
++
++	* include/bits/stl_iterator.h (__cpp_lib_array_constexpr): Update
++	value to indicate P0858R0 support.
++	* include/std/string_view (__cpp_lib_string_view): Likewise.
++	* include/std/version (__cpp_lib_array_constexpr)
++	(__cpp_lib_string_view): Likewise.
++	* testsuite/23_containers/array/element_access/constexpr_c++17.cc:
++	New test.
++	* testsuite/23_containers/array/requirements/constexpr_iter.cc: Test
++	in C++17 mode and check feature test macro.
++
++	Backport from mainline
++	2020-04-22  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/bits/ptr_traits.h (__cpp_lib_constexpr_memory): Define to
++	indicate P1006R1 support.
++	(__cpp_lib_to_address): Define to indicate P0653R2 support.
++	* include/std/memory (__cpp_lib_assume_aligned): Define to indicate
++	P1007R3 support.
++	* include/std/memory_resource (__cpp_lib_polymorphic_allocator):
++	Define to indicate P0339R6 support.
++	* include/std/string_view (__cpp_lib_starts_ends_with): Define to
++	indicate P0457R2 support.
++	* include/std/type_traits (__cpp_lib_is_nothrow_convertible): Define
++	to indicate P0758R1 support.
++	(__cpp_lib_remove_cvref): Define to indicate P0550R2 support.
++	(__cpp_lib_type_identity): Define to indicate P0887R1 support.
++	* include/std/version (__cpp_lib_is_nothrow_convertible)
++	(__cpp_lib_remove_cvref, __cpp_lib_type_identity)
++	(__cpp_lib_assume_aligned, __cpp_lib_constexpr_memory)
++	(__cpp_lib_polymorphic_allocator, __cpp_lib_starts_ends_with)
++	(__cpp_lib_to_address): Define.
++	* testsuite/20_util/to_address/1_neg.cc: Adjust dg-error line number.
++
++	* include/bits/stl_map.h (__cpp_lib_map_insertion): Add comment to
++	non-standard macro.
++	* include/bits/unordered_map.h (__cpp_lib_unordered_map_insertion):
++	Likewise.
++	* include/std/version (__cpp_lib_map_insertion)
++	(__cpp_lib_unordered_map_insertion): Likewise.
++
++	* include/std/bit (__cpp_lib_int_pow2): Define to indicate P0556R3
++	support.
++	* include/std/version (__cpp_lib_int_pow2): Likewise.
++
++	Backport from mainline
++	2019-12-10  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/std/complex (__cpp_lib_constexpr_complex): Define.
++	* include/std/version (__cpp_lib_constexpr_complex): Likewise.
++	* testsuite/26_numerics/complex/1.cc: New test.
++	* testsuite/26_numerics/complex/2.cc: New test.
++
++	Backport from mainline
++	2019-11-05  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/std/version [!_GLIBCXX_HOSTED]: Do not define feature test
++	macros for features that are only present in hosted builds.
++
++	Backport from mainline
++	2019-10-30  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/std/bit (__cpp_lib_bitops): Define.
++	* include/std/version (__cpp_lib_bitops): Define.
++	* testsuite/26_numerics/bit/header.cc: New test.
++	* testsuite/26_numerics/bit/header-2.cc: New test.
++
++	Backport from mainline
++	2020-02-19  Jonathan Wakely  <jwakely@redhat.com>
++
++	* include/std/type_traits (__cpp_lib_unwrap_ref): Define (LWG 3348).
++	* include/std/version (__cpp_lib_unwrap_ref): Likewise.
++	* testsuite/20_util/unwrap_reference/1.cc: Check macro.
++	* testsuite/20_util/unwrap_reference/3.cc: New test.
++
 +2020-04-22  Jonathan Wakely  <jwakely@redhat.com>
 +
 +	* doc/Makefile.am (xml_sources_manual): Add missing XML files.
@@ -13893,21 +14391,22 @@ index 5dc624dbb1e..6b39c46ac6e 100644
  		__str += __slash;
  	      __str += __elem._M_pathname;
 diff --git a/libstdc++-v3/include/bits/ptr_traits.h b/libstdc++-v3/include/bits/ptr_traits.h
-index c90a35080f1..cff56feb66f 100644
+index c90a35080f1..80ecf5b420d 100644
 --- a/libstdc++-v3/include/bits/ptr_traits.h
 +++ b/libstdc++-v3/include/bits/ptr_traits.h
-@@ -34,6 +34,10 @@
+@@ -34,6 +34,11 @@
  
  #include <bits/move.h>
  
 +#if __cplusplus > 201703L
++#define __cpp_lib_constexpr_memory 201811L
 +namespace __gnu_debug { struct _Safe_iterator_base; }
 +#endif
 +
  namespace std _GLIBCXX_VISIBILITY(default)
  {
  _GLIBCXX_BEGIN_NAMESPACE_VERSION
-@@ -169,7 +173,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -169,7 +174,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
    template<typename _Ptr, typename... _None>
      constexpr auto
      __to_address(const _Ptr& __ptr, _None...) noexcept
@@ -13918,29 +14417,468 @@ index c90a35080f1..cff56feb66f 100644
 +      else
 +	return std::__to_address(__ptr.operator->());
 +    }
++
++#define __cpp_lib_to_address 201711L
  
    /**
     * @brief Obtain address referenced by a pointer to an object
+diff --git a/libstdc++-v3/include/bits/stl_iterator.h b/libstdc++-v3/include/bits/stl_iterator.h
+index e9d90fa01f4..11dd9b0fd4c 100644
+--- a/libstdc++-v3/include/bits/stl_iterator.h
++++ b/libstdc++-v3/include/bits/stl_iterator.h
+@@ -69,8 +69,8 @@
+ # include <type_traits>
+ #endif
+ 
+-#if __cplusplus > 201402L
+-# define __cpp_lib_array_constexpr 201603
++#if __cplusplus >= 201703L
++# define __cpp_lib_array_constexpr 201803L
+ #endif
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+diff --git a/libstdc++-v3/include/bits/stl_map.h b/libstdc++-v3/include/bits/stl_map.h
+index 322d0a8290a..a87bba83c0d 100644
+--- a/libstdc++-v3/include/bits/stl_map.h
++++ b/libstdc++-v3/include/bits/stl_map.h
+@@ -892,7 +892,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+ 	{ _M_t._M_insert_range_unique(__first, __last); }
+ 
+ #if __cplusplus > 201402L
+-#define __cpp_lib_map_insertion 201411
++#define __cpp_lib_map_insertion 201411 // non-standard macro
+       /**
+        *  @brief Attempts to insert or assign a std::pair into the %map.
+        *  @param __k    Key to use for finding a possibly existing pair in
+diff --git a/libstdc++-v3/include/bits/unordered_map.h b/libstdc++-v3/include/bits/unordered_map.h
+index b8243a73445..9959c39d083 100644
+--- a/libstdc++-v3/include/bits/unordered_map.h
++++ b/libstdc++-v3/include/bits/unordered_map.h
+@@ -657,7 +657,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+ 
+ 
+ #if __cplusplus > 201402L
+-#define __cpp_lib_unordered_map_insertion 201411
++#define __cpp_lib_unordered_map_insertion 201411 // non-standard macro
+       /**
+        *  @brief Attempts to insert a std::pair into the %unordered_map.
+        *  @param __k    Key to use for finding a possibly existing pair in
 diff --git a/libstdc++-v3/include/experimental/executor b/libstdc++-v3/include/experimental/executor
-index 266a2487899..15f28de9b9d 100644
+index 266a2487899..7e2a97fd8ec 100644
 --- a/libstdc++-v3/include/experimental/executor
 +++ b/libstdc++-v3/include/experimental/executor
-@@ -127,7 +127,14 @@ inline namespace v1
+@@ -127,7 +127,13 @@ inline namespace v1
    /// An extensible, type-safe, polymorphic set of services.
    class execution_context;
  
 -  class service_already_exists : public logic_error { };
 +  class service_already_exists : public logic_error
 +  {
-+    template<typename _Service, typename... _Args>
-+      friend _Service&
-+      make_service(execution_context&, _Args&&...);
-+
++  public:
++    // _GLIBCXX_RESOLVE_LIB_DEFECTS
++    // 3414. service_already_exists has no usable constructors
 +    service_already_exists() : logic_error("service already exists") { }
 +  };
  
    template<typename _Tp> struct is_executor;
  
+@@ -288,26 +294,22 @@ inline namespace v1
+   class executor;
+ 
+   bool
+-  operator==(const executor& __a, const executor& __b) noexcept;
++  operator==(const executor&, const executor&) noexcept;
+ 
+   bool
+-  operator==(const executor& __e, nullptr_t) noexcept;
++  operator==(const executor&, nullptr_t) noexcept;
+ 
+-  inline bool
+-  operator==(nullptr_t, const executor& __e) noexcept
+-  { return __e == nullptr; }
++  bool
++  operator==(nullptr_t, const executor&) noexcept;
+ 
+-  inline bool
+-  operator!=(const executor& __a, const executor& __b) noexcept
+-  { return !(__a == __b); }
++  bool
++  operator!=(const executor&, const executor&) noexcept;
+ 
+-  inline bool
+-  operator!=(const executor& __e, nullptr_t) noexcept
+-  { return !(__e == nullptr); }
++  bool
++  operator!=(const executor&, nullptr_t) noexcept;
+ 
+-  inline bool
+-  operator!=(nullptr_t, const executor& __e) noexcept
+-  { return !(__e == nullptr); }
++  bool
++  operator!=(nullptr_t, const executor&) noexcept;
+ 
+   void swap(executor&, executor&) noexcept;
+ 
+@@ -847,7 +849,7 @@ inline namespace v1
+ 
+     // construct / copy / destroy:
+ 
+-    system_context() = default;
++    system_context() = delete;
+     system_context(const system_context&) = delete;
+     system_context& operator=(const system_context&) = delete;
+ 
+@@ -992,12 +994,13 @@ inline namespace v1
+ 
+     template<typename _Executor>
+       executor(_Executor __e)
+-      : _M_target(_M_create(std::move(__e)))
++      : _M_target(make_shared<_Tgt1<_Executor>>(std::move(__e)))
+       { }
+ 
+     template<typename _Executor, typename _ProtoAlloc>
+       executor(allocator_arg_t, const _ProtoAlloc& __a, _Executor __e)
+-      : _M_target(_M_create(std::move(__e), __a))
++      : _M_target(allocate_shared<_Tgt2<_Executor, _ProtoAlloc>>(__a,
++	    std::move(__e), __a))
+       { }
+ 
+     executor& operator=(const executor&) noexcept = default;
+@@ -1094,28 +1097,46 @@ inline namespace v1
+ #if __cpp_rtti
+     const type_info&
+     target_type() const noexcept
+-    { return _M_target ? _M_target->target_type() : typeid(void); }
++    {
++      if (_M_target)
++	return *static_cast<const type_info*>(_M_target->target_type());
++      return typeid(void);
++    }
++#endif
+ 
+     template<typename _Executor>
+       _Executor*
+       target() noexcept
+       {
++	void* __p = nullptr;
+ 	if (_M_target)
+-	  if (const auto* __p = _M_target->target(typeid(_Executor)))
+-	    return const_cast<_Executor*>(static_cast<const _Executor>(__p));
+-	return nullptr;
++	  {
++	    if (_M_target->_M_func == &_Tgt1<remove_cv_t<_Executor>>::_S_func)
++	      __p = _M_target->_M_func(_M_target.get(), nullptr);
++#if __cpp_rtti
++	    else
++	      __p = _M_target->target(&typeid(_Executor));
++#endif
++	  }
++	return static_cast<_Executor*>(__p);
+       }
+ 
+     template<typename _Executor>
+       const _Executor*
+       target() const noexcept
+       {
++	const void* __p = nullptr;
+ 	if (_M_target)
+-	  if (const auto* __p = _M_target->target(typeid(_Executor)))
+-	    return static_cast<const _Executor*>(__p);
+-	return nullptr;
+-      }
++	  {
++	    if (_M_target->_M_func == &_Tgt1<remove_cv_t<_Executor>>::_S_func)
++	      return (_Executor*)_M_target->_M_func(_M_target.get(), nullptr);
++#if __cpp_rtti
++	    else
++	      __p = _M_target->target(&typeid(_Executor));
+ #endif
++	  }
++	return static_cast<const _Executor*>(__p);
++      }
+ 
+   private:
+     struct _Tgt
+@@ -1126,85 +1147,134 @@ inline namespace v1
+       virtual void dispatch(std::function<void()>) const = 0;
+       virtual void post(std::function<void()>) const = 0;
+       virtual void defer(std::function<void()>) const = 0;
+-#if __cpp_rtti
+-      virtual const type_info& target_type() const = 0;
+-      virtual void* target(const std::type_info&) const = 0;
++      virtual const void* target_type() const noexcept = 0;
++      virtual void* target(const void*) noexcept = 0;
+       virtual bool _M_equals(_Tgt*) const noexcept = 0;
+-      virtual const void* _M_get_executor() const noexcept = 0;
+-#endif
++
++      using _Func = void* (_Tgt*, const _Tgt*);
++      _Func* _M_func; // Provides access to target without RTTI
+     };
+ 
+-    template<typename _Ex, typename _Alloc>
+-      struct _TgtImpl : _Tgt
++    template<typename _Ex>
++      struct _Tgt1 : _Tgt
+       {
+ 	explicit
+-	_TgtImpl(_Ex&& __ex, const _Alloc& __a)
+-	: _M_impl(std::move(__ex), __a) { }
++	_Tgt1(_Ex&& __ex)
++	: _M_ex(std::move(__ex))
++	{ this->_M_func = &_S_func; }
+ 
+-	void on_work_started() const noexcept { _M_ex().on_work_started(); }
+-	void on_work_finished() const noexcept { _M_ex().on_work_finished(); }
+-	execution_context& context() const noexcept { return _M_ex().context(); }
+ 	void
+-	dispatch(std::function<void()> __f) const
+-	{ _M_ex().dispatch(std::move(__f), _M_alloc()); }
++	on_work_started() const noexcept override
++	{ _M_ex.on_work_started(); }
++
++	void
++	on_work_finished() const noexcept override
++	{ _M_ex.on_work_finished(); }
++
++	execution_context&
++	context() const noexcept override
++	{ return _M_ex.context(); }
++
++	void
++	dispatch(std::function<void()> __f) const override
++	{ _M_ex.dispatch(std::move(__f), allocator<void>()); }
++
+ 	void
+-	post(std::function<void()> __f) const
+-	{ _M_ex().post(std::move(__f), _M_alloc()); }
++	post(std::function<void()> __f) const override
++	{ _M_ex.post(std::move(__f), allocator<void>()); }
++
+ 	void
+-	defer(std::function<void()> __f) const
+-	{ _M_ex().defer(std::move(__f), _M_alloc()); }
++	defer(std::function<void()> __f) const override
++	{ _M_ex.defer(std::move(__f), allocator<void>()); }
+ 
++	const void*
++	target_type() const noexcept override
++	{
+ #if __cpp_rtti
+-	virtual const type_info&
+-	target_type() const
+-	{ return typeid(_Ex); }
++	  return &typeid(_Ex);
++#else
++	  return nullptr;
++#endif
++	}
+ 
+-	virtual const void*
+-	target(const std::type_info& __ti) const
++	void*
++	target(const void* __ti) noexcept override
+ 	{
+-	  if (__ti == typeid(_Ex))
+-	    return std::addressof(_M_ex());
++#if __cpp_rtti
++	  if (*static_cast<const type_info*>(__ti) == typeid(_Ex))
++	    return std::__addressof(_M_ex);
++#endif
+ 	  return nullptr;
+ 	}
+ 
+-	virtual bool
+-	_M_equals(const _Tgt* __tgt) const noexcept
++	bool
++	_M_equals(_Tgt* __tgt) const noexcept override
+ 	{
+-	  if (__tgt->target_type() == typeid(_Ex))
+-	    *static_cast<const _Ex*>(__tgt->_M_get_executor()) == _M_ex();
++#if __cpp_rtti
++	  if (const void* __p = __tgt->target(&typeid(_Ex)))
++	    return *static_cast<const _Ex*>(__p) == _M_ex;
++#endif
+ 	  return false;
+ 	}
+ 
+-	virtual const void*
+-	_M_get_executor() const noexcept
+-	{ return std::addressof(_M_ex()); }
+-#endif
++	_Ex _M_ex [[__no_unique_address__]];
+ 
+-	_Ex& _M_ex() { return std::get<0>(_M_impl); }
+-	_Alloc& _M_alloc() { return std::get<1>(_M_impl); }
+-	std::tuple<_Ex, _Alloc> _M_impl;
++	static void*
++	_S_func(_Tgt* __p, const _Tgt* __q) noexcept
++	{
++	  auto& __ex = static_cast<_Tgt1*>(__p)->_M_ex;
++	  if (__q)
++	    {
++	      if (__ex == static_cast<const _Tgt1*>(__q)->_M_ex)
++		return __p;
++	      else
++		return nullptr;
++	    }
++	  else
++	    return std::__addressof(__ex);
++	}
+       };
+ 
+-    template<typename _Ex, typename _Alloc = std::allocator<void>>
+-      shared_ptr<_Tgt>
+-      _M_create(_Ex&& __ex, const _Alloc& __a = _Alloc())
++    template<typename _Ex, typename _Alloc>
++      struct _Tgt2 : _Tgt1<_Ex>
+       {
+-	return allocate_shared<_TgtImpl<_Ex, _Alloc>>(__a, std::move(__ex),
+-						      __a);
+-      }
++	explicit
++	_Tgt2(_Ex&& __ex, const _Alloc& __a)
++	: _Tgt1<_Ex>(std::move(__ex)), _M_alloc(__a) { }
++
++	void
++	dispatch(std::function<void()> __f) const override
++	{ this->_M_ex.dispatch(std::move(__f), _M_alloc); }
++
++	void
++	post(std::function<void()> __f) const override
++	{ this->_M_ex.post(std::move(__f), _M_alloc); }
++
++	void
++	defer(std::function<void()> __f) const override
++	{ this->_M_ex.defer(std::move(__f), _M_alloc); }
++
++	_Alloc _M_alloc [[__no_unique_address__]];
++      };
++
++    // Partial specialization for std::allocator<T>.
++    // Don't store the allocator.
++    template<typename _Ex, typename _Tp>
++      struct _Tgt2<_Ex, std::allocator<_Tp>> : _Tgt1<_Ex>
++      { };
+ 
+     friend bool
+     operator==(const executor& __a, const executor& __b) noexcept
+     {
+-      if (__a._M_target == __b._M_target)
++      _Tgt* __ta = __a._M_target.get();
++      _Tgt* __tb = __b._M_target.get();
++      if (__ta == __tb)
+ 	return true;
+-      if (!__a._M_target || !__b._M_target)
++      if (!__ta || !__tb)
+ 	return false;
+-#if __cpp_rtti
+-      return __a._M_target->_M_equals(__b._M_target.get());
+-#else
+-      return false; // XXX can we do better?
+-#endif
++      if (__ta->_M_func == __tb->_M_func)
++	return __ta->_M_func(__ta, __tb);
++      return __ta->_M_equals(__tb);
+     }
+ 
+     shared_ptr<_Tgt> _M_target;
+@@ -1217,6 +1287,22 @@ inline namespace v1
+   operator==(const executor& __e, nullptr_t) noexcept
+   { return !__e; }
+ 
++  inline bool
++  operator==(nullptr_t, const executor& __e) noexcept
++  { return !__e; }
++
++  inline bool
++  operator!=(const executor& __a, const executor& __b) noexcept
++  { return !(__a == __b); }
++
++  inline bool
++  operator!=(const executor& __e, nullptr_t) noexcept
++  { return (bool)__e; }
++
++  inline bool
++  operator!=(nullptr_t, const executor& __e) noexcept
++  { return (bool)__e; }
++
+   /// Swap two executor objects.
+   inline void swap(executor& __a, executor& __b) noexcept { __a.swap(__b); }
+ 
+diff --git a/libstdc++-v3/include/experimental/socket b/libstdc++-v3/include/experimental/socket
+index e80626528ce..cea17312dbd 100644
+--- a/libstdc++-v3/include/experimental/socket
++++ b/libstdc++-v3/include/experimental/socket
+@@ -79,6 +79,20 @@ inline namespace v1
+     not_found = 4
+   };
+ 
++} // namespace v1
++} // namespace net
++} // namespace experimental
++
++  template<>
++    struct is_error_code_enum<experimental::net::v1::socket_errc>
++    : public true_type {};
++
++namespace experimental
++{
++namespace net
++{
++inline namespace v1
++{
+   const error_category& socket_category() noexcept
+   {
+     struct __cat : error_category
+@@ -2602,10 +2616,6 @@ inline namespace v1
+ } // namespace net
+ } // namespace experimental
+ 
+-  template<>
+-    struct is_error_code_enum<experimental::net::v1::socket_errc>
+-    : public true_type {};
+-
+ _GLIBCXX_END_NAMESPACE_VERSION
+ } // namespace std
+ 
+diff --git a/libstdc++-v3/include/std/bit b/libstdc++-v3/include/std/bit
+index c753e39b64a..c4af1cfcb4d 100644
+--- a/libstdc++-v3/include/std/bit
++++ b/libstdc++-v3/include/std/bit
+@@ -250,6 +250,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+ #if __cplusplus > 201703L
+ 
++#define __cpp_lib_bitops 201907L
++
+   template<typename _Tp, typename _Up, bool = is_integral_v<_Tp>>
+     struct _If_is_unsigned_integer_type { };
+ 
+@@ -305,6 +307,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+   // [bit.pow.two], integral powers of 2
+ 
++#define __cpp_lib_int_pow2 201806L
++
+   template<typename _Tp>
+     constexpr _If_is_unsigned_integer<_Tp, bool>
+     ispow2(_Tp __x) noexcept
+diff --git a/libstdc++-v3/include/std/complex b/libstdc++-v3/include/std/complex
+index 45450e8ca01..d156d3249a7 100644
+--- a/libstdc++-v3/include/std/complex
++++ b/libstdc++-v3/include/std/complex
+@@ -47,6 +47,10 @@
+ // Get rid of a macro possibly defined in <complex.h>
+ #undef complex
+ 
++#if __cplusplus > 201703L
++# define __cpp_lib_constexpr_complex 201711L
++#endif
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
 diff --git a/libstdc++-v3/include/std/deque b/libstdc++-v3/include/std/deque
 index ed4927e13b7..b940dacb848 100644
 --- a/libstdc++-v3/include/std/deque
@@ -13954,6 +14892,18 @@ index ed4927e13b7..b940dacb848 100644
  
    template<typename _Tp, typename _Alloc, typename _Predicate>
      inline typename deque<_Tp, _Alloc>::size_type
+diff --git a/libstdc++-v3/include/std/execution b/libstdc++-v3/include/std/execution
+index 2d821e5c624..9f941c5e2f4 100644
+--- a/libstdc++-v3/include/std/execution
++++ b/libstdc++-v3/include/std/execution
+@@ -50,6 +50,7 @@
+ 
+ // Feature test macro for parallel algorithms
+ # define __cpp_lib_parallel_algorithm 201603L
++# define __cpp_lib_execution 201902L
+ 
+ #endif // C++17
+ 
 diff --git a/libstdc++-v3/include/std/forward_list b/libstdc++-v3/include/std/forward_list
 index 9d6cc40593b..4b319f93a61 100644
 --- a/libstdc++-v3/include/std/forward_list
@@ -13993,6 +14943,30 @@ index 8d6ac198c9a..6fb5ea8dcc4 100644
  
    template<typename _Tp, typename _Alloc, typename _Predicate>
      inline typename list<_Tp, _Alloc>::size_type
+diff --git a/libstdc++-v3/include/std/memory b/libstdc++-v3/include/std/memory
+index b6950c76089..cb8be4dc129 100644
+--- a/libstdc++-v3/include/std/memory
++++ b/libstdc++-v3/include/std/memory
+@@ -157,6 +157,7 @@ inline pointer_safety
+ get_pointer_safety() noexcept { return pointer_safety::relaxed; }
+ 
+ #if __cplusplus > 201703L
++#define __cpp_lib_assume_aligned 201811L
+   /// Inform the compiler that a pointer is aligned.
+   template<size_t _Align, class _Tp>
+     [[nodiscard,__gnu__::__always_inline__]]
+diff --git a/libstdc++-v3/include/std/memory_resource b/libstdc++-v3/include/std/memory_resource
+index 7ff5d17afe7..5b6ec60268a 100644
+--- a/libstdc++-v3/include/std/memory_resource
++++ b/libstdc++-v3/include/std/memory_resource
+@@ -61,6 +61,7 @@ namespace pmr
+   template<typename _Tp>
+     class polymorphic_allocator;
+ #else // C++20
++# define __cpp_lib_polymorphic_allocator 201902L
+   template<typename _Tp = std::byte>
+     class polymorphic_allocator;
+ #endif
 diff --git a/libstdc++-v3/include/std/string b/libstdc++-v3/include/std/string
 index 6ccc06f337a..506cb78313e 100644
 --- a/libstdc++-v3/include/std/string
@@ -14006,6 +14980,65 @@ index 6ccc06f337a..506cb78313e 100644
  
    template<typename _CharT, typename _Traits, typename _Alloc,
  	   typename _Predicate>
+diff --git a/libstdc++-v3/include/std/string_view b/libstdc++-v3/include/std/string_view
+index 42822cc41ab..4d90438e6be 100644
+--- a/libstdc++-v3/include/std/string_view
++++ b/libstdc++-v3/include/std/string_view
+@@ -47,7 +47,7 @@ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+-#define __cpp_lib_string_view 201603
++#define __cpp_lib_string_view 201803
+ 
+   // Helper for basic_string and basic_string_view members.
+   constexpr size_t
+@@ -310,6 +310,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+       }
+ 
+ #if __cplusplus > 201703L
++#define __cpp_lib_starts_ends_with 201711L
+       constexpr bool
+       starts_with(basic_string_view __x) const noexcept
+       { return this->substr(0, __x.size()) == __x; }
+diff --git a/libstdc++-v3/include/std/type_traits b/libstdc++-v3/include/std/type_traits
+index 9bad55829ce..18bcac824c3 100644
+--- a/libstdc++-v3/include/std/type_traits
++++ b/libstdc++-v3/include/std/type_traits
+@@ -1362,6 +1362,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+       using type = decltype(__test<_From, _To>(0));
+     };
+ 
++#define __cpp_lib_is_nothrow_convertible 201806L
+   /// is_nothrow_convertible
+   template<typename _From, typename _To>
+     struct is_nothrow_convertible
+@@ -3027,6 +3028,8 @@ template <typename _From, typename _To>
+ #endif // C++17
+ 
+ #if __cplusplus > 201703L
++#define __cpp_lib_remove_cvref 201711L
++
+   /// Remove references and cv-qualifiers.
+   template<typename _Tp>
+     struct remove_cvref
+@@ -3037,6 +3040,7 @@ template <typename _From, typename _To>
+   template<typename _Tp>
+     using remove_cvref_t = __remove_cvref_t<_Tp>;
+ 
++#define __cpp_lib_type_identity 201806L
+   /// Identity metafunction.
+   template<typename _Tp>
+     struct type_identity { using type = _Tp; };
+@@ -3044,6 +3048,8 @@ template <typename _From, typename _To>
+   template<typename _Tp>
+     using type_identity_t = typename type_identity<_Tp>::type;
+ 
++#define __cpp_lib_unwrap_ref 201811L
++
+   /// Unwrap a reference_wrapper
+   template<typename _Tp>
+     struct unwrap_reference { using type = _Tp; };
 diff --git a/libstdc++-v3/include/std/vector b/libstdc++-v3/include/std/vector
 index e5e13ab3ef7..1c1e2fd60e7 100644
 --- a/libstdc++-v3/include/std/vector
@@ -14020,18 +15053,209 @@ index e5e13ab3ef7..1c1e2fd60e7 100644
    template<typename _Tp, typename _Alloc, typename _Predicate>
      inline typename vector<_Tp, _Alloc>::size_type
 diff --git a/libstdc++-v3/include/std/version b/libstdc++-v3/include/std/version
-index 3c288301952..9dc7cbbb184 100644
+index 3c288301952..0f704c054cf 100644
 --- a/libstdc++-v3/include/std/version
 +++ b/libstdc++-v3/include/std/version
-@@ -155,7 +155,7 @@
+@@ -35,7 +35,9 @@
+ #include <bits/c++config.h>
+ 
+ // c++03
+-#define __cpp_lib_incomplete_container_elements 201505
++#if _GLIBCXX_HOSTED
++# define __cpp_lib_incomplete_container_elements 201505
++#endif
+ 
+ #if !defined(__STRICT_ANSI__)
+ // gnu++03
+@@ -44,17 +46,22 @@
+ 
+ #if __cplusplus >= 201103L
+ // c++11
+-#define __cpp_lib_allocator_is_always_equal 201411
+-#define __cpp_lib_allocator_traits_is_always_equal 201411
+ #define __cpp_lib_is_null_pointer 201309
+ #define __cpp_lib_result_of_sfinae 201210
+-#define __cpp_lib_shared_ptr_arrays 201611L
++
++#if _GLIBCXX_HOSTED
++# define __cpp_lib_allocator_is_always_equal 201411
++# define __cpp_lib_allocator_traits_is_always_equal 201411
++# define __cpp_lib_shared_ptr_arrays 201611L
++#endif
+ 
+ #if !defined(__STRICT_ANSI__)
+ // gnu++11
+-# define __cpp_lib_enable_shared_from_this 201603
+ # define __cpp_lib_is_swappable 201603
+ # define __cpp_lib_void_t 201411
++# if _GLIBCXX_HOSTED
++#  define __cpp_lib_enable_shared_from_this 201603
++# endif
+ #endif
+ 
+ // For C++11 and later we support ISO/IEC 29124 Mathematical Special Functions
+@@ -62,52 +69,41 @@
+ 
+ #if __cplusplus >= 201402L
+ // c++14
+-#define __cpp_lib_chrono_udls 201304
+-#define __cpp_lib_complex_udls 201309
+-#define __cpp_lib_exchange_function 201304
+-#define __cpp_lib_generic_associative_lookup 201304
+-#define __cpp_lib_integer_sequence 201304
+ #define __cpp_lib_integral_constant_callable 201304
+ #define __cpp_lib_is_final 201402L
+-#define __cpp_lib_make_reverse_iterator 201402
+-#define __cpp_lib_make_unique 201304
+-#ifndef _GLIBCXX_DEBUG // PR libstdc++/70303
+-# define __cpp_lib_null_iterators 201304L
+-#endif
+-#define __cpp_lib_quoted_string_io 201304
+-#define __cpp_lib_robust_nonmodifying_seq_ops 201304
+-#ifdef _GLIBCXX_HAS_GTHREADS
+-# define __cpp_lib_shared_timed_mutex 201402
+-#endif
+-#define __cpp_lib_string_udls 201304
+ #define __cpp_lib_transformation_trait_aliases 201304
+-#define __cpp_lib_transparent_operators 201510
+-#define __cpp_lib_tuple_element_t 201402L
+-#define __cpp_lib_tuples_by_type 201304
++
++#if _GLIBCXX_HOSTED
++# define __cpp_lib_chrono_udls 201304
++# define __cpp_lib_complex_udls 201309
++# define __cpp_lib_exchange_function 201304
++# define __cpp_lib_generic_associative_lookup 201304
++# define __cpp_lib_integer_sequence 201304
++# define __cpp_lib_make_reverse_iterator 201402
++# define __cpp_lib_make_unique 201304
++# ifndef _GLIBCXX_DEBUG // PR libstdc++/70303
++#  define __cpp_lib_null_iterators 201304L
++# endif
++# define __cpp_lib_quoted_string_io 201304
++# define __cpp_lib_robust_nonmodifying_seq_ops 201304
++# ifdef _GLIBCXX_HAS_GTHREADS
++#  define __cpp_lib_shared_timed_mutex 201402
++# endif
++# define __cpp_lib_string_udls 201304
++# define __cpp_lib_transparent_operators 201510
++# define __cpp_lib_tuple_element_t 201402L
++# define __cpp_lib_tuples_by_type 201304
++#endif
+ 
+ #if __cplusplus >= 201703L
+ // c++17
+ #define __cpp_lib_addressof_constexpr 201603
+-#define __cpp_lib_any 201606L
+-#define __cpp_lib_apply 201603
+-#define __cpp_lib_array_constexpr 201603
+-#define __cpp_lib_as_const 201510
+ #define __cpp_lib_atomic_is_always_lock_free 201603
+ #define __cpp_lib_bool_constant 201505
+-#define __cpp_lib_boyer_moore_searcher 201603
+ #define __cpp_lib_byte 201603
+-#define __cpp_lib_chrono 201611
+-#define __cpp_lib_clamp 201603
+-#define __cpp_lib_constexpr_char_traits 201611
+-#define __cpp_lib_enable_shared_from_this 201603
+-#define __cpp_lib_filesystem 201703
+-#define __cpp_lib_gcd 201606
+-#define __cpp_lib_gcd_lcm 201606
+ #ifdef _GLIBCXX_HAVE_BUILTIN_HAS_UNIQ_OBJ_REP
+ # define __cpp_lib_has_unique_object_representations 201606
+ #endif
+-#define __cpp_lib_hypot 201603
+-#define __cpp_lib_invoke 201411
+ #ifdef _GLIBCXX_HAVE_BUILTIN_IS_AGGREGATE
+ # define __cpp_lib_is_aggregate 201703
+ #endif
+@@ -116,10 +112,30 @@
+ #ifdef _GLIBCXX_HAVE_BUILTIN_LAUNDER
+ # define __cpp_lib_launder 201606
+ #endif
+-#define __cpp_lib_lcm 201606
+ #define __cpp_lib_logical_traits 201510
++#define __cpp_lib_type_trait_variable_templates 201510L
++#define __cpp_lib_uncaught_exceptions 201411L
++#define __cpp_lib_void_t 201411
++
++#if _GLIBCXX_HOSTED
++#define __cpp_lib_any 201606L
++#define __cpp_lib_apply 201603
++#define __cpp_lib_array_constexpr 201803L
++#define __cpp_lib_as_const 201510
++#define __cpp_lib_boyer_moore_searcher 201603
++#define __cpp_lib_chrono 201611
++#define __cpp_lib_clamp 201603
++#define __cpp_lib_constexpr_char_traits 201611
++#define __cpp_lib_enable_shared_from_this 201603
++#define __cpp_lib_execution 201902L // FIXME: should be 201603L
++#define __cpp_lib_filesystem 201703
++#define __cpp_lib_gcd 201606
++#define __cpp_lib_gcd_lcm 201606
++#define __cpp_lib_hypot 201603
++#define __cpp_lib_invoke 201411
++#define __cpp_lib_lcm 201606
+ #define __cpp_lib_make_from_tuple 201606
+-#define __cpp_lib_map_insertion 201411
++#define __cpp_lib_map_insertion 201411  // non-standard macro
+ #define __cpp_lib_map_try_emplace 201411
+ #define __cpp_lib_math_special_functions 201603L
+ #ifdef _GLIBCXX_HAS_GTHREADS
+@@ -138,29 +154,45 @@
+ # define __cpp_lib_shared_mutex 201505
+ #endif
+ #define __cpp_lib_shared_ptr_weak_type 201606
+-#define __cpp_lib_string_view 201603
+-#define __cpp_lib_type_trait_variable_templates 201510L
+-#define __cpp_lib_uncaught_exceptions 201411L
+-#define __cpp_lib_unordered_map_insertion 201411
++#define __cpp_lib_string_view 201803
++// #define __cpp_lib_to_chars 201611L
++#define __cpp_lib_unordered_map_insertion 201411  // non-standard macro
+ #define __cpp_lib_unordered_map_try_emplace 201411
+ #define __cpp_lib_variant 201606L
+-#define __cpp_lib_void_t 201411
+ #define __cpp_lib_parallel_algorithm 201603L
++#endif
+ 
+ #if __cplusplus > 201703L
+ // c++2a
+-#define __cpp_lib_bind_front 201907L
++#define __cpp_lib_bitops 201907L
+ #define __cpp_lib_bounded_array_traits 201902L
++// __cpp_lib_char8_t is defined in <bits/c++config.h>
+ #if __cpp_impl_destroying_delete
  # define __cpp_lib_destroying_delete 201806L
  #endif
  #define __cpp_lib_endian 201907L
 -#define __cpp_lib_erase_if 201900L
-+#define __cpp_lib_erase_if 202002L
- #define __cpp_lib_interpolate 201902L
+-#define __cpp_lib_interpolate 201902L
++#define __cpp_lib_int_pow2 201806L
  #ifdef _GLIBCXX_HAVE_BUILTIN_IS_CONSTANT_EVALUATED
  # define __cpp_lib_is_constant_evaluated 201811L
+ #endif
++#define __cpp_lib_is_nothrow_convertible 201806L
++#define __cpp_lib_remove_cvref 201711L
++#define __cpp_lib_type_identity 201806L
++#define __cpp_lib_unwrap_ref 201811L
++
++#if _GLIBCXX_HOSTED
++#define __cpp_lib_assume_aligned 201811L
++#define __cpp_lib_bind_front 201907L
++// FIXME: #define __cpp_lib_execution 201902L
++#define __cpp_lib_constexpr_complex 201711L
++#define __cpp_lib_constexpr_memory 201811L
++#define __cpp_lib_erase_if 202002L
++#define __cpp_lib_interpolate 201902L
+ #define __cpp_lib_list_remove_return_type 201806L
++#define __cpp_lib_polymorphic_allocator 201902L
++#define __cpp_lib_starts_ends_with 201711L
++#define __cpp_lib_to_address 201711L
++#endif
+ #endif // C++2a
+ #endif // C++17
+ #endif // C++14
 diff --git a/libstdc++-v3/src/c++17/fs_path.cc b/libstdc++-v3/src/c++17/fs_path.cc
 index 54bef75efd8..a6be0e03a78 100644
 --- a/libstdc++-v3/src/c++17/fs_path.cc
@@ -14091,7 +15315,7 @@ index 54bef75efd8..a6be0e03a78 100644
    const auto orig_type = _M_type();
    const auto orig_size = _M_cmpts.size();
 diff --git a/libstdc++-v3/testsuite/20_util/to_address/1_neg.cc b/libstdc++-v3/testsuite/20_util/to_address/1_neg.cc
-index 0954ac7b458..33a0e32711a 100644
+index 0954ac7b458..092413e6581 100644
 --- a/libstdc++-v3/testsuite/20_util/to_address/1_neg.cc
 +++ b/libstdc++-v3/testsuite/20_util/to_address/1_neg.cc
 @@ -17,7 +17,7 @@
@@ -14099,7 +15323,7 @@ index 0954ac7b458..33a0e32711a 100644
  // { dg-options "-std=gnu++2a" }
  // { dg-do compile { target c++2a } }
 -// { dg-error "not a function pointer" "" { target *-*-* } 153 }
-+// { dg-error "not a function pointer" "" { target *-*-* } 157 }
++// { dg-error "not a function pointer" "" { target *-*-* } 158 }
  
  #include <memory>
  
@@ -14145,6 +15369,56 @@ index 00000000000..4555284416d
 +{
 +  test01();
 +}
+diff --git a/libstdc++-v3/testsuite/20_util/unwrap_reference/1.cc b/libstdc++-v3/testsuite/20_util/unwrap_reference/1.cc
+index 243526725a0..3c04028bb6e 100644
+--- a/libstdc++-v3/testsuite/20_util/unwrap_reference/1.cc
++++ b/libstdc++-v3/testsuite/20_util/unwrap_reference/1.cc
+@@ -20,6 +20,12 @@
+ 
+ #include <type_traits>
+ 
++#ifndef __cpp_lib_unwrap_ref
++# error "Feature-test macro for unwrap_reference missing in <type_traits>"
++#elif __cpp_lib_unwrap_ref != 201811L
++# error "Feature-test macro for unwrap_reference has wrong value in <type_traits>"
++#endif
++
+ template<typename T, typename U> struct expect_same;
+ template<typename T> struct expect_same<T, T> : std::true_type { };
+ 
+diff --git a/libstdc++-v3/testsuite/20_util/unwrap_reference/3.cc b/libstdc++-v3/testsuite/20_util/unwrap_reference/3.cc
+new file mode 100644
+index 00000000000..3ea9cd18a05
+--- /dev/null
++++ b/libstdc++-v3/testsuite/20_util/unwrap_reference/3.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do compile { target c++2a } }
++
++#include <version>
++
++#ifndef __cpp_lib_unwrap_ref
++# error "Feature-test macro for unwrap_reference missing in <version>"
++#elif __cpp_lib_unwrap_ref != 201811L
++# error "Feature-test macro for unwrap_reference has wrong value in <version>"
++#endif
 diff --git a/libstdc++-v3/testsuite/21_strings/basic_string/erasure.cc b/libstdc++-v3/testsuite/21_strings/basic_string/erasure.cc
 index 873dd0cbf0f..a00faf94180 100644
 --- a/libstdc++-v3/testsuite/21_strings/basic_string/erasure.cc
@@ -14161,6 +15435,95 @@ index 873dd0cbf0f..a00faf94180 100644
 +
  void
  test01()
+ {
+diff --git a/libstdc++-v3/testsuite/23_containers/array/element_access/constexpr_c++17.cc b/libstdc++-v3/testsuite/23_containers/array/element_access/constexpr_c++17.cc
+new file mode 100644
+index 00000000000..dd69645833f
+--- /dev/null
++++ b/libstdc++-v3/testsuite/23_containers/array/element_access/constexpr_c++17.cc
+@@ -0,0 +1,55 @@
++// { dg-options "-std=gnu++17" }
++// { dg-do compile { target c++17 } }
++
++// Copyright (C) 2011-2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++#include <array>
++
++#ifndef __cpp_lib_array_constexpr
++# error "Feature test macro for array constexpr is missing in <array>"
++#elif __cpp_lib_array_constexpr < 201603L
++# error "Feature test macro for array constexpr has wrong value in <array>"
++#endif
++
++constexpr std::size_t test01()
++{
++  // array
++  typedef std::array<std::size_t, 6> array_type;
++  array_type a = { { 0, 55, 66, 99, 4115, 2 } };
++  auto v1  = a[1];
++  auto v2  = a.at(2);
++  auto v3  = a.front();
++  auto v4  = a.back();
++  return v1 + v2 + v3 + v4;
++}
++
++static_assert( test01() == (55 + 66 + 0 + 2) );
++
++constexpr std::size_t test02()
++{
++  // array
++  typedef std::array<std::size_t, 6> array_type;
++  const array_type a = { { 0, 55, 66, 99, 4115, 2 } };
++  auto v1  = a[1];
++  auto v2  = a.at(2);
++  auto v3  = a.front();
++  auto v4  = a.back();
++  return v1 + v2 + v3 + v4;
++}
++
++static_assert( test02() == (55 + 66 + 0 + 2) );
+diff --git a/libstdc++-v3/testsuite/23_containers/array/requirements/constexpr_iter.cc b/libstdc++-v3/testsuite/23_containers/array/requirements/constexpr_iter.cc
+index 208078c3b5a..7ede36073e1 100644
+--- a/libstdc++-v3/testsuite/23_containers/array/requirements/constexpr_iter.cc
++++ b/libstdc++-v3/testsuite/23_containers/array/requirements/constexpr_iter.cc
+@@ -1,5 +1,5 @@
+-// { dg-options "-std=gnu++2a" }
+-// { dg-do compile { target c++2a } }
++// { dg-options "-std=gnu++17" }
++// { dg-do compile { target c++17 } }
+ //
+ // Copyright (C) 2019 Free Software Foundation, Inc.
+ //
+@@ -20,6 +20,15 @@
+ 
+ #include <array>
+ 
++#ifndef __cpp_lib_array_constexpr
++# error "Feature test macro for array constexpr is missing in <array>"
++#elif __cpp_lib_array_constexpr < 201803L
++# error "Feature test macro for array constexpr has wrong value in <array>"
++#endif
++
++// This test is compiled as C++17 because array::iterator is just a pointer,
++// so always meets the C++20 constexpr iterator requirements, even in C++17.
++
+ constexpr int
+ test()
  {
 diff --git a/libstdc++-v3/testsuite/23_containers/deque/erasure.cc b/libstdc++-v3/testsuite/23_containers/deque/erasure.cc
 index 39ea6deecc2..da5330b300a 100644
@@ -14298,6 +15661,322 @@ index 0a23c3f0d12..ec479053cf1 100644
  #endif
  
  void
+diff --git a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-2.cc b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-2.cc
+new file mode 100644
+index 00000000000..3e74f89bc41
+--- /dev/null
++++ b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-2.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++17" }
++// { dg-do preprocess { target c++17 } }
++
++#include <numeric>
++
++#ifndef __cpp_lib_parallel_algorithm
++# error "Feature-test macro for parallel algorithms missing in <numeric>"
++#elif __cpp_lib_parallel_algorithm != 201603L
++# error "Feature-test macro for parallel algorithms has wrong value in <numeric>"
++#endif
+diff --git a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-3.cc b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-3.cc
+new file mode 100644
+index 00000000000..4d75a186211
+--- /dev/null
++++ b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-3.cc
+@@ -0,0 +1,35 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++17" }
++// { dg-do preprocess { target c++17 } }
++// { dg-require-effective-target tbb-backend }
++
++#include <execution>
++
++#ifndef __cpp_lib_execution
++# error "Feature-test macro for execution policies is missing in <execution>"
++#elif __cpp_lib_execution != 201902L
++# error "Feature-test macro for parallel algorithms has wrong value in <execution>"
++#endif
++
++// Neither SD-6 nor C++20 requires this macro to be defined in <execution>.
++#ifndef __cpp_lib_parallel_algorithm
++# error "Feature-test macro for parallel algorithms missing in <execution>"
++#elif __cpp_lib_parallel_algorithm != 201603L
++# error "Feature-test macro for parallel algorithms has wrong value in <execution>"
++#endif
+diff --git a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-4.cc b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-4.cc
+new file mode 100644
+index 00000000000..e7bbf920499
+--- /dev/null
++++ b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-4.cc
+@@ -0,0 +1,33 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++17" }
++// { dg-do preprocess { target c++17 } }
++
++#include <version>
++
++#ifndef __cpp_lib_parallel_algorithm
++# error "Feature-test macro for parallel algorithms missing in <version>"
++#elif __cpp_lib_parallel_algorithm != 201603L
++# error "Feature-test macro for parallel algorithms has wrong value in <version>"
++#endif
++
++#ifndef __cpp_lib_execution
++# error "Feature-test macro for execution policies is missing in <version>"
++#elif __cpp_lib_execution != 201902L
++# error "Feature-test macro for parallel algorithms has wrong value in <version>"
++#endif
+diff --git a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-5.cc b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-5.cc
+new file mode 100644
+index 00000000000..2d991958e75
+--- /dev/null
++++ b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test-5.cc
+@@ -0,0 +1,28 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++17" }
++// { dg-do preprocess { target c++17 } }
++
++#include <memory>
++
++// Neither SD-6 nor C++20 requires this macro to be defined in <memory>.
++#ifndef __cpp_lib_parallel_algorithm
++# error "Feature-test macro for parallel algorithms missing in <memory>"
++#elif __cpp_lib_parallel_algorithm != 201603L
++# error "Feature-test macro for parallel algorithms has wrong value in <memory>"
++#endif
+diff --git a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test.cc b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test.cc
+index d9d558b9dea..c6408f523e0 100644
+--- a/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test.cc
++++ b/libstdc++-v3/testsuite/25_algorithms/pstl/feature_test.cc
+@@ -21,31 +21,7 @@
+ 
+ #include <algorithm>
+ #ifndef __cpp_lib_parallel_algorithm
+-# error "Feature-test macro for parallel algorithms missing"
++# error "Feature-test macro for parallel algorithms missing in <algorithm>"
+ #elif __cpp_lib_parallel_algorithm != 201603L
+ # error "Feature-test macro for parallel algorithms has wrong value in <algorithm>"
+ #endif
+-
+-#include <numeric>
+-#if __cpp_lib_parallel_algorithm != 201603L
+-# error "Feature-test macro for parallel algorithms has wrong value in <numeric>"
+-#endif
+-
+-#include <version>
+-#if __cpp_lib_parallel_algorithm != 201603L
+-# error "Feature-test macro for parallel algorithms has wrong value in <version>"
+-#endif
+-
+-// The N4810 draft does not require the macro to be defined in <execution>.
+-#include <memory>
+-#if __cpp_lib_parallel_algorithm != 201603L
+-# error "Feature-test macro for parallel algorithms has wrong value in <memory>"
+-#endif
+-
+-// The N4810 draft does not require the macro to be defined in <execution>.
+-// Include this last, because it will trigger the inclusion of TBB headers,
+-// which then include <memory>, so we need to have already checked <memory>.
+-#include <execution>
+-#if __cpp_lib_parallel_algorithm != 201603L
+-# error "Feature-test macro for parallel algorithms has wrong value in <execution>"
+-#endif
+diff --git a/libstdc++-v3/testsuite/26_numerics/bit/header-2.cc b/libstdc++-v3/testsuite/26_numerics/bit/header-2.cc
+new file mode 100644
+index 00000000000..f67a1cdcac1
+--- /dev/null
++++ b/libstdc++-v3/testsuite/26_numerics/bit/header-2.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2019 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do compile { target c++2a } }
++
++#include <version>
++
++#ifndef __cpp_lib_bitops
++# error "Feature test macro for bitops is missing in <version>"
++#elif __cpp_lib_bitops < 201907L
++# error "Feature test macro for bitops has wrong value in <version>"
++#endif
+diff --git a/libstdc++-v3/testsuite/26_numerics/bit/header.cc b/libstdc++-v3/testsuite/26_numerics/bit/header.cc
+new file mode 100644
+index 00000000000..824ee002e96
+--- /dev/null
++++ b/libstdc++-v3/testsuite/26_numerics/bit/header.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2019 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do compile { target c++2a } }
++
++#include <bit>
++
++#ifndef __cpp_lib_bitops
++# error "Feature test macro for bitops is missing in <bit>"
++#elif __cpp_lib_bitops < 201907L
++# error "Feature test macro for bitops has wrong value in <bit>"
++#endif
+diff --git a/libstdc++-v3/testsuite/26_numerics/complex/1.cc b/libstdc++-v3/testsuite/26_numerics/complex/1.cc
+new file mode 100644
+index 00000000000..e3e6c22c5f4
+--- /dev/null
++++ b/libstdc++-v3/testsuite/26_numerics/complex/1.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2019 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do preprocess { target c++2a } }
++
++#include <complex>
++
++#ifndef __cpp_lib_constexpr_complex
++# error "Feature test macro for constexpr complex is missing in <complex>"
++#elif __cpp_lib_constexpr_complex < 201711L
++# error "Feature test macro for constexpr complex has wrong value in <complex>"
++#endif
+diff --git a/libstdc++-v3/testsuite/26_numerics/complex/2.cc b/libstdc++-v3/testsuite/26_numerics/complex/2.cc
+new file mode 100644
+index 00000000000..e84e92c62ae
+--- /dev/null
++++ b/libstdc++-v3/testsuite/26_numerics/complex/2.cc
+@@ -0,0 +1,27 @@
++// Copyright (C) 2019 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do preprocess { target c++2a } }
++
++#include <version>
++
++#ifndef __cpp_lib_constexpr_complex
++# error "Feature test macro for constexpr complex is missing in <version>"
++#elif __cpp_lib_constexpr_complex < 201711L
++# error "Feature test macro for constexpr complex has wrong value in <version>"
++#endif
 diff --git a/libstdc++-v3/testsuite/27_io/filesystem/operations/last_write_time.cc b/libstdc++-v3/testsuite/27_io/filesystem/operations/last_write_time.cc
 index 3f31375f51b..5d6e62c421a 100644
 --- a/libstdc++-v3/testsuite/27_io/filesystem/operations/last_write_time.cc
@@ -14892,10 +16571,10 @@ index 1bbc37408c3..82061f9e7e9 100644
    VERIFY( approx_equal(last_write_time(f.path), time) );
 diff --git a/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc b/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc
 new file mode 100644
-index 00000000000..f134add48b5
+index 00000000000..0898d12927a
 --- /dev/null
 +++ b/libstdc++-v3/testsuite/experimental/net/execution_context/make_service.cc
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,39 @@
 +// Copyright (C) 2020 Free Software Foundation, Inc.
 +//
 +// This file is part of the GNU ISO C++ Library.  This library is free
@@ -14932,6 +16611,129 @@ index 00000000000..f134add48b5
 +{
 +  net::make_service<S>(c);
 +}
++
++static_assert(std::is_default_constructible<net::service_already_exists>(),
++	      "LWG 3414. service_already_exists has no usable constructors");
+diff --git a/libstdc++-v3/testsuite/experimental/net/executor/1.cc b/libstdc++-v3/testsuite/experimental/net/executor/1.cc
+new file mode 100644
+index 00000000000..cd0af4b7737
+--- /dev/null
++++ b/libstdc++-v3/testsuite/experimental/net/executor/1.cc
+@@ -0,0 +1,100 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-do run { target c++14 } }
++
++#include <experimental/executor>
++#include <testsuite_hooks.h>
++
++namespace net = std::experimental::net;
++
++void
++test01()
++{
++  net::executor e;
++  VERIFY( !e );
++  VERIFY( e == nullptr );
++  VERIFY( nullptr == e );
++  VERIFY( e == e );
++  VERIFY( e == e );
++  net::executor e2;
++  VERIFY( e == e2 );
++  swap(e, e2);
++  VERIFY( e == e2 );
++  e = e2;
++  VERIFY( e == e2 );
++}
++
++void
++test02()
++{
++  struct E
++  {
++    void on_work_started() const noexcept { }
++    void on_work_finished() const noexcept { }
++    net::execution_context& context() const noexcept { return c; }
++    void dispatch(std::function<void()>, std::allocator<void>) const { }
++    void post(std::function<void()>, std::allocator<void>) const { }
++    void defer(std::function<void()>, std::allocator<void>) const { }
++
++    net::execution_context& c;
++
++    bool operator==(const E& rhs) const noexcept
++    { return &c == &rhs.c; }
++  };
++
++  net::execution_context c;
++  E d{c};
++  net::executor e(d);
++  VERIFY( e == e );
++  VERIFY( e != nullptr );
++  VERIFY( nullptr != e );
++
++  VERIFY( &e.context() == &c );
++#if __cpp_rtti
++  VERIFY( e.target_type() == typeid(E) );
++#endif
++  VERIFY( *e.target<E>() == d );
++  VERIFY( *e.target<const E>() == d );
++  VERIFY( *const_cast<const net::executor&>(e).target<E>() == d );
++  VERIFY( *const_cast<const net::executor&>(e).target<const E>() == d );
++
++  net::executor f = e;
++  VERIFY( f == e );
++  e = nullptr;
++  VERIFY( f != e );
++  swap(e, f);
++  VERIFY( f == nullptr );
++  VERIFY( nullptr != e );
++
++  net::executor g(E{c});
++  VERIFY( e == g );
++}
++
++void
++test03()
++{
++  static_assert( ! std::is_default_constructible<net::system_context>::value, "" );
++}
++
++int
++main()
++{
++  test01();
++  test02();
++  test03();
++}
+diff --git a/libstdc++-v3/testsuite/lib/libstdc++.exp b/libstdc++-v3/testsuite/lib/libstdc++.exp
+index 1ab896d3deb..a616227ae7b 100644
+--- a/libstdc++-v3/testsuite/lib/libstdc++.exp
++++ b/libstdc++-v3/testsuite/lib/libstdc++.exp
+@@ -1623,7 +1623,8 @@ proc check_effective_target_tbb-backend { } {
+         puts $f "}"
+         close $f
+ 
+-        set lines [v3_target_compile $src $exe executable "additional_flags=-std=c++17 additional_flags=-ltbb"]
++        set lines [v3_target_compile $src $exe executable "additional_flags=-std=c++17 additional_flags=-ltbb
++                                                           additional_flags=-DTBB_SUPPRESS_DEPRECATED_MESSAGES=1"]
+         file delete $src
+ 
+         if [string match "" $lines] {
 diff --git a/libstdc++-v3/testsuite/tr1/8_c_compatibility/cstdlib/functions.cc b/libstdc++-v3/testsuite/tr1/8_c_compatibility/cstdlib/functions.cc
 index e1feef99582..0f00a94da42 100644
 --- a/libstdc++-v3/testsuite/tr1/8_c_compatibility/cstdlib/functions.cc
