@@ -98,7 +98,7 @@ sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'a526cfab91a1499be92c824c7f2185a013a38dbdfbeabe63ecbe84451e07b021'
             'e467f0ac68b349de826c79b00a45c5ad9e7c5a55d06b9b9fa7afd94c597f6376')
 
-_threads="posix"
+_threads="win32"
 _git_base_commit=
 _gcc_version=
 _gcc_date=
@@ -240,13 +240,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
