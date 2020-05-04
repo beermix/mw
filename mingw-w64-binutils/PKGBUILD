@@ -46,6 +46,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         135_bfd_soversion.patch
         binutils-stable-34branch.patch
         branch-version.patch
+        branch-updates.diff
         000-git-binutils-2_34.patch
         binutils-2.29-filename-in-error-messages.patch
         binutils-export-demangle.h.patch
@@ -56,7 +57,7 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
-  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/branch-updates.diff
   patch -p1 -i "${srcdir}"/branch-version.patch
 
   #patch -p1 -i "${srcdir}"/000-git-binutils-2_34.patch
@@ -116,7 +117,7 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
-    --enable-targets=x86_64-w64-mingw32,i686-w64-mingw32 \
+    --enable-targets=x86_64-w64-mingw32 \
     --enable-compressed-debug-sections=all \
     --enable-generate-build-notes=no \
     --disable-shared

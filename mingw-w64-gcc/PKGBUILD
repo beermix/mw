@@ -130,7 +130,7 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     git-updates.patch \
-    libiberty-sync.patch 
+    libiberty-sync.patch
 
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
@@ -248,9 +248,6 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libunwind-exceptions \
-    --disable-cet \
-    --disable-libmpx \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
