@@ -111,7 +111,8 @@ build() {
     --enable-gold \
     --with-system-zlib \
     --enable-targets=x86_64-*-mingw64 \
-    --disable-shared
+    --disable-shared \
+    --enable-silent-rules
 
   make
 }
