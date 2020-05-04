@@ -76,8 +76,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         icelake.patch
         libiberty-sync.patch
         git-updates.patch
-        997-g.patch
-        997-g1.patch)
+        gcc-g1.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -147,7 +146,8 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     git-updates.patch \
-    libiberty-sync.patch
+    libiberty-sync.patch \
+    gcc-g1.patch
 
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
@@ -279,7 +279,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti nice -n19 make all
+  /home/User/.bin/noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
