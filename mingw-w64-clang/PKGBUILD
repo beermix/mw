@@ -27,6 +27,7 @@ pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
+license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
@@ -43,9 +44,9 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc"
 options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
-source=(${_url}/llvm-${pkgver}.src.tar.xz
-        ${_url}/clang-${pkgver}.src.tar.xz
-        ${_url}/compiler-rt-${pkgver}.src.tar.xz
+source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/clang-${pkgver}.src.tar.xz{,.sig}
+        ${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig}
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -116,7 +117,6 @@ prepare() {
          projects/libcxxabi projects/libunwind projects/openmp projects/test-suite | true
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
-  #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
 }
 
 build() {

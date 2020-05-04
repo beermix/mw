@@ -5,7 +5,7 @@
 # Contributor: Liu Hao <lh_mouse@126.com>
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
-_enable_fortran=yes
+_enable_fortran=no
 _enable_ada=no
 _enable_objc=no
 _realname=gcc
@@ -19,7 +19,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 pkgver=9.3.0.d20200501.c0.gcb2c76c8b15
-pkgrel=1
+pkgrel=2
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -39,7 +39,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 #checkdepends=('dejagnu')
 optdepends=()
-options=('staticlibs' '!emptydirs' 'strip') # '!strip' '!debug')
+options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 
 _gccver=9.3.0
 _islver=0.16.1
@@ -183,8 +183,6 @@ prepare() {
 #    fortran-vector-v2.patch \
 #    gomp-relax.patch \
 #    ipa-cp.patch \
-#   Enable clear linux patches
-#   apply_patch_with_msg \
 #    zero-regs-gcc8.patch \
 #    avx512-when-we-ask-for-it.patch \
 #    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
@@ -283,9 +281,7 @@ build() {
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
-    --disable-isl-version-check \
+    ${extra_config} \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -295,6 +291,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
@@ -304,12 +301,7 @@ build() {
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
-    --enable-plugin  \
     ${_conf}
-    #--enable-libitm
-    #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
-    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -353,8 +345,8 @@ package_mingw-w64-gcc() {
            "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
            "${MINGW_PACKAGE_PREFIX}-winpthreads"
            "${MINGW_PACKAGE_PREFIX}-zlib")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-base")
+  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-base")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,include,lib,share}
 
