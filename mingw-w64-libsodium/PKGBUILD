@@ -3,7 +3,7 @@
 _realname=libsodium
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=73aa0ebad2d2444d193dae70c9a4eb4597428312
+pkgver=f88e24f88774885d9c2e180c02190e94fd6945e5
 pkgrel=1
 pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
 arch=("any")
@@ -16,7 +16,8 @@ sha256sums=('6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e46636c1')
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  ./autogen.sh
+  #./autogen.sh
+  autoreconf -fiv
 }
 
 build() {
