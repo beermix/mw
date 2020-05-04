@@ -52,9 +52,18 @@ build() {
     -DUSE_SHARED_MBEDTLS_LIBRARY=ON \
     -DUSE_STATIC_MBEDTLS_LIBRARY=ON \
     -DLINK_WITH_PTHREAD=ON \
+    -DCMAKE_BUILD_TYPE=Release \
     -Wno-dev \
     ../${_realname}-${pkgver}
   make
+  # Generate the documentation
+  make apidoc
+}
+
+check() {
+  cd "${srcdir}/build-${MINGW_CHOST}"
+  cp -p library/*.dll tests/ # Tests are dynamically linked
+  make test
 }
 
 package () {
