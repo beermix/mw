@@ -117,9 +117,7 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
-    --enable-targets=x86_64-w64-mingw32 \
-    --enable-compressed-debug-sections=all \
-    --enable-generate-build-notes=no \
+    --enable-targets=x86_64-*-mingw64 \ 
     --disable-shared
 
   make
