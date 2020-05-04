@@ -91,7 +91,8 @@ prepare() {
       "0005-add-pthread-as-system-lib-for-mingw.patch" \
       "0009-empty-target-prefix-only-msvc.patch" \
       "0010-mbig-obj-for-all.patch" \
-      "0012-fix-testplugin-linking.patch"
+      "0012-fix-testplugin-linking.patch" \
+      "no-z3.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -159,6 +160,7 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_RTTI=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -196,7 +198,7 @@ build() {
   # sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   # sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti.exe nice -n 19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n 19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
