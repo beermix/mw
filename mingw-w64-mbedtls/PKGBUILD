@@ -56,8 +56,6 @@ build() {
     -Wno-dev \
     ../${_realname}-${pkgver}
   make
-  # Generate the documentation
-  make apidoc
 }
 
 check() {
