@@ -146,7 +146,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-stable-branch.patch \
+    000-git-updates-CLR-FULL.patch \
     libiberty-sync.patch \
     ipa-cp.patch \
     gomp-relax.patch \
