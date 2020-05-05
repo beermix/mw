@@ -75,7 +75,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
-        git-updates.patch
+        000-git-updates-CLR-FULL.patch
         gcc-g1.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
@@ -145,8 +145,13 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-stable-branch.patch \
-    libiberty-sync.patch
+    000-git-updates-CLR-FULL.patch \
+    libiberty-sync.patch \
+    ipa-cp.patch \
+    gomp-relax.patch \
+    fortran-vector-v2.patch
+    optimize-at-least-some.patch \
+    optimize.patch
 
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
@@ -224,10 +229,24 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
+  #unset CFLAGS
+  #unset CXXFLAGS
+  #export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
+  #export CXXFLAGS="-march=haswell -g1 -O3"
+
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="$CFLAGS -I /mingw64/include -isystem /mingw64/include -isysroot=/mingw64/ "
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -isystem /mingw64/include"
+  export FFLAGS_FOR_TARGET="$FFLAGS  -isystem /mingw64/include"
+  export LDFLAGS_FOR_TARGET="$LFDLAGS -L/mingw64/lib "
+  export AS="/mingw64/bin/as"
+  export AR="/mingw64/bin/x86_64-w64-mingw32-gcc-ar"
+  export RANLIB="/mingw64/bin/x86_64-w64-mingw32-gcc-ranlib"
+  export DLLTOOL="/mingw64/bin/dlltool" 
+  export LIBRARY_PATH=/usr/lib:/mingw64/lib
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
