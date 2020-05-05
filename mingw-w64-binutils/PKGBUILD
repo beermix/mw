@@ -67,7 +67,7 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
-  patch -p1 -i "${srcdir}"/branch-updates.diff
+  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   patch -p1 -i "${srcdir}"/branch-version.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
