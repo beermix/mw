@@ -22,7 +22,7 @@ pkgver=9.3.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=2
+pkgrel=3
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -75,6 +75,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         icelake.patch
         libiberty-sync.patch
         000-git-updates-CLR-FULL.patch
+        gcc-stable-branch.patch
         arch-native-override.patch
         gcc-g1.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
@@ -145,14 +146,13 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-git-updates-CLR-FULL.patch \
+    gcc-stable-branch.patch \
     libiberty-sync.patch \
     ipa-cp.patch \
     gomp-relax.patch \
     fortran-vector-v2.patch \
     optimize-at-least-some.patch \
-    optimize.patch \
-    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
+    optimize.patch
 
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
