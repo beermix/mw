@@ -61,7 +61,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
-        gcc-stable-branch.patch
         010-documentation.patch
         zero-regs-gcc8.patch
         openmp-vectorize-v2.patch
@@ -76,6 +75,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         icelake.patch
         libiberty-sync.patch
         000-git-updates-CLR-FULL.patch
+        arch-native-override.patch
         gcc-g1.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
@@ -151,7 +151,9 @@ prepare() {
     gomp-relax.patch \
     fortran-vector-v2.patch
     optimize-at-least-some.patch \
-    optimize.patch
+    optimize.patch \
+    arch-native-override.patch \
+    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
 
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
