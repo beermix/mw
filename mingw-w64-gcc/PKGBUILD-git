@@ -19,7 +19,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 pkgver=9.3.0.d20200501.c0.gcb2c76c8b15
-pkgrel=2
+pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -55,6 +55,7 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
+        "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
         0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
@@ -71,9 +72,10 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch
         0017-gcc-7-branch-Enable-std-experimental-filesystem.patch
-        0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patc
+        0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch
         0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
         0130-libstdc++-in-out.patch
+        0140-gcc-8.2.0-diagnostic-color.patch
         010-documentation.patch
         zero-regs-gcc8.patch
         openmp-vectorize-v2.patch
@@ -83,9 +85,14 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         optimize-at-least-some.patch
         gomp-relax.patch 
         avx512-when-we-ask-for-it.patch
+        gcc10-isl-dl.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
         icelake.patch
         libiberty-sync.patch
+        000-git-updates-CLR-FULL.patch
+        gcc-stable-branch.patch
+        arch-native-override.patch
+        gcc-g1.patch
         997-g1.patch
         997-g.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
@@ -179,13 +186,14 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    libiberty-sync.patch \
-    ipa-cp.patch \
-    gomp-relax.patch \
-    fortran-vector-v2.patch
-    optimize-at-least-some.patch \
-    optimize.patch
+    libiberty-sync.patch
 
+
+#    ipa-cp.patch \
+#    gomp-relax.patch \
+#    fortran-vector-v2.patch
+#    optimize-at-least-some.patch \
+#    optimize.patch
 #    optimize-at-least-some.patch \
 #    optimize.patch \
 #    openmp-vectorize-v2.patch \
@@ -255,24 +263,10 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  #unset CFLAGS
-  #unset CXXFLAGS
-  #export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
-  #export CXXFLAGS="-march=haswell -g1 -O3"
-
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
-  export CXXFLAGS="-march=haswell -g1 -O3"
-  export CFLAGS_FOR_TARGET="$CFLAGS -I /mingw64/include -isystem /mingw64/include -isysroot=/mingw64/ "
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -isystem /mingw64/include"
-  export FFLAGS_FOR_TARGET="$FFLAGS  -isystem /mingw64/include"
-  export LDFLAGS_FOR_TARGET="$LFDLAGS -L/mingw64/lib "
-  export AS="/mingw64/bin/as"
-  export AR="/mingw64/bin/x86_64-w64-mingw32-gcc-ar"
-  export RANLIB="/mingw64/bin/x86_64-w64-mingw32-gcc-ranlib"
-  export DLLTOOL="/mingw64/bin/dlltool" 
-  export LIBRARY_PATH=/usr/lib:/mingw64/lib
+  export CFLAGS="-march=haswell -g1 -O2 -fno-stack-protector"
+  export CXXFLAGS="-march=haswell -g1 -O2"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -342,8 +336,6 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
@@ -421,8 +413,6 @@ package_mingw-w64-gcc() {
 package_mingw-w64-gcc-libgfortran() {
   pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
   cd ${srcdir}${MINGW_PREFIX}
@@ -433,8 +423,6 @@ package_mingw-w64-gcc-fortran() {
   pkgdesc="GNU Compiler Collection (Fortran) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran=${pkgver}-${pkgrel}")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-fortran")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-fortran")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
@@ -452,8 +440,6 @@ package_mingw-w64-gcc-fortran() {
 package_mingw-w64-gcc-ada() {
   pkgdesc="GNU Compiler Collection (Ada) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
@@ -471,8 +457,6 @@ package_mingw-w64-gcc-ada() {
 package_mingw-w64-gcc-objc() {
   pkgdesc="GNU Compiler Collection (ObjC,Obj-C++) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}-${pkgrel}")
-  provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
-  conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{bin,lib}
 
