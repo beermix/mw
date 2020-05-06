@@ -77,7 +77,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         000-git-updates-CLR-FULL.patch
         gcc-stable-branch.patch
         arch-native-override.patch
-        gcc-g1.patch)
+        gcc-g1.patch
+        gcov.patch
+        reproducible-sort.patch
+        vmov-alignment.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -147,7 +150,10 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     gcc-stable-branch.patch \
-    libiberty-sync.patch
+    libiberty-sync.patch \
+    gcov.patch \
+    reproducible-sort.patch \
+    vmov-alignment.patch
 
 #    ipa-cp.patch \
 #    gomp-relax.patch \
@@ -280,6 +286,7 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-vtable-verify \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
