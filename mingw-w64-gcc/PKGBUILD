@@ -146,14 +146,14 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-git-updates-CLR-FULL.patch \
-    libiberty-sync.patch \
-    ipa-cp.patch \
-    gomp-relax.patch \
-    fortran-vector-v2.patch \
-    optimize-at-least-some.patch \
-    optimize.patch
+    gcc-stable-branch.patch \
+    libiberty-sync.patch
 
+#    ipa-cp.patch \
+#    gomp-relax.patch \
+#    fortran-vector-v2.patch \
+#    optimize-at-least-some.patch \
+#    optimize.patch
 #    gcc-stable-branch.patch \
 #    gcc-g1.patch
 #    libiberty-sync.patch \
@@ -265,7 +265,6 @@ build() {
     --enable-libatomic \
     --enable-threads=${_threads} \
     --enable-fully-dynamic-string \
-    --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
@@ -297,7 +296,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti make all
+  /home/User/.go/bin/noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
