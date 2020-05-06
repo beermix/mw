@@ -1,8 +1,8 @@
 Description: Force locale-independent stable sort order
 Author: Stephen Kitt <skitt@debian.org>
 
---- a/src/gcc/Makefile.in
-+++ b/src/gcc/Makefile.in
+--- a/gcc/Makefile.in
++++ b/gcc/Makefile.in
 @@ -2936,7 +2936,7 @@
  	echo | $(GCC_FOR_TARGET) -E -dM - | \
  	  sed -n -e 's/^#define \([^_][a-zA-Z0-9_]*\).*/\1/p' \
