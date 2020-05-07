@@ -4,7 +4,7 @@ _realname=aria2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=9d0a48ac8147c5e56402706d5c17efa8bf6340f2
-pkgrel=1
+pkgrel=2
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
 url="https://github.com/aria2/aria2"
@@ -16,6 +16,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-cppunit"
          "${MINGW_PACKAGE_PREFIX}-libxml2"
          "${MINGW_PACKAGE_PREFIX}-sqlite3"
+	 "${MINGW_PACKAGE_PREFIX}-openssl"
+	 "${MINGW_PACKAGE_PREFIX}-c-ares"
          "${MINGW_PACKAGE_PREFIX}-zlib"
          )
 optdepends=("${MINGW_PACKAGE_PREFIX}-ruby: aria2rpc and aria2mon")
@@ -40,12 +42,12 @@ build() {
     --host=${MINGW_CHOST} \
     --disable-shared \
     --without-gnutls \
-    --without-openssl \
-    --with-wintls \
+    --with-openssl \
+    --without-wintls \
     --disable-libaria2 \
     --with-libcares \
     --without-libssh2 \
-    --disable-nls \
+    --enable-nls \
     ARIA2_STATIC=no
 
   /home/User/.go/bin/noti.exe nice -n 19 make
