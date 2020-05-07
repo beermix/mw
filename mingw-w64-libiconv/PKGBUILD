@@ -42,7 +42,7 @@ build() {
     --docdir=${MINGW_PREFIX}/share/doc/libiconv \
     --enable-static \
     --enable-shared \
-    --disable-extra-encodings \
+    --enable-extra-encodings \
     --enable-relocatable \
     --disable-rpath \
     --enable-silent-rules \
