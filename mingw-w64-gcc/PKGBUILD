@@ -79,6 +79,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         arch-native-override.patch
         gcc-g1.patch
         gcov.patch
+        0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         reproducible-sort.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
             'SKIP'
@@ -135,7 +136,8 @@ prepare() {
     0010-Fix-using-large-PCH.patch \
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
+    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
 
   apply_patch_with_msg \
     0130-libstdc++-in-out.patch
@@ -158,7 +160,6 @@ prepare() {
 #    fortran-vector-v2.patch \
 #    optimize-at-least-some.patch \
 #    optimize.patch
-#    gcc-stable-branch.patch \
 #    gcc-g1.patch
 #    libiberty-sync.patch \
 #    optimize-at-least-some.patch \
