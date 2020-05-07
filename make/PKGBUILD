@@ -16,13 +16,15 @@ options=() # 'debug' '!strip')
 source=(https://ftp.gnu.org/gnu/make/${pkgname}-${pkgver}.tar.gz
         make-3.82-011-noclock_gettime.patch
         make-3.82-016-weird-shell.patch
-        make-4.2-j8k.patch)
+        make-4.2-j8k.patch
+        make-git.patch
+        make-4.2.1-nonblocking-reads.patch)
 
 prepare() {
   cd "${srcdir}"/${pkgname}-${pkgver}
   patch -p1 -i ${srcdir}/make-3.82-011-noclock_gettime.patch
-#  patch -p1 -i ${srcdir}/make-3.82-016-weird-shell.patch
-#  patch -p1 -i ${srcdir}/make-4.2-j8k.patch
+  patch -p1 -i ${srcdir}/make-git.patch
+ # patch -p1 -i ${srcdir}/make-4.2.1-nonblocking-reads.patch
 
 # autoreconf -fi
 }

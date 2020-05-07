@@ -1,0 +1,66 @@
+# Maintainer: Lukas Fleischer <lfleischer@archlinux.org>
+# Contributor: Allan McRae <allan@archlinux.org>
+# Contributor: judd <jvinet@zeroflux.org>
+
+pkgname=make
+pkgver=4.2.1
+pkgrel=6
+pkgdesc="GNU make utility to maintain groups of programs"
+arch=('x86_64')
+url="https://www.gnu.org/software/make"
+license=('GPL3')
+groups=('base-devel')
+depends=('glibc' 'guile')
+makedepends=(automake autoconf flex bison m4)
+source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.bz2"
+        make-4.2-getcwd.patch
+        make-4.0-newlines.patch
+        make-4.0-noclock_gettime.patch
+        make-4.2-j8k.patch
+        make-4.0-weird-shell.patch
+        make-4.2.1-glob-fix-2.patch
+        make-4.2.1-glob-fix.patch
+        make-4.2.1-glob-fix-3.patch
+        make-4.2.1-test-driver.patch
+        0001-configure.ac-SV-50648-Detect-Guile-2.2-packages.patch
+        make-4.2.1-nonblocking-reads.patch)
+md5sums=('15b012617e7c44c0ed482721629577ac'
+         'SKIP'
+         '89bbbe3f806f208608e117665feb562b'
+         '05a3b10e0da01d84cd078905a11437ed'
+         '6f5dbcb368728582b34bac197f0d3197'
+         'af63eff24206e1fa06af64b8ec7b07b9')
+validpgpkeys=('3D2554F0A15338AB9AF1BB9D96B047156338B6D4')   # Paul Smith
+
+prepare() {
+	cd "${pkgname}-${pkgver}"
+	patch -p1 -i "${srcdir}"/make-4.2-getcwd.patch
+	#patch -p1 -i "${srcdir}"/make-4.0-newlines.patch
+	patch -p1 -i "${srcdir}"/make-4.0-noclock_gettime.patch
+	patch -p1 -i "${srcdir}"/make-4.2-j8k.patch
+	patch -p1 -i "${srcdir}"/make-4.0-weird-shell.patch
+	patch -p1 -i "${srcdir}"/make-4.2.1-glob-fix-2.patch
+	patch -p1 -i "${srcdir}"/make-4.2.1-glob-fix.patch
+	patch -p1 -i "${srcdir}"/make-4.2.1-glob-fix-3.patch
+	patch -p1 -i "${srcdir}"/make-4.2.1-test-driver.patch
+	patch -p1 -i "${srcdir}"/0001-configure.ac-SV-50648-Detect-Guile-2.2-packages.patch
+	patch -p1 -i "${srcdir}"/make-4.2.1-nonblocking-reads.patch
+
+	autoreconf -vfi
+}
+
+build() {
+	cd "${pkgname}-${pkgver}"
+	./configure --prefix=/usr --with-guile
+	make
+}
+
+check() {
+	cd "${pkgname}-${pkgver}"
+	make -k check
+}
+
+package() {
+	cd "${pkgname}-${pkgver}"
+	make DESTDIR="${pkgdir}" install
+}
