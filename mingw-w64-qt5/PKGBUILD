@@ -25,7 +25,7 @@ if [ "${_variant}" = "-static" ]; then
   _system_libtiff=no
   _system_libwebp=no
   _build_examples=no # examples result in > 100 GiB
-  _build_tools=yes
+  _build_tools=no
   _build_tests=no
   _make_docs=no # docs in shared qt5 are sufficient
 #  _ltcg="yes"
@@ -48,7 +48,7 @@ else
   _system_libtiff=yes
   _system_libwebp=yes
   _build_examples=no
-  _build_tools=yes
+  _build_tools=no
   _build_tests=no
   _make_docs=no
   _ltcg=no
