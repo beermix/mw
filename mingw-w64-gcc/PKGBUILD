@@ -21,7 +21,7 @@ pkgver=10.1.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-_islver=0.16.1
+_islver=0.22.1
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -71,11 +71,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         avx512-when-we-ask-for-it.patch
         gcc10-isl-dl.patch
         0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        icelake.patch
-        libiberty-sync.patch
-        000-git-updates-CLR-FULL.patch
-        gcc-stable-branch.patch
-        arch-native-override.patch
         gcc-g1.patch
         gcov.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
@@ -152,25 +147,6 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch 
 
-#    ipa-cp.patch \
-#    gomp-relax.patch \
-#    fortran-vector-v2.patch \
-#    optimize-at-least-some.patch \
-#    optimize.patch
-#    gcc-g1.patch
-#    libiberty-sync.patch \
-#    optimize-at-least-some.patch \
-#    optimize.patch \
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    gomp-relax.patch \
-#    ipa-cp.patch \
-#    zero-regs-gcc8.patch \
-#    avx512-when-we-ask-for-it.patch \
-#    0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-#    0001-Fix-stack-protection-issues.patch \
-#    arch-native-override.patch
-
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -180,7 +156,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-#  echo ${pkgver} > gcc/BASE-VER
+# echo ${pkgver} > gcc/BASE-VER
 
   ln -s ../isl-${_islver} isl
 
@@ -228,13 +204,13 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2 -fno-stack-protector"
+#  export CFLAGS="-march=haswell -g1 -O2"
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 
 #  unset CFLAGS
@@ -266,7 +242,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -299,7 +274,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n 19 make all
+  /home/User/.go/bin/noti nice -n 19 make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -395,7 +370,7 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
+  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale}
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
