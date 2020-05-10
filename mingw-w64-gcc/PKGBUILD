@@ -21,7 +21,7 @@ pkgver=10.1.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-_islver=0.22.1
+_islver=0.16.1
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -61,18 +61,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         010-documentation.patch
-        zero-regs-gcc8.patch
-        openmp-vectorize-v2.patch
-        fortran-vector-v2.patch
-        optimize.patch
-        ipa-cp.patch
-        optimize-at-least-some.patch
-        gomp-relax.patch 
-        avx512-when-we-ask-for-it.patch
-        gcc10-isl-dl.patch
-        0001-Ignore-Werror-if-GCC_IGNORE_WERROR-environment-varia.patch
-        gcc-g1.patch
-        gcov.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
