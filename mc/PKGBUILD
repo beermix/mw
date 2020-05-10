@@ -1,0 +1,112 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+pkgname=mc
+pkgver=4.8.24
+pkgrel=1
+pkgdesc="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
+arch=('i686' 'x86_64')
+url="https://www.midnight-commander.org/"
+license=('GPL')
+depends=('glib2'
+         'libssh2')
+makedepends=('glib2-devel' 'libssh2-devel' 'ncurses-devel')
+optdepends=('gawk: hp48+ extfs'
+            #'aspell: spelling corrections'
+            'cvs: CVS support'
+            'perl: needed by several extfs scripts'
+            #'unace: uace extfs'
+            #'unarj: uarj extfs'
+            'unrar: urar extfs'
+            'zip: uzip extfs'
+            'p7zip: support for 7zip archives')
+options=('!emptydirs' '!makeflags')
+backup=('etc/mc/edit.indent.rc'
+        'etc/mc/filehighlight.ini'
+        'etc/mc/mcedit.menu'
+        'etc/mc/mc.ext'
+        'etc/mc/mc.keymap'
+        'etc/mc/mc.menu'
+        'etc/mc/sfs.ini')
+source=(${pkgname}-${pkgver}.tar.gz::"https://github.com/MidnightCommander/${pkgname}/archive/${pkgver}.tar.gz"
+        4.7.5.2-ncursesw-term.h.patch
+        mc-4.8.19-msys2.patch
+        010-subshell.patch
+        2987.patch
+        4055.patch
+        4056.patch
+        alt_editor.patch
+        disable_internal_editor.patch
+        dummy-zip-password.patch
+        ext_run-mailcap.patch
+        ext_use_default_editor.patch
+        mc-3954-mouse-with-new-terminfo.patch
+        mc-mksh-subshell-v2.patch
+        mc-python3.patch
+        mcedit_auto_indent.patch
+        mcedit_full_path.patch
+        mcedit_group_undo.patch
+        use_sensible-editor.patch)
+sha256sums=('7574a58f39d65bec52963e91adb5a76c989bfc65ad2a2bcea382d3500df9d845'
+            '49e9a7d918088c8760b0090e99cd6257fa56efa3a4d3e6c9166270cda9c2e8e3'
+            '513a015f237a6907bbbf92bcc13351d831740163a0b8a508a99ba647dea64981')
+noextract=(${pkgname}-${pkgver}.tar.gz)
+
+prepare() {
+  [[ -d ${srcdir}/${pkgname}-${pkgver} ]] && rm -rf ${srcdir}/${pkgname}-${pkgver}
+  tar -xzf ${srcdir}/${pkgname}-${pkgver}.tar.gz -C ${srcdir} || true
+  
+  cd "${srcdir}/${pkgname}-${pkgver}"
+  cp -f doc/{INSTALL,NEWS,README} .
+  
+  ./autogen.sh
+  
+  patch -Np2 -i "${srcdir}/4.7.5.2-ncursesw-term.h.patch"
+  patch -Np1 -i "${srcdir}/mc-4.8.19-msys2.patch"
+  patch -Np1 -i "${srcdir}/010-subshell.patch
+  patch -Np1 -i "${srcdir}/2987.patch
+  patch -Np1 -i "${srcdir}/4055.patch
+  patch -Np1 -i "${srcdir}/4056.patch
+  patch -Np1 -i "${srcdir}/alt_editor.patch
+  patch -Np1 -i "${srcdir}/disable_internal_editor.patch
+  patch -Np1 -i "${srcdir}/dummy-zip-password.patch
+  patch -Np1 -i "${srcdir}/ext_run-mailcap.patch
+  patch -Np1 -i "${srcdir}/ext_use_default_editor.patch
+  patch -Np1 -i "${srcdir}/mc-3954-mouse-with-new-terminfo.patch
+  patch -Np1 -i "${srcdir}/mc-mksh-subshell-v2.patch
+  patch -Np1 -i "${srcdir}/mc-python3.patch
+  patch -Np1 -i "${srcdir}/mcedit_auto_indent.patch
+  patch -Np1 -i "${srcdir}/mcedit_full_path.patch
+  patch -Np1 -i "${srcdir}/mcedit_group_undo.patch
+  patch -Np1 -i "${srcdir}/use_sensible-editor.patch
+
+  autoreconf -fi
+
+}
+
+build() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  ./configure --build=${CHOST} \
+    --prefix=/usr \
+    --sysconfdir=/etc \
+    --without-libintl-prefix \
+    --without-libiconv-prefix \
+    --with-screen=ncursesw \
+    --enable-charset \
+    --libexecdir=/usr/lib
+
+  make
+}
+
+package() {
+  cd "${srcdir}/${pkgname}-${pkgver}"
+
+  make DESTDIR="${pkgdir}" install
+
+  # Fix FS#15177
+  sed 's|op_has_zipinfo = 0|op_has_zipinfo = 1|' \
+    -i "${pkgdir}/usr/lib/mc/extfs.d/uzip"
+
+  sed 's#/usr/bin/env python#/usr/bin/python2#' \
+    -i "${pkgdir}/usr/lib/mc/extfs.d/s3+"
+}
