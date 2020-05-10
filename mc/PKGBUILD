@@ -27,7 +27,7 @@ backup=('etc/mc/edit.indent.rc'
         'etc/mc/mc.keymap'
         'etc/mc/mc.menu'
         'etc/mc/sfs.ini')
-source=(${pkgname}-${pkgver}.tar.gz::"https://github.com/MidnightCommander/${pkgname}/archive/${pkgver}.tar.gz"
+source=(${pkgname}-${pkgver}.tar.xz::"http://ftp.midnight-commander.org/${pkgname}-${pkgver}.tar.xz"
         4.7.5.2-ncursesw-term.h.patch
         mc-4.8.19-msys2.patch
         010-subshell.patch
@@ -49,35 +49,20 @@ source=(${pkgname}-${pkgver}.tar.gz::"https://github.com/MidnightCommander/${pkg
 sha256sums=('7574a58f39d65bec52963e91adb5a76c989bfc65ad2a2bcea382d3500df9d845'
             '49e9a7d918088c8760b0090e99cd6257fa56efa3a4d3e6c9166270cda9c2e8e3'
             '513a015f237a6907bbbf92bcc13351d831740163a0b8a508a99ba647dea64981')
-noextract=(${pkgname}-${pkgver}.tar.gz)
+noextract=(${pkgname}-${pkgver}.tar.xz)
 
 prepare() {
   [[ -d ${srcdir}/${pkgname}-${pkgver} ]] && rm -rf ${srcdir}/${pkgname}-${pkgver}
-  tar -xzf ${srcdir}/${pkgname}-${pkgver}.tar.gz -C ${srcdir} || true
+  tar -xzf ${srcdir}/${pkgname}-${pkgver}.tar.xz -C ${srcdir} || true
   
   cd "${srcdir}/${pkgname}-${pkgver}"
   cp -f doc/{INSTALL,NEWS,README} .
   
-  ./autogen.sh
+#  ./autogen.sh
   
   patch -Np2 -i "${srcdir}/4.7.5.2-ncursesw-term.h.patch"
   patch -Np1 -i "${srcdir}/mc-4.8.19-msys2.patch"
-  patch -Np1 -i "${srcdir}/010-subshell.patch
-  patch -Np1 -i "${srcdir}/2987.patch
-  patch -Np1 -i "${srcdir}/4055.patch
-  patch -Np1 -i "${srcdir}/4056.patch
-  patch -Np1 -i "${srcdir}/alt_editor.patch
-  patch -Np1 -i "${srcdir}/disable_internal_editor.patch
-  patch -Np1 -i "${srcdir}/dummy-zip-password.patch
-  patch -Np1 -i "${srcdir}/ext_run-mailcap.patch
-  patch -Np1 -i "${srcdir}/ext_use_default_editor.patch
-  patch -Np1 -i "${srcdir}/mc-3954-mouse-with-new-terminfo.patch
-  patch -Np1 -i "${srcdir}/mc-mksh-subshell-v2.patch
-  patch -Np1 -i "${srcdir}/mc-python3.patch
-  patch -Np1 -i "${srcdir}/mcedit_auto_indent.patch
-  patch -Np1 -i "${srcdir}/mcedit_full_path.patch
-  patch -Np1 -i "${srcdir}/mcedit_group_undo.patch
-  patch -Np1 -i "${srcdir}/use_sensible-editor.patch
+  patch -Np1 -i "${srcdir}/mc-3954-mouse-with-new-terminfo.patch"
 
   autoreconf -fi
 
