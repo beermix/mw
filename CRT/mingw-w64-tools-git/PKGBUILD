@@ -56,4 +56,5 @@ package() {
     plain "Installing ${cur} ..."
     cd ${srcdir}/${MINGW_CHOST}-${cur}
     make DESTDIR=${pkgdir} install
+  done
 }
