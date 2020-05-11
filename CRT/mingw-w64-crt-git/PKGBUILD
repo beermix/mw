@@ -68,9 +68,4 @@ package() {
   msg "Installing ${MINGW_CHOST} crt"
   cd ${srcdir}/crt-${MINGW_CHOST}
   make DESTDIR=${pkgdir} install-strip
-
-  msg "Installing MinGW-w64 licenses"
-  install -Dm644 ${srcdir}/mingw-w64/COPYING ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
-  install -Dm644 ${srcdir}/mingw-w64/COPYING.MinGW-w64/COPYING.MinGW-w64.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.MinGW-w64.txt
-  install -Dm644 ${srcdir}/mingw-w64/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.MinGW-w64-runtime.txt
 }

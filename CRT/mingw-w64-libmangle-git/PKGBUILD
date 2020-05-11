@@ -45,5 +45,4 @@ build() {
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
   make DESTDIR=${pkgdir} install
-  install -Dm644 ${srcdir}/mingw-w64/mingw-w64-libraries/libmangle/COPYING ${pkgdir}${MINGW_PREFIX}/share/licenses/mingw-w64-libraries/COPYING.${_realname}
 }

@@ -74,12 +74,6 @@ build() {
   make
 }
 
-_install_licenses() {
-  # TODO: any more license files?
-  install -Dm644 ${srcdir}/mingw-w64/COPYING                                 ${pkgdir}${MINGW_PREFIX}/share/licenses/$1/COPYING
-  install -Dm644 ${srcdir}/mingw-w64/mingw-w64-libraries/winpthreads/COPYING ${pkgdir}${MINGW_PREFIX}/share/licenses/$1/mingw-w64-libraries/winpthreads/COPYING
-}
-
 package_winpthreads() {
   depends=("${MINGW_PACKAGE_PREFIX}-crt-git" "${MINGW_PACKAGE_PREFIX}-libwinpthread-git=${pkgver}")
   replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
@@ -93,8 +87,6 @@ package_winpthreads() {
   mv ${pkgdir}${MINGW_PREFIX}/include ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/
   mv ${pkgdir}${MINGW_PREFIX}/lib ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/
   rm -rf ${pkgdir}${MINGW_PREFIX}/bin
-
-  _install_licenses ${_realname}
 }
 
 package_libwinpthread() {

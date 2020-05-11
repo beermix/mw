@@ -65,10 +65,4 @@ package() {
   rm ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include/pthread_signal.h
   rm ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include/pthread_time.h
   rm ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include/pthread_unistd.h
-
-  msg "Installing MinGW-w64 licenses"
-  install -Dm644 ${srcdir}/mingw-w64/mingw-w64-headers/ddk/readme.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/ddk-readme.txt
-  install -Dm644 ${srcdir}/mingw-w64/COPYING ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
-  install -Dm644 ${srcdir}/mingw-w64/COPYING.MinGW-w64/COPYING.MinGW-w64.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.MinGW-w64.txt
-  install -Dm644 ${srcdir}/mingw-w64/COPYING.MinGW-w64-runtime/COPYING.MinGW-w64-runtime.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.MinGW-w64-runtime.txt
 }

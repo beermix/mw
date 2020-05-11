@@ -1,7 +1,6 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
-# Contributor: Martell Malone <martellmalone@gmail.com>
 
-_realname=tools
+_realname=pseh
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
@@ -9,17 +8,19 @@ provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=8.0.0.5855.17a356e9
 pkgrel=1
-pkgdesc="MinGW-w64 tools"
+pkgdesc="MinGW-w64 pseh"
 arch=('any')
 url="https://mingw-w64.sourceforge.io/"
 license=('custom')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
-makedepends=("git" "${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-libmangle")
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
-options=('staticlibs' '!emptydirs')
+makedepends=("git"
+             "${MINGW_PACKAGE_PREFIX}-gcc"
+             "${MINGW_PACKAGE_PREFIX}-binutils"
+             "${MINGW_PACKAGE_PREFIX}-crt-git"
+             "${MINGW_PACKAGE_PREFIX}-headers-git")
+options=('strip' 'staticlibs' '!emptydirs')
 source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64")
 sha256sums=('SKIP')
-_tools="gendef genlib genidl genpeimg widl" # genstubdll
 
 pkgver() {
   cd "${srcdir}/mingw-w64"
@@ -29,31 +30,19 @@ pkgver() {
   printf "%s.%s.%s.%s.%s" ${_major} ${_minor} ${_rev} "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-  cd "${srcdir}/mingw-w64"
-  #git am "${srcdir}/0001-widl-Relocate-DEFAULT_INCLUDE_DIR.patch"
-}
-
 build() {
-  local cur=
-  for cur in ${_tools}; do
-    plain "Building ${cur} ..."
-    [[ -d ${srcdir}/${MINGW_CHOST}-${cur} ]] && rm -rf ${srcdir}/${MINGW_CHOST}-${cur}
-    mkdir -p ${srcdir}/${MINGW_CHOST}-${cur}
-    cd ${srcdir}/${MINGW_CHOST}-${cur}
-    ${srcdir}/mingw-w64/mingw-w64-tools/${cur}/configure \
-      --prefix=${MINGW_PREFIX} \
-      --build=${MINGW_CHOST} \
-      --host=${MINGW_CHOST} \
-      --with-mangle=${MINGW_PREFIX}
-    make
-  done
+  [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
+  mkdir -p ${srcdir}/build-${MINGW_CHOST} && cd ${srcdir}/build-${MINGW_CHOST}
+
+  ${srcdir}/mingw-w64/mingw-w64-libraries/pseh/configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST}
+
+  make
 }
 
 package() {
-  local cur=
-  for cur in ${_tools}; do
-    plain "Installing ${cur} ..."
-    cd ${srcdir}/${MINGW_CHOST}-${cur}
-    make DESTDIR=${pkgdir} install
+  cd ${srcdir}/build-${MINGW_CHOST}
+  make DESTDIR=${pkgdir} install
 }
