@@ -22,7 +22,7 @@ pkgver=10.1.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=2
+pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -134,8 +134,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch \
-    gcc-10.1.0-stable-branch.patch
+    010-documentation.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -146,9 +145,9 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
- echo ${pkgver} > gcc/BASE-VER
+# echo ${pkgver} > gcc/BASE-VER
  
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 
 #  rm -rf gcc/ada/*.ad*
 #  rm -rf gcc/testsuite/ada
@@ -198,10 +197,10 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -252,7 +251,7 @@ build() {
     --with-diagnostics-color=always \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
