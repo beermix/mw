@@ -1,0 +1,1847 @@
+commit 6032350c350b72859f1280e0eb13c8af4c522422
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu May 7 13:31:16 2020 +0200
+
+    Bump BASE-VER.
+    
+    2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+    
+            * BASE-VER: Set to 10.1.1.
+
+diff --git a/gcc/BASE-VER b/gcc/BASE-VER
+index 4149c39eec6..23127993ac0 100644
+--- a/gcc/BASE-VER
++++ b/gcc/BASE-VER
+@@ -1 +1 @@
+-10.1.0
++10.1.1
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index caef1920f92..b8861a43f19 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,7 @@
++2020-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	* BASE-VER: Set to 10.1.1.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+
+commit 61fb8963c22d91152a9c46a3512307bef3b3d7f7
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu Apr 30 21:48:30 2020 +0200
+
+    c: Fix ICE with _Atomic side-effect in nested fn param decls [PR94842]
+    
+    If there are _Atomic side-effects in the parameter declarations
+    of non-nested function, when they are parsed, current_function_decl is
+    NULL, the create_artificial_label created labels during build_atomic* are
+    then adjusted by store_parm_decls through set_labels_context_r callback.
+    Unfortunately, if such thing happens in nested function parameter
+    declarations, while those decls are parsed current_function_decl is the
+    parent function (and am not sure it is a good idea to temporarily clear it,
+    some code perhaps should be aware it is in a nested function, or it can
+    refer to variables from the parent function etc.) and that means
+    store_param_decls through set_labels_context_r doesn't adjust anything.
+    As those labels are emitted in the nested function body rather than in the
+    parent, I think it is ok to override the context in those cases.
+    
+    2020-04-30  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR c/94842
+            * c-decl.c (set_labels_context_r): In addition to context-less
+            LABEL_DECLs adjust also LABEL_DECLs with context equal to
+            parent function if any.
+            (store_parm_decls): Adjust comment.
+    
+            * gcc.dg/pr94842.c: New test.
+
+diff --git a/gcc/c/ChangeLog b/gcc/c/ChangeLog
+index 42bc68ea556..c7dbd7d5423 100644
+--- a/gcc/c/ChangeLog
++++ b/gcc/c/ChangeLog
+@@ -1,3 +1,11 @@
++2020-04-30  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c/94842
++	* c-decl.c (set_labels_context_r): In addition to context-less
++	LABEL_DECLs adjust also LABEL_DECLs with context equal to
++	parent function if any.
++	(store_parm_decls): Adjust comment.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+diff --git a/gcc/c/c-decl.c b/gcc/c/c-decl.c
+index 0b7f4376dd3..b3e05be0af8 100644
+--- a/gcc/c/c-decl.c
++++ b/gcc/c/c-decl.c
+@@ -9722,15 +9722,18 @@ store_parm_decls_from (struct c_arg_info *arg_info)
+   store_parm_decls ();
+ }
+ 
+-/* Called by walk_tree to look for and update context-less labels.  */
++/* Called by walk_tree to look for and update context-less labels
++   or labels with context in the parent function.  */
+ 
+ static tree
+ set_labels_context_r (tree *tp, int *walk_subtrees, void *data)
+ {
++  tree ctx = static_cast<tree>(data);
+   if (TREE_CODE (*tp) == LABEL_EXPR
+-      && DECL_CONTEXT (LABEL_EXPR_LABEL (*tp)) == NULL_TREE)
++      && (DECL_CONTEXT (LABEL_EXPR_LABEL (*tp)) == NULL_TREE
++	  || DECL_CONTEXT (LABEL_EXPR_LABEL (*tp)) == DECL_CONTEXT (ctx)))
+     {
+-      DECL_CONTEXT (LABEL_EXPR_LABEL (*tp)) = static_cast<tree>(data);
++      DECL_CONTEXT (LABEL_EXPR_LABEL (*tp)) = ctx;
+       *walk_subtrees = 0;
+     }
+ 
+@@ -9800,7 +9803,11 @@ store_parm_decls (void)
+ 	 gotos, labels, etc.  Because at that time the function decl
+ 	 for F has not been created yet, those labels do not have any
+ 	 function context.  But we have the fndecl now, so update the
+-	 labels accordingly.  gimplify_expr would crash otherwise.  */
++	 labels accordingly.  gimplify_expr would crash otherwise.
++	 Or with nested functions the labels could be created with parent
++	 function's context, while when the statement is emitted at the
++	 start of the nested function, it needs the nested function's
++	 context.  */
+       walk_tree_without_duplicates (&arg_info->pending_sizes,
+ 				    set_labels_context_r, fndecl);
+       add_stmt (arg_info->pending_sizes);
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 348894049cc..7167f6db53b 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-04-30  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c/94842
++	* gcc.dg/pr94842.c: New test.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+diff --git a/gcc/testsuite/gcc.dg/pr94842.c b/gcc/testsuite/gcc.dg/pr94842.c
+new file mode 100644
+index 00000000000..33d9d42644c
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94842.c
+@@ -0,0 +1,11 @@
++/* PR c/94842 */
++/* { dg-do compile } */
++/* { dg-options "" } */
++
++_Atomic float x = 5;
++
++void
++foo (void)
++{
++  void bar (float y[(int) (x += 2)]) {}
++}
+
+commit a764bbb72ae2f732f5ccfec2c8331388ac3f7b62
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Mon May 4 09:31:27 2020 +0200
+
+    diagnostics: get_option_html_page fixes
+    
+    While testing the --with-documentation-root-url= changes, I run into
+    [Wreturn-type] URL pointing to gfortran documentation where it obviously
+    isn't documented.  The following patch updates the list of options to match
+    reality (on the other side -Wconversion-extra is gfortran only option
+    documented in gfortran.texi).
+    
+    Or, perhaps better use the attached patch instead, which doesn't have a
+    hardcoded list and instead uses the flags?  I went through options.c
+    and the updated list of options matches exactly the cases where CL_Fortran
+    is set for "-W*" options together with CL_C and/or CL_CXX (ok, there is also
+    -Wall and -Wextra, but hopefully we don't emit [Wall] or [Wextra] for
+    anything).
+    
+    2020-05-04  Jakub Jelinek  <jakub@redhat.com>
+    
+            * opts.c (get_option_html_page): Instead of hardcoding a list of
+            options common between C/C++ and Fortran only use gfortran/
+            documentation for warnings that have CL_Fortran set but not
+            CL_C or CL_CXX.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index b8861a43f19..577309a438f 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,10 @@
++2020-05-04  Jakub Jelinek  <jakub@redhat.com>
++
++	* opts.c (get_option_html_page): Instead of hardcoding a list of
++	options common between C/C++ and Fortran only use gfortran/
++	documentation for warnings that have CL_Fortran set but not
++	CL_C or CL_CXX.
++
+ 2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	* BASE-VER: Set to 10.1.1.
+diff --git a/gcc/opts.c b/gcc/opts.c
+index c212a1a57dc..4429d82e61f 100644
+--- a/gcc/opts.c
++++ b/gcc/opts.c
+@@ -3141,25 +3141,15 @@ get_option_html_page (int option_index)
+     return "gcc/Static-Analyzer-Options.html";
+ 
+ #ifdef CL_Fortran
+-  if (cl_opt->flags & CL_Fortran)
+-    {
+-      switch (option_index)
+-	{
+-	default:
+-	  /* Most Fortran warnings are documented on this page.  */
+-	  return "gfortran/Error-and-Warning-Options.html";
+-
+-	case OPT_Wdate_time:
+-	case OPT_Wconversion:
+-	case OPT_Wconversion_extra:
+-	case OPT_Wmissing_include_dirs:
+-	case OPT_Wopenmp_simd:
+-	  /* These warnings are marked in fortran/lang.opt as
+-	     "Documented in C" and thus use the common
+-	     Warning-Options page below.  */
+-	  break;
+-	}
+-    }
++  if ((cl_opt->flags & CL_Fortran) != 0
++      /* If it is option common to both C/C++ and Fortran, it is documented
++	 in gcc/ rather than gfortran/ docs.  */
++      && (cl_opt->flags & CL_C) == 0
++#ifdef CL_CXX
++      && (cl_opt->flags & CL_CXX) == 0
++#endif
++     )
++    return "gfortran/Error-and-Warning-Options.html";
+ #endif
+ 
+   return "gcc/Warning-Options.html";
+
+commit 1b53c1169a6d0b10d43de0a56aabf7386b67496b
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Tue May 5 11:33:47 2020 +0200
+
+    x86: Fix *vec_dupv4hi constraints [PR94942]
+    
+    This insn and split splits into HI->V?HImode broadcast for avx2 and later,
+    but either the operands need to be %xmm0-%xmm15 (i.e. VEX encoded insn), or
+    the insn needs both AVX512BW and AVX512VL.
+    Now, Yv constraint is v for AVX512VL and x otherwise, so for -mavx512vl -mno-avx512bw
+    we ICE if we end up with a %xmm16+ register from RA.
+    Yw constraint is v for AVX512VL and AVX512BW and nothing otherwise, so
+    in this pattern we actually need xYw.
+    
+    2020-05-05  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR target/94942
+            * config/i386/mmx.md (*vec_dupv4hi): Use xYw constraints instead of Yv.
+    
+            * gcc.target/i386/pr94942.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 577309a438f..5f1be733c19 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-05  Jakub Jelinek  <jakub@redhat.com>
++
++	PR target/94942
++	* config/i386/mmx.md (*vec_dupv4hi): Use xYw constraints instead of Yv.
++
+ 2020-05-04  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	* opts.c (get_option_html_page): Instead of hardcoding a list of
+diff --git a/gcc/config/i386/mmx.md b/gcc/config/i386/mmx.md
+index c3f195bb34a..472f90f9bc1 100644
+--- a/gcc/config/i386/mmx.md
++++ b/gcc/config/i386/mmx.md
+@@ -1613,10 +1613,10 @@
+    (set_attr "mode" "DI")])
+ 
+ (define_insn_and_split "*vec_dupv4hi"
+-  [(set (match_operand:V4HI 0 "register_operand" "=y,Yv,Yw")
++  [(set (match_operand:V4HI 0 "register_operand" "=y,xYw,Yw")
+ 	(vec_duplicate:V4HI
+ 	  (truncate:HI
+-	    (match_operand:SI 1 "register_operand" "0,Yv,r"))))]
++	    (match_operand:SI 1 "register_operand" "0,xYw,r"))))]
+   "(TARGET_MMX || TARGET_MMX_WITH_SSE)
+    && (TARGET_SSE || TARGET_3DNOW_A)"
+   "@
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 7167f6db53b..5611637f62f 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-05  Jakub Jelinek  <jakub@redhat.com>
++
++	PR target/94942
++	* gcc.target/i386/pr94942.c: New test.
++
+ 2020-04-30  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c/94842
+diff --git a/gcc/testsuite/gcc.target/i386/pr94942.c b/gcc/testsuite/gcc.target/i386/pr94942.c
+new file mode 100644
+index 00000000000..b20f7a62e91
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/pr94942.c
+@@ -0,0 +1,24 @@
++/* PR target/94942 */
++/* { dg-do compile } */
++/* { dg-options "-O -flive-range-shrinkage -ftree-vrp -mavx512vl -mno-avx512bw -Wno-div-by-zero" } */
++
++typedef unsigned __attribute__((__vector_size__(8))) U;
++typedef short __attribute__((__vector_size__(8))) V;
++typedef char __attribute__((__vector_size__(16))) W;
++typedef int __attribute__((__vector_size__(16))) Z;
++int i, j, n, o;
++W k;
++Z l;
++char m;
++
++U
++foo (U q, long long r, V s)
++{
++  Z t = (i & i - (Z){10} & 4) - (0 != j);
++  Z u = o * (j * l);
++  s -= (char)__builtin_clrsbll (n);
++  W v = (k | k >> m + (W){4}) % 0;
++  W w = v + (W)t + (W)u;
++  U x = ((union { W a; U b; })w).b + q + (U)s + (U)r;
++  return x;
++}
+
+commit 8982e39b46b1e4a4b09022ddebd758b77ab73bac
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed May 6 09:31:19 2020 +0200
+
+    combine: Don't replace SET_SRC with REG_EQUAL note content if SET_SRC has side-effects [PR94873]
+    
+    There were some discussions about whether REG_EQUAL notes are valid on insns with a single
+    set which contains auto-inc-dec side-effects in the SET_SRC and the majority thinks that
+    it should be valid.  So, this patch fixes the combiner to punt in that case, because otherwise
+    the auto-inc-dec side-effects from the SET_SRC are lost.
+    
+    2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR rtl-optimization/94873
+            * combine.c (combine_instructions): Don't optimize using REG_EQUAL
+            note if SET_SRC (set) has side-effects.
+    
+            * gcc.dg/pr94873.c: New test.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 5f1be733c19..8c80642c85e 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR rtl-optimization/94873
++	* combine.c (combine_instructions): Don't optimize using REG_EQUAL
++	note if SET_SRC (set) has side-effects.
++
+ 2020-05-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94942
+diff --git a/gcc/combine.c b/gcc/combine.c
+index 4c324f38660..f69413a34d0 100644
+--- a/gcc/combine.c
++++ b/gcc/combine.c
+@@ -1485,6 +1485,7 @@ combine_instructions (rtx_insn *f, unsigned int nregs)
+ 	      if ((set = single_set (temp)) != 0
+ 		  && (note = find_reg_equal_equiv_note (temp)) != 0
+ 		  && (note = XEXP (note, 0), GET_CODE (note)) != EXPR_LIST
++		  && ! side_effects_p (SET_SRC (set))
+ 		  /* Avoid using a register that may already been marked
+ 		     dead by an earlier instruction.  */
+ 		  && ! unmentioned_reg_p (note, SET_SRC (set))
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 5611637f62f..0bc4058d318 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR rtl-optimization/94873
++	* gcc.dg/pr94873.c: New test.
++
+ 2020-05-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94942
+diff --git a/gcc/testsuite/gcc.dg/pr94873.c b/gcc/testsuite/gcc.dg/pr94873.c
+new file mode 100644
+index 00000000000..36152176fbf
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94873.c
+@@ -0,0 +1,27 @@
++/* PR rtl-optimization/94873 */
++/* { dg-do run { target int128 } } */
++/* { dg-options "-O -fno-merge-constants -fno-split-wide-types -fno-tree-fre" } */
++
++__attribute__((noipa)) void
++foo (const char *p, int q)
++{
++  if (p[0] != '%' || p[1] != '0' || p[2] != '2' || p[3] != 'x' || p[4] != '\0')
++    __builtin_abort ();
++#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++  if ((unsigned char) q != 0x95)
++    __builtin_abort ();
++#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++  if ((unsigned char) q != 0)
++    __builtin_abort ();
++#endif
++}
++
++int
++main ()
++{
++  union U { __int128 a; char b[sizeof (__int128)]; };
++  char x = ((union U){ .a = 0xF4409395252B9560ULL}).b[1];
++  for (unsigned i = 0; i < sizeof (x); i++)
++    foo ("%02x", i[(volatile unsigned char *) &x]);
++  return 0;
++}
+
+commit 5454a13add37fa6a8eedbf9d2f6bdc63a7825e2c
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed May 6 09:40:33 2020 +0200
+
+    riscv: Fix up riscv_atomic_assign_expand_fenv [PR94950]
+    
+    Similarly to the fixes on many other targets, riscv needs to use TARGET_EXPR
+    to avoid having the create_tmp_var_raw temporaries without proper DECL_CONTEXT
+    and not mentioned in local decls.
+    
+    2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR target/94950
+            * config/riscv/riscv-builtins.c (riscv_atomic_assign_expand_fenv): Use
+            TARGET_EXPR instead of MODIFY_EXPR for first assignment to old_flags.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 8c80642c85e..c948d829d6b 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR target/94950
++	* config/riscv/riscv-builtins.c (riscv_atomic_assign_expand_fenv): Use
++	TARGET_EXPR instead of MODIFY_EXPR for first assignment to old_flags.
++
+ 2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR rtl-optimization/94873
+diff --git a/gcc/config/riscv/riscv-builtins.c b/gcc/config/riscv/riscv-builtins.c
+index 201fdb52f20..a45108e0355 100644
+--- a/gcc/config/riscv/riscv-builtins.c
++++ b/gcc/config/riscv/riscv-builtins.c
+@@ -283,8 +283,8 @@ riscv_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
+   tree fsflags = GET_BUILTIN_DECL (CODE_FOR_riscv_fsflags);
+   tree old_flags = create_tmp_var_raw (RISCV_ATYPE_USI);
+ 
+-  *hold = build2 (MODIFY_EXPR, RISCV_ATYPE_USI, old_flags,
+-		  build_call_expr (frflags, 0));
++  *hold = build4 (TARGET_EXPR, RISCV_ATYPE_USI, old_flags,
++		  build_call_expr (frflags, 0), NULL_TREE, NULL_TREE);
+   *clear = build_call_expr (fsflags, 1, old_flags);
+   *update = NULL_TREE;
+ }
+
+commit 3d4c7e05de438fb0672f376e628c18812eea8982
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed May 6 23:36:31 2020 +0200
+
+    c++: Don't synthesize sfk_comparison method multiple times [PR94907]
+    
+    On the following testcase we ICE, because synthesize_method is called twice
+    on the same sfk_comparison method fndecl, the first time it works fine
+    because start_preparsed_function in that case sets both
+    current_function_decl and cfun, but second time it is called it only sets
+    the former and keeps cfun NULL, so we ICE when trying to store
+    current_function_returns_value.
+    I think it is just wrong to call synthesize_method multiple times, and most
+    synthesize_method callers avoid that by not calling it if DECL_INITIAL is
+    already set, so this patch does that too.
+    
+    2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR c++/94907
+            * method.c (defaulted_late_check): Don't call synthesize_method
+            on constexpr sfk_comparison if it has been called on it already.
+    
+            * g++.dg/cpp2a/spaceship-synth8.C: New test.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index e99485b12db..f32ef9239c7 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,9 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c++/94907
++	* method.c (defaulted_late_check): Don't call synthesize_method
++	on constexpr sfk_comparison if it has been called on it already.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+diff --git a/gcc/cp/method.c b/gcc/cp/method.c
+index fb2dd47013f..47f96aa845e 100644
+--- a/gcc/cp/method.c
++++ b/gcc/cp/method.c
+@@ -2939,7 +2939,7 @@ defaulted_late_check (tree fn)
+     {
+       /* If the function was declared constexpr, check that the definition
+ 	 qualifies.  Otherwise we can define the function lazily.  */
+-      if (DECL_DECLARED_CONSTEXPR_P (fn))
++      if (DECL_DECLARED_CONSTEXPR_P (fn) && !DECL_INITIAL (fn))
+ 	synthesize_method (fn);
+       return;
+     }
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 0bc4058d318..28faf7a9b56 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c++/94907
++	* g++.dg/cpp2a/spaceship-synth8.C: New test.
++
+ 2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR rtl-optimization/94873
+diff --git a/gcc/testsuite/g++.dg/cpp2a/spaceship-synth8.C b/gcc/testsuite/g++.dg/cpp2a/spaceship-synth8.C
+new file mode 100644
+index 00000000000..d0d68c7fa6f
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/cpp2a/spaceship-synth8.C
+@@ -0,0 +1,12 @@
++// PR c++/94907
++// { dg-do compile { target c++2a } }
++
++namespace std { struct strong_ordering { }; }
++
++struct E;
++struct D {
++  virtual std::strong_ordering operator<=>(const struct E&) const = 0;
++};
++struct E : D {
++  std::strong_ordering operator<=>(const E&) const override = default;
++};
+
+commit d82414ebcf7716ea24688510594a2c464a105908
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Wed May 6 23:38:13 2020 +0200
+
+    c++: Avoid strict_aliasing_warning on dependent types or expressions [PR94951]
+    
+    The following testcase gets a bogus warning during build_base_path,
+    when cp_build_indirect_ref* calls strict_aliasing_warning with a dependent
+    expression.  IMHO calling get_alias_set etc. on dependent types feels wrong
+    to me, we should just defer the warnings in those cases until instantiation
+    and only handle the cases where neither type nor expr are dependent.
+    
+    2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR c++/94951
+            * typeck.c (cp_strict_aliasing_warning): New function.
+            (cp_build_indirect_ref_1, build_reinterpret_cast_1): Use
+            it instead of strict_aliasing_warning.
+    
+            * g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C: New test.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index f32ef9239c7..c374c2b7644 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,10 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c++/94951
++	* typeck.c (cp_strict_aliasing_warning): New function.
++	(cp_build_indirect_ref_1, build_reinterpret_cast_1): Use
++	it instead of strict_aliasing_warning.
++
+ 2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94907
+diff --git a/gcc/cp/typeck.c b/gcc/cp/typeck.c
+index 8e3188a415d..13d9602c32b 100644
+--- a/gcc/cp/typeck.c
++++ b/gcc/cp/typeck.c
+@@ -3318,6 +3318,22 @@ build_x_indirect_ref (location_t loc, tree expr, ref_operator errorstring,
+     return rval;
+ }
+ 
++/* Like c-family strict_aliasing_warning, but don't warn for dependent
++   types or expressions.  */
++
++static bool
++cp_strict_aliasing_warning (location_t loc, tree type, tree expr)
++{
++  if (processing_template_decl)
++    {
++      tree e = expr;
++      STRIP_NOPS (e);
++      if (dependent_type_p (type) || type_dependent_expression_p (e))
++	return false;
++    }
++  return strict_aliasing_warning (loc, type, expr);
++}
++
+ /* The implementation of the above, and of indirection implied by other
+    constructs.  If DO_FOLD is true, fold away INDIRECT_REF of ADDR_EXPR.  */
+ 
+@@ -3360,10 +3376,10 @@ cp_build_indirect_ref_1 (location_t loc, tree ptr, ref_operator errorstring,
+ 	  /* If a warning is issued, mark it to avoid duplicates from
+ 	     the backend.  This only needs to be done at
+ 	     warn_strict_aliasing > 2.  */
+-	  if (warn_strict_aliasing > 2)
+-	    if (strict_aliasing_warning (EXPR_LOCATION (ptr),
+-					 type, TREE_OPERAND (ptr, 0)))
+-	      TREE_NO_WARNING (ptr) = 1;
++	  if (warn_strict_aliasing > 2
++	      && cp_strict_aliasing_warning (EXPR_LOCATION (ptr),
++					     type, TREE_OPERAND (ptr, 0)))
++	    TREE_NO_WARNING (ptr) = 1;
+ 	}
+ 
+       if (VOID_TYPE_P (t))
+@@ -7777,7 +7793,7 @@ build_reinterpret_cast_1 (location_t loc, tree type, tree expr,
+       expr = cp_build_addr_expr (expr, complain);
+ 
+       if (warn_strict_aliasing > 2)
+-	strict_aliasing_warning (EXPR_LOCATION (expr), type, expr);
++	cp_strict_aliasing_warning (EXPR_LOCATION (expr), type, expr);
+ 
+       if (expr != error_mark_node)
+ 	expr = build_reinterpret_cast_1
+@@ -7891,7 +7907,7 @@ build_reinterpret_cast_1 (location_t loc, tree type, tree expr,
+ 
+       if (warn_strict_aliasing <= 2)
+ 	/* strict_aliasing_warning STRIP_NOPs its expr.  */
+-	strict_aliasing_warning (EXPR_LOCATION (expr), type, expr);
++	cp_strict_aliasing_warning (EXPR_LOCATION (expr), type, expr);
+ 
+       return build_nop_reinterpret (type, expr);
+     }
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 28faf7a9b56..7be686f68c6 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c++/94951
++	* g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C: New test.
++
+ 2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94907
+diff --git a/gcc/testsuite/g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C b/gcc/testsuite/g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C
+new file mode 100644
+index 00000000000..d0375042e42
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C
+@@ -0,0 +1,12 @@
++// PR c++/94951
++// { dg-do compile }
++// { dg-options "-O2 -Wall" }
++
++struct A { int a; };
++template <int N>
++struct B : public A
++{
++  static B<N> foo () { B<N> t; t.a = 4; return t; }	// { dg-bogus "dereferencing type-punned pointer will break strict-aliasing rules" }
++};
++
++B<0> b = B<0>::foo ();
+
+commit da91f9d2b6edea15eee052f93976b15e786da536
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu May 7 14:54:20 2020 +0200
+
+    c-family: Fix error-recovery ICE on __builtin_speculation_safe_value [PR94968]
+    
+    If the second argument of __builtin_speculation_safe_value is
+    error_mark_node (or has such a type), we ICE during
+    useless_typ_conversion_p.
+    
+    202-05-07  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR c/94968
+            * c-common.c (speculation_safe_value_resolve_params): Return false if
+            error_operand_p (val2).
+            (resolve_overloaded_builtin) <case BUILT_IN_SPECULATION_SAFE_VALUE_N>:
+            Remove extraneous semicolon.
+    
+            * gcc.dg/pr94968.c: New test.
+
+diff --git a/gcc/c-family/ChangeLog b/gcc/c-family/ChangeLog
+index 61259afda37..75eacd1efbc 100644
+--- a/gcc/c-family/ChangeLog
++++ b/gcc/c-family/ChangeLog
+@@ -1,3 +1,11 @@
++202-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c/94968
++	* c-common.c (speculation_safe_value_resolve_params): Return false if
++	error_operand_p (val2).
++	(resolve_overloaded_builtin) <case BUILT_IN_SPECULATION_SAFE_VALUE_N>:
++	Remove extraneous semicolon.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+diff --git a/gcc/c-family/c-common.c b/gcc/c-family/c-common.c
+index 4e46178d595..d164f1e2f1f 100644
+--- a/gcc/c-family/c-common.c
++++ b/gcc/c-family/c-common.c
+@@ -6716,6 +6716,8 @@ speculation_safe_value_resolve_params (location_t loc, tree orig_function,
+       tree val2 = (*params)[1];
+       if (TREE_CODE (TREE_TYPE (val2)) == ARRAY_TYPE)
+ 	val2 = default_conversion (val2);
++      if (error_operand_p (val2))
++	return false;
+       if (!(TREE_TYPE (val) == TREE_TYPE (val2)
+ 	    || useless_type_conversion_p (TREE_TYPE (val), TREE_TYPE (val2))))
+ 	{
+@@ -7400,7 +7402,7 @@ resolve_overloaded_builtin (location_t loc, tree function,
+       {
+ 	tree new_function, first_param, result;
+ 	enum built_in_function fncode
+-	  = speculation_safe_value_resolve_call (function, params);;
++	  = speculation_safe_value_resolve_call (function, params);
+ 
+ 	if (fncode == BUILT_IN_NONE)
+ 	  return error_mark_node;
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 7be686f68c6..fb3658c62a7 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,8 @@
++202-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c/94968
++	* gcc.dg/pr94968.c: New test.
++
+ 2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94951
+diff --git a/gcc/testsuite/gcc.dg/pr94968.c b/gcc/testsuite/gcc.dg/pr94968.c
+new file mode 100644
+index 00000000000..e8b282139c4
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/pr94968.c
+@@ -0,0 +1,8 @@
++/* PR c/94968 */
++/* { dg-do compile } */
++
++int
++foo (void)
++{ 
++  __builtin_speculation_safe_value (1, x);	/* { dg-error "undeclared" } */
++}						/* { dg-message "each undeclared identifier is reported only once" "" { target *-*-* } .-1 } */
+
+commit dd38686d9c810cecbaa80bb82ed91caaa58ad635
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Thu May 7 14:56:51 2020 +0200
+
+    testsuite: Improve g++.dg/ext/attr-parm-1.C testcase [PR94946]
+    
+    The testcase in the current form doesn't FAIL without the patch on
+    x86_64-linux unless also testing with -m32; as that the 64-bit testing
+    on that target is probably way more common, and we can use also attributes
+    that FAIL without the patch with -m64, the following patch adjusts the
+    test, so that it FAILs without the patch for both -m64 and -m32 (but not
+    -mx32) and PASSes with the patch.
+    
+    2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR c++/94946
+            * g++.dg/ext/attr-parm-1.C: Enable the test also for lp64 x86, use
+            sysv_abi and ms_abi attributes in that case instead of fastcall and
+            no attribute.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index c948d829d6b..905bd056b2d 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,21 +1,22 @@
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++2020-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94950
+ 	* config/riscv/riscv-builtins.c (riscv_atomic_assign_expand_fenv): Use
+ 	TARGET_EXPR instead of MODIFY_EXPR for first assignment to old_flags.
+ 
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+-
+ 	PR rtl-optimization/94873
+ 	* combine.c (combine_instructions): Don't optimize using REG_EQUAL
+ 	note if SET_SRC (set) has side-effects.
+ 
+-2020-05-05  Jakub Jelinek  <jakub@redhat.com>
++	2020-05-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94942
+ 	* config/i386/mmx.md (*vec_dupv4hi): Use xYw constraints instead of Yv.
+ 
+-2020-05-04  Jakub Jelinek  <jakub@redhat.com>
++	2020-05-04  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	* opts.c (get_option_html_page): Instead of hardcoding a list of
+ 	options common between C/C++ and Fortran only use gfortran/
+diff --git a/gcc/c/ChangeLog b/gcc/c/ChangeLog
+index c7dbd7d5423..7fb870148da 100644
+--- a/gcc/c/ChangeLog
++++ b/gcc/c/ChangeLog
+@@ -1,4 +1,7 @@
+-2020-04-30  Jakub Jelinek  <jakub@redhat.com>
++2020-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-04-30  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c/94842
+ 	* c-decl.c (set_labels_context_r): In addition to context-less
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index c374c2b7644..b5201634053 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,12 +1,13 @@
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++2020-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	Backported from mainline
++	2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94951
+ 	* typeck.c (cp_strict_aliasing_warning): New function.
+ 	(cp_build_indirect_ref_1, build_reinterpret_cast_1): Use
+ 	it instead of strict_aliasing_warning.
+ 
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+-
+ 	PR c++/94907
+ 	* method.c (defaulted_late_check): Don't call synthesize_method
+ 	on constexpr sfk_comparison if it has been called on it already.
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index fb3658c62a7..4ae9129a796 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,29 +1,31 @@
+-202-05-07  Jakub Jelinek  <jakub@redhat.com>
++2020-05-07  Jakub Jelinek  <jakub@redhat.com>
++
++	PR c++/94946
++	* g++.dg/ext/attr-parm-1.C: Enable the test also for lp64 x86, use
++	sysv_abi and ms_abi attributes in that case instead of fastcall and
++	no attribute.
+ 
+ 	PR c/94968
+ 	* gcc.dg/pr94968.c: New test.
+ 
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
++	Backported from mainline
++	2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94951
+ 	* g++.dg/warn/Wstrict-aliasing-bogus-tmpl.C: New test.
+ 
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+-
+ 	PR c++/94907
+ 	* g++.dg/cpp2a/spaceship-synth8.C: New test.
+ 
+-2020-05-06  Jakub Jelinek  <jakub@redhat.com>
+-
+ 	PR rtl-optimization/94873
+ 	* gcc.dg/pr94873.c: New test.
+ 
+-2020-05-05  Jakub Jelinek  <jakub@redhat.com>
++	2020-05-05  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR target/94942
+ 	* gcc.target/i386/pr94942.c: New test.
+ 
+-2020-04-30  Jakub Jelinek  <jakub@redhat.com>
++	2020-04-30  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c/94842
+ 	* gcc.dg/pr94842.c: New test.
+diff --git a/gcc/testsuite/g++.dg/ext/attr-parm-1.C b/gcc/testsuite/g++.dg/ext/attr-parm-1.C
+index cc53a2ce328..681a652de1f 100644
+--- a/gcc/testsuite/g++.dg/ext/attr-parm-1.C
++++ b/gcc/testsuite/g++.dg/ext/attr-parm-1.C
+@@ -1,6 +1,11 @@
+-// { dg-do compile { target { { i?86-*-* x86_64-*-* } && ia32 } } }
++// { dg-do compile { target { { i?86-*-* x86_64-*-* } && { ia32 || lp64 } } } }
+ // PR 94946
+ class a {
++#ifdef __LP64__
++  template <typename b> a(b(__attribute__((sysv_abi)) *c)());
++  template <typename b> a(b(__attribute__((ms_abi)) *c)());
++#else
+   template <typename b> a(b (*)());
+   template <typename b> a(b(__attribute__((fastcall)) *c)());
++#endif
+ };
+
+commit 71e815a5b691d8de6f9cace8c2f26204855e1ed3
+Author: Martin Liska <mliska@suse.cz>
+Date:   Thu May 7 16:07:46 2020 +0200
+
+    Fix optindex entries for 2 options.
+    
+            Backport from mainline
+            2020-05-07  Martin Liska  <mliska@suse.cz>
+    
+            * doc/invoke.texi: Fix 2 optindex entries.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 905bd056b2d..3cdffe87046 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,10 @@
++2020-05-07  Martin Liska  <mliska@suse.cz>
++
++	Backport from mainline
++	2020-05-07  Martin Liska  <mliska@suse.cz>
++
++	* doc/invoke.texi: Fix 2 optindex entries.
++
+ 2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
+diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
+index 527d362533a..f98161391a0 100644
+--- a/gcc/doc/invoke.texi
++++ b/gcc/doc/invoke.texi
+@@ -11399,7 +11399,7 @@ default, GCC emits an error message when an inconsistent profile is detected.
+ This option is enabled by @option{-fauto-profile}.
+ 
+ @item -fprofile-partial-training
+-@opindex fprofile-use
++@opindex fprofile-partial-training
+ With @code{-fprofile-use} all portions of programs not executed during train
+ run are optimized agressively for size rather than speed.  In some cases it is
+ not practical to train all possible hot paths in the program. (For
+@@ -13393,6 +13393,7 @@ location.  If you combine the option with multiple source files,
+ the @file{.gcno} file will be overwritten.
+ 
+ @item -fprofile-prefix-path=@var{path}
++@opindex fprofile-prefix-path
+ 
+ This option can be used in combination with
+ @option{profile-generate=}@var{profile_dir} and
+
+commit 9a993849bd37c340d6cda696b14e6efaf3160499
+Author: Uros Bizjak <ubizjak@gmail.com>
+Date:   Thu May 7 17:14:23 2020 +0200
+
+    alpha: Implement the PR94780 fix for alpha.
+    
+    Essentially the same fix as for x86.
+    
+    2020-05-07  Uroš Bizjak  <ubizjak@gmail.com>
+    
+    gcc/
+            * config/alpha/alpha.c (alpha_atomic_assign_expand_fenv): Use
+            TARGET_EXPR instead of MODIFY_EXPR for the first assignments to
+            fenv_var and new_fenv_var.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 3cdffe87046..877b75cc4e6 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-05-07  Uroš Bizjak  <ubizjak@gmail.com>
++
++	* config/alpha/alpha.c (alpha_atomic_assign_expand_fenv): Use
++	TARGET_EXPR instead of MODIFY_EXPR for the first assignments to
++	fenv_var and new_fenv_var.
++
+ 2020-05-07  Martin Liska  <mliska@suse.cz>
+ 
+ 	Backport from mainline
+diff --git a/gcc/config/alpha/alpha.c b/gcc/config/alpha/alpha.c
+index 7e5d1cbb0c4..49b5a24d4b0 100644
+--- a/gcc/config/alpha/alpha.c
++++ b/gcc/config/alpha/alpha.c
+@@ -9775,8 +9775,8 @@ alpha_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
+     = build_fn_decl ("__ieee_set_fp_control",
+ 		     build_function_type_list (void_type_node, NULL));
+   mask = build_int_cst (long_unsigned_type_node, ~SWCR_STATUS_MASK);
+-  ld_fenv = build2 (MODIFY_EXPR, long_unsigned_type_node,
+-		    fenv_var, build_call_expr (get_fpscr, 0));
++  ld_fenv = build4 (TARGET_EXPR, long_unsigned_type_node, fenv_var,
++		    build_call_expr (get_fpscr, 0), NULL_TREE, NULL_TREE);
+   masked_fenv = build2 (BIT_AND_EXPR, long_unsigned_type_node, fenv_var, mask);
+   hold_fnclex = build_call_expr (set_fpscr, 1, masked_fenv);
+   *hold = build2 (COMPOUND_EXPR, void_type_node,
+@@ -9797,8 +9797,8 @@ alpha_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
+        __atomic_feraiseexcept (new_fenv_var);  */
+ 
+   new_fenv_var = create_tmp_var_raw (long_unsigned_type_node);
+-  reload_fenv = build2 (MODIFY_EXPR, long_unsigned_type_node, new_fenv_var,
+-			build_call_expr (get_fpscr, 0));
++  reload_fenv = build4 (TARGET_EXPR, long_unsigned_type_node, new_fenv_var,
++			build_call_expr (get_fpscr, 0), NULL_TREE, NULL_TREE);
+   restore_fnenv = build_call_expr (set_fpscr, 1, fenv_var);
+   atomic_feraiseexcept = builtin_decl_implicit (BUILT_IN_ATOMIC_FERAISEEXCEPT);
+   update_call
+
+commit e5613c55c2900cd23c9e78592f10258e19c74ab3
+Author: Marek Polacek <polacek@redhat.com>
+Date:   Thu May 7 14:34:15 2020 -0400
+
+    c++: ICE in value_dependent_expression_p in C++98 mode [PR94938]
+    
+    Here we ICE with -std=c++98 since the newly added call to uses_template_parms
+    (r10-6357): we hit
+    26530             gcc_assert (cxx_dialect >= cxx11
+    26531                         || INTEGRAL_OR_ENUMERATION_TYPE_P (type));
+    and TYPE is a record type.  The problem is that the argument to
+    value_dependent_expression_p does not satisfy potential_constant_expression
+    which it must, as the comment explains.  I thought about fixing this in
+    uses_template_parms -- only call v_d_e_p if p_c_e is true, but in this
+    case we want to also suppress the warnings if we don't have a constant
+    expression.  I couldn't simply check TREE_CONSTANT as in
+    compute_array_index_type_loc, because then we'd stop warning in the new
+    Wtype-limits3.C test.
+    
+    Fixed by using type_dependent_expression_p_push instead.  This means
+    that we won't suppress the warnings for value-dependent expressions that
+    aren't type-dependent, e.g. sizeof (T).  This only seems to make a
+    difference for -Wdiv-by-zero, now tested in Wdiv-by-zero-3.C, where I
+    think it's reasonable to warn.  It could make -Wtautological-compare
+    warn more, but that warning doesn't trigger when it gets constant arguments.
+    Wtype-limits4.C is a test reduced from poly-int.h and it tests a scenario
+    that was missing in our testsuite.
+    
+    This patch also moves the warning_sentinels after the RECURs -- we mean
+    to use them for build_x_binary_op purposes only.
+    
+            PR c++/94938
+            * pt.c (tsubst_copy_and_build): Call type_dependent_expression_p_push
+            instead of uses_template_parms.  Move the warning_sentinels after the
+            RECURs.
+    
+            * g++.dg/warn/Wdiv-by-zero-3.C: New test.
+            * g++.dg/warn/Wtype-limits4.C: New test.
+            * g++.dg/warn/template-2.C: New test.
+            * g++.old-deja/g++.pt/crash10.C: Add dg-warning.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index b5201634053..4d0a69c1586 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,13 @@
++2020-05-07  Marek Polacek  <polacek@redhat.com>
++	
++	Backported from mainline
++	2020-05-06  Marek Polacek  <polacek@redhat.com>
++
++	PR c++/94938
++	* pt.c (tsubst_copy_and_build): Call type_dependent_expression_p_push
++	instead of uses_template_parms.  Move the warning_sentinels after the
++	RECURs.
++
+ 2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	Backported from mainline
+diff --git a/gcc/cp/pt.c b/gcc/cp/pt.c
+index d28585efd17..b8f03d18541 100644
+--- a/gcc/cp/pt.c
++++ b/gcc/cp/pt.c
+@@ -19408,14 +19408,16 @@ tsubst_copy_and_build (tree t,
+       {
+ 	/* If T was type-dependent, suppress warnings that depend on the range
+ 	   of the types involved.  */
+-	bool was_dep = uses_template_parms (t);
++	bool was_dep = type_dependent_expression_p_push (t);
++
++	tree op0 = RECUR (TREE_OPERAND (t, 0));
++	tree op1 = RECUR (TREE_OPERAND (t, 1));
++
+ 	warning_sentinel s1(warn_type_limits, was_dep);
+ 	warning_sentinel s2(warn_div_by_zero, was_dep);
+ 	warning_sentinel s3(warn_logical_op, was_dep);
+ 	warning_sentinel s4(warn_tautological_compare, was_dep);
+ 
+-	tree op0 = RECUR (TREE_OPERAND (t, 0));
+-	tree op1 = RECUR (TREE_OPERAND (t, 1));
+ 	tree r = build_x_binary_op
+ 	  (input_location, TREE_CODE (t),
+ 	   op0,
+diff --git a/gcc/testsuite/g++.dg/warn/Wdiv-by-zero-3.C b/gcc/testsuite/g++.dg/warn/Wdiv-by-zero-3.C
+new file mode 100644
+index 00000000000..424eb0c3d49
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/warn/Wdiv-by-zero-3.C
+@@ -0,0 +1,17 @@
++// PR c++/94938
++
++template <typename T, int N> int
++foo (T t, int i)
++{
++  int m1 = 10 / t;
++  int m2 = 10 / i;
++  int m3 = 10 / (sizeof(T) - sizeof(int)); // { dg-warning "division by" }
++  int m4 = 10 / N; // { dg-warning "division by" }
++  return m1 + m2 + m3 + m4;
++}
++
++void
++f ()
++{
++  foo<int, 0>(0, 0);
++}
+diff --git a/gcc/testsuite/g++.dg/warn/Wtype-limits4.C b/gcc/testsuite/g++.dg/warn/Wtype-limits4.C
+new file mode 100644
+index 00000000000..3ae44b4f25a
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/warn/Wtype-limits4.C
+@@ -0,0 +1,23 @@
++// PR c++/94938
++// { dg-additional-options "-Wtype-limits" }
++
++template<unsigned N> struct B { unsigned arr[N]; };
++template<> struct B<1u> { int arr[10]; };
++
++template <unsigned N> bool
++foo(B<N> l)
++{
++  int i = 0;
++  return l.arr[i] < 0;
++}
++
++void
++j()
++{
++  B<1u> b;
++  foo (b);
++  B<2u> b2;
++  // I think that in this instantiation we could warn, but it breaks
++  // gcc bootstrap (marek 5/2020).
++  foo (b2);
++}
+diff --git a/gcc/testsuite/g++.dg/warn/template-2.C b/gcc/testsuite/g++.dg/warn/template-2.C
+new file mode 100644
+index 00000000000..1d29528b2ac
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/warn/template-2.C
+@@ -0,0 +1,22 @@
++// PR c++/94938 - ICE in value_dependent_expression_p in C++98 mode.
++// { dg-do compile }
++
++template <typename> struct S { S(); S(bool); };
++
++struct C {
++  bool operator()(S<float>);
++};
++
++S<float> fn (bool);
++
++template<typename T> void
++foo (T)
++{
++  S<float> s;
++  S<float> x = fn(false || C()(s));
++}
++
++int main ()
++{
++  foo(int());
++}
+diff --git a/gcc/testsuite/g++.old-deja/g++.pt/crash10.C b/gcc/testsuite/g++.old-deja/g++.pt/crash10.C
+index a84b19004ee..012e3d0c11b 100644
+--- a/gcc/testsuite/g++.old-deja/g++.pt/crash10.C
++++ b/gcc/testsuite/g++.old-deja/g++.pt/crash10.C
+@@ -6,6 +6,7 @@ public:
+   enum { val = (N == 0) ? M : GCD<N, M % N>::val };
+ // { dg-error "constant expression" "valid" { target *-*-* } .-1 }
+ // { dg-message "template argument" "valid" { target *-*-* } .-2 }
++// { dg-warning "division by" "" { target *-*-* } .-3 }
+ };
+ 
+ int main() {
+
+commit 6fedf28c7921f125be75a9f688a7b845a1b5663b
+Author: Jonathan Wakely <jwakely@redhat.com>
+Date:   Thu May 7 17:39:56 2020 +0100
+
+    libstdc++: Replace deduced return type in ranges::iter_move (PR 92894)
+    
+    The deduced return type causes the instantiation of the function body,
+    which can then require the instantiation of std::projected::operator*
+    which is intentionally not defined.
+    
+    This patch uses a helper trait to define the return type, so that the
+    function body doesn't need to be instantiated.
+    
+    Unlike on the master branch, this backport to gcc-10 does not change the
+    iter_rvalue_reference_t alias template and __indirectly_readable_impl
+    concept to use the new trait.
+    
+    Backport from mainline
+    2020-05-01  Jonathan Wakely  <jwakely@redhat.com>
+                Patrick Palka  <ppalka@redhat.com>
+    
+            PR libstdc++/92894
+            * include/bits/iterator_concepts.h (ranges::__cust_imove::_IMove):
+            Add trait to determine return type and an alias for it.
+            (ranges::__cust_imove::_IMove::operator()): Use __result instead of
+            deduced return type.
+            * testsuite/24_iterators/customization_points/92894.cc: New test.
+            * testsuite/24_iterators/indirect_callable/92894.cc: New test.
+    
+    Co-authored-by: Patrick Palka <ppalka@redhat.com>
+
+diff --git a/libstdc++-v3/ChangeLog b/libstdc++-v3/ChangeLog
+index 70e296622e7..55d975b84fc 100644
+--- a/libstdc++-v3/ChangeLog
++++ b/libstdc++-v3/ChangeLog
+@@ -1,3 +1,17 @@
++2020-05-07  Jonathan Wakely  <jwakely@redhat.com>
++
++	Backport from mainline
++	2020-05-01  Jonathan Wakely  <jwakely@redhat.com>
++		    Patrick Palka  <ppalka@redhat.com>
++
++	PR libstdc++/92894
++	* include/bits/iterator_concepts.h (ranges::__cust_imove::_IMove):
++	Add trait to determine return type and an alias for it.
++	(ranges::__cust_imove::_IMove::operator()): Use __result instead of
++	deduced return type.
++	* testsuite/24_iterators/customization_points/92894.cc: New test.
++	* testsuite/24_iterators/indirect_callable/92894.cc: New test.
++
+ 2020-05-07  Release Manager
+ 
+ 	* GCC 10.1.0 released.
+diff --git a/libstdc++-v3/include/bits/iterator_concepts.h b/libstdc++-v3/include/bits/iterator_concepts.h
+index b598532089e..c5b6247cde7 100644
+--- a/libstdc++-v3/include/bits/iterator_concepts.h
++++ b/libstdc++-v3/include/bits/iterator_concepts.h
+@@ -89,6 +89,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+       struct _IMove
+       {
+       private:
++	template<typename _Tp>
++	  struct __result
++	  { using type = iter_reference_t<_Tp>; };
++
++	template<typename _Tp>
++	  requires __adl_imove<_Tp>
++	  struct __result<_Tp>
++	  { using type = decltype(iter_move(std::declval<_Tp>())); };
++
++	template<typename _Tp>
++	  requires (!__adl_imove<_Tp>)
++	  && is_lvalue_reference_v<iter_reference_t<_Tp>>
++	  struct __result<_Tp>
++	  { using type = remove_reference_t<iter_reference_t<_Tp>>&&; };
++
+ 	template<typename _Tp>
+ 	  static constexpr bool
+ 	  _S_noexcept()
+@@ -100,16 +115,19 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 	  }
+ 
+       public:
+-	template<typename _Tp>
+-	  requires __adl_imove<_Tp> || requires(_Tp& __e) { *__e; }
+-	  constexpr decltype(auto)
++	// The result type of iter_move(std::declval<_Tp>())
++	template<std::__detail::__dereferenceable _Tp>
++	  using __type = typename __result<_Tp>::type;
++
++	template<std::__detail::__dereferenceable _Tp>
++	  constexpr __type<_Tp>
+ 	  operator()(_Tp&& __e) const
+ 	  noexcept(_S_noexcept<_Tp>())
+ 	  {
+ 	    if constexpr (__adl_imove<_Tp>)
+ 	      return iter_move(static_cast<_Tp&&>(__e));
+-	    else if constexpr (is_reference_v<iter_reference_t<_Tp>>)
+-	      return std::move(*__e);
++	    else if constexpr (is_lvalue_reference_v<iter_reference_t<_Tp>>)
++	      return static_cast<__type<_Tp>>(*__e);
+ 	    else
+ 	      return *__e;
+ 	  }
+diff --git a/libstdc++-v3/testsuite/24_iterators/customization_points/92894.cc b/libstdc++-v3/testsuite/24_iterators/customization_points/92894.cc
+new file mode 100644
+index 00000000000..197268fe5e3
+--- /dev/null
++++ b/libstdc++-v3/testsuite/24_iterators/customization_points/92894.cc
+@@ -0,0 +1,52 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do compile { target c++2a } }
++
++#include <iterator>
++
++using namespace std;
++
++// Define our own of version of indirectly_readable_impl here,
++// to check the use of iter_move even if the real concept in
++// <bits/iterator_concepts.h> no longer uses iter_move.
++template<class In>
++concept indirectly_readable_impl
++  = requires(const In in)
++      {
++	typename iter_value_t<In>;
++	typename iter_reference_t<In>;
++	typename iter_rvalue_reference_t<In>;
++	{ *in } -> same_as<iter_reference_t<In>>;
++	{ ranges::iter_move(in) } -> same_as<iter_rvalue_reference_t<In>>;
++      };
++
++template<class T> requires indirectly_readable_impl<projected<T*, identity>>
++  void algo(T)
++  { }
++
++void
++test01()
++{
++  // PR libstdc++/92894
++  // Verify that the use of range::iter_move above doesn't cause odr-use of
++  // projected<local-class-type, identity>::operator* (which is not defined).
++  struct X { };
++  X a;
++  algo(a);
++}
+diff --git a/libstdc++-v3/testsuite/24_iterators/indirect_callable/92894.cc b/libstdc++-v3/testsuite/24_iterators/indirect_callable/92894.cc
+new file mode 100644
+index 00000000000..3408c76bde1
+--- /dev/null
++++ b/libstdc++-v3/testsuite/24_iterators/indirect_callable/92894.cc
+@@ -0,0 +1,55 @@
++// Copyright (C) 2020 Free Software Foundation, Inc.
++//
++// This file is part of the GNU ISO C++ Library.  This library is free
++// software; you can redistribute it and/or modify it under the
++// terms of the GNU General Public License as published by the
++// Free Software Foundation; either version 3, or (at your option)
++// any later version.
++
++// This library is distributed in the hope that it will be useful,
++// but WITHOUT ANY WARRANTY; without even the implied warranty of
++// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++// GNU General Public License for more details.
++
++// You should have received a copy of the GNU General Public License along
++// with this library; see the file COPYING3.  If not see
++// <http://www.gnu.org/licenses/>.
++
++// { dg-options "-std=gnu++2a" }
++// { dg-do compile { target c++2a } }
++
++#include <iterator>
++
++using std::projected;
++using std::identity;
++using std::indirect_unary_predicate;
++
++template<typename T,
++	 indirect_unary_predicate<projected<T*, identity>> Pred>
++  constexpr void
++  all_of(T*, Pred)
++  { }
++
++void
++test01()
++{
++  // PR libstdc++/92894
++  struct X { };
++  X x;
++  all_of(&x, [](X&) { return false; });
++}
++
++template<class R, class Proj = identity,
++	 indirect_unary_predicate<projected<R, Proj>> Pred>
++  constexpr void
++  find_if(R, Pred, Proj = {})
++  { }
++
++void
++test02()
++{
++  // PR 94241
++  struct s { int m; };
++  s r[] = { s{0}, s{1}, s{2}, s{3} };
++  find_if(r, [](auto const) { return true; });
++}
+
+commit 48f3d4eb96c7dfe89c55e2505e34410bf419a68e
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Fri May 8 00:16:45 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index e0dd7b4aaaf..a4ec51424d2 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200507
++20200508
+
+commit 3a296f322dea92747a0874cb1fd073313749673e
+Author: Jakub Jelinek <jakub@redhat.com>
+Date:   Fri May 8 09:37:09 2020 +0200
+
+    tree: Avoid variable sharing in get_narrower [PR94724]
+    
+    On Thu, May 07, 2020 at 02:45:29PM +0200, Thomas Schwinge wrote:
+    > >>+      for (tree op = win; TREE_CODE (op) == COMPOUND_EXPR;
+    >
+    > ..., and new 'op' variable here.
+    >
+    > >>+        op = TREE_OPERAND (op, 1))
+    > >>+     v.safe_push (op);
+    > >>+      FOR_EACH_VEC_ELT_REVERSE (v, i, op)
+    > >>+     ret = build2_loc (EXPR_LOCATION (op), COMPOUND_EXPR,
+    > >>+                       TREE_TYPE (win), TREE_OPERAND (op, 0),
+    > >>+                       ret);
+    > >>+      return ret;
+    > >>     }
+    > >>   while (TREE_CODE (op) == NOP_EXPR)
+    > >>     {
+    
+    There is no reason for the shadowing and op at this point acts as a
+    temporary and will be overwritten in FOR_EACH_VEC_ELT_REVERSE anyway.
+    So, we can just s/tree // here.
+    
+    2020-05-08  Jakub Jelinek  <jakub@redhat.com>
+    
+            PR middle-end/94724
+            * tree.c (get_narrower): Reuse the op temporary instead of
+            shadowing it.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 877b75cc4e6..676a707b4a5 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,9 @@
++2020-05-08  Jakub Jelinek  <jakub@redhat.com>
++
++	PR middle-end/94724
++	* tree.c (get_narrower): Reuse the op temporary instead of
++	shadowing it.
++
+ 2020-05-07  Uroš Bizjak  <ubizjak@gmail.com>
+ 
+ 	* config/alpha/alpha.c (alpha_atomic_assign_expand_fenv): Use
+diff --git a/gcc/tree.c b/gcc/tree.c
+index e451401822c..397474900ff 100644
+--- a/gcc/tree.c
++++ b/gcc/tree.c
+@@ -8889,7 +8889,7 @@ get_narrower (tree op, int *unsignedp_ptr)
+ 	return win;
+       auto_vec <tree, 16> v;
+       unsigned int i;
+-      for (tree op = win; TREE_CODE (op) == COMPOUND_EXPR;
++      for (op = win; TREE_CODE (op) == COMPOUND_EXPR;
+ 	   op = TREE_OPERAND (op, 1))
+ 	v.safe_push (op);
+       FOR_EACH_VEC_ELT_REVERSE (v, i, op)
+
+commit ceae6a13366d9646e172fc943fe8e221b70f0920
+Author: Marek Polacek <polacek@redhat.com>
+Date:   Fri May 8 11:04:29 2020 -0400
+
+    c++: Parenthesized-init of aggregates accepts invalid code [PR94885]
+    
+    Here we have (conceptually *) something like
+    
+      struct B { };
+      struct D : B { };
+      D(0); // invalid
+    
+    and in C++20 the ()-initialization has created a { 0 } constructor that
+    it tries to initialize an object of type D with.  We should reject
+    initializing an object of type B from 0, but we wrongly accept it because
+    process_init_constructor_record skips initializers for empty bases/fields:
+           if (DECL_SIZE (field) && integer_zerop (DECL_SIZE (field))
+               && !TREE_SIDE_EFFECTS (next))
+             /* Don't add trivial initialization of an empty base/field to the
+                constructor, as they might not be ordered the way the back-end
+                expects.  */
+             continue;
+    but here 'next' was error_mark_node, returned by massage_elt_init, so we
+    wound up with { } which would validly value-initialize the object.
+    
+    [*] Usually digest_init in build_new_method_call_1 would detect this,
+    but in this case the instance is is_dummy_object and we don't call
+    digest just yet.
+    
+            PR c++/94885
+            * typeck2.c (process_init_constructor_record): Return PICFLAG_ERRONEOUS
+            if an initializer element was erroneous.
+    
+            * g++.dg/cpp2a/paren-init26.C: New test.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index 4d0a69c1586..9a6d647cabb 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,12 @@
++2020-05-08  Marek Polacek  <polacek@redhat.com>
++
++	Backported from mainline
++	2020-05-01  Marek Polacek  <polacek@redhat.com>
++
++	PR c++/94885
++	* typeck2.c (process_init_constructor_record): Return PICFLAG_ERRONEOUS
++	if an initializer element was erroneous.
++
+ 2020-05-07  Marek Polacek  <polacek@redhat.com>
+ 	
+ 	Backported from mainline
+diff --git a/gcc/cp/typeck2.c b/gcc/cp/typeck2.c
+index 56fd9bafa7e..9e5d145a6cd 100644
+--- a/gcc/cp/typeck2.c
++++ b/gcc/cp/typeck2.c
+@@ -1661,7 +1661,11 @@ process_init_constructor_record (tree type, tree init, int nested, int flags,
+ 	      ++idx;
+ 	    }
+ 	}
+-      if (next)
++      if (next == error_mark_node)
++	/* We skip initializers for empty bases/fields, so skipping an invalid
++	   one could make us accept invalid code.  */
++	return PICFLAG_ERRONEOUS;
++      else if (next)
+ 	/* Already handled above.  */;
+       else if (DECL_INITIAL (field))
+ 	{
+diff --git a/gcc/testsuite/g++.dg/cpp2a/paren-init26.C b/gcc/testsuite/g++.dg/cpp2a/paren-init26.C
+new file mode 100644
+index 00000000000..0b98ebf43bb
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/cpp2a/paren-init26.C
+@@ -0,0 +1,14 @@
++// PR c++/94885 - paren-init of aggregates accepts invalid code.
++// { dg-do compile { target c++2a } }
++
++template <typename T, typename = decltype(T(0))> // { dg-error "could not convert" }
++void foo();
++
++struct base {};
++struct derived : base {};
++
++void
++bar()
++{
++  foo<derived>(); // { dg-error "no matching function" }
++}
+
+commit 986e80d520e84a85b81d2e0c378d73f3e8a93f78
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sat May 9 00:16:42 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index a4ec51424d2..edea0329ce1 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200508
++20200509
+
+commit 6a05439351bf17242026905a0a45c56c3cab7874
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Sun May 10 00:16:44 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index edea0329ce1..4ae7902f547 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200509
++20200510
+
+commit f09d898296c02d023ec51489fd233075ac553fd4
+Author: Iain Sandoe <iain@sandoe.co.uk>
+Date:   Sun May 10 14:20:13 2020 +0100
+
+    coroutines: Update TREE_SIDE_EFFECTS on inserted bind exprs.
+    
+    There are several places where we insert bind expressions while
+    making the coroutine AST transforms.  These should be marked as
+    having side-effects where relevant, which had been omitted.  This
+    leads to at least one failure in the cppcoros test suite, where a loop
+    body is dropped in gimplification because it is not marked.
+    
+    gcc/cp/ChangeLog:
+    
+    2020-05-10  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backported from mainline
+            2020-05-08  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            PR c++/95003
+            * coroutines.cc (build_actor_fn): Ensure that bind scopes
+            are marked as having side-effects where necessary.
+            (replace_statement_captures): Likewise.
+            (morph_fn_to_coro): Likewise.
+    
+    gcc/testsuite/ChangeLog:
+    
+    2020-05-10  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            Backported from mainline
+            2020-05-08  Iain Sandoe  <iain@sandoe.co.uk>
+    
+            PR c++/95003
+            * g++.dg/coroutines/torture/pr95003.C: New test.
+
+diff --git a/gcc/cp/ChangeLog b/gcc/cp/ChangeLog
+index 9a6d647cabb..b009a7810ca 100644
+--- a/gcc/cp/ChangeLog
++++ b/gcc/cp/ChangeLog
+@@ -1,3 +1,14 @@
++2020-05-10  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backported from mainline
++	2020-05-08  Iain Sandoe  <iain@sandoe.co.uk>
++
++	PR c++/95003
++	* coroutines.cc (build_actor_fn): Ensure that bind scopes
++	are marked as having side-effects where necessary.
++	(replace_statement_captures): Likewise.
++	(morph_fn_to_coro): Likewise.
++
+ 2020-05-08  Marek Polacek  <polacek@redhat.com>
+ 
+ 	Backported from mainline
+diff --git a/gcc/cp/coroutines.cc b/gcc/cp/coroutines.cc
+index e90d3d5a3b3..db687c32b97 100644
+--- a/gcc/cp/coroutines.cc
++++ b/gcc/cp/coroutines.cc
+@@ -1971,8 +1971,6 @@ build_actor_fn (location_t loc, tree coro_frame_type, tree actor, tree fnbody,
+   current_stmt_tree ()->stmts_are_full_exprs_p = 1;
+   tree stmt = begin_compound_stmt (BCS_FN_BODY);
+ 
+-  /* ??? Can we dispense with the enclosing bind if the function body does
+-     not start with a bind_expr? (i.e. there's no contained scopes).  */
+   tree actor_bind = build3 (BIND_EXPR, void_type_node, NULL, NULL, NULL);
+   tree top_block = make_node (BLOCK);
+   BIND_EXPR_BLOCK (actor_bind) = top_block;
+@@ -2423,8 +2421,8 @@ build_actor_fn (location_t loc, tree coro_frame_type, tree actor, tree fnbody,
+ 		       continue_label, continuation, 2};
+   cp_walk_tree (&actor_body, await_statement_expander, &data, NULL);
+ 
+-  actor_body = pop_stmt_list (actor_body);
+-  BIND_EXPR_BODY (actor_bind) = actor_body;
++  BIND_EXPR_BODY (actor_bind) = pop_stmt_list (actor_body);
++  TREE_SIDE_EFFECTS (actor_bind) = true;
+ 
+   finish_compound_stmt (stmt);
+   DECL_SAVED_TREE (actor) = pop_stmt_list (actor_outer);
+@@ -2889,6 +2887,7 @@ replace_statement_captures (tree *stmt, void *d)
+ 	}
+     }
+   BIND_EXPR_BLOCK (aw_bind) = b_block;
++  TREE_SIDE_EFFECTS (aw_bind) = TREE_SIDE_EFFECTS (BIND_EXPR_BODY (aw_bind));
+   *stmt = aw_bind;
+ }
+ 
+@@ -3602,10 +3601,13 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
+ 	{
+ 	  tree tlist = NULL_TREE;
+ 	  append_to_statement_list_force (fnbody, &tlist);
++	  TREE_SIDE_EFFECTS (tlist) = TREE_SIDE_EFFECTS (fnbody);
+ 	  BIND_EXPR_BODY (update_body) = tlist;
+ 	}
+       tree new_body_list = NULL_TREE;
+-      append_to_statement_list_force (update_body, &new_body_list);
++      TREE_SIDE_EFFECTS (update_body) = true;
++      append_to_statement_list (update_body, &new_body_list);
++      TREE_SIDE_EFFECTS (new_body_list) = true;
+       fnbody = new_body_list;
+     }
+ 
+@@ -4301,7 +4303,9 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
+   /* Finish up the ramp function.  */
+   BIND_EXPR_VARS (gro_context_bind) = gro_bind_vars;
+   BIND_EXPR_BODY (gro_context_bind) = pop_stmt_list (gro_context_body);
++  TREE_SIDE_EFFECTS (gro_context_bind) = true;
+   BIND_EXPR_BODY (ramp_bind) = pop_stmt_list (ramp_body);
++  TREE_SIDE_EFFECTS (ramp_bind) = true;
+ 
+   /* We know the "real" promise and have a frame layout with a slot for each
+      suspend point, so we can build an actor function (which contains the
+@@ -4420,6 +4424,7 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
+ 	  BLOCK_SUPERCONTEXT (replace_blk) = tcb_block;
+ 	  BLOCK_SUBBLOCKS (tcb_block) = replace_blk;
+ 	  BIND_EXPR_BLOCK (fnbody) = tcb_block;
++	  TREE_SIDE_EFFECTS (fnbody) = true;
+ 	}
+     }
+   else if (pedantic)
+diff --git a/gcc/testsuite/ChangeLog b/gcc/testsuite/ChangeLog
+index 4ae9129a796..0e4abe46b09 100644
+--- a/gcc/testsuite/ChangeLog
++++ b/gcc/testsuite/ChangeLog
+@@ -1,3 +1,11 @@
++2020-05-10  Iain Sandoe  <iain@sandoe.co.uk>
++
++	Backported from mainline
++	2020-05-08  Iain Sandoe  <iain@sandoe.co.uk>
++
++	PR c++/95003
++	* g++.dg/coroutines/torture/pr95003.C: New test.
++
+ 2020-05-07  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR c++/94946
+diff --git a/gcc/testsuite/g++.dg/coroutines/torture/pr95003.C b/gcc/testsuite/g++.dg/coroutines/torture/pr95003.C
+new file mode 100644
+index 00000000000..eda785827ec
+--- /dev/null
++++ b/gcc/testsuite/g++.dg/coroutines/torture/pr95003.C
+@@ -0,0 +1,50 @@
++// { dg-do run }
++
++#include "../coro.h"
++#include "../coro1-ret-int-yield-int.h"
++
++// This tests that, when we insert bind scopes to contain variables that
++// have been promoted from compiler temporaries to extend their lifetimes
++// to a containing full expression, the inserted bind scopes have their
++// tree-side-effects set.
++
++struct Awaitable {
++  int v;
++  Awaitable (int _v) : v(_v) {}
++  bool await_ready() { return false; }
++  void await_suspend(std::coroutine_handle<coro1::promise_type>) {}
++  int await_resume() { return v; }
++  auto operator co_await() { return *this; }
++};
++
++coro1
++my_coro
++(int x)
++{
++  int sum = 0;
++  for (unsigned i = 0; i < 100; ++i) {
++    sum += co_await Awaitable{x+1};
++  }
++  co_return sum;
++}
++
++int main ()
++{
++  PRINT ("main: create coro1");
++  struct coro1 f_coro = my_coro (0);
++
++  PRINT ("main: OK -- looping");
++
++  do {
++    f_coro.handle.resume();
++  } while (!f_coro.handle.done());
++
++  int y = f_coro.handle.promise().get_value();
++  if (y != 100)
++    {
++      PRINTF ("main: y is wrong : %d, should be 100\n", y);
++      abort ();
++    }
++  puts ("main: done");
++  return 0;
++}
+
+commit 94c98e1f4520f24be3eb2a375077d7eb545fa5fb
+Author: GCC Administrator <gccadmin@gcc.gnu.org>
+Date:   Mon May 11 00:16:48 2020 +0000
+
+    Daily bump.
+
+diff --git a/gcc/DATESTAMP b/gcc/DATESTAMP
+index 4ae7902f547..7cc5ad9fe46 100644
+--- a/gcc/DATESTAMP
++++ b/gcc/DATESTAMP
+@@ -1 +1 @@
+-20200510
++20200511
+
+commit 340c711bc0835346000d7863155fbf82af42828e
+Author: Martin Liska <mliska@suse.cz>
+Date:   Mon May 11 09:35:16 2020 +0200
+
+    Fix typo in fprofile-prefix-path.
+    
+            Backport from mainline
+            2020-05-11  Martin Liska  <mliska@suse.cz>
+    
+            PR c/95040
+            * common.opt: Fix typo in option description.
+
+diff --git a/gcc/ChangeLog b/gcc/ChangeLog
+index 676a707b4a5..9c546133700 100644
+--- a/gcc/ChangeLog
++++ b/gcc/ChangeLog
+@@ -1,3 +1,11 @@
++2020-05-11  Martin Liska  <mliska@suse.cz>
++
++	Backport from mainline
++	2020-05-11  Martin Liska  <mliska@suse.cz>
++
++	PR c/95040
++	* common.opt: Fix typo in option description.
++
+ 2020-05-08  Jakub Jelinek  <jakub@redhat.com>
+ 
+ 	PR middle-end/94724
+diff --git a/gcc/common.opt b/gcc/common.opt
+index d33383b523c..65a82410abc 100644
+--- a/gcc/common.opt
++++ b/gcc/common.opt
+@@ -2210,7 +2210,7 @@ Enum(profile_update) String(prefer-atomic) Value(PROFILE_UPDATE_PREFER_ATOMIC)
+ 
+ fprofile-prefix-path=
+ Common Joined RejectNegative Var(profile_prefix_path)
+-Remove prefix from absolute path before manging name for -fprofile-generate= and -fprofile-use=.
++Remove prefix from absolute path before mangling name for -fprofile-generate= and -fprofile-use=.
+ 
+ fprofile-generate
+ Common

@@ -22,7 +22,7 @@ pkgver=10.1.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=1
+pkgrel=2
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -63,7 +63,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         010-documentation.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
+        0140-gcc-8.2.0-diagnostic-color.patch
+        gcc-10.1.0-stable-branch.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -133,7 +134,8 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch 
+    010-documentation.patch \
+    gcc-10.1.0-stable-branch.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -144,20 +146,20 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-# echo ${pkgver} > gcc/BASE-VER
+ echo ${pkgver} > gcc/BASE-VER
+ 
+#  ln -s ../isl-${_islver} isl
 
-  ln -s ../isl-${_islver} isl
-
-#  rm -rf gcc/ada/*.ad*
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
+  rm -rf gcc/ada/*.ad*
+  rm -rf gcc/testsuite/ada
+  rm -rf gcc/testsuite/brig.dg
+  rm -rf gcc/testsuite/c-c++-common
+  rm -rf gcc/testsuite/ChangeLog*
+  rm -rf gcc/testsuite/config
+  rm -rf gcc/testsuite/g*
+  rm -rf gcc/testsuite/jit.dg
+  rm -rf gcc/testsuite/lib
+  rm -rf gcc/testsuite/o*
 }
 
 build() {
@@ -250,7 +252,7 @@ build() {
     --with-diagnostics-color=always \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-isl=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
