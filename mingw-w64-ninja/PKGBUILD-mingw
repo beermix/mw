@@ -19,11 +19,14 @@ sha256sums=('5d7ec75828f8d3fd1a0c2f31b5b0cea780cdfe1031359228c428c1a48bfcd5b9')
 prepare () {
   cd ${srcdir}/${_realname}-${pkgver}
 
+ #patch -p1 -i ${srcdir}/1678.patch
+
     MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_PREFIX}/bin/cmake \
     -G'MSYS Makefiles' \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
+    -H. \
     -Bbuild-mingw \
     ../${_realname}-${pkgver}
 

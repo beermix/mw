@@ -251,7 +251,9 @@ build() {
     --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-vtable-verify \
     --with-diagnostics-color=always \
+    --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --without-isl \

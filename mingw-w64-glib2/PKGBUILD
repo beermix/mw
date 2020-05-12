@@ -51,6 +51,7 @@ build() {
     --default-library=static \
     -Dforce_posix_threads=true \
     "../glib-${pkgver}"
+
   ninja -j7
 
   msg "Build shared version"
