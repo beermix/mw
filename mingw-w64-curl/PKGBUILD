@@ -13,8 +13,8 @@ fi
 _realname=curl
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}${_namesuff}"
-pkgver=7.69.0
-pkgrel=3
+pkgver=7.70.0
+pkgrel=1
 pkgdesc="Command line tool and library for transferring data with URLs. (mingw-w64)"
 arch=('any')
 url="https://curl.haxx.se/"
@@ -46,24 +46,15 @@ source=("${url}/download/${_realname}-${pkgver}.tar.bz2"{,.asc}
         "0001-Make-cURL-relocatable.patch"
         "0002-nghttp2-static.patch"
         "0003-libpsl-static-libs.patch"
-"0002-Hack-make-relocation-work-inside-libexec-git-core.patch")
-sha256sums=('207f54917dd6a2dc733065ccf18d61bb5bebeaceb5df49cd9445483e8623eeb9'
-            'SKIP'
-            '37dff8355e410b65563d51f7c1314d309276add644d55836a067142fc36951f4'
-            '79eec8a337e375d5102fef884030ceacd163a79e5c495e9a974a6b9a11b60c61'
-            '7492d019036b5bec251bfbc3c0b40e5f16d3dd6b2515068835e087a6c21f19ad')
-validpgpkeys=('914C533DF9B2ADA2204F586D78E11C6B279D5C91'  # Daniel Stenberg
-              '27EDEAF22F3ABCEB50DB9A125CC908FDB71E12C2'
-              '4461EAF0F8E9097F48AF0555F9FEAFF9D34A1BDB')
+        "0002-Hack-make-relocation-work-inside-libexec-git-core-an.patch")
 
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
-  rm -f lib/pathtools.h lib/pathtools.c > /dev/null 2>&1 || true
+  rm -f lib/pathtools.h lib/pathtools.c tests/data/test2070 >/dev/null 2>&1 || true
   patch -p1 -i "${srcdir}/0001-Make-cURL-relocatable.patch"
+  patch -p1 -i "${srcdir}/0002-Hack-make-relocation-work-inside-libexec-git-core-an.patch"
   patch -p1 -i "${srcdir}/0002-nghttp2-static.patch"
   patch -p1 -i "${srcdir}/0003-libpsl-static-libs.patch"
-  patch -p1 -i "${srcdir}/0002-Hack-make-relocation-work-inside-libexec-git-core.patch"
-
   autoreconf -vfi
 }
 
