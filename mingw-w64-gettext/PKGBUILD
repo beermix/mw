@@ -11,11 +11,10 @@ pkgdesc="GNU internationalization library (mingw-w64)"
 depends=("${MINGW_PACKAGE_PREFIX}-expat"
          "${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libiconv"
-         "${MINGW_PACKAGE_PREFIX}-libcroco"
          "${MINGW_PACKAGE_PREFIX}-libunistring"
          "${MINGW_PACKAGE_PREFIX}-libxml2"
          "${MINGW_PACKAGE_PREFIX}-glib2")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libcroco" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-glib2")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "${MINGW_PACKAGE_PREFIX}-ncurses" "git" "${MINGW_PACKAGE_PREFIX}-libunistring" "${MINGW_PACKAGE_PREFIX}-libxml2" "${MINGW_PACKAGE_PREFIX}-glib2")
 options=('strip' 'staticlibs')
 
 # GPL3 for the package as a whole and LGPL for some parts, see the license files
@@ -109,7 +108,7 @@ build() {
     --disable-openmp \
     --without-cvs \
     --without-git \
-    --without-included-libcroco \
+    --with-included-libcroco \
     --without-included-libunistring \
     --without-included-libxml \
     --without-included-glib \
