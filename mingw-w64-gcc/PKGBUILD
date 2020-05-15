@@ -150,18 +150,7 @@ prepare() {
 
 # echo ${pkgver} > gcc/BASE-VER
  
-#  ln -s ../isl-${_islver} isl
-
-#  rm -rf gcc/ada/*.ad*
-#  rm -rf gcc/testsuite/ada
-#  rm -rf gcc/testsuite/brig.dg
-#  rm -rf gcc/testsuite/c-c++-common
-#  rm -rf gcc/testsuite/ChangeLog*
-#  rm -rf gcc/testsuite/config
-#  rm -rf gcc/testsuite/g*
-#  rm -rf gcc/testsuite/jit.dg
-#  rm -rf gcc/testsuite/lib
-#  rm -rf gcc/testsuite/o*
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -251,12 +240,11 @@ build() {
     --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-vtable-verify \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
