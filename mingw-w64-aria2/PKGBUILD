@@ -47,10 +47,10 @@ build() {
     --disable-libaria2 \
     --with-libcares \
     --without-libssh2 \
-    --enable-nls \
+    --disable-nls \
     ARIA2_STATIC=no
 
-  /home/User/.go/bin/noti.exe nice -n 19 make
+  /home/User/.go/bin/noti.exe nice -n19 make
 }
 
 package() {
