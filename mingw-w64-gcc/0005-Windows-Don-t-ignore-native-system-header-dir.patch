@@ -18,7 +18,7 @@ index c835734..4638567 100644
 -        native_system_header_dir=/mingw/include
 +	# Don't ignore values passed in to configure via --native-system-header-dir
 +	if test x$native_system_header_dir = x ; then
-+		native_system_header_dir=/mingw/include
++		native_system_header_dir=/mingw64/include
 +	fi
  	target_gtfiles="$target_gtfiles \$(srcdir)/config/i386/winnt.c"
  	extra_options="${extra_options} i386/cygming.opt i386/mingw.opt"
