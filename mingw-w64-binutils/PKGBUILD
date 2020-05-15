@@ -72,7 +72,6 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/000-branch-updates.patch
   patch -p1 -i "${srcdir}"/001-branch-version.patch
-  patch -p1 -i "${srcdir}"/500-libctf-soname.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
@@ -112,7 +111,6 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
     --enable-targets=x86_64-*-mingw64 \
     --disable-shared
 
