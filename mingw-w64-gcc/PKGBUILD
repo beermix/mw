@@ -44,7 +44,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
@@ -61,10 +61,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0012-Handle-spaces-in-path-for-default-manifest.patch
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0015-makedeps-properly-handle-win-paths.patch
-        010-documentation.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
+        0140-gcc-8.2.0-diagnostic-color.patch
+        010-documentation.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -242,7 +242,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n 19 make V=1 all
+  /home/User/.go/bin/noti nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -258,6 +258,26 @@ package_mingw-w64-gcc-libs() {
            "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
+
+  # Licensing information
+
+  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
+  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
+  # with GPL3+, the whole package can be redistributed under GPL3+.
+  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
+
+  # We explain the licensing in this generated README file
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
+  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
+The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
+GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
+by LGPL2+. The package as a whole can be redistributed under GPL3+.
+ENDFILE
+
+  # License files
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
@@ -338,7 +358,7 @@ package_mingw-w64-gcc() {
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale}
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/share/{doc,info,locale,man}
 
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
