@@ -42935,3 +42935,277 @@ index d2e43d793a..13931ef5ee 100644
  #define BFD_VERSION @bfd_version@
  #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
  #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 2049564fe9d66d2d8d846f33ccc743befa406637
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Thu May 7 00:00:30 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 13931ef5ee..2ea547ed18 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200506
++#define BFD_VERSION_DATE 20200507
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit a72427b1ae01304da0b5170e1e53f68c6d46c1de
+Author: Andre Simoes Dias Vieira <andre.simoesdiasvieira@arm.com>
+Date:   Mon May 4 13:05:42 2020 +0100
+
+    gas: PR 25863: Fix scalar vmul inside it block when assembling for MVE
+    
+    This fixes PR 25863 by fixing the condition in the parsing of vmul in
+    do_mve_vmull.  It also simplifies the code in there fixing latent issues that
+    would lead to NEON code being accepted when it shouldn't.
+    
+    2020-05-07  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+    
+            Backport from mainline.
+            2020-05-04  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+    
+            PR gas/25863
+            * config/tc-arm.c (do_mve_vmull): Fix scalar and NEON parsing of vmul.
+            * testsuite/gas/arm/mve-scalar-vmult-it.d: New test.
+            * testsuite/gas/arm/mve-scalar-vmult-it.s: New test.
+
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 3ebb0aa53e..901af53f54 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,13 @@
++2020-05-07  Andre Vieira  <andre.simoesdiasvieira@arm.com>
++
++	Backport from mainline.
++	2020-05-04  Andre Vieira  <andre.simoesdiasvieira@arm.com>
++
++	PR gas/25863
++	* config/tc-arm.c (do_mve_vmull): Fix scalar and NEON parsing of vmul.
++	* testsuite/gas/arm/mve-scalar-vmult-it.d: New test.
++	* testsuite/gas/arm/mve-scalar-vmult-it.s: New test.
++
+ 2020-04-21  Tamar Christina  <tamar.christina@arm.com>
+ 
+ 	Backport from mainline.
+diff --git a/gas/config/tc-arm.c b/gas/config/tc-arm.c
+index 8ad2d6d3bd..7550f9096c 100644
+--- a/gas/config/tc-arm.c
++++ b/gas/config/tc-arm.c
+@@ -18221,19 +18221,13 @@ do_mve_vmull (void)
+ 
+   enum neon_shape rs = neon_select_shape (NS_HHH, NS_FFF, NS_DDD, NS_DDS,
+ 					  NS_QQS, NS_QQQ, NS_QQR, NS_NULL);
+-  if (!ARM_CPU_HAS_FEATURE (cpu_variant, mve_ext)
+-      && inst.cond == COND_ALWAYS
++  if (inst.cond == COND_ALWAYS
+       && ((unsigned)inst.instruction) == M_MNEM_vmullt)
+     {
++
+       if (rs == NS_QQQ)
+ 	{
+-
+-	  struct neon_type_el et = neon_check_type (3, rs, N_EQK , N_EQK,
+-						    N_SUF_32 | N_F64 | N_P8
+-						    | N_P16 | N_I_MVE | N_KEY);
+-	  if (((et.type == NT_poly) && et.size == 8
+-	       && ARM_CPU_IS_ANY (cpu_variant))
+-	      || (et.type == NT_integer) || (et.type == NT_float))
++	  if (!ARM_CPU_HAS_FEATURE (cpu_variant, mve_ext))
+ 	    goto neon_vmul;
+ 	}
+       else
+diff --git a/gas/testsuite/gas/arm/mve-scalar-vmul-it.d b/gas/testsuite/gas/arm/mve-scalar-vmul-it.d
+new file mode 100644
+index 0000000000..f4564a5e80
+--- /dev/null
++++ b/gas/testsuite/gas/arm/mve-scalar-vmul-it.d
+@@ -0,0 +1,11 @@
++# name: Armv8.1-M Mainline scalar vmul instructions in it blocks (with MVE)
++# as: -march=armv8.1-m.main+mve.fp+fp.dp
++# objdump: -dr --prefix-addresses --show-raw-insn -marmv8.1-m.main
++
++.*: +file format .*arm.*
++
++Disassembly of section .text:
++[^>]*> bfbc      	itt	lt
++[^>]*> ee20 0a81 	vmullt.f32	s0, s1, s2
++[^>]*> ee21 0b02 	vmullt.f64	d0, d1, d2
++#...
+diff --git a/gas/testsuite/gas/arm/mve-scalar-vmul-it.s b/gas/testsuite/gas/arm/mve-scalar-vmul-it.s
+new file mode 100644
+index 0000000000..e6c24acdfc
+--- /dev/null
++++ b/gas/testsuite/gas/arm/mve-scalar-vmul-it.s
+@@ -0,0 +1,5 @@
++.syntax unified
++.text
++itt lt
++vmullt.f32 s0, s1, s2
++vmullt.f64 d0, d1, d2
+
+commit 3b87b29a68658d7b8a3c08e7398ee2093a462c48
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Fri May 8 00:00:31 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 2ea547ed18..3ab55f8026 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200507
++#define BFD_VERSION_DATE 20200508
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 7969021e689695d1ea77800829b52bec04540b0c
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sat May 9 00:00:25 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 3ab55f8026..dc9ed2cff3 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200508
++#define BFD_VERSION_DATE 20200509
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit b07f13754fda091a81bce6b2f243633efd7d0259
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sun May 10 00:00:30 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index dc9ed2cff3..b62450116c 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200509
++#define BFD_VERSION_DATE 20200510
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit ed174d7542d25a70648b226851dc7f8329ce2916
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Mon May 11 00:00:27 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index b62450116c..d50a487a4e 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200510
++#define BFD_VERSION_DATE 20200511
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 79e3300aacafd72300c3b9d05509ebf70e78b699
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Tue May 12 00:00:31 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index d50a487a4e..fb7214839f 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200511
++#define BFD_VERSION_DATE 20200512
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 314750d92e2482e27880910e2ac47d52c4f1bdd4
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Wed May 13 00:00:39 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index fb7214839f..238677142f 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200512
++#define BFD_VERSION_DATE 20200513
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 9d67d950a5927dc61fa71fedfbb211ff1bfd7b95
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Thu May 14 00:00:32 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 238677142f..5934196f40 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200513
++#define BFD_VERSION_DATE 20200514
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 68823a856b585d44b4fbd57d049d3afd5977f4a1
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Fri May 15 00:00:18 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 5934196f40..a4a1e59cce 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200514
++#define BFD_VERSION_DATE 20200515
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
