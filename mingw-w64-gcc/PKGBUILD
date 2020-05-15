@@ -64,8 +64,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         010-documentation.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch
-        gcc-10.1.0-stable-branch.patch)
+        0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -149,7 +148,7 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
 # echo ${pkgver} > gcc/BASE-VER
- 
+
   ln -s ../isl-${_islver} isl
 }
 
@@ -194,20 +193,6 @@ build() {
 #  export CFLAGS="-march=haswell -g1 -O2"
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O3 -fno-stack-protector"
-#  export CXXFLAGS="-march=haswell -g1 -O3"
-#  export CFLAGS_FOR_TARGET="$CFLAGS -I /mingw64/include -isystem /mingw64/include -isysroot=/mingw64/ "
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -isystem /mingw64/include"
-#  export FFLAGS_FOR_TARGET="$FFLAGS  -isystem /mingw64/include"
-#  export LDFLAGS_FOR_TARGET="$LFDLAGS -L/mingw64/lib "
-#  export AS="/mingw64/bin/as"
-#  export AR="/mingw64/bin/x86_64-w64-mingw32-gcc-ar"
-#  export RANLIB="/mingw64/bin/x86_64-w64-mingw32-gcc-ranlib"
-#  export DLLTOOL="/mingw64/bin/dlltool" 
-#  export LIBRARY_PATH=/usr/lib:/mingw64/lib
-
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
@@ -246,6 +231,7 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
+    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
