@@ -66,7 +66,13 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         0015-makedeps-properly-handle-win-paths.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
         0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
+        0140-gcc-8.2.0-diagnostic-color.patch
+        010-documentation.patch
+        openmp-vectorize-v2.patch
+        optimize.patch
+        ipa-cp.patch
+        optimize-at-least-some.patch
+        gomp-relax.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -150,6 +156,9 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
+    openmp-vectorize-v2.patch \
+    ipa-cp.patch \
+    gomp-relax.patch \
     010-documentation.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
@@ -200,8 +209,11 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
+  unset LDLAGS
   export CFLAGS="-march=haswell -g1 -O2"
   export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
