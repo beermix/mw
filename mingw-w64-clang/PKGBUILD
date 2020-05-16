@@ -24,9 +24,13 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-tools-extra"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
          "${MINGW_PACKAGE_PREFIX}-libc++"
+         "${MINGW_PACKAGE_PREFIX}-libc++abi"
+         "${MINGW_PACKAGE_PREFIX}-libunwind"
          "${MINGW_PACKAGE_PREFIX}-lld"
+         "${MINGW_PACKAGE_PREFIX}-lldb"
          "${MINGW_PACKAGE_PREFIX}-llvm"
-         "${MINGW_PACKAGE_PREFIX}-openmp")
+         "${MINGW_PACKAGE_PREFIX}-openmp"
+         "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.0
 pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
@@ -54,9 +58,14 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/openmp-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}.src.tar.xz
+        ${_url}/test-suite-${pkgver}.src.tar.xz
         ${_url}/libcxx-${pkgver}.src.tar.xz
+        ${_url}/libcxxabi-${pkgver}.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
         ${_url}/lld-${pkgver}.src.tar.xz
+        ${_url}/lldb-${pkgver}.src.tar.xz
+        ${_url}/libunwind-${pkgver}.src.tar.xz
+        ${_url}/polly-${pkgver}.src.tar.xz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -133,7 +142,9 @@ sha256sums=('df83a44b3a9a71029049ec101fb0077ecbbdf5fe41e395215025779099a98fdf'
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
 noextract=(clang-${pkgver}.src.tar.xz
-           libcxx-${pkgver}.src.tar.xz)
+           libcxx-${pkgver}.src.tar.xz
+           lldb-${pkgver}.src.tar.xz
+           test-suite-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -152,9 +163,9 @@ prepare() {
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
   [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
-#  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-#  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
-#  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
+  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
@@ -179,17 +190,17 @@ prepare() {
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch"
 
-#  cd "${srcdir}/lldb-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0501-mingw-w64-provides-vasprintf.patch" \
-#      "0502-Add-missing-declarations-for-linking-to-psapi.patch" \
-#      "0503-lldb-find-mingw-python.patch" \
-#      "0504-fix-lldb-library-name-mingw.patch" \
+  cd "${srcdir}/lldb-${pkgver}.src"
+  apply_patch_with_msg \
+      "0501-mingw-w64-provides-vasprintf.patch" \
+      "0502-Add-missing-declarations-for-linking-to-psapi.patch" \
+      "0503-lldb-find-mingw-python.patch" \
+      "0504-fix-lldb-library-name-mingw.patch" \
 
-#  cd "${srcdir}/polly-${pkgver}.src"
-#  # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
-#  apply_patch_with_msg \
-#      "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
+  cd "${srcdir}/polly-${pkgver}.src"
+  # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
+  apply_patch_with_msg \
+      "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
 
   cd "${srcdir}/openmp-${pkgver}.src"
   apply_patch_with_msg \
@@ -205,8 +216,14 @@ prepare() {
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
   mv "${srcdir}/lld-${pkgver}.src"               tools/lld
+  mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
+  mv "${srcdir}/polly-${pkgver}.src"             tools/polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
+  mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
+  mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
+  mv "${srcdir}/libunwind-${pkgver}.src"         projects/libunwind
   mv "${srcdir}/openmp-${pkgver}.src"            projects/openmp
+  #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
 }
 
 build() {
@@ -237,7 +254,7 @@ build() {
     export CC='clang'
     export CXX='clang++'
   fi
-
+  
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
@@ -253,7 +270,7 @@ build() {
     -DLLVM_CCACHE_BUILD=OFF \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS -D_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_GNU_SOURCE -D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS -D_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
@@ -263,8 +280,13 @@ build() {
     -DLIBCXX_ENABLE_SHARED=OFF \
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON \
     -DLIBCXX_HAS_WIN32_THREAD_API=ON \
+    -DLIBCXXABI_ENABLE_SHARED=OFF \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
+    -DLIBUNWIND_ENABLE_SHARED=ON \
+    -DLLDB_ENABLE_LIBEDIT=OFF \
+    -DLLDB_RELOCATABLE_PYTHON=ON \
+    -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_FFI=ON \
@@ -272,6 +294,7 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
+    -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
@@ -285,7 +308,7 @@ build() {
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
   #
-#  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
+  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
   sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
 # sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
@@ -379,12 +402,44 @@ package_libcxxabi() {
   ${_make_cmd} -C ../build-${CARCH}/projects/libcxxabi -j1 DESTDIR="${pkgdir}" install
 }
 
+package_libunwind() {
+  pkgdesc='A new implementation of a stack unwinder for C++ exceptions (mingw-w64)'
+  url='https://llvm.org/'
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+  ${_make_cmd} -C ../build-${CARCH}/projects/libunwind -j1 DESTDIR="${pkgdir}" install
+
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
+  install "${srcdir}/build-${CARCH}/lib/libunwind.dll" "${pkgdir}${MINGW_PREFIX}/bin/libunwind.dll"
+}
+
 package_lld() {
   pkgdesc="Linker tools for LLVM (mingw-w64)"
   url="https://lld.llvm.org/"
 
   cd "${srcdir}/llvm-${pkgver}.src"
   ${_make_cmd} -C ../build-${CARCH}/tools/lld -j1 DESTDIR="${pkgdir}" install
+}
+
+package_lldb() {
+  pkgdesc="Next generation, high-performance debugger (mingw-w64)"
+  url="https://lldb.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-libxml2"
+           "${MINGW_PACKAGE_PREFIX}-llvm"
+           "${MINGW_PACKAGE_PREFIX}-python"
+           "${MINGW_PACKAGE_PREFIX}-readline"
+           "${MINGW_PACKAGE_PREFIX}-swig")
+
+  cd "${srcdir}/llvm-${pkgver}.src"
+
+  ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
+
+  # Compile Python scripts
+   local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
+  ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+  ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+
+  install -Dm644 tools/lldb/LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -413,6 +468,21 @@ package_llvm() {
   sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
 }
 
+package_polly() {
+  pkgdesc="Polly - Polyhedral optimizations for LLVM (mingw-w64)"
+  url="https://polly.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
+
+  cd "${srcdir}"/llvm-${pkgver}.src
+  ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
+  # fox cmake files.
+  local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
+  local SRC_WIN=$(cygpath -wm ${srcdir})
+  sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}/|g" \
+    -e "s|${SRC_WIN}/build-${CARCH}/lib|${MINGW_PREFIX}/lib|g" \
+    -i "${pkgdir}/${MINGW_PREFIX}/lib/cmake/polly/PollyConfig.cmake"
+}
+
 # Wrappers
 package_mingw-w64-i686-clang(){
   package_clang
@@ -430,6 +500,10 @@ package_mingw-w64-i686-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-i686-libc++abi(){
+  package_libcxxabi
+}
+
 package_mingw-w64-i686-libc++(){
   package_libcxx
 }
@@ -442,9 +516,20 @@ package_mingw-w64-i686-lld(){
   package_lld
 }
 
+package_mingw-w64-i686-lldb(){
+  package_lldb
+}
+
+package_mingw-w64-i686-libunwind(){
+  package_libunwind
+}
 
 package_mingw-w64-i686-llvm(){
   package_llvm
+}
+
+package_mingw-w64-i686-polly(){
+  package_polly
 }
 
 package_mingw-w64-x86_64-clang(){
@@ -463,6 +548,10 @@ package_mingw-w64-x86_64-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-x86_64-libc++abi(){
+  package_libcxxabi
+}
+
 package_mingw-w64-x86_64-libc++(){
   package_libcxx
 }
@@ -476,6 +565,18 @@ package_mingw-w64-x86_64-lld(){
   package_lld
 }
 
+package_mingw-w64-x86_64-lldb(){
+  package_lldb
+}
+
+package_mingw-w64-x86_64-libunwind(){
+  package_libunwind
+}
+
 package_mingw-w64-x86_64-llvm(){
   package_llvm
+}
+
+package_mingw-w64-x86_64-polly(){
+  package_polly
 }
