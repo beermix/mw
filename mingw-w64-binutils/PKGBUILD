@@ -112,6 +112,7 @@ build() {
     --enable-plugins \
     --enable-gold \
     --enable-targets=x86_64-*-mingw64 \
+    --with-system-zlib \
     --enable-silent-rules \
     --disable-shared
 
