@@ -5,7 +5,7 @@
 _realname=go
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.13.7
+pkgver=1.14.3
 pkgrel=1
 pkgdesc="Go Lang (mingw-w64)"
 arch=('any')
@@ -17,9 +17,8 @@ depends=()
 options=('!strip')
 source=("https://fossies.org/linux/misc/go${pkgver}.src.tar.gz"
         0010-go1.7-proper-go-binary-path.patch
-        default-buildmode-pie.patch
         0011-add-GO_BUILD_VERBOSE.patch)
-sha256sums=('81f154e69544b9fa92b1475ff5f11e64270260d46e7e36c34aafc8bc96209358'
+sha256sums=('98de84e69726a66da7b4e58eac41b99cbe274d7e8906eeb8a5b7eb0aadee7f7c'
             'af2c10300635ac84e6d870cb40a6481ccb57487fb7a6efad781f20088bec4de8'
             'c7f9a39a4b29668276d5836d2c1e1d5c8017c6dd66b976f519e9f5e85383ab85')
 noextract=(go${pkgver}.src.tar.gz)
@@ -39,8 +38,8 @@ prepare() {
   tar -xzf ${srcdir}/go${pkgver}.src.tar.gz -C ${srcdir} || true
   mv "${srcdir}"/${_realname} "${srcdir}"/${_realname}-${pkgver}
 
-  cd "${srcdir}/${_realname}-${pkgver}"
-  apply_patch_with_msg default-buildmode-pie.patch
+  #cd "${srcdir}/${_realname}-${pkgver}"
+  #apply_patch_with_msg default-buildmode-pie.patch
 }
 
 build() {
@@ -60,9 +59,9 @@ build() {
   # about what went wrong.
 
   rm -f /tmp/bootstrap_go.bat
- # echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $MINGW_PREFIX/lib/go)"     > /tmp/bootstrap_go.bat
+  echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $HOME/go)"     > /tmp/bootstrap_go.bat
   echo "cd $(cygpath -w $PWD)"                                      >> /tmp/bootstrap_go.bat
-  echo "start /wait \"\" cmd.exe /c .\\make.bat -v"                    >> /tmp/bootstrap_go.bat
+  echo "start /wait \"\" cmd.exe /c .\\make.bat"                    >> /tmp/bootstrap_go.bat
   /tmp/bootstrap_go.bat
 
   # ./make.bat
