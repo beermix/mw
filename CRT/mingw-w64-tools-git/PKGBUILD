@@ -56,5 +56,8 @@ package() {
     plain "Installing ${cur} ..."
     cd ${srcdir}/${MINGW_CHOST}-${cur}
     make DESTDIR=${pkgdir} install
+    if [[ -f "${srcdir}/mingw-w64/mingw-w64-tools/${cur}"/COPYING ]]; then
+      install -Dm644 ${srcdir}/mingw-w64/mingw-w64-tools/${cur}/COPYING ${pkgdir}${MINGW_PREFIX}/share/licenses/mingw-w64-tools/COPYING.${cur}
+    fi
   done
 }
