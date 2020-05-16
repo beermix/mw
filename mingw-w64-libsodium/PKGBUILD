@@ -28,7 +28,6 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --enable-minimal \
     --with-pthreads \
     --disable-ssp \
     --enable-shared \
