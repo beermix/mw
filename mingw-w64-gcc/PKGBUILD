@@ -238,6 +238,7 @@ build() {
     --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
@@ -253,7 +254,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make V=1 all
+  /home/User/.go/bin/noti nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
