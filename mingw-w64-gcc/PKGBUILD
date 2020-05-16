@@ -145,9 +145,8 @@ prepare() {
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    gomp-relax.patch
-
-#     010-documentation.patch \
+    gomp-relax.patch \
+    010-documentation.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
