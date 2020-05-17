@@ -172,7 +172,7 @@ prepare() {
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
-  ln -s ../isl-${_islver} isl
+#  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -234,8 +234,7 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=yes \
-    --disable-isl-version-check \
+    --enable-libstdcxx-filesystem-ts=no \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -245,15 +244,16 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --enable-plugin \
+    --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --disable-libunwind-exceptions \
     --disable-vtable-verify \
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --without-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
