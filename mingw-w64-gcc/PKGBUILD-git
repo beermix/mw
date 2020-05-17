@@ -9,7 +9,7 @@ _enable_ada=no
 _enable_objc=no
 _realname=gcc
 _sourcedir=${_realname}-git
-pkgbase=mingw-w64-${_realname}-git
+pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-libs"
          $([[ "$_enable_fortran" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-libgfortran")
@@ -265,7 +265,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n 19 make V=1 all
+  /home/User/.go/bin/noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
