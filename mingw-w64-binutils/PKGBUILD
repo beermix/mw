@@ -70,8 +70,8 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
-  patch -p1 -i "${srcdir}"/000-branch-updates.patch
-  patch -p1 -i "${srcdir}"/001-branch-version.patch
+ # patch -p1 -i "${srcdir}"/000-branch-updates.patch
+ # patch -p1 -i "${srcdir}"/001-branch-version.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
