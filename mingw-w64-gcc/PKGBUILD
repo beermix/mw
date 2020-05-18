@@ -141,11 +141,6 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    openmp-vectorize-v2.patch \
-    optimize.patch \
-    ipa-cp.patch \
-    optimize-at-least-some.patch \
-    gomp-relax.patch \
     010-documentation.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
