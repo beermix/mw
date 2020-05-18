@@ -156,9 +156,6 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    openmp-vectorize-v2.patch \
-    ipa-cp.patch \
-    gomp-relax.patch \
     010-documentation.patch
 
   # do not expect ${prefix}/mingw symlink - this should be superceded by
@@ -172,7 +169,7 @@ prepare() {
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -230,11 +227,13 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     --disable-libstdcxx-debug \
-    --enable-libstdcxx-filesystem-ts=no \
+    --enable-libstdcxx-filesystem-ts=yes \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -252,14 +251,12 @@ build() {
     --with-diagnostics-color=always \
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
-
   # While we're debugging -fopenmp problems at least.
-  # .. we may as well not strip anything.
+  # .. we may as well not strip anything.     --with-isl
   if check_option "strip" "n"; then
     sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
