@@ -30,7 +30,7 @@ build() {
     --target=${MINGW_CHOST} \
     --with-pthreads \
     --disable-ssp \
-    --enable-shared \
+    --disable-shared \
     --enable-static
 
   make
