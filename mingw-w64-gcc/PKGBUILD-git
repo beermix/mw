@@ -207,8 +207,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -O2"
-  export CXXFLAGS="-march=haswell -O2"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
