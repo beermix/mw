@@ -4,7 +4,7 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: wirx6 <wirx654@gmail.com>
 
-_enable_fortran=yes
+_enable_fortran=no
 _enable_ada=no
 _enable_objc=no
 _realname=gcc
@@ -207,8 +207,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -O2"
+  export CXXFLAGS="-march=haswell -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -246,10 +246,8 @@ build() {
     --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libunwind-exceptions \
     --disable-vtable-verify \
     --with-diagnostics-color=always \
-    --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
@@ -262,7 +260,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n 19 make all
+  /home/User/.go/bin/noti nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
