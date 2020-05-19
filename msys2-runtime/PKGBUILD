@@ -1,0 +1,221 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Ray Donnelly <mingw.android@gmail.com>
+
+pkgbase=msys2-runtime
+pkgname=('msys2-runtime' 'msys2-runtime-devel')
+pkgver=3.1.4
+pkgrel=2
+pkgdesc="Cygwin POSIX emulation engine"
+arch=('i686' 'x86_64')
+url="https://www.cygwin.com/"
+license=('GPL')
+groups=('base')
+makedepends=('cocom'
+             'git'
+             'perl'
+             'gcc'
+             'make'
+             'mingw-w64-cross-crt-git'
+             'mingw-w64-cross-gcc'
+             'mingw-w64-cross-zlib'
+             'zlib-devel'
+             'gettext-devel'
+             'libiconv-devel'
+             'diffutils')
+# options=('debug' '!strip')
+source=('msys2-runtime'::git://sourceware.org/git/newlib-cygwin.git#tag=cygwin-${pkgver//./_}-release
+        0001-Add-MSYS2-triplet.patch
+        0002-Rename-dll-from-cygwin-to-msys.patch
+        0003-Add-functionality-for-converting-UNIX-paths-in-argum.patch
+        0004-Add-functionality-for-changing-OS-name-via-MSYSTEM-e.patch
+        0005-Move-root-to-usr.-Change-sorting-mount-points.-By-de.patch
+        0006-Do-not-create-cygwin-symlinks.-Instead-use-deep-copy.patch
+        0007-Automatically-rewrite-TERM-msys-to-TERM-cygwin-With-.patch
+        0008-Do-not-convert-environment-for-strace.patch
+        0009-Special-case-for-converting-root-directory-to-have-t.patch
+        0010-dcrt0.cc-Untangle-allow_glob-from-winshell.patch
+        0011-dcrt0.cc-globify-Don-t-quote-literal-strings-differe.patch
+        0012-strace.cc-Don-t-set-MSYS-noglob.patch
+        0013-Add-debugging-for-build_argv.patch
+        0014-Add-debugging-for-strace-make_command_line.patch
+        0015-environ.cc-New-facility-environment-variable-MSYS2_E.patch
+        0016-Fix-native-symbolic-link-spawn-passing-wrong-arg0.patch
+        0017-QueryUnbiasedInterruptTime-must-be-load-from-kernel3.patch
+        0018-fixup-Do-not-create-cygwin-symlinks.-Instead-use-dee.patch
+        0019-strace-quiet-be-really-quiet.patch
+        0020-Work-around-backward-incompatible-bfd_-changes.patch
+        0021-setup_pseudoconsole-handle-missing-incorrect-helper-.patch
+        0022-Default-to-disable_pcon.patch
+        0023-Introduce-the-enable_pcon-value-for-MSYS.patch)
+sha256sums=('SKIP'
+            'f05c08ef2b6647a2f66c63bda5e077f1443cad7cd0edabfcf8d752021bc9aea6'
+            '0dccf2f4c949b0b12d4460b085334678eda37e957f4829c3b59e98499b4f55d8'
+            'eab0333a201436f79996283260b58dcc2267bad4b7500f2d45d4a35772284195'
+            'f106ded5f17931afb72fc3b24f86b99ca81a2f4d70ae74e356e6d749d4d51a03'
+            'b9a61d14b2d7965f513f26cda7fc62d931af332388921ed6de5f4e626bdab6fa'
+            'c0c1b55cb84cf93fef757ae04c5d142bd871fd9b47b0565e7967c1f94ba64ef6'
+            '9562520215825b6aa8b8ea80ac578dc796cd5a21ad7b0ccad9b5018b92b6ca05'
+            '7e0ebf8797f5ea77ffcd8be89680122f65af85e0186aeeb624aa295c2a66886b'
+            '9ade2875b1cad19cb452ca94b9abd544be5008a9cad40101a51acc31a4059cc0'
+            '4f87ad3c0ab97d86ec6c5a3c8524a91f33d130c3831a7115a36b8b40f21463da'
+            'eb81165f0417d7760f1c4c18283241bcf074219d65cca2d3baf532e8c664e569'
+            '76190025a7b67b043c1aa8039d07c73ae98624d8eeabeea85edf5f292b3c8787'
+            '3edb4eeeafc1a3ad14c5a6f506371ddf455a0f691310695a97e813d69af70d8e'
+            '3c82587af9feb673b9290a6e85a784f93cf74a85acd5d4c1aa40da5da58d146f'
+            'e81c59bde16b9f063477795feef72641b2888929fa3095548c06404032341a48'
+            '16c6300aa283a7db894cd95e1973be2fbe6c06afeadc6fe49dc4a932cab77880'
+            'e96a3ac2f57418c37dab0ce20f43a9e39c5c3a6cb729e20c000115955e901519'
+            '84ddcb863ed12afafddea4693a66aa7a923742f02342316212b682c09c92376c'
+            'f5130841a101816fe4e45ff54e34aeead0568389d0833c4e4cc968af64a9c736'
+            'a8c26f752f635d33668eeb0f3b9694d2d30e8a92603f290c17bba4b91f654b6b'
+            '95903731da28f48f14b65e66d0855950a2a2cf67953007b0aee40b83c1ce3944'
+            '3cedd2577d450f3c0e9938079fb794bb72d4ab1e3787133d882c0004727bafb2'
+            'b6e94eebe4491fb1076b7f56793dc34ee678b63a5f0a112bd4c6a2e434d8b729')
+
+# Helper macros to help make tasks easier #
+apply_patch_with_msg() {
+  for _patch in "$@"
+  do
+    msg2 "Applying $_patch"
+    patch -Nbp1 -i "${srcdir}/${_patch}"
+  done
+}
+
+apply_git_am_with_msg() {
+  for _patch in "$@"
+  do
+    msg2 "Applying $_patch"
+    git am --committer-date-is-author-date "${srcdir}/${_patch}"
+  done
+}
+
+del_file_exists() {
+  for _fname in "$@"
+  do
+    if [ -f $_fname ]; then
+      rm -rf $_fname
+    fi
+  done
+}
+# =========================================== #
+
+prepare() {
+  cd "${srcdir}"/msys2-runtime
+  if test true != "$(git config core.symlinks)"
+  then
+    git config core.symlinks true &&
+    /usr/bin/git reset --hard
+  fi
+  del_file_exists winsup/cygwin/msys2_path_conv.cc \
+    winsup/cygwin/msys2_path_conv.h
+ apply_git_am_with_msg 0001-Add-MSYS2-triplet.patch \
+  0002-Rename-dll-from-cygwin-to-msys.patch \
+  0003-Add-functionality-for-converting-UNIX-paths-in-argum.patch \
+  0004-Add-functionality-for-changing-OS-name-via-MSYSTEM-e.patch \
+  0005-Move-root-to-usr.-Change-sorting-mount-points.-By-de.patch \
+  0006-Do-not-create-cygwin-symlinks.-Instead-use-deep-copy.patch \
+  0007-Automatically-rewrite-TERM-msys-to-TERM-cygwin-With-.patch \
+  0008-Do-not-convert-environment-for-strace.patch \
+  0009-Special-case-for-converting-root-directory-to-have-t.patch \
+  0010-dcrt0.cc-Untangle-allow_glob-from-winshell.patch \
+  0011-dcrt0.cc-globify-Don-t-quote-literal-strings-differe.patch \
+  0012-strace.cc-Don-t-set-MSYS-noglob.patch \
+  0013-Add-debugging-for-build_argv.patch \
+  0014-Add-debugging-for-strace-make_command_line.patch \
+  0015-environ.cc-New-facility-environment-variable-MSYS2_E.patch \
+  0016-Fix-native-symbolic-link-spawn-passing-wrong-arg0.patch \
+  0017-QueryUnbiasedInterruptTime-must-be-load-from-kernel3.patch \
+  0018-fixup-Do-not-create-cygwin-symlinks.-Instead-use-dee.patch \
+  0019-strace-quiet-be-really-quiet.patch \
+  0020-Work-around-backward-incompatible-bfd_-changes.patch \
+  0021-setup_pseudoconsole-handle-missing-incorrect-helper-.patch \
+  0022-Default-to-disable_pcon.patch \
+  0023-Introduce-the-enable_pcon-value-for-MSYS.patch
+}
+
+build() {
+  [[ -d "${srcdir}"/build-${CHOST} ]] && rm -rf "${srcdir}"/build-${CHOST}
+  mkdir -p "${srcdir}"/build-${CHOST} && cd "${srcdir}"/build-${CHOST}
+
+  # Gives more verbose compile output when debugging.
+  local -a extra_config
+
+    OPTIM="-march=haswell -O2"
+
+
+  CFLAGS="$OPTIM -pipe -g0 -Wno-error=deprecated -Wno-error=stringop-truncation -Wno-error=missing-attributes -Wno-error=maybe-uninitialized" #-Wno-error=class-memaccess
+  CXXFLAGS="$OPTIM -pipe -g0 -Wno-error=deprecated -Wno-error=stringop-truncation -Wno-error=missing-attributes -Wno-error=maybe-uninitialized" #-Wno-error=class-memaccess
+
+  "${srcdir}"/msys2-runtime/configure \
+    --prefix=/usr \
+    --build=${CHOST} \
+    --sysconfdir=/etc \
+    "${extra_config[@]}"
+  LC_ALL=C make
+  LC_ALL=C make -j1 DESTDIR="${srcdir}"/dest install
+
+  #pushd ${CHOST}/winsup/cygwin > /dev/null
+  #LANG=C make libmsys2_s.a
+  #cp libmsys2_s.a "${srcdir}"/dest/usr/${CHOST}/lib/
+  #popd > /dev/null
+
+  rm -rf "${srcdir}"/dest/etc
+}
+
+package_msys2-runtime() {
+  pkgdesc="Posix emulation engine for Windows"
+  groups=('base')
+  options=('!strip')
+  conflicts=('catgets' 'libcatgets')
+  replaces=('catgets' 'libcatgets')
+  #install=msys2-runtime.install
+
+  mkdir -p "${pkgdir}"/usr
+  cp -rf "${srcdir}"/dest/usr/bin "${pkgdir}"/usr/
+  rm -f "${pkgdir}"/usr/bin/msys-2.0.dbg
+  rm -f "${pkgdir}"/usr/bin/cyglsa-config
+  rm -f "${pkgdir}"/usr/bin/cyglsa.dll
+  rm -f "${pkgdir}"/usr/bin/cyglsa64.dll
+  rm -f "${pkgdir}"/usr/bin/cygserver-config
+  cp -rf "${srcdir}"/dest/usr/share "${pkgdir}"/usr/
+}
+
+package_msys2-runtime-devel() {
+  pkgdesc="MSYS2 headers and libraries"
+  groups=('msys2-devel')
+  depends=("msys2-runtime=${pkgver}")
+  options=('staticlibs' '!strip')
+  conflicts=('libcatgets-devel')
+  replaces=('libcatgets-devel')
+
+  mkdir -p "${pkgdir}"/usr/bin
+  cp -f "${srcdir}"/dest/usr/bin/msys-2.0.dbg "${pkgdir}"/usr/bin/
+  cp -rLf "${srcdir}"/dest/usr/${CHOST}/include "${pkgdir}"/usr/
+  rm -f "${pkgdir}"/usr/include/iconv.h
+  rm -f "${pkgdir}"/usr/include/unctrl.h
+  # provided by libtirpc
+  rm -fr "${pkgdir}"/usr/include/rpc/
+
+  cp -rLf "${srcdir}"/dest/usr/${CHOST}/lib "${pkgdir}"/usr/
+}
+
+# return 0
+# To hack on this:
+# cd /c/repo-MSYS2/msys2-runtime/
+# pushd src/build-i686-pc-msys
+# LANG=C make && make -j1 DESTDIR=/c/repo-MSYS2/msys2-runtime/src/dest install
+# popd
+# makepkg -sRLf
+# pacman -U msys2-runtime*.xz
+
+# Quicker:
+# open cmd.exe
+# set "PATH=C:\\msys32\\usr\\bin;%PATH%"
+# E:
+# pushd E:\m2\repo-MSYS2\msys2-runtime\src\build-i686-pc-msys\i686-pc-msys\winsup\cygwin
+# C:/msys32/usr/bin/bash -c "LANG=C && make"
+# copy /y new-msys-2.0.dll C:\msys32\usr\bin\msys-2.0.dll
+# popd
+# C:
+# C:/msys32/usr/bin/strace ls / > C:/strace.txt 2>&1
+#
