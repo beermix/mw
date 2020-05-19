@@ -1,41 +1,50 @@
-# Maintainer: Lukas Fleischer <lfleischer@archlinux.org>
-# Contributor: Allan McRae <allan@archlinux.org>
-# Contributor: judd <jvinet@zeroflux.org>
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Ray Donnelly <mingw.android@gmail.com>
 
 pkgname=make
 pkgver=4.3
-pkgrel=10
+pkgrel=2
 pkgdesc="GNU make utility to maintain groups of programs"
-arch=('x86_64')
+arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/make"
 license=('GPL3')
 groups=('base-devel')
-depends=('glibc' 'guile')
-source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.lz"{,.sig}
-		make-git.patch)
-md5sums=('d5c40e7bd1e97a7404f5d3be982f479a'
-         'SKIP')
-validpgpkeys=('6D4EEB02AD834703510B117680CB727A20C79BB2')   # Paul Smith
+depends=('msys2-runtime' 'libintl' 'sh')
+makedepends=('gettext' 'msys2-runtime-devel' 'procps')
+install=${pkgname}.install
+options=() # 'debug' '!strip')
+source=("https://ftp.gnu.org/gnu/make/${pkgname}-${pkgver}.tar.gz"
+	make-git.patch)
+sha256sums=('e05fdde47c5f7ca45cb697e973894ff4f5d79e13b750ed57d7b66d8defc78e19'
+            'SKIP')
+validpgpkeys=('6D4EEB02AD834703510B117680CB727A20C79BB2')  # Paul D. Smith <psmith@gnu.org>
+
 
 prepare() {
-	cd "${pkgname}-${pkgver}"
-	patch -p1 -i "${srcdir}"/make-git.patch
-
-	#autoreconf -vfi
+  cd ${srcdir}/${pkgname}-${pkgver}
+  patch -p1 -i "${srcdir}"/make-git.patch
+  #autoreconf -fi
 }
 
 build() {
-	cd "${pkgname}-${pkgver}"
-	./configure --prefix=/usr
-	make
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure \
+    --build=${CHOST} \
+    --prefix=/usr \
+    --without-libintl-prefix \
+    --without-libiconv-prefix \
+    --without-guile \
+    ac_cv_dos_paths=yes
+
+  make -j1 all
 }
 
 check() {
-	cd "${pkgname}-${pkgver}"
-	make -k check
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make check
 }
 
 package() {
-	cd "${pkgname}-${pkgver}"
-	make DESTDIR="${pkgdir}" install
+  cd ${srcdir}/${pkgname}-${pkgver}
+  make DESTDIR=${pkgdir} install
 }
