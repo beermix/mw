@@ -17,7 +17,9 @@ depends=()
 options=('!strip')
 source=("https://fossies.org/linux/misc/go${pkgver}.src.tar.gz"
         0010-go1.7-proper-go-binary-path.patch
-        0011-add-GO_BUILD_VERBOSE.patch)
+        0011-add-GO_BUILD_VERBOSE.patch
+        0004-nontq.patch
+        0005-cmd-cgo-force-O0.patch)
 sha256sums=('98de84e69726a66da7b4e58eac41b99cbe274d7e8906eeb8a5b7eb0aadee7f7c'
             'af2c10300635ac84e6d870cb40a6481ccb57487fb7a6efad781f20088bec4de8'
             'c7f9a39a4b29668276d5836d2c1e1d5c8017c6dd66b976f519e9f5e85383ab85')
@@ -38,8 +40,10 @@ prepare() {
   tar -xzf ${srcdir}/go${pkgver}.src.tar.gz -C ${srcdir} || true
   mv "${srcdir}"/${_realname} "${srcdir}"/${_realname}-${pkgver}
 
-  #cd "${srcdir}/${_realname}-${pkgver}"
-  #apply_patch_with_msg default-buildmode-pie.patch
+  cd "${srcdir}/${_realname}-${pkgver}"
+  apply_patch_with_msg \
+       0004-nontq.patch \
+       0005-cmd-cgo-force-O0.patch
 }
 
 build() {
