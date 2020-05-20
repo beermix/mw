@@ -3,7 +3,7 @@
 _realname=libsodium
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=5a300d6480d73d64949835513e19bb187eadc3df
+pkgver=f057d474e2303f93cd745054e8915a33c88b4e7d
 pkgrel=1
 pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
 arch=("any")
@@ -28,8 +28,7 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-pthreads \
-    --disable-ssp \
+    --enable-minimal \
     --disable-shared \
     --enable-static
 
