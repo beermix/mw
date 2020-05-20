@@ -24,7 +24,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
-             "${MINGW_PACKAGE_PREFIX}-python"
+             "${MINGW_PACKAGE_PREFIX}-python2"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
@@ -87,7 +87,7 @@ build() {
     --enable-ninja \
     --enable-extended \
     --disable-codegen-tests \
-    --python=${MINGW_PREFIX}/bin/python \
+    --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
@@ -100,7 +100,7 @@ build() {
 check() {
   cd "${srcdir}/${CARCH}"
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test || true
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
@@ -108,7 +108,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
