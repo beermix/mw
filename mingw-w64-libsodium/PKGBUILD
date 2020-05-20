@@ -29,6 +29,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --enable-minimal \
+    --enable-opt \
     --disable-shared \
     --enable-static
 
