@@ -1,4 +1,4 @@
-# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+.# Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
 # Contributor: Mateusz Mikuła <mati865@gmail.com
 
@@ -94,7 +94,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build -j6 --verbose
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
