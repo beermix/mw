@@ -43209,3 +43209,528 @@ index 5934196f40..a4a1e59cce 100644
  #define BFD_VERSION @bfd_version@
  #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
  #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 5768460022b2928f1a5bd6d14dcc6176319a1c01
+Author: Alan Modra <amodra@gmail.com>
+Date:   Fri May 15 18:06:05 2020 +0930
+
+    Fix tight loop on recursively-defined symbols
+    
+    This patch fixes a bug in GAS where the assembler enters a tight loop
+    when attempting to resolve recursively-defined symbols, e.g. when
+    trying to assemble "a=a".
+    
+    This is a regression introduced between binutils 2.32 and 2.33,
+    by commit 1903f1385bff9
+    
+            * symbols.c (struct local_symbol): Update comment.
+            (resolve_symbol_value): For resolved symbols equated to other
+            symbols, verify that the referenced symbol is not a local_symbol
+            before accessing sy_value.  Don't leave symbol loops during
+            finalize_syms resolution.
+            * testsuite/gas/all/assign-bad-recursive.d: New test.
+            * testsuite/gas/all/assign-bad-recursive.l: Error output for test.
+            * testsuite/gas/all/assign-bad-recursive.s: Assembly for test.
+            * testsuite/gas/all/gas.exp: Run it.
+    
+    (cherry picked from commit 2a50b401465f74d7f3ee1654915b9070b4dc0fee)
+
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 901af53f54..7a623e8b86 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,16 @@
++2020-05-15  Alan Modra  <amodra@gmail.com>
++	    Alex Coplan  <alex.coplan@arm.com>
++
++	* symbols.c (struct local_symbol): Update comment.
++	(resolve_symbol_value): For resolved symbols equated to other
++	symbols, verify that the referenced symbol is not a local_symbol
++	before accessing sy_value.  Don't leave symbol loops during
++	finalize_syms resolution.
++	* testsuite/gas/all/assign-bad-recursive.d: New test.
++	* testsuite/gas/all/assign-bad-recursive.l: Error output for test.
++	* testsuite/gas/all/assign-bad-recursive.s: Assembly for test.
++	* testsuite/gas/all/gas.exp: Run it.
++
+ 2020-05-07  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+ 
+ 	Backport from mainline.
+diff --git a/gas/symbols.c b/gas/symbols.c
+index 79cdb82ba8..9bae085e68 100644
+--- a/gas/symbols.c
++++ b/gas/symbols.c
+@@ -114,7 +114,7 @@ struct symbol
+ /* A pointer in the symbol may point to either a complete symbol
+    (struct symbol above) or to a local symbol (struct local_symbol
+    defined here).  The symbol code can detect the case by examining
+-   the first field.  It is always NULL for a local symbol.
++   the first field which is present in both structs.
+ 
+    We do this because we ordinarily only need a small amount of
+    information for a local symbol.  The symbol table takes up a lot of
+@@ -1237,11 +1237,18 @@ resolve_symbol_value (symbolS *symp)
+   if (symp->sy_flags.sy_resolved)
+     {
+       final_val = 0;
+-      while (symp->sy_value.X_op == O_symbol
+-	     && symp->sy_value.X_add_symbol->sy_flags.sy_resolved)
++      while (symp->sy_value.X_op == O_symbol)
+ 	{
+ 	  final_val += symp->sy_value.X_add_number;
+ 	  symp = symp->sy_value.X_add_symbol;
++	  if (LOCAL_SYMBOL_CHECK (symp))
++	    {
++	      struct local_symbol *locsym = (struct local_symbol *) symp;
++	      final_val += locsym->lsy_value;
++	      return final_val;
++	    }
++	  if (!symp->sy_flags.sy_resolved)
++	    return 0;
+ 	}
+       if (symp->sy_value.X_op == O_constant)
+ 	final_val += symp->sy_value.X_add_number;
+@@ -1380,6 +1387,11 @@ resolve_symbol_value (symbolS *symp)
+ 	      break;
+ 	    }
+ 
++	  /* Don't leave symbol loops.  */
++	  if (finalize_syms
++	      && add_symbol->sy_flags.sy_resolving)
++	    break;
++
+ 	  if (finalize_syms && final_val == 0)
+ 	    {
+ 	      if (LOCAL_SYMBOL_CHECK (add_symbol))
+diff --git a/gas/testsuite/gas/all/assign-bad-recursive.d b/gas/testsuite/gas/all/assign-bad-recursive.d
+new file mode 100644
+index 0000000000..aeec5d55f8
+--- /dev/null
++++ b/gas/testsuite/gas/all/assign-bad-recursive.d
+@@ -0,0 +1,4 @@
++#name: bad recursive assignments
++#source: assign-bad-recursive.s
++#xfail: bfin-*-*
++#error_output: assign-bad-recursive.l
+diff --git a/gas/testsuite/gas/all/assign-bad-recursive.l b/gas/testsuite/gas/all/assign-bad-recursive.l
+new file mode 100644
+index 0000000000..70eaf0fe2e
+--- /dev/null
++++ b/gas/testsuite/gas/all/assign-bad-recursive.l
+@@ -0,0 +1,7 @@
++[^:]*: Assembler messages:
++.*: Error: symbol definition loop encountered at `aaa'
++#...
++.*: Error: symbol definition loop encountered at `iii'
++#...
++.*: Error: symbol definition loop encountered at `xxx'
++#pass
+diff --git a/gas/testsuite/gas/all/assign-bad-recursive.s b/gas/testsuite/gas/all/assign-bad-recursive.s
+new file mode 100644
+index 0000000000..21917d91ff
+--- /dev/null
++++ b/gas/testsuite/gas/all/assign-bad-recursive.s
+@@ -0,0 +1,8 @@
++ aaa = aaa
++
++ iii = jjj
++ jjj = iii
++
++ xxx = yyy
++ yyy = zzz
++ zzz = xxx
+diff --git a/gas/testsuite/gas/all/gas.exp b/gas/testsuite/gas/all/gas.exp
+index 78cd3eb3ea..93e6e79b9d 100644
+--- a/gas/testsuite/gas/all/gas.exp
++++ b/gas/testsuite/gas/all/gas.exp
+@@ -97,6 +97,7 @@ if { ![istarget "bfin-*-*"] } then {
+     gas_test "assign-ok.s" "" "" "== assignment support"
+ }
+ gas_test_error "assign-bad.s" "" "== assignment for symbol already set"
++run_dump_test assign-bad-recursive
+ 
+ run_dump_test simple-forward
+ run_dump_test forward
+
+commit f61ef3f92ed9c7676cd881266329a34affcf5697
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sat May 16 00:00:25 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index a4a1e59cce..810a82ef25 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200515
++#define BFD_VERSION_DATE 20200516
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit a7eb87ef0e83a88dea4388370026b84cfe1d15d2
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sun May 17 00:00:26 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 810a82ef25..08a6344a4d 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200516
++#define BFD_VERSION_DATE 20200517
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit e2f43708cc6b7afaf402a58c6cf64614558b1cfe
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Mon May 18 00:00:28 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 08a6344a4d..9abdcc4efa 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200517
++#define BFD_VERSION_DATE 20200518
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 8524bb5bd28a9275ea38eaf3187badd13d15f5f2
+Author: Alan Modra <amodra@gmail.com>
+Date:   Mon May 18 13:30:59 2020 +0930
+
+    Re: Fix tight loop on recursively-defined symbols
+    
+    sy_resolving ought to not be set for a struct local_symbol, but it is
+    apparent from local_symbol_make that the field is not initialised.
+    
+            * symbols.c (resolve_symbol_value): Invoke LOCAL_SYMBOL_CHECK
+            before looking at add_symbol->sy_flags.sy_resolving.
+    
+    (cherry picked from commit d402189f2faa0aaa9fb8ad4669fdf0059946cd8a)
+
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 7a623e8b86..0ee9056472 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-18  Alan Modra  <amodra@gmail.com>
++
++	* symbols.c (resolve_symbol_value): Invoke LOCAL_SYMBOL_CHECK
++	before looking at add_symbol->sy_flags.
++
+ 2020-05-15  Alan Modra  <amodra@gmail.com>
+ 	    Alex Coplan  <alex.coplan@arm.com>
+ 
+diff --git a/gas/symbols.c b/gas/symbols.c
+index 9bae085e68..acdab3f5e0 100644
+--- a/gas/symbols.c
++++ b/gas/symbols.c
+@@ -1389,6 +1389,7 @@ resolve_symbol_value (symbolS *symp)
+ 
+ 	  /* Don't leave symbol loops.  */
+ 	  if (finalize_syms
++	      && !LOCAL_SYMBOL_CHECK (add_symbol)
+ 	      && add_symbol->sy_flags.sy_resolving)
+ 	    break;
+ 
+
+commit c5eaaf2cd937edbea5c7ce41f77ccb794232f7c0
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Tue May 19 00:00:35 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 9abdcc4efa..3592187782 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200518
++#define BFD_VERSION_DATE 20200519
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 937dbd7b4d63ca10dc61af1b8f029c6df05b6ea5
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Wed May 20 00:00:35 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 3592187782..4341150097 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200519
++#define BFD_VERSION_DATE 20200520
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit ef2826c0fdbbd9016630f0738e3e2dd5eb14012a
+Author: Alexander Fedotov <alfedotov@gmail.com>
+Date:   Wed May 20 11:46:54 2020 +0100
+
+    Fix the ARM assembler to generate a Realtime profile for armv8-r.
+    
+                PR 25992
+        gas     * config/tc-arm.c : Add arm_ext_v8r feature.
+                (it_fsm_post_encode): Check arm_ext_v8r feature.
+                (get_aeabi_cpu_arch_from_fset): Check arm_ext_v8r feature.
+    
+        include * opcode/arm.h (ARM_EXT2_V8R): Define. Modified ARM_AEXT2_V8R.
+
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 0ee9056472..13ff6add65 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,10 @@
++2020-05-18  Alexander Fedotov <alfedotov@gmail.com>
++
++	PR 25992
++	* config/tc-arm.c : Add arm_ext_v8r feature.
++	(it_fsm_post_encode): Check arm_ext_v8r feature.
++	(get_aeabi_cpu_arch_from_fset): Check arm_ext_v8r feature.
++
+ 2020-05-18  Alan Modra  <amodra@gmail.com>
+ 
+ 	* symbols.c (resolve_symbol_value): Invoke LOCAL_SYMBOL_CHECK
+diff --git a/gas/config/tc-arm.c b/gas/config/tc-arm.c
+index 7550f9096c..b6bb0debbe 100644
+--- a/gas/config/tc-arm.c
++++ b/gas/config/tc-arm.c
+@@ -230,6 +230,7 @@ static const arm_feature_set arm_ext_div = ARM_FEATURE_CORE_LOW (ARM_EXT_DIV);
+ static const arm_feature_set arm_ext_v7 = ARM_FEATURE_CORE_LOW (ARM_EXT_V7);
+ static const arm_feature_set arm_ext_v7a = ARM_FEATURE_CORE_LOW (ARM_EXT_V7A);
+ static const arm_feature_set arm_ext_v7r = ARM_FEATURE_CORE_LOW (ARM_EXT_V7R);
++static const arm_feature_set arm_ext_v8r = ARM_FEATURE_CORE_HIGH (ARM_EXT2_V8R);
+ #ifdef OBJ_ELF
+ static const arm_feature_set ATTRIBUTE_UNUSED arm_ext_v7m = ARM_FEATURE_CORE_LOW (ARM_EXT_V7M);
+ #endif
+@@ -22800,7 +22801,8 @@ it_fsm_post_encode (void)
+       && warn_on_restrict_it
+       && !now_pred.warn_deprecated
+       && warn_on_deprecated
+-      && ARM_CPU_HAS_FEATURE (cpu_variant, arm_ext_v8)
++      && (ARM_CPU_HAS_FEATURE (cpu_variant, arm_ext_v8)
++          || ARM_CPU_HAS_FEATURE (cpu_variant, arm_ext_v8r))
+       && !ARM_CPU_HAS_FEATURE (cpu_variant, arm_ext_m))
+     {
+       if (inst.instruction >= 0x10000)
+@@ -32335,12 +32337,14 @@ get_aeabi_cpu_arch_from_fset (const arm_feature_set *arch_ext_fset,
+ 
+ found:
+   /* Tag_CPU_arch_profile.  */
+-  if (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v7a)
+-      || ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8)
+-      || (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_atomics)
+-	  && !ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8m_m_only)))
++  if (!ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8r)
++      && (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v7a)
++          || ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8)
++          || (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_atomics)
++              && !ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8m_m_only))))
+     *profile = 'A';
+-  else if (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v7r))
++  else if (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v7r)
++      || ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_v8r))
+     *profile = 'R';
+   else if (ARM_CPU_HAS_FEATURE (p_ver_ret->flags, arm_ext_m))
+     *profile = 'M';
+diff --git a/gas/testsuite/gas/arm/attr-march-armv8-r+crypto.d b/gas/testsuite/gas/arm/attr-march-armv8-r+crypto.d
+index e2d83a0dbe..5bd0fc5f37 100644
+--- a/gas/testsuite/gas/arm/attr-march-armv8-r+crypto.d
++++ b/gas/testsuite/gas/arm/attr-march-armv8-r+crypto.d
+@@ -9,7 +9,7 @@ Attribute Section: aeabi
+ File Attributes
+   Tag_CPU_name: "8-R"
+   Tag_CPU_arch: v8-R
+-  Tag_CPU_arch_profile: Application
++  Tag_CPU_arch_profile: Realtime
+   Tag_ARM_ISA_use: Yes
+   Tag_THUMB_ISA_use: Thumb-2
+   Tag_FP_arch: FP for ARMv8
+diff --git a/gas/testsuite/gas/arm/attr-march-armv8-r+fp.d b/gas/testsuite/gas/arm/attr-march-armv8-r+fp.d
+index e7a8446f9d..afd5a756d0 100644
+--- a/gas/testsuite/gas/arm/attr-march-armv8-r+fp.d
++++ b/gas/testsuite/gas/arm/attr-march-armv8-r+fp.d
+@@ -9,7 +9,7 @@ Attribute Section: aeabi
+ File Attributes
+   Tag_CPU_name: "8-R"
+   Tag_CPU_arch: v8-R
+-  Tag_CPU_arch_profile: Application
++  Tag_CPU_arch_profile: Realtime
+   Tag_ARM_ISA_use: Yes
+   Tag_THUMB_ISA_use: Thumb-2
+   Tag_FP_arch: FP for ARMv8
+diff --git a/gas/testsuite/gas/arm/attr-march-armv8-r+simd.d b/gas/testsuite/gas/arm/attr-march-armv8-r+simd.d
+index e09091cb22..8c8578a78f 100644
+--- a/gas/testsuite/gas/arm/attr-march-armv8-r+simd.d
++++ b/gas/testsuite/gas/arm/attr-march-armv8-r+simd.d
+@@ -9,7 +9,7 @@ Attribute Section: aeabi
+ File Attributes
+   Tag_CPU_name: "8-R"
+   Tag_CPU_arch: v8-R
+-  Tag_CPU_arch_profile: Application
++  Tag_CPU_arch_profile: Realtime
+   Tag_ARM_ISA_use: Yes
+   Tag_THUMB_ISA_use: Thumb-2
+   Tag_FP_arch: FP for ARMv8
+diff --git a/gas/testsuite/gas/arm/attr-march-armv8-r.d b/gas/testsuite/gas/arm/attr-march-armv8-r.d
+index 820f32beea..cf4b3a51f8 100644
+--- a/gas/testsuite/gas/arm/attr-march-armv8-r.d
++++ b/gas/testsuite/gas/arm/attr-march-armv8-r.d
+@@ -9,7 +9,7 @@ Attribute Section: aeabi
+ File Attributes
+   Tag_CPU_name: "8-R"
+   Tag_CPU_arch: v8-R
+-  Tag_CPU_arch_profile: Application
++  Tag_CPU_arch_profile: Realtime
+   Tag_ARM_ISA_use: Yes
+   Tag_THUMB_ISA_use: Thumb-2
+   Tag_MPextension_use: Allowed
+diff --git a/include/ChangeLog b/include/ChangeLog
+index 2cf472a5df..7cdf7ec41c 100644
+--- a/include/ChangeLog
++++ b/include/ChangeLog
+@@ -1,3 +1,8 @@
++2020-05-20  Alexander Fedotov  <alfedotov@gmail.com>
++
++	PR 25992
++	* opcode/arm.h (ARM_EXT2_V8R): Define. Modified ARM_AEXT2_V8R.
++
+ 2020-04-01  Martin Liska  <mliska@suse.cz>
+ 	    Maciej W. Rozycki <macro@linux-mips.org>
+ 
+diff --git a/include/opcode/arm.h b/include/opcode/arm.h
+index 6d8c3d0086..ca46985d61 100644
+--- a/include/opcode/arm.h
++++ b/include/opcode/arm.h
+@@ -76,9 +76,10 @@
+ #define ARM_EXT2_V8_6A	     0x00010000	/* ARM V8.6A.			     */
+ #define ARM_EXT2_BF16	     0x00020000 /* ARMv8 bfloat16.		     */
+ #define ARM_EXT2_I8MM	     0x00040000 /* ARMv8.6A i8mm.		     */
+-#define ARM_EXT2_CRC	     0x00080000	/* ARMv8 CRC32 */
+-#define ARM_EXT2_MVE	     0x00100000	/* MVE Integer extension.	   */
+-#define ARM_EXT2_MVE_FP	     0x00200000	/* MVE Floating Point extension.   */
++#define ARM_EXT2_CRC	     0x00080000	/* ARMv8 CRC32.                      */
++#define ARM_EXT2_MVE	     0x00100000	/* MVE Integer extension.	     */
++#define ARM_EXT2_MVE_FP	     0x00200000	/* MVE Floating Point extension.     */
++#define ARM_EXT2_V8R	     0x80000000	/* ARM V8-R.	                     */
+ 
+ /* Co-processor space extensions.  */
+ #define ARM_CEXT_XSCALE	     0x00000001	/* Allow MIA etc.	 	   */
+@@ -182,7 +183,7 @@
+ #define ARM_AEXT2_V8M_MAIN	(ARM_AEXT2_V8M_BASE | ARM_EXT2_V8M_MAIN)
+ #define ARM_AEXT2_V8M_MAIN_DSP	 ARM_AEXT2_V8M_MAIN
+ #define ARM_AEXT_V8R		 ARM_AEXT_V8A
+-#define ARM_AEXT2_V8R		 ARM_AEXT2_V8AR
++#define ARM_AEXT2_V8R		 (ARM_EXT2_V8R | ARM_AEXT2_V8AR)
+ #define ARM_AEXT_V8_1M_MAIN	 ARM_AEXT_V8M_MAIN
+ #define ARM_AEXT2_V8_1M_MAIN	(ARM_AEXT2_V8M_MAIN | ARM_EXT2_V8_1M_MAIN     \
+ 						    | ARM_EXT2_FP16_INST)
+
+commit cb5f6a3e146cc70bc2d864989386df80acec5d3e
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Thu May 21 00:00:28 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 4341150097..1fe65d9785 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200520
++#define BFD_VERSION_DATE 20200521
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 5dfc0c955dbe912cd328fc2688e5fceb3239ac2a
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Fri May 22 00:00:30 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 1fe65d9785..52398152ac 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200521
++#define BFD_VERSION_DATE 20200522
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit dde9718c713b09871f50ce53460ec02e3d04b5b3
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sat May 23 00:00:32 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 52398152ac..196523072b 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200522
++#define BFD_VERSION_DATE 20200523
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 7e3237cd5bf2c084cb5d855a3aa267b28fdf4f32
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sun May 24 00:00:29 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 196523072b..84619444ea 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200523
++#define BFD_VERSION_DATE 20200524
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
