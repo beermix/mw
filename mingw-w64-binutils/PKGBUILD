@@ -68,10 +68,10 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i "${srcdir}"/nodocs.patch
+  #patch -p1 -i "${srcdir}"/nodocs.patch
 
- patch -p1 -i "${srcdir}"/000-git-binutils-2_34.patch
- patch -p1 -i "${srcdir}"/001-branch-version.patch
+  #patch -p1 -i "${srcdir}"/000-git-binutils-2_34.patch
+  #patch -p1 -i "${srcdir}"/001-branch-version.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch

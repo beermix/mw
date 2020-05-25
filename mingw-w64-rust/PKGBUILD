@@ -57,6 +57,7 @@ prepare() {
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
   patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/70163.patch"
@@ -82,24 +83,22 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
-    --enable-optimize \
     --enable-extended \
     --disable-codegen-tests \
-    --python=${MINGW_PREFIX}/bin/python2 \
+    --python=${MINGW_PREFIX}/bin/python3 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
   cd "${srcdir}/${CARCH}"
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
@@ -107,16 +106,9 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
-
-  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
