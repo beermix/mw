@@ -7,7 +7,7 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
 replaces=("${MINGW_PACKAGE_PREFIX}-${_realname}-svn")
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=8.0.0.5911.b1487f41
+pkgver=8.0.0.5903.3310d459
 pkgrel=1
 pkgdesc="MinGW-w64 tools"
 arch=('any')
@@ -44,7 +44,8 @@ build() {
     ${srcdir}/mingw-w64/mingw-w64-tools/${cur}/configure \
       --prefix=${MINGW_PREFIX} \
       --build=${MINGW_CHOST} \
-      --host=${MINGW_CHOST}
+      --host=${MINGW_CHOST} \
+      --with-mangle=${MINGW_PREFIX}
     make
   done
 }
