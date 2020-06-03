@@ -28,7 +28,6 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         1001-PR25447.patch
         0300-default-secure-pe-flags.patch
         0310-reproducible-import-libraries.patch
-        binutils-stable-branch.patch
         nodocs.patch
         0015-bfd-install-config.h.patch
         0003-enable-shared-bfd.all.patch
@@ -47,14 +46,10 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         013_bash_in_ld_testsuite.patch
         130_gold_disable_testsuite_build.patch
         135_bfd_soversion.patch
-        binutils-stable-34branch.patch
-        branch-updates.diff
-        000-git-binutils-2_34.patch
         binutils-2.29-filename-in-error-messages.patch
         binutils-export-demangle.h.patch
         000-binutils-stable-34branch-UBU.patch
         binutils-add-LD_AS_NEEDED-global-env.patch
-        000-branch-updates.patch
         001-branch-version.patch
         500-libctf-soname.patch)
 sha256sums=('89f010078b6cf69c23c27897d686055ab89b198dddf819efb0a4f2c38a0b36e6'
