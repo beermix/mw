@@ -6,7 +6,7 @@ _base_ver=2.34
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 # replaces="${MINGW_PACKAGE_PREFIX}-${_realname}=${_base_ver}"
-pkgver=2.34.r100256.13963f64c28
+pkgver=2.34.r100265.1a4d543e78c
 pkgrel=1
 provides=("${MINGW_PACKAGE_PREFIX}-${_realname}=${pkgver}")
 conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}")
