@@ -258,7 +258,7 @@ build() {
     export CC='clang'
     export CXX='clang++'
   fi
-  
+
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
