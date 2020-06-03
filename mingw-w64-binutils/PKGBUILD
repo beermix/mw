@@ -48,7 +48,6 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         135_bfd_soversion.patch
         binutils-2.29-filename-in-error-messages.patch
         binutils-export-demangle.h.patch
-        000-binutils-stable-34branch-UBU.patch
         binutils-add-LD_AS_NEEDED-global-env.patch
         001-branch-version.patch
         500-libctf-soname.patch)
