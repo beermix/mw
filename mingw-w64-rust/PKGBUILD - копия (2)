@@ -6,7 +6,7 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.43.0
+pkgver=1.43.1
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -83,24 +83,22 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
-    --enable-ninja \
     --enable-extended \
     --disable-codegen-tests \
-    --python=${MINGW_PREFIX}/bin/python2 \
+    --python=${MINGW_PREFIX}/bin/python3 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
   cd "${srcdir}/${CARCH}"
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
@@ -108,16 +106,9 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
-
-  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
