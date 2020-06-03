@@ -41,9 +41,9 @@ prepare() {
   mv "${srcdir}"/${_realname} "${srcdir}"/${_realname}-${pkgver}
 
   cd "${srcdir}/${_realname}-${pkgver}"
-  apply_patch_with_msg \
-       0004-nontq.patch \
-       0005-cmd-cgo-force-O0.patch
+#  apply_patch_with_msg \
+#    0010-go1.7-proper-go-binary-path.patch
+#    0011-add-GO_BUILD_VERBOSE.patch
 }
 
 build() {
@@ -63,7 +63,7 @@ build() {
   # about what went wrong.
 
   rm -f /tmp/bootstrap_go.bat
-  echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $HOME/go)"     > /tmp/bootstrap_go.bat
+  echo "SET GOROOT_BOOTSTRAP=$(cygpath -w $HOME/goo)"     > /tmp/bootstrap_go.bat
   echo "cd $(cygpath -w $PWD)"                                      >> /tmp/bootstrap_go.bat
   echo "start /wait \"\" cmd.exe /c .\\make.bat"                    >> /tmp/bootstrap_go.bat
   /tmp/bootstrap_go.bat
