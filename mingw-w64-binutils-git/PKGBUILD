@@ -26,7 +26,9 @@ source=("${_realname}"::"git+https://sourceware.org/git/binutils-gdb.git#branch=
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
         0020-binutils_2.31_mkdtemp_impl.patch
         0110-binutils-mingw-gnu-print.patch
-        0120-windres-handle-spaces.patch)
+        0120-windres-handle-spaces.patch
+        1000-PR24511.patch
+        1001-PR25447.patch)
 
 pkgver() {
   cd "$srcdir/$_realname"
@@ -42,6 +44,10 @@ prepare() {
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
   patch -p1 -i "${srcdir}"/0120-windres-handle-spaces.patch
+
+  # Upstream patches
+  #patch -p1 -i "${srcdir}"/1000-PR24511.patch
+  #patch -p1 -i "${srcdir}"/1001-PR25447.patch
 
   rm -rf gdb readline libdecnumber sim
 
@@ -79,7 +85,9 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --with-system-zlib \
     --enable-targets=x86_64-*-mingw64 \
+    --enable-silent-rules \
     --disable-shared
 
   make
