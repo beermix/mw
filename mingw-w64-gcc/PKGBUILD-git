@@ -48,7 +48,7 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-        #"http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
+        "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
         010-documentation.patch
         0002-Relocate-libintl.patch
@@ -175,7 +175,7 @@ prepare() {
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -254,7 +254,8 @@ build() {
     --with-system-zlib \
     --with-diagnostics-color=always \
     --enable-silent-rules \
-    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-isl \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
