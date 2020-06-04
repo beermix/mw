@@ -221,7 +221,6 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
@@ -243,7 +242,9 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-isl=no \
+    --enable-graphite=no \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \

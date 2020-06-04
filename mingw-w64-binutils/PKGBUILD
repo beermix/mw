@@ -116,6 +116,8 @@ build() {
     --enable-plugins \
     --enable-gold \
     --with-system-zlib \
+    --enable-graphite=no \
+    --with-isl=no \
     --enable-targets=x86_64-*-mingw64 \
     --enable-silent-rules \
     --disable-shared
