@@ -115,6 +115,9 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
+    --disable-libada \
+    --without-ppl \
+    --without-cloog \
     --with-system-zlib \
     --enable-graphite=no \
     --with-isl=no \

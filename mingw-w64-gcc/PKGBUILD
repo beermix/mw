@@ -226,7 +226,6 @@ build() {
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -245,12 +244,14 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --enable-graphite=no \
+    --without-ppl \
+    --without-cloog \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
-  # While we're debugging -fopenmp problems at least.
+  # While we're debugging -fopenmp problems at least. --disable-isl-version-check \
   # .. we may as well not strip anything.
   if check_option "strip" "n"; then
     sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
