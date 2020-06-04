@@ -2,10 +2,10 @@
 set -e
 url=https://github.com/gcc-mirror/gcc.git
 package=gcc
-tag=releases/gcc-9.2.0
-branch=releases/gcc-9
+tag=releases/gcc-10.1.0
+branch=releases/gcc-10
 out=gcc-stable-branch.patch
-repo=$package.git
+repo=gcc-git
 
 # use filterdiff, etc to exclude bad chunks from diff
 filter() {
