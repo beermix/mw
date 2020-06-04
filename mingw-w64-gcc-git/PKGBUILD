@@ -1,12 +1,13 @@
-# Maintainer:  Alexey Pavlov <alexpux@gmail.com>
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Maintainer: Ray Donnelly <mingw.android@gmail.com>
 # Contributor: Alexey Borzenkov <snaury@gmail.com>
-# Contributor: Ray Donnelly <mingw.android@gmail.com>
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
-# Contributor: wirx6 <wirx654@gmail.com>
+# Contributor: Liu Hao <lh_mouse@126.com>
+# Contributor: Tim Stahlhut <stahta01@gmail.com>
 
 _enable_fortran=yes
-_enable_ada=no
-_enable_objc=no
+_enable_ada=yes
+_enable_objc=yes
 _realname=gcc
 _sourcedir=${_realname}-git
 pkgbase=mingw-w64-${_realname}
@@ -17,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-pkgver=10.1.0.d20200603.c0.gdd65f29a907
+pkgver=10.0.1.d20200507.c12.g0df8d1efee2
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -48,52 +49,33 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-        "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
-        "gdbinit"
-        010-documentation.patch
-        0002-Relocate-libintl.patch
-        0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
-        0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
-        0005-Windows-Don-t-ignore-native-system-header-dir.patch
-        0006-Windows-New-feature-to-allow-overriding.patch
-        0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
-        0008-Prettify-linking-no-undefined.patch
-        0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
-        0010-Fix-using-large-PCH.patch
-        0011-Enable-shared-gnat-implib.patch
-        0012-Handle-spaces-in-path-for-default-manifest.patch
-        0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
-        0015-makedeps-properly-handle-win-paths.patch
-        0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
-        0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
-        0130-libstdc++-in-out.patch
-        0140-gcc-8.2.0-diagnostic-color.patch
-        010-documentation.patch
-        openmp-vectorize-v2.patch
-        optimize.patch
-        ipa-cp.patch
-        optimize-at-least-some.patch
-        gomp-relax.patch)
-sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
-            'SKIP'
-            'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
-            '1247e81571c908548b4d9aaa3df1ad8fd73aad7b81e7eafea12d53bbada70e94'
-            '5b8ab5a54ebdd10c9802ea431b935ff4ba225eec6ca92824cfddfcf2ee8ac910'
+        "0002-Relocate-libintl.patch"
+        "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
+        "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
+        "0005-Windows-Don-t-ignore-native-system-header-dir.patch"
+        "0006-Windows-New-feature-to-allow-overriding.patch"
+        "0007-Build-EXTRA_GNATTOOLS-for-Ada.patch"
+        "0008-Prettify-linking-no-undefined.patch"
+        "0010-Fix-using-large-PCH.patch"
+        "0011-Enable-shared-gnat-implib.patch"
+        "0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch"
+        "0015-makedeps-properly-handle-win-paths.patch"
+        "0016-Ensure-lmsvcrt-precede-lkernel32.patch"
+        "0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch")
+sha256sums=('SKIP'
+            'dcc6ec24d7946643b35fce57c50d9900bcdbeb8723981ee5e7ff2ae935137598'
+            '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
             '388f423a67e4be6f547ca7e340ff8ee4c78b1ed83f3fd698daa409e309911807'
-            'bd1c201febdf292570b0da9dcc066a237916ab3166dce3610487814f131517e5'
-            '7f5fc74961ec0face6c4c56d3fc3613c38c5133bb68648191065bbf597f3e906'
+            '6e407a782d3fb636d800a4278fbe1da876732ea17cba6aa82c261b6ec6ec2073'
+            'd1e10cd2ef5594c34acead334bb93af500e00699ba673edc8916da22a572677d'
             '3629446c0039d9061cfedcb6d7a7589279588bb4601c7ce233546d357bd4be34'
-            '2e4f7d0ef739aec8986eb06a2baadee552ebc2e8be661c39a448e93515179eb5'
-            '513a824ee500d063f09ec920a9ad317a3a117e5468bf201aaf3f70dd0000e769'
-            'ec58aafba0174313451c282339bbd67ed0b11bca034c29023e0138b61441cf71'
-            '3402f11c3edb3a2b0f27f7159c476879e1e6cddb05ac0327968d89ea245044c7'
-            '11dd5388a1e1c0a2bc8bc3824726598784b9b9e0896a3d77950ba6a4569f1128'
-            '21e31addcf13bc6fa6650b02ed0f2e195a1226260ae48c536840cc9230de2cfc'
-            '4233a8d893787413b316de3ac320fd65c46844d463b98c0a98fdc17100cca505'
-            '276ecc392c777d4b17d771a987e80dca50ff25d8f65671d5de139be73997064b'
-            'c7359f4c7015bc1fb02bc13449fa9826669273bd1f0663ba898decb67e8487fc'
-            '441d63d95622ffcc2fa5dd688aecad20d2ab16d7d275c567865a754e1d3d4b7a'
-            '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47')
+            'ec6800816632234afc35ce40542a6aab3ee76e8514a7d0cb4171fd874353ecd7'
+            '7a201413020cc9d7357e51921f49b22092fec2b644c36f4420c65966a67ec68c'
+            '8faff8e503a617f283270f411399a8bcacda3ab62b4072dedf117e108af4844a'
+            '2321c7dce29a600477e481d16d847f05dc8c6d6461ee1eba7814c5bf62c2ef95'
+            'e6b8a610142836ae9c5eba3c5ecbb3766078ac530483590c587b3c6341508af0'
+            'f96348a858722d6de87445e264a7b021f684b5fb11fcd8f7fbfbc9a8fb2d45e1'
+            '2331365b6d42250d83eba36a1ef1a02e56b81a7c2595df6a43cb1a6abbcb99f0')
 
 _threads="posix"
 _git_base_commit=
@@ -131,41 +113,22 @@ prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
+  ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
+  ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
+  ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
+  ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
+  ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
+  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
+  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+  ${GIT_AM} ${srcdir}/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  ${GIT_AM} ${srcdir}/0015-makedeps-properly-handle-win-paths.patch
+  ${GIT_AM} ${srcdir}/0016-Ensure-lmsvcrt-precede-lkernel32.patch
+  ${GIT_AM} ${srcdir}/0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
 
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
-
-  apply_patch_with_msg \
-    0002-Relocate-libintl.patch \
-    0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
-    0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
-    0005-Windows-Don-t-ignore-native-system-header-dir.patch \
-    0006-Windows-New-feature-to-allow-overriding.patch \
-    0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
-    0008-Prettify-linking-no-undefined.patch \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0015-makedeps-properly-handle-win-paths.patch \
-    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
-    0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
-
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
-
-  # Enable diagnostic color under mintty
-  # Вячеслав Петрищев <vyachemail@gmail.com>
-  apply_patch_with_msg \
-    0140-gcc-8.2.0-diagnostic-color.patch
-
-  # Enable clear linux patches
-  apply_patch_with_msg \
-    010-documentation.patch
-
-  # do not expect ${prefix}/mingw symlink - this should be superceded by
-  # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+  # do not expect $prefix/mingw symlink - this should be superceded by
+  # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
@@ -213,8 +176,8 @@ build() {
 #  unset CFLAGS
 #  unset CXXFLAGS
 #  unset LDLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS="-march=haswell -g0 -O2"
+#  export CXXFLAGS="-march=haswell -g0 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -249,17 +212,20 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
     --enable-silent-rules \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
+    --enable-plugin  \
     ${_conf}
+    #--enable-libitm
+    #--enable-objc-gc
+    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
+    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
