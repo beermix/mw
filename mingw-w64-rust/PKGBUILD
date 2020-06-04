@@ -83,7 +83,7 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
+    --release-channel=nightly \
     --enable-ninja \
     --enable-extended \
     --disable-codegen-tests \
