@@ -4,8 +4,8 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: wirx6 <wirx654@gmail.com>
 
-_enable_ada=yes
-_enable_objc=yes
+_enable_ada=no
+_enable_objc=no
 _threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
