@@ -6,7 +6,7 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.43.0
+pkgver=1.44.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -60,7 +60,7 @@ prepare() {
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  patch -p1 -i "${srcdir}/70163.patch"
+  #patch -p1 -i "${srcdir}/70163.patch"
 }
 
 build() {
@@ -68,6 +68,7 @@ build() {
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
   #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
+  #     --enable-full-bootstrap \ --enable-cargo-native-stati
   OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
@@ -83,8 +84,13 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=nightly \
-    --enable-ninja \
+    --release-channel=stable \
+    --disable-sanitizers \
+    --enable-profiler \
+    --enable-vendor \
+    --enable-lld \
+    --disable-rpath \
+    --enable-optimize \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
@@ -94,7 +100,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 check() {
