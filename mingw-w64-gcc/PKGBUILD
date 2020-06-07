@@ -195,17 +195,17 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDLAGS
+#  export CFLAGS="-march=haswell -g0 -O2"
+#  export CXXFLAGS="-march=haswell -g0 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -222,11 +222,13 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -242,11 +244,7 @@ build() {
     --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --without-isl \
-    --disable-graphite \
-    --without-ppl \
-    --without-cloog \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
     --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
