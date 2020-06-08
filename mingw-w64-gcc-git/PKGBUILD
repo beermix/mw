@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-pkgver=10.0.1.d20200507.c12.g0df8d1efee2
+pkgver=10.1.0.d20200608.c13.gad48414d2c0
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -110,7 +110,6 @@ del_file_exists() {
 }
 # =========================================== #
 
-
 prepare() {
   cd ${srcdir}/${_sourcedir}
   _git_base_commit=$(git rev-parse HEAD)
@@ -129,10 +128,12 @@ prepare() {
   ${GIT_AM} ${srcdir}/0016-Ensure-lmsvcrt-precede-lkernel32.patch
   ${GIT_AM} ${srcdir}/0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
 
-  ${GIT_AM} ${srcdir}/010-documentation.patch
-
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+
+  apply_patch_with_msg \
+    010-documentation.patch
+
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
@@ -180,8 +181,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
