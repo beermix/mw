@@ -8,6 +8,7 @@ pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.44.0
 pkgrel=1
+_llvm_ver=10.0.0
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -24,12 +25,13 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
-             "${MINGW_PACKAGE_PREFIX}-python2"
+             "${MINGW_PACKAGE_PREFIX}-python"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
 source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,.asc}
+        "https://github.com/llvm/llvm-project/releases/download/llvmorg-$_llvm_ver/compiler-rt-$_llvm_ver.src.tar.xz"{,.sig}
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -61,52 +63,55 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   #patch -p1 -i "${srcdir}/70163.patch"
+  
+    cat >config.toml <<END
+[llvm]
+link-shared = true
+
+[build]
+target = ["x86_64-w64-mingw32"]
+cargo = "/mingw64/bin/cargo"
+rustc = "/mingw64/bin/rustc"
+python = "/mingw64/bin/python"
+extended = true
+sanitizers = false
+profiler = true
+vendor = true
+
+[install]
+prefix = "/mingw64"
+
+[rust]
+# LLVM crashes when passing an object through ThinLTO twice.  This is triggered when using rust
+# code in cross-language LTO if libstd was built using ThinLTO.
+# http://blog.llvm.org/2019/09/closing-gap-cross-language-lto-between.html
+# https://github.com/rust-lang/rust/issues/54872
+codegen-units-std = 1
+
+debuginfo-level-std = 2
+
+channel = "stable"
+
+rpath = false
+
+[target.x86_64-w64-mingw32]
+llvm-config = "/mingw64/bin/llvm-config"
+END
 }
 
 build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  #     --enable-full-bootstrap \ --enable-cargo-native-stati
-  OSTYPE="$CARCH-pc-windows-gnu"
+  export RUST_COMPILER_RT_ROOT="$srcdir/compiler-rt-$_llvm_ver.src"
 
-  local -a _rust_conf=()
-  if [ "${_bootstrapping}" = "no" ]; then
-    _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
-  fi
-
-  MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
-  ../${_realname}c-${pkgver}-src/configure \
-    --prefix=${MINGW_PREFIX} \
-    --sysconfdir=${MINGW_PREFIX}/etc \
-    --localstatedir=${MINGW_PREFIX}/var/lib \
-    --build=$OSTYPE \
-    --host=$OSTYPE \
-    --target=$OSTYPE \
-    --release-channel=stable \
-    --disable-sanitizers \
-    --enable-profiler \
-    --enable-vendor \
-    --enable-lld \
-    --disable-rpath \
-    --enable-optimize \
-    --enable-extended \
-    --disable-codegen-tests \
-    --python=${MINGW_PREFIX}/bin/python2 \
-    --llvm-root=${MINGW_PREFIX} \
-    ${_rust_conf}
-
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
   cd "${srcdir}/${CARCH}"
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
@@ -114,7 +119,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
