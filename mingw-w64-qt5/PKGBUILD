@@ -3,8 +3,8 @@
 
 # Please keep this file exactly the same (except _variant=)
 # as {mingw-w64-qt5/PKGBUILD,mingw-w64-qt5-static/PKGBUILD}
-_variant=-static
-#_variant=-shared
+#_variant=-static
+_variant=-shared
 
 # Tune the following to decide how and what to build
 if [ "${_variant}" = "-static" ]; then

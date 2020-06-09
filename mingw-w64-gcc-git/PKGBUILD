@@ -21,7 +21,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-jit-git")
         )
-pkgver=11.0.0.d20200529.c11.g33e23881aa
+pkgver=11.0.0.d20200609.c13.gd7274dbf820
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
