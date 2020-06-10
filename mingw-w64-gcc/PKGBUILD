@@ -5,7 +5,7 @@
 # Contributor: wirx6 <wirx654@gmail.com>
 
 _enable_ada=no
-_enable_objc=no
+_enable_objc=yes
 _threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
