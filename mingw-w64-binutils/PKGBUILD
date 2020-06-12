@@ -82,8 +82,8 @@ prepare() {
   patch -p1 -i "${srcdir}"/0120-windres-handle-spaces.patch
 
   # Upstream patches
-  patch -p1 -i "${srcdir}"/1000-PR24511.patch
-  patch -p1 -i "${srcdir}"/1001-PR25447.patch
+  # patch -p1 -i "${srcdir}"/1000-PR24511.patch
+  # patch -p1 -i "${srcdir}"/1001-PR25447.patch
 
   #sed -i '/^development=/s/true/false/' bfd/development.sh
 }
