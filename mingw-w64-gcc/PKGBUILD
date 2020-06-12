@@ -121,10 +121,8 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-stable-branch.patch \
-    010-documentation.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    git-updates.diff \
+    010-documentation.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
