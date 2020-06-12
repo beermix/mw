@@ -122,7 +122,9 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    010-documentation.patch
+    010-documentation.patch \
+    optimize.patch \
+    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -195,17 +197,17 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  unset LDLAGS
-#  export CFLAGS="-march=haswell -g0 -O2"
-#  export CXXFLAGS="-march=haswell -g0 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDLAGS
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
