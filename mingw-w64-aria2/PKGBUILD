@@ -43,9 +43,8 @@ build() {
     --disable-shared \
     --without-gnutls \
     --with-openssl \
-    --without-wintls \
     --disable-libaria2 \
-    --with-libcares \
+    --without-libcares \
     --without-libssh2 \
     --disable-nls \
     ARIA2_STATIC=yes
