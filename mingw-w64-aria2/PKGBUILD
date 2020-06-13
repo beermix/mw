@@ -48,7 +48,7 @@ build() {
     --with-libcares \
     --without-libssh2 \
     --disable-nls \
-    ARIA2_STATIC=no
+    ARIA2_STATIC=yes
 
   /home/User/.go/bin/noti.exe nice -n19 make
 }
