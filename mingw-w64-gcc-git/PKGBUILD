@@ -8,7 +8,7 @@
 _enable_fortran=yes
 #HACK
 _enable_ada=no
-_enable_objc=yes
+_enable_objc=no
 _enable_jit=yes
 _realname=gcc
 _sourcedir=${_realname}-git
