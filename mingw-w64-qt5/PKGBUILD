@@ -48,7 +48,7 @@ else
   _system_libtiff=yes
   _system_libwebp=yes
   _build_examples=no
-  _build_tools=no
+  _build_tools=yes
   _build_tests=no
   _make_docs=no
   _ltcg=no
@@ -115,17 +115,7 @@ pkgver=${_ver_base//-/}
 pkgrel=1
 arch=('any')
 pkgdesc="A cross-platform application and UI framework (mingw-w64${_namesuff})"
-url='https://w
-  apply_patch_with_msg \
-    010-documentation.patch
-  apply_patch_with_msg \
-    010-documentation.patch
-  apply_patch_with_msg \
-    010-documentation.patch
-  apply_patch_with_msg \
-    010-documentation.patch
-  apply_patch_with_msg \
-    010-documentation.patchww.qt.io/'
+url='https://www.qt.io/'
 install=qt5-${CARCH}.install
 license=('GPL3' 'LGPL' 'FDL' 'custom')
 
@@ -628,7 +618,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-  /home/User/.go/bin/noti nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+  /home/User/.go/bin/noti nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
 
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
