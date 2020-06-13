@@ -105,7 +105,7 @@ build() {
 
   # export RUST_COMPILER_RT_ROOT="$srcdir/compiler-rt-$_llvm_ver.src"
 
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 check() {
