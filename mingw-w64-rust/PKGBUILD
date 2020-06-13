@@ -25,13 +25,13 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
-             "${MINGW_PACKAGE_PREFIX}-python"
+             "${MINGW_PACKAGE_PREFIX}-python2"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
 source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,.asc}
-        "https://github.com/llvm/llvm-project/releases/download/llvmorg-$_llvm_ver/compiler-rt-$_llvm_ver.src.tar.xz"{,.sig}
+        #"https://github.com/llvm/llvm-project/releases/download/llvmorg-$_llvm_ver/compiler-rt-$_llvm_ver.src.tar.xz"{,.sig}
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -63,7 +63,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   #patch -p1 -i "${srcdir}/70163.patch"
-  
+
     cat >config.toml <<END
 [llvm]
 link-shared = true
@@ -72,7 +72,7 @@ link-shared = true
 target = ["x86_64-w64-mingw32"]
 cargo = "/mingw64/bin/cargo"
 rustc = "/mingw64/bin/rustc"
-python = "/mingw64/bin/python"
+python = "/mingw64/bin/python2"
 extended = true
 sanitizers = false
 profiler = true
@@ -88,14 +88,14 @@ prefix = "/mingw64"
 # https://github.com/rust-lang/rust/issues/54872
 codegen-units-std = 1
 
-debuginfo-level-std = 2
+debuginfo-level-std = 0
 
 channel = "stable"
 
 rpath = false
 
-[target.x86_64-w64-mingw32]
-llvm-config = "/mingw64/bin/llvm-config"
+# [target.x86_64-w64-mingw32]
+# llvm-config = "/mingw64/bin/llvm-config"
 END
 }
 
@@ -103,15 +103,15 @@ build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  export RUST_COMPILER_RT_ROOT="$srcdir/compiler-rt-$_llvm_ver.src"
+  # export RUST_COMPILER_RT_ROOT="$srcdir/compiler-rt-$_llvm_ver.src"
 
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
   cd "${srcdir}/${CARCH}"
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test || true
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
@@ -119,7 +119,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
