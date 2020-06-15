@@ -122,7 +122,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-10-git.patch \
+    gcc-stable-branch.patch \
     010-documentation.patch
 
   apply_patch_with_msg \
