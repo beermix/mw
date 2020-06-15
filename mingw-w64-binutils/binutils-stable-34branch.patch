@@ -44158,3 +44158,238 @@ index 564a1affec..3ed04787d2 100644
  #define BFD_VERSION @bfd_version@
  #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
  #define REPORT_BUGS_TO @report_bugs_to@
+
+commit ae4695558dccab099b92059d5b182673ee41d012
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Wed Jun 10 00:00:33 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 3ed04787d2..4856b08ab8 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200609
++#define BFD_VERSION_DATE 20200610
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 7324292cd94269c6542492beea9a11f11d0bd8b1
+Author: Alex Coplan <alex.coplan@arm.com>
+Date:   Fri May 29 16:04:50 2020 +0100
+
+    gas: Fix checking for backwards .org with negative offset
+    
+    This patch fixes internal errors in (at least) arm and aarch64 GAS
+    when assembling code that attempts a negative .org.  The bug appears
+    to be a regression introduced in binutils-2.29 by commit 9875b36538d.
+    
+            * write.c (relax_segment): Fix handling of negative offset when
+            relaxing an rs_org frag.
+            * testsuite/gas/aarch64/org-neg.d: New test.
+            * testsuite/gas/aarch64/org-neg.l: Error output for test.
+            * testsuite/gas/aarch64/org-neg.s: Input for test.
+            * testsuite/gas/arm/org-neg.d: New test.
+            * testsuite/gas/arm/org-neg.l: Error output for test.
+            * testsuite/gas/arm/org-neg.s: Input for test.
+    
+    (cherry picked from commit c39c821c1da3e8a64eff5984a39e104eb798e8b8)
+
+diff --git a/gas/ChangeLog b/gas/ChangeLog
+index 13ff6add65..92957f531b 100644
+--- a/gas/ChangeLog
++++ b/gas/ChangeLog
+@@ -1,3 +1,16 @@
++2020-06-10  Alex Coplan  <alex.coplan@arm.com>
++
++	Backport from master
++	2020-06-01  Alex Coplan  <alex.coplan@arm.com>
++	* write.c (relax_segment): Fix handling of negative offset when
++	relaxing an rs_org frag.
++	* testsuite/gas/aarch64/org-neg.d: New test.
++	* testsuite/gas/aarch64/org-neg.l: Error output for test.
++	* testsuite/gas/aarch64/org-neg.s: Input for test.
++	* testsuite/gas/arm/org-neg.d: New test.
++	* testsuite/gas/arm/org-neg.l: Error output for test.
++	* testsuite/gas/arm/org-neg.s: Input for test.
++
+ 2020-05-18  Alexander Fedotov <alfedotov@gmail.com>
+ 
+ 	PR 25992
+diff --git a/gas/testsuite/gas/aarch64/org-neg.d b/gas/testsuite/gas/aarch64/org-neg.d
+new file mode 100644
+index 0000000000..83e6af6afb
+--- /dev/null
++++ b/gas/testsuite/gas/aarch64/org-neg.d
+@@ -0,0 +1,3 @@
++#name: negative org should not cause internal error
++#source: org-neg.s
++#error_output: org-neg.l
+diff --git a/gas/testsuite/gas/aarch64/org-neg.l b/gas/testsuite/gas/aarch64/org-neg.l
+new file mode 100644
+index 0000000000..f8414adc19
+--- /dev/null
++++ b/gas/testsuite/gas/aarch64/org-neg.l
+@@ -0,0 +1,2 @@
++[^:]*: Assembler messages:
++.*: Error: attempt to move .org backwards
+diff --git a/gas/testsuite/gas/aarch64/org-neg.s b/gas/testsuite/gas/aarch64/org-neg.s
+new file mode 100644
+index 0000000000..403e70d5e0
+--- /dev/null
++++ b/gas/testsuite/gas/aarch64/org-neg.s
+@@ -0,0 +1,2 @@
++.=-1
++ret
+diff --git a/gas/testsuite/gas/arm/org-neg.d b/gas/testsuite/gas/arm/org-neg.d
+new file mode 100644
+index 0000000000..83e6af6afb
+--- /dev/null
++++ b/gas/testsuite/gas/arm/org-neg.d
+@@ -0,0 +1,3 @@
++#name: negative org should not cause internal error
++#source: org-neg.s
++#error_output: org-neg.l
+diff --git a/gas/testsuite/gas/arm/org-neg.l b/gas/testsuite/gas/arm/org-neg.l
+new file mode 100644
+index 0000000000..f8414adc19
+--- /dev/null
++++ b/gas/testsuite/gas/arm/org-neg.l
+@@ -0,0 +1,2 @@
++[^:]*: Assembler messages:
++.*: Error: attempt to move .org backwards
+diff --git a/gas/testsuite/gas/arm/org-neg.s b/gas/testsuite/gas/arm/org-neg.s
+new file mode 100644
+index 0000000000..f60486e2c8
+--- /dev/null
++++ b/gas/testsuite/gas/arm/org-neg.s
+@@ -0,0 +1,2 @@
++.=-1
++nop
+diff --git a/gas/write.c b/gas/write.c
+index 5d9a239422..acdf07b344 100644
+--- a/gas/write.c
++++ b/gas/write.c
+@@ -2936,7 +2936,7 @@ relax_segment (struct frag *segment_frag_root, segT segment, int pass)
+ 
+ 	      case rs_org:
+ 		{
+-		  addressT target = offset;
++		  offsetT target = offset;
+ 		  addressT after;
+ 
+ 		  if (symbolP)
+@@ -2956,7 +2956,7 @@ relax_segment (struct frag *segment_frag_root, segT segment, int pass)
+ 		  /* Growth may be negative, but variable part of frag
+ 		     cannot have fewer than 0 chars.  That is, we can't
+ 		     .org backwards.  */
+-		  if (address + fragP->fr_fix > target)
++		  if ((offsetT) (address + fragP->fr_fix) > target)
+ 		    {
+ 		      growth = 0;
+ 
+
+commit b6aac75326bbece1e6d12c3322bb549f5a8a6fba
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Thu Jun 11 00:00:34 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 4856b08ab8..a35733c664 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200610
++#define BFD_VERSION_DATE 20200611
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 9e09b89532457730af447ef7a7989dcebebea954
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Fri Jun 12 00:00:49 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index a35733c664..e791bccf38 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200611
++#define BFD_VERSION_DATE 20200612
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit eb6029e398cf2abed16c130424b97897a8caa3d2
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sat Jun 13 00:00:29 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index e791bccf38..05cbf4115d 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200612
++#define BFD_VERSION_DATE 20200613
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit b5f50c79654ee649a3abdaaf2662ea11a8964feb
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Sun Jun 14 00:00:27 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 05cbf4115d..579b78eb84 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200613
++#define BFD_VERSION_DATE 20200614
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
+
+commit 825ba0d1bc78985f83e439cb50685f67f4788cc4
+Author: GDB Administrator <gdbadmin@sourceware.org>
+Date:   Mon Jun 15 00:00:32 2020 +0000
+
+    Automatic date update in version.in
+
+diff --git a/bfd/version.h b/bfd/version.h
+index 579b78eb84..81ca69e35b 100644
+--- a/bfd/version.h
++++ b/bfd/version.h
+@@ -16,7 +16,7 @@
+ 
+    In releases, the date is not included in either version strings or
+    sonames.  */
+-#define BFD_VERSION_DATE 20200614
++#define BFD_VERSION_DATE 20200615
+ #define BFD_VERSION @bfd_version@
+ #define BFD_VERSION_STRING  @bfd_version_package@ @bfd_version_string@
+ #define REPORT_BUGS_TO @report_bugs_to@
