@@ -1,18 +1,6 @@
-From de1a266e403da3629e42daa6d8e589ae02feeedd Mon Sep 17 00:00:00 2001
-From: Liu Hao <lh_mouse@126.com>
-Date: Tue, 12 May 2020 10:38:33 +0800
-Subject: [PATCH] Don't escape colons in paths
-
-Reference: https://github.com/msys2/MINGW-packages/commit/9b7f67c5f620d1ba7ce951cfee3ce2328fb751f6
----
- libcpp/mkdeps.c | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/libcpp/mkdeps.c b/libcpp/mkdeps.c
-index 09a111fcdd5..c4b301dddae 100644
---- a/libcpp/mkdeps.c
-+++ b/libcpp/mkdeps.c
-@@ -156,7 +156,6 @@ munge (const char *str, const char *trail = NULL, ...)
+--- gcc-10.1.0/libcpp/mkdeps.c.orig	2020-05-10 20:37:27.263933600 +0300
++++ gcc-10.1.0/libcpp/mkdeps.c	2020-05-10 20:42:00.700896900 +0300
+@@ -156,7 +156,6 @@
  	      /* FALLTHROUGH  */
  
  	    case '#':
@@ -20,6 +8,3 @@ index 09a111fcdd5..c4b301dddae 100644
  	      buf[dst++] = '\\';
  	      /* FALLTHROUGH  */
  
--- 
-2.26.2
-
