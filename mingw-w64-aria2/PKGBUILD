@@ -4,7 +4,7 @@ _realname=aria2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=9d0a48ac8147c5e56402706d5c17efa8bf6340f2
-pkgrel=2
+pkgrel=1
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
 url="https://github.com/aria2/aria2"
@@ -42,6 +42,7 @@ build() {
     --host=${MINGW_CHOST} \
     --disable-shared \
     --without-gnutls \
+    --with-wintls \
     --with-openssl \
     --disable-libaria2 \
     --without-libcares \
@@ -49,7 +50,7 @@ build() {
     --disable-nls \
     ARIA2_STATIC=yes
 
-  /home/User/.go/bin/noti.exe nice -n19 make
+  /home/User/.go/bin/noti.exe nice -n 19 make
 }
 
 package() {
