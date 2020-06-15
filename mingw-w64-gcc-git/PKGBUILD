@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=10.0.1.d20200507.c12.g0df8d1efee2.d20200615.c0.g8a3453786c3
+pkgver=10.0.1.d20200507.c12.g0df8d1efee2.d20200615.c0.g8a3453786c3.d20200615.c0.g8a3453786c3
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
