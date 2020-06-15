@@ -72,9 +72,6 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         optimize.patch
         ipa-cp.patch
         optimize-at-least-some.patch
-        gcc-stable-branch.patch
-        git-updates.diff
-        gcc-10-git.patch
         gomp-relax.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
