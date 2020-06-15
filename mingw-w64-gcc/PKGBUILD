@@ -72,6 +72,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize-at-least-some.patch
         gcc-stable-branch.patch
         git-updates.diff
+        gcc-10-git.patch
         gomp-relax.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
@@ -121,7 +122,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    git-updates.diff \
+    gcc-10-git.patch \
     010-documentation.patch
 
   apply_patch_with_msg \
