@@ -138,7 +138,8 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     optimize.patch \
-    optimize-at-least-some.patch
+    optimize-at-least-some.patch \
+    ipa-cp.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
