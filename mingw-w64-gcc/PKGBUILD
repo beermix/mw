@@ -159,9 +159,9 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  #ln -s ../isl-${_islver} isl
+  echo ${_gcc_ver} > gcc/BASE-VER
 
-  echo ${pkgver} > gcc/BASE-VER
+#  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -242,7 +242,6 @@ build() {
     --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
-    --disable-libstdcxx-verbose \
     --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
