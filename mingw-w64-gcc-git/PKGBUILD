@@ -127,18 +127,17 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-#  _git_base_commit=$(git rev-parse HEAD)
-#  GIT_AM="git am --committer-date-is-author-date"
+  _git_base_commit=$(git rev-parse HEAD)
+  GIT_AM="git am --committer-date-is-author-date"
 
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch
-
-#    optimize.patch \
-#    optimize-at-least-some.patch
+    010-documentation.patch \
+    optimize.patch \
+    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -211,17 +210,17 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDLAGS=${LDLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDLAGS=${LDLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  unset LDLAGS
-#  export CFLAGS="-march=haswell -g1 -O3"
-#  export CXXFLAGS="-march=haswell -g1 -O3"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDLAGS
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -258,8 +257,6 @@ build() {
     --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
