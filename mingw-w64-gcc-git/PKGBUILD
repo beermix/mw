@@ -251,7 +251,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
