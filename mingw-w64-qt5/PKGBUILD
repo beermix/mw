@@ -153,8 +153,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
             "${MINGW_PACKAGE_PREFIX}-xpm-nox" \
             $([[ "$_system_zlib" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-zlib"))
             $([[ "$_with_icu" == "yes" ]] && echo \
-              "${MINGW_PACKAGE_PREFIX}-icu" \
-              "${MINGW_PACKAGE_PREFIX}-icu-debug-libs")
+              "${MINGW_PACKAGE_PREFIX}-icu")
         )
 optdepends=($([[ "$_variant" == "-shared" ]] && echo \
               "${MINGW_PACKAGE_PREFIX}-clang" \
@@ -619,7 +618,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-  /home/User/.go/bin/noti nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+    /home/User/.go/bin/noti nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
 
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
@@ -652,6 +651,16 @@ package_it() {
       make install_qch_docs
     fi
   fi
+
+  install -D -m644 LICENSE.FDL     "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.FDL
+  install -D -m644 LICENSE.GPLv2   "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.GPLv2
+  install -D -m644 LICENSE.GPLv3   "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.GPLv3
+  install -D -m644 LICENSE.LGPLv21  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.LGPLv21
+  install -D -m644 LICENSE.LGPLv3  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.LGPLv3
+  install -D -m644 LICENSE.QT-LICENSE-AGREEMENT  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.QT-LICENSE-AGREEMENT
+
+#  mv -f "${pkgdir}${_qt5_prefix}/lib"/*.debug "${pkgdir}${_qt5_prefix}/bin"/ || true
+#  rsync -armR --remove-source-files --include="*/" --include="*.debug" --exclude="*" --prune-empty-dirs ${pkgdir}/.${MI#NGW_PREFIX} ${srcdir}/${CARCH}-debug/
 
   # Remove dlls from lib/
   rm -f "${pkgdir}${_qt5_prefix}/lib"/*.dll
