@@ -60,7 +60,7 @@ prepare() {
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  #patch -p1 -i "${srcdir}/70163.patch"
+  patch -p1 -i "${srcdir}/70163.patch"
 }
 
 build() {
@@ -68,7 +68,7 @@ build() {
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
   #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  OSTYPE="x86_64-pc-windows-gnu"
+  OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
   if [ "${_bootstrapping}" = "no" ]; then
