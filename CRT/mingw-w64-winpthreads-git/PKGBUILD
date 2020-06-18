@@ -40,7 +40,7 @@ prepare() {
   cd "${srcdir}/mingw-w64"
   [[ -f mingw-w64-libraries/winpthreads/src/libgcc/dll_frame_info.c ]] && rm -rf mingw-w64-libraries/winpthreads/src/libgcc/dll_frame_info.c
   git am --committer-date-is-author-date "${srcdir}"/0001-Define-__-de-register_frame_info-in-fake-libgcc_s.patch
- # git am --committer-date-is-author-date "${srcdir}"/0002-build-without-_USE_MINGW_ANSI_STDIO.patch
+  git am --committer-date-is-author-date "${srcdir}"/0002-build-without-_USE_MINGW_ANSI_STDIO.patch
   cd "${srcdir}"/mingw-w64/mingw-w64-libraries/winpthreads
   autoreconf -vfi
 }
