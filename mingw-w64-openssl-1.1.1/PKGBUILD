@@ -54,14 +54,12 @@ prepare() {
   cd ${srcdir}/${_realname}-${_ver}
 
   apply_patch_with_msg \
-     openssl-1.1.1-relocation.patch \
-     0001-tests-work-around-the-MSYS-vs-Windows-paths-problem.patch \
-     0001-shlib_wrap.sh-accommodate-for-MINGW-builds-being-tes.patch
+     openssl-1.1.1-relocation.patch
 }
 
 build() {
   rm -rf ${srcdir}/build-${CARCH}
- 
+
   # No support for out-of-source builds
   mkdir -p ${srcdir}/build-${CARCH}
 #  cp -a ${srcdir}/${_realname}-${_ver}/* ${srcdir}/build-${CARCH}
@@ -77,8 +75,8 @@ build() {
   fi
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
-  export CC=clang
-  export CXX=clang++
+  #export CC=clang
+  #export CXX=clang++
   ${srcdir}/${_realname}-${_ver}/Configure \
     --prefix=${MINGW_PREFIX} \
     --openssldir=ssl \
@@ -94,9 +92,9 @@ build() {
     -D__MINGW_USE_VC2005_COMPAT \
     -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\"
 
-  sed -i -e 's/ -O3 /&-g /' \
-    -e 's/TOP=\.\.\//TOP="$(pwd)"\/..\//' \
-    Makefile
+#  sed -i -e 's/ -O3 /&-g /' \
+#    -e 's/TOP=\.\.\//TOP="$(pwd)"\/..\//' \
+#    Makefile
 
   make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
 }
