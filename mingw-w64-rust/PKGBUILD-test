@@ -60,8 +60,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  #patch -p1 -i "${srcdir}/70163.patch"
+  patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
 
 build() {
@@ -85,13 +84,10 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=stable \
+    --enable-llvm-link-shared \
     --enable-ninja \
-    --enable-lldb \
-    --enable-lld \
     --enable-optimize \
     --disable-rpath \
-    --enable-sanitizers \
-    --enable-sccache \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \

@@ -35,8 +35,7 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,
         "0002-fix-install-msys2.patch"
         "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
-        "0005-win32-config.patch"
-        "70163.patch")
+        "0005-win32-config.patch")
 sha256sums=('75f6ac6c9da9f897f4634d5a07be4084692f7ccc2d2bb89337be86cfc18453a1'
             'SKIP'
             '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
@@ -59,8 +58,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  #patch -p1 -i "${srcdir}/70163.patch"
+  patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
 
 build() {
@@ -84,7 +82,9 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=stable \
+    --enable-llvm-link-shared \
     --enable-ninja \
+    --enable-optimize \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
