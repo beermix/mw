@@ -60,7 +60,7 @@ prepare() {
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  patch -p1 -i "${srcdir}/70163.patch"
+  #patch -p1 -i "${srcdir}/70163.patch"
 }
 
 build() {
