@@ -66,6 +66,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0022-gcc-plugin-ada-use-def.patch"
         "0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch"
         "gnat1.exe.def"
+        "0140-gcc-8.2.0-diagnostic-color.patch"
         "010-documentation.patch"
         "openmp-vectorize-v2.patch"
         "optimize.patch"
@@ -153,6 +154,7 @@ prepare() {
 
   apply_patch_with_msg \
     010-documentation.patch \
+    0140-gcc-8.2.0-diagnostic-color.patch \
     openmp-vectorize-v2.patch \
     optimize.patch \
     ipa-cp.patch \
