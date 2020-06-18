@@ -359,15 +359,6 @@ package_mingw-w64-gcc() {
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/
   cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/
 
-  #mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib
-  #cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib/libgcc_s.a ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/
-  #cp lib/gcc/${MINGW_CHOST}/lib/libgcc_s.a                ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib/
-
-  #cp -r lib/gcc/${MINGW_CHOST}/${_gcc_ver}/include/c++      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/include/
-  cp -r include/c++                                       ${pkgdir}${MINGW_PREFIX}/include/
-  #cp lib/gcc/${MINGW_CHOST}/${_gcc_ver}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/
-  #cp lib/gcc/${MINGW_CHOST}/${_gcc_ver}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gcc_ver}/
-
   #cp share/locale/* ${pkgdir}${MINGW_PREFIX}/share/locale/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${_gcc_ver}/python
   cp -r share/gcc-${_gcc_ver}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${_gcc_ver}/python/
