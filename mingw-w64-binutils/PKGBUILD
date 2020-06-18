@@ -149,26 +149,31 @@ package() {
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
 
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/addr2line.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-addr2line.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ar.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ar.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/as.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-as.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/c++filt.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-c++filt.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dlltool.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dlltool.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dllwrap.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dllwrap.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dwp.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dwp.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/elfedit.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-elfedit.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/gprof.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-gprof.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.bfd.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.bfd.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.gold.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.gold.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/nm.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-nm.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/objcopy.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objcopy.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/objdump.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objdump.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ranlib.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ranlib.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/readelf.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-readelf.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/size.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-size.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/strings.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strings.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/strip.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strip.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/windmc.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windmc.exe
-  ln -s ${pkgdir}${MINGW_PREFIX}/bin/windres.exe "${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windres.exe
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING      ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.LIB  ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.LIB
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3     ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3.LIB ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3.LIB
+
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/addr2line.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-addr2line.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ar.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ar.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/as.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-as.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/c++filt.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-c++filt.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dlltool.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dlltool.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dllwrap.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dllwrap.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/dwp.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dwp.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/elfedit.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-elfedit.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/gprof.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-gprof.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.bfd.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.bfd.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ld.gold.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.gold.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/nm.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-nm.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/objcopy.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objcopy.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/objdump.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objdump.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/ranlib.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ranlib.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/readelf.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-readelf.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/size.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-size.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/strings.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strings.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/strip.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strip.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/windmc.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windmc.exe
+  ln -s ${pkgdir}${MINGW_PREFIX}/bin/windres.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windres.exe
 }
