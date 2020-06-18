@@ -77,6 +77,8 @@ build() {
   fi
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
+  export CC=clang
+  export CXX=clang++
   ${srcdir}/${_realname}-${_ver}/Configure \
     --prefix=${MINGW_PREFIX} \
     --openssldir=ssl \
