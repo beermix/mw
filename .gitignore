@@ -9,6 +9,7 @@
 *.asc
 *.log
 *.log.[0-9]*
+gcc-git
 */src/
 /*/src/
 */pkg/
