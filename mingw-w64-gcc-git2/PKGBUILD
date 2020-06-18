@@ -145,7 +145,12 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   apply_patch_with_msg \
-    010-documentation.patch
+    010-documentation.patch \
+    openmp-vectorize-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
@@ -187,8 +192,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
