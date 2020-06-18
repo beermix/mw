@@ -154,11 +154,8 @@ prepare() {
 
   apply_patch_with_msg \
     010-documentation.patch \
-    openmp-vectorize-v2.patch \
     optimize.patch \
-    ipa-cp.patch \
-    optimize-at-least-some.patch \
-    gomp-relax.patch
+    optimize-at-least-some.patch
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
