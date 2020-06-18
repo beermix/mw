@@ -6,11 +6,11 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.43.1
+pkgver=1.44.1
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
-url="https://www.rust-lang.org/"
+url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("bison"
@@ -21,6 +21,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-libssh2"
              "${MINGW_PACKAGE_PREFIX}-lldb"
+             "${MINGW_PACKAGE_PREFIX}-lld"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
@@ -59,8 +60,8 @@ prepare() {
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  patch -p1 -i "${srcdir}/70163.patch"
+  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
+  #patch -p1 -i "${srcdir}/70163.patch"
 }
 
 build() {
@@ -85,6 +86,12 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-ninja \
+    --enable-lldb \
+    --enable-lld \
+    --enable-optimize \
+    --disable-rpath \
+    --enable-sanitizers \
+    --enable-sccache \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
@@ -94,7 +101,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  /home/User/.go/bin/noti nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
