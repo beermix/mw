@@ -82,8 +82,6 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=stable \
-    --enable-llvm-link-shared \
-    --enable-ninja \
     --enable-optimize \
     --enable-extended \
     --disable-codegen-tests \
