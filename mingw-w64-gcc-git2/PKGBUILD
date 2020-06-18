@@ -5,8 +5,8 @@
 # Contributor: Liu Hao <lh_mouse@126.com>
 # Contributor: Tim Stahlhut <stahta01@gmail.com>
 
-_enable_fortran=yes
 _enable_ada=no
+_enable_fortran=yes
 _enable_objc=no
 _realname=gcc
 _sourcedir=${_realname}-git
@@ -63,7 +63,9 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0015-makedeps-properly-handle-win-paths.patch"
         "0016-Ensure-lmsvcrt-precede-lkernel32.patch"
         "0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch"
-        "0140-gcc-8.2.0-diagnostic-color.patch"
+        "0022-gcc-plugin-ada-use-def.patch"
+        "0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch"
+        "gnat1.exe.def"
         "010-documentation.patch"
         "openmp-vectorize-v2.patch"
         "optimize.patch"
@@ -83,7 +85,10 @@ sha256sums=('SKIP'
             '2321c7dce29a600477e481d16d847f05dc8c6d6461ee1eba7814c5bf62c2ef95'
             'e6b8a610142836ae9c5eba3c5ecbb3766078ac530483590c587b3c6341508af0'
             'f96348a858722d6de87445e264a7b021f684b5fb11fcd8f7fbfbc9a8fb2d45e1'
-            '2331365b6d42250d83eba36a1ef1a02e56b81a7c2595df6a43cb1a6abbcb99f0')
+            '2331365b6d42250d83eba36a1ef1a02e56b81a7c2595df6a43cb1a6abbcb99f0'
+            '4a9a2e23539e59d3a0580e7699f1f6904dae0f99b9555f3433b2cbf20f4d26a6'
+            'ece86b56f34b33f851629feee6d07238a8ddda125e851d0862f3e63e2d6ecb06'
+            '19498cf8254e1990731b5468d7211dd964108688dab2973f53ed0a6e17ce0137')
 
 _threads="posix"
 _git_base_commit=
@@ -134,6 +139,8 @@ prepare() {
   ${GIT_AM} ${srcdir}/0015-makedeps-properly-handle-win-paths.patch
   ${GIT_AM} ${srcdir}/0016-Ensure-lmsvcrt-precede-lkernel32.patch
   ${GIT_AM} ${srcdir}/0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
+  ${GIT_AM} ${srcdir}/0022-gcc-plugin-ada-use-def.patch
+  ${GIT_AM} ${srcdir}/0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -257,14 +264,37 @@ build() {
   fi
 }
 
+#check() {
+  #cd ${srcdir}/build-${MINGW_CHOST}/gcc
+  #make -k check-ada || true
+#}
+
 package_mingw-w64-gcc-libs-git() {
   pkgdesc="GNU Compiler Collection (libraries) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-gmp"
-           "${MINGW_PACKAGE_PREFIX}-mpc"
-           "${MINGW_PACKAGE_PREFIX}-mpfr"
            "${MINGW_PACKAGE_PREFIX}-libwinpthread")
   provides=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
   conflicts=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs")
+
+  # Licensing information
+
+  # Part of the package is GCCRLE, part is LGPL2+, see README generation below.
+  # Since the packaged GCCRLE libraries are also GPL3+, and LGPL2+ is compatible
+  # with GPL3+, the whole package can be redistributed under GPL3+.
+  license=(GPL3+ partial:'GCCRLE' partial:'LGPL2+')
+
+  # We explain the licensing in this generated README file
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs"
+  cat << ENDFILE > "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/README"
+The libgcc, libssp, libstdc++, libgomp and libatomic libraries are covered by
+GPL3+ with the GCC Runtime Library Exception. The libquadmath library is covered
+by LGPL2+. The package as a whole can be redistributed under GPL3+.
+ENDFILE
+
+  # License files
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING3"        "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING3"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.LIB"     "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.LIB"
+  install -Dm644 "${srcdir}/${_sourcedir}/COPYING.RUNTIME" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}-libs/COPYING.RUNTIME"
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
