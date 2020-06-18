@@ -154,7 +154,6 @@ prepare() {
 
   apply_patch_with_msg \
     010-documentation.patch \
-    0140-gcc-8.2.0-diagnostic-color.patch \
     openmp-vectorize-v2.patch \
     optimize.patch \
     ipa-cp.patch \
