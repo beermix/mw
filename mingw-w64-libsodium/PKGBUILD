@@ -22,8 +22,8 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --enable-minimal \
-    --enable-shared \
-    --enable-static
+    --disable-shared \
+    --enable-static --disable-silent-rules
 
   make
 }
