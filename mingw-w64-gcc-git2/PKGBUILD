@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-pkgver=10.1.0.d20200618.c15.g6e81b0cf4ff
+pkgver=10.1.0.d20200619.c15.geb13d29d0cd
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
