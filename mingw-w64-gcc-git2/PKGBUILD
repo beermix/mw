@@ -68,6 +68,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0022-gcc-plugin-ada-use-def.patch"
         "0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch"
         "gnat1.exe.def"
+        "0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch"
         "0130-libstdc++-in-out.patch"
         "0140-gcc-8.2.0-diagnostic-color.patch"
         "010-documentation.patch"
@@ -126,6 +127,7 @@ del_file_exists() {
   done
 }
 # =========================================== #
+
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
@@ -255,10 +257,6 @@ build() {
     --with-isl \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
-    #--enable-libitm
-    #--enable-objc-gc
-    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_gccver} \
-    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -338,7 +336,7 @@ package_mingw-w64-gcc() {
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
-#  cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
+ #cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
