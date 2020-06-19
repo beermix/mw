@@ -131,9 +131,6 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
-
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
   ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
@@ -152,8 +149,8 @@ prepare() {
   ${GIT_AM} ${srcdir}/0022-gcc-plugin-ada-use-def.patch
   ${GIT_AM} ${srcdir}/0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
+  #apply_patch_with_msg \
+  #  0130-libstdc++-in-out.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
@@ -164,10 +161,10 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  apply_patch_with_msg \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0140-gcc-8.2.0-diagnostic-color.patch
+#  apply_patch_with_msg \
+#    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
+#    0012-Handle-spaces-in-path-for-default-manifest.patch \
+#    0140-gcc-8.2.0-diagnostic-color.patch
 
   apply_patch_with_msg \
     010-documentation.patch \
@@ -248,7 +245,6 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
@@ -256,7 +252,12 @@ build() {
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
     --with-gnu-as --with-gnu-ld \
+    --enable-plugin  \
     ${_conf}
+    #--enable-libitm
+    #--enable-objc-gc
+    #--with-gxx-include-dir=${MINGW_PREFIX}/include/c++/${_realpkgver} \
+    #--enable-version-specific-runtime-libs \
 
   # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
@@ -331,12 +332,12 @@ package_mingw-w64-gcc() {
   cp bin/${MINGW_CHOST}-gcc-ranlib.exe                  ${pkgdir}${MINGW_PREFIX}/bin/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include
-#  cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
+  cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
- #cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
+  cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
