@@ -838,32 +838,6 @@ diff --git a/libstdc++-v3/include/bits/ranges_algobase.h b/libstdc++-v3/include/
 index 618bc7d10..815539f9c 100644
 --- a/libstdc++-v3/include/bits/ranges_algobase.h
 +++ b/libstdc++-v3/include/bits/ranges_algobase.h
-@@ -121,9 +121,9 @@ namespace ranges
- 	    else
- 	      {
- 		for (; __first1 != __last1; ++__first1, (void)++__first2)
--		  if (!(bool)std::__invoke(__pred,
--					   std::__invoke(__proj1, *__first1),
--					   std::__invoke(__proj2, *__first2)))
-+		  if (!(bool)std::___invoke(__pred,
-+					   std::___invoke(__proj1, *__first1),
-+					   std::___invoke(__proj2, *__first2)))
- 		    return false;
- 		return true;
- 	      }
-@@ -132,9 +132,9 @@ namespace ranges
- 	  {
- 	    for (; __first1 != __last1 && __first2 != __last2;
- 		 ++__first1, (void)++__first2)
--	      if (!(bool)std::__invoke(__pred,
--				       std::__invoke(__proj1, *__first1),
--				       std::__invoke(__proj2, *__first2)))
-+	      if (!(bool)std::___invoke(__pred,
-+				       std::___invoke(__proj1, *__first1),
-+				       std::___invoke(__proj2, *__first2)))
- 		return false;
- 	    return __first1 == __last1 && __first2 == __last2;
- 	  }
 @@ -220,34 +220,34 @@ namespace ranges
        using __detail::__is_normal_iterator;
        if constexpr (__is_move_iterator<_Iter> && same_as<_Iter, _Sent>)

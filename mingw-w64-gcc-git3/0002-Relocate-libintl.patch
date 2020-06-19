@@ -124,7 +124,7 @@ index 6faac5756a3..b7a62d58f55 100644
    set_binding_values (domainname, &dirname, NULL);
    return (char *) dirname;
 +*/
-+  if (!access (dirname, R_OK)) {
++  if (!dirname || !access(dirname, R_OK)) {
 +	  set_binding_values (domainname, &dirname, NULL);
 +	  return (char *) dirname;
 +  } else {

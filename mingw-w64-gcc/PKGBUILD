@@ -4,8 +4,8 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: wirx6 <wirx654@gmail.com>
 
-_enable_ada=no
-_enable_objc=no
+_enable_ada=yes
+_enable_objc=yes
 _threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
@@ -22,7 +22,7 @@ pkgver=10.1.0
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
 _islver=0.16.1
-pkgrel=3
+pkgrel=4
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -46,7 +46,7 @@ optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
-        #"http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
+        "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
@@ -65,14 +65,17 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
+        0016-Ensure-lmsvcrt-precede-lkernel32.patch
+        0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
+        0022-gcc-plugin-ada-use-def.patch
+        0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
+        gnat1.exe.def
         010-documentation.patch
         openmp-vectorize-v2.patch
         optimize.patch
+        gcc-stable-branch.patch
         ipa-cp.patch
         optimize-at-least-some.patch
-        gcc-stable-branch.patch
-        git-updates.diff
-        gcc-10-git.patch
         gomp-relax.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
@@ -123,7 +126,13 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    010-documentation.patch
+    010-documentation.patch \
+    openmp-vectorize-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    0022-gcc-plugin-ada-use-def.patch \
+    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -161,7 +170,7 @@ prepare() {
 
   echo ${_gcc_ver} > gcc/BASE-VER
 
-#  ln -s ../isl-${_islver} isl
+  ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -203,8 +212,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -223,13 +232,11 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -244,9 +251,8 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
-    --with-pkgversion="Rev${pkgrel}, Built by MSYS2 project" \
-    --with-bugurl="https://sourceforge.net/projects/msys2" \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-isl \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
@@ -257,7 +263,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n 19 make all
+  /home/User/.go/bin/noti /usr/bin/nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
