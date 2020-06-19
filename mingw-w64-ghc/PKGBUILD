@@ -161,8 +161,8 @@ build() {
     --enable-distro-toolchain \
     --with-ffi-includes="$(cygpath -u $(pkg-config --variable=includedir libffi))"
 
-  make
-  make html
+  /home/User/.go/bin/noti /usr/bin/nice -n 19 make
+  #make html
 }
 
 check() {
@@ -174,9 +174,7 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}/ghc-${pkgver}"
 
-  make prefix="${pkgdir}${MINGW_PREFIX}" \
-    docdir="${pkgdir}${MINGW_PREFIX}/share/docs/ghc" \
-    install
+  make prefix="${pkgdir}${MINGW_PREFIX}" install
 
   for _hook in "${_hooks[@]}"; do
     install -Dm644 "${srcdir}/${CARCH}/${_hook}" \
@@ -184,6 +182,4 @@ package() {
   done
 
   mkdir -vp "${pkgdir}${MINGW_PREFIX}/share/haskell/"{register,unregister}
-
-  install -Dm644 LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/ghc/LICENSE"
 }
