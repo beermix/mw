@@ -127,10 +127,9 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     optimize.patch \
-    optimize-at-least-some.patch
-
-#    0022-gcc-plugin-ada-use-def.patch \
-#    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
+    optimize-at-least-some.patch \
+    0022-gcc-plugin-ada-use-def.patch \
+    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -166,7 +165,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+  #echo ${pkgver} > gcc/BASE-VER
 
  # ln -s ../isl-${_islver} isl
 }
