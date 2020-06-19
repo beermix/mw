@@ -72,7 +72,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         gnat1.exe.def
         010-documentation.patch
         optimize.patch
-        gcc-stable-branch.patch
         git-updates.diff
         optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
@@ -118,10 +117,11 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
+  apply_patch_with_msg \
+    git-updates.diff
+
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
-
-  patch -Nbp0 -i "${srcdir}/git-updates.diff"
 
   # Enable clear linux patches
   apply_patch_with_msg \
