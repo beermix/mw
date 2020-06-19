@@ -1,4 +1,4 @@
-From 954e1daf349bc21a3171b526ed842467075519cf Mon Sep 17 00:00:00 2001
+From d8cd8d0211dcd606a3753a6b3c36c19a7b1672dc Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 5 Aug 2015 23:36:13 +0100
 Subject: [PATCH 05/19] master Windows: New feature to allow overriding
@@ -13,7 +13,7 @@ always using msvcrt.dll
  2 files changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/gcc/config/i386/cygming.opt b/gcc/config/i386/cygming.opt
-index 73f143858..fec8822ac 100644
+index a9074bf..e1d89e2 100644
 --- a/gcc/config/i386/cygming.opt
 +++ b/gcc/config/i386/cygming.opt
 @@ -22,6 +22,9 @@ mconsole
@@ -27,7 +27,7 @@ index 73f143858..fec8822ac 100644
  Target RejectNegative
  Generate code for a DLL.
 diff --git a/gcc/config/i386/mingw32.h b/gcc/config/i386/mingw32.h
-index 321c30e41..487f43477 100644
+index 4ac5f68..f875e7b 100644
 --- a/gcc/config/i386/mingw32.h
 +++ b/gcc/config/i386/mingw32.h
 @@ -165,7 +165,7 @@ along with GCC; see the file COPYING3.  If not see
@@ -40,5 +40,5 @@ index 321c30e41..487f43477 100644
  #undef STARTFILE_SPEC
  #define STARTFILE_SPEC "%{shared|mdll:dllcrt2%O%s} \
 -- 
-2.25.1.windows.1
+2.7.1
 
