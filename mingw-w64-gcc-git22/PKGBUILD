@@ -48,19 +48,15 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-        "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "0002-Relocate-libintl.patch"
-        "gdbinit"
         "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
         "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
         "0005-Windows-Don-t-ignore-native-system-header-dir.patch"
         "0006-Windows-New-feature-to-allow-overriding.patch"
         "0007-Build-EXTRA_GNATTOOLS-for-Ada.patch"
         "0008-Prettify-linking-no-undefined.patch"
-        "0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch"
         "0010-Fix-using-large-PCH.patch"
         "0011-Enable-shared-gnat-implib.patch"
-        "0012-Handle-spaces-in-path-for-default-manifest.patch"
         "0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch"
         "0015-makedeps-properly-handle-win-paths.patch"
         "0016-Ensure-lmsvcrt-precede-lkernel32.patch"
@@ -129,9 +125,6 @@ del_file_exists() {
 
 prepare() {
   cd ${srcdir}/${_sourcedir}
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
-
   _git_base_commit=$(git rev-parse HEAD)
   GIT_AM="git am --committer-date-is-author-date"
   ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
@@ -150,9 +143,6 @@ prepare() {
   ${GIT_AM} ${srcdir}/0022-gcc-plugin-ada-use-def.patch
   ${GIT_AM} ${srcdir}/0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
-
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -163,18 +153,14 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   apply_patch_with_msg \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0140-gcc-8.2.0-diagnostic-color.patch
+    010-documentation.patch
 
-  apply_patch_with_msg \
-    010-documentation.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    #optimize.patch \
+    #optimize-at-least-some.patch
 
   echo ${_gccver} > gcc/BASE-VER
 
-  ln -s ../isl-${_islver} isl
+  #ln -s ../isl-${_islver} isl
 }
 
 build() {
@@ -212,8 +198,8 @@ build() {
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -246,14 +232,14 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --without-isl \
     --with-gnu-as --with-gnu-ld \
+    --enable-plugin  \
     ${_conf}
     #--enable-libitm
     #--enable-objc-gc
@@ -267,7 +253,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti /usr/bin/nice -n 19 make all
+  /home/User/.go/bin/noti nice -n 19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -333,12 +319,12 @@ package_mingw-w64-gcc() {
   cp bin/${MINGW_CHOST}-gcc-ranlib.exe                  ${pkgdir}${MINGW_PREFIX}/bin/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include
-#  cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
+  cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
-#  cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
+  cp -r lib/gcc/${MINGW_CHOST}/${_gccver}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
   cp lib/gcc/${MINGW_CHOST}/${_gccver}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${_gccver}/
