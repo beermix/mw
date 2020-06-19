@@ -168,7 +168,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${_gcc_ver} > gcc/BASE-VER
+  echo ${pkgver} > gcc/BASE-VER
 
   ln -s ../isl-${_islver} isl
 }
