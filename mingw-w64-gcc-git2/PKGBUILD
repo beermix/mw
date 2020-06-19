@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
-pkgver=10.1.0.d20200619.c15.geb13d29d0cd
+pkgver=10.1.0.d20200619.c15.geb13d29d0cd.d20200619.c0.g
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -177,7 +177,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+  echo ${_gccver} > gcc/BASE-VER
 
   ln -s ../isl-${_islver} isl
 }
