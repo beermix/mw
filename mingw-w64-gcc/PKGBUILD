@@ -71,12 +71,10 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
         gnat1.exe.def
         010-documentation.patch
-        openmp-vectorize-v2.patch
         optimize.patch
         gcc-stable-branch.patch
-        ipa-cp.patch
-        optimize-at-least-some.patch
-        gomp-relax.patch)
+        git-updates.diff
+        optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -123,9 +121,10 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
+  patch -Nbp0 -i "${srcdir}/git-updates.diff"
+
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-stable-branch.patch \
     010-documentation.patch \
     optimize.patch \
     optimize-at-least-some.patch \
