@@ -124,7 +124,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-10-git.patch \
+    git-updates.diff \
     optimize.patch \
     optimize-at-least-some.patch \
     0022-gcc-plugin-ada-use-def.patch \
