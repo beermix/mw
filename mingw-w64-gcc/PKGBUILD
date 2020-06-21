@@ -124,11 +124,12 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    git-updates.diff \
-    optimize.patch \
-    optimize-at-least-some.patch \
-    0022-gcc-plugin-ada-use-def.patch \
-    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
+    git-updates.diff
+
+#    optimize.patch \
+#    optimize-at-least-some.patch \
+#    0022-gcc-plugin-ada-use-def.patch \
+#    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -201,13 +202,13 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  unset LDLAGS
+#  export CFLAGS="-march=haswell -g1 -O3"
+#  export CXXFLAGS="-march=haswell -g1 -O3"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
