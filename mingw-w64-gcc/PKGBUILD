@@ -36,7 +36,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-binutils"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
-              "${MINGW_PACKAGE_PREFIX}-libiconv"
+             "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib"
@@ -261,10 +261,8 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
+  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
   
-  #"CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
-
   rm -rf ${srcdir}${MINGW_PREFIX}
 
   make -j1 DESTDIR=${srcdir} install
@@ -290,7 +288,6 @@ package_mingw-w64-gcc() {
            "${MINGW_PACKAGE_PREFIX}-crt"
            "${MINGW_PACKAGE_PREFIX}-headers"
            "${MINGW_PACKAGE_PREFIX}-libiconv"
-           "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
            "${MINGW_PACKAGE_PREFIX}-winpthreads"
@@ -370,7 +367,6 @@ package_mingw-w64-gcc() {
 }
 
 package_mingw-w64-gcc-libgfortran() {
-  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
