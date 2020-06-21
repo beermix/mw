@@ -123,6 +123,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
+    git-updates.diff \
     optimize.patch \
     optimize-at-least-some.patch \
     0022-gcc-plugin-ada-use-def.patch \
@@ -199,15 +200,11 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
-
   unset CFLAGS
   unset CXXFLAGS
   unset LDLAGS
-  export CFLAGS="-march=haswell -g0 -O3"
-  export CXXFLAGS="-march=haswell -g0 -O3"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
@@ -226,13 +223,11 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
-    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
-    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
