@@ -17,8 +17,9 @@ license=('LGPL')
 options=('staticlibs')
 depends=("${MINGW_PACKAGE_PREFIX}-gmp")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp" "autoconf-archive")
-source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz{,.sig}
-        mpfr-4.0.2-p1.patch)
+source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz
+        mpfr-4.0.2-p1.patch
+        001-only_src.patch)
 sha256sums=('1d3be708604eae0e42d578ba93b390c2a145f17743a744d8f3f8c2ad5855a38a'
             'SKIP')
 validpgpkeys=('07F3DBBECC1A39605078094D980C197698C3739D')

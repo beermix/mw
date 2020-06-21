@@ -36,7 +36,10 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
              "${MINGW_PACKAGE_PREFIX}-binutils"
              "${MINGW_PACKAGE_PREFIX}-crt"
              "${MINGW_PACKAGE_PREFIX}-headers"
+             "${MINGW_PACKAGE_PREFIX}-gmp"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
+             "${MINGW_PACKAGE_PREFIX}-mpc"
+             "${MINGW_PACKAGE_PREFIX}-mpfr"
              "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
              "${MINGW_PACKAGE_PREFIX}-winpthreads"
              "${MINGW_PACKAGE_PREFIX}-zlib"
@@ -46,9 +49,9 @@ optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
-        "https://gmplib.org/download/gmp-${_gmpver}/gmp-${_gmpver}.tar.xz"
-        "https://ftp.gnu.org/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"
-        "https://ftp.gnu.org/gnu/mpc/mpc-${_mpcver}.tar.gz"
+        #"https://gmplib.org/download/gmp-${_gmpver}/gmp-${_gmpver}.tar.xz"
+        #"https://ftp.gnu.org/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"
+        #"https://ftp.gnu.org/gnu/mpc/mpc-${_mpcver}.tar.gz"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
         "gdbinit"
         0002-Relocate-libintl.patch
@@ -170,14 +173,13 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-  mv -fv ../gmp-${_gmpver} gmp
-  mv -fv ../mpfr-${_mpfrver} mpfr
-  mv -fv ../mpc-${_mpcver} mpc
+#  mv -fv ../gmp-${_gmpver} gmp
+#  mv -fv ../mpfr-${_mpfrver} mpfr
+#  mv -fv ../mpc-${_mpcver} mpc
   mv -fv ../isl-${_islver} isl
 
-
-  apply_patch_with_msg \
-    mpfr-4.0.2-p1.patch
+#  apply_patch_with_msg \
+#    mpfr-4.0.2-p1.patch
 }
 
 build() {
@@ -255,6 +257,8 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
+    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-isl \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
@@ -265,7 +269,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
+  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
   
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -277,7 +281,10 @@ build() {
 
 package_mingw-w64-gcc-libs() {
   pkgdesc="GNU Compiler Collection (libraries) for MinGW-w64"
-  depends=("${MINGW_PACKAGE_PREFIX}-libwinpthread")
+  depends=("${MINGW_PACKAGE_PREFIX}-gmp"
+           "${MINGW_PACKAGE_PREFIX}-mpc"
+           "${MINGW_PACKAGE_PREFIX}-mpfr"
+           "${MINGW_PACKAGE_PREFIX}-libwinpthread")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
 
@@ -292,6 +299,7 @@ package_mingw-w64-gcc() {
            "${MINGW_PACKAGE_PREFIX}-crt"
            "${MINGW_PACKAGE_PREFIX}-headers"
            "${MINGW_PACKAGE_PREFIX}-libiconv"
+           "${MINGW_PACKAGE_PREFIX}-mpc"
            "${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-windows-default-manifest"
            "${MINGW_PACKAGE_PREFIX}-winpthreads"
@@ -371,6 +379,7 @@ package_mingw-w64-gcc() {
 }
 
 package_mingw-w64-gcc-libgfortran() {
+  pkgdesc="GNU Compiler Collection (libgfortran) for MinGW-w64"
   depends=("${MINGW_PACKAGE_PREFIX}-${_realname}-libs=${pkgver}-${pkgrel}")
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
