@@ -76,6 +76,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize.patch
         git-updates.diff
         gcc-10-git.patch
+        mpfr-4.0.2-p1.patch
         optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
@@ -173,6 +174,10 @@ prepare() {
   mv -fv ../mpfr-${_mpfrver} mpfr
   mv -fv ../mpc-${_mpcver} mpc
   mv -fv ../isl-${_islver} isl
+
+
+  apply_patch_with_msg \
+    mpfr-4.0.2-p1.patch
 }
 
 build() {
@@ -250,7 +255,6 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc,isl} \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
