@@ -53,7 +53,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         #"https://ftp.gnu.org/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"
         #"https://ftp.gnu.org/gnu/mpc/mpc-${_mpcver}.tar.gz"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
-        "gdbinit"
+        #"gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
         0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
@@ -77,7 +77,9 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         gnat1.exe.def
         010-documentation.patch
         optimize.patch
+        gcc-10-git.patch
         mpfr-4.0.2-p1.patch
+        0130-libstdc++-in-out-new.patch
         optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             'SKIP'
@@ -127,6 +129,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
+    gcc-10-git.patch \
     010-documentation.patch
 
 #    optimize.patch \
@@ -152,7 +155,7 @@ prepare() {
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
 
   apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
+    0130-libstdc++-in-out-new.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
@@ -173,7 +176,7 @@ prepare() {
 #  mv -fv ../gmp-${_gmpver} gmp
 #  mv -fv ../mpfr-${_mpfrver} mpfr
 #  mv -fv ../mpc-${_mpcver} mpc
-  mv -fv ../isl-${_islver} isl
+#  mv -fv ../isl-${_islver} isl
 
 #  apply_patch_with_msg \
 #    mpfr-4.0.2-p1.patch
@@ -211,9 +214,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDLAGS=${LDLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -258,8 +261,7 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
@@ -270,8 +272,8 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
-  
+  /home/User/.go/bin/noti nice -n19 make all
+  #  "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
   rm -rf ${srcdir}${MINGW_PREFIX}
 
   make -j1 DESTDIR=${srcdir} install
