@@ -245,7 +245,7 @@ build() {
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl \
-     --with-gnu-as --with-gnu-ld \
+    --with-gnu-as --with-gnu-ld \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
