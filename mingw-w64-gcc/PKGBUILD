@@ -135,9 +135,9 @@ prepare() {
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    gomp-relax.patch \
-    0001-x86-Add-mzero-caller.patch
-
+    gomp-relax.patch
+    
+#    0001-x86-Add-mzero-caller.patch
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
@@ -213,8 +213,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-O2/-O3/}
-  CXXFLAGS=${CXXFLAGS/-O2/-O3/}
+  CFLAGS=${CFLAGS/-O2/-O3}
+  CXXFLAGS=${CFLAGS/-O2/-O3}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -252,7 +252,6 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
-    --disable-cet \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
@@ -266,6 +265,7 @@ build() {
   fi
 
   /home/User/.go/bin/noti nice -n19 make all
+
   #  "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
   rm -rf ${srcdir}${MINGW_PREFIX}
 
@@ -352,8 +352,14 @@ package_mingw-w64-gcc() {
   cp lib/libstdc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/libsupc++*                                      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
+  #mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib
+  #cp ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib/libgcc_s.a ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  #cp lib/gcc/${MINGW_CHOST}/lib/libgcc_s.a                ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/lib/
 
+  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/c++      ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r include/c++                                       ${pkgdir}${MINGW_PREFIX}/include/
+  #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libstdc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  #cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/libsupc++*         ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python
   cp -r share/gcc-${pkgver%%+*}/python/libstdcxx             ${pkgdir}${MINGW_PREFIX}/share/gcc-${pkgver%%+*}/python/
