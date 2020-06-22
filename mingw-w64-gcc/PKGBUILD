@@ -213,8 +213,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  #CFLAGS=${CFLAGS/-O2/-O3}
-  #CXXFLAGS=${CFLAGS/-O2/-O3}
+  # CFLAGS=${CFLAGS/-O2/-O3}
+  # CXXFLAGS=${CFLAGS/-O2/-O3}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
