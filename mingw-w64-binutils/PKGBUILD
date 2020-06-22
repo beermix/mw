@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=6
+pkgrel=8
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -85,7 +85,11 @@ prepare() {
   patch -p1 -i "${srcdir}"/1000-PR24511.patch
   patch -p1 -i "${srcdir}"/1001-PR25447.patch
 
-  #sed -i '/^development=/s/true/false/' bfd/development.sh
+  # Turn off development mode (-Werror, gas run-time checks, date in sonames)
+  sed -i '/^development=/s/true/false/' bfd/development.sh
+
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 }
 
 build() {
@@ -117,8 +121,14 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
+    --disable-cet \
     --enable-targets=x86_64-*-mingw* \
+    --enable-threads \
+    --disable-gdb \
+    --disable-sim \
     --enable-gold \
+    --disable-libada \
+    --disable-libssp \
     --disable-shared
 
   make MAKEINFO=true
