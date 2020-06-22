@@ -11,7 +11,7 @@
 # We can switch to clang when it fully works with mingw-w64
 _compiler=clang
 _generator="MSYS Makefiles"
-#_generator="Ninja"
+_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
   _make_cmd="ninja"
 else
@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1rc1
-pkgrel=2
+pkgrel=3
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -267,6 +267,8 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -Wno-dev \
+    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
+    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
@@ -279,7 +281,7 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -308,8 +310,8 @@ build() {
     ../llvm-${pkgver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
-  sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
-  sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
   /home/User/.go/bin/noti nice -n19 ${_make_cmd} -j7
 
