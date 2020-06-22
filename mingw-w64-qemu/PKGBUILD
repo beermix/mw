@@ -60,6 +60,9 @@ build() {
       --enable-capstone=system \
       --enable-gnutls \
       --enable-libssh \
+      --disable-werror \
+      --disable-docs \
+      --disable-debug-info \
       --enable-lzo \
       --enable-nettle \
       --enable-slirp=system \
@@ -75,7 +78,8 @@ build() {
       --python=${MINGW_PREFIX}/bin/python \
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
-  make
+
+  /home/User/.go/bin/noti nice -n19 make
 }
 
 package() {
