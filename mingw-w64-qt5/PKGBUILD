@@ -106,7 +106,7 @@ pkgbase="mingw-w64-${_realname}"
 if [ "${_variant}" = "-static" ]; then
   pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 else
-  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}" "${MINGW_PACKAGE_PREFIX}-${_realname}-debug")
 fi
 _ver_base=5.15.0
 # use 5.6.1-1 hot fix : only the archive name was changed from *-5.6.1.tar.xz to *-5.6.1-1.tar.xz
@@ -153,7 +153,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
             "${MINGW_PACKAGE_PREFIX}-xpm-nox" \
             $([[ "$_system_zlib" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-zlib"))
             $([[ "$_with_icu" == "yes" ]] && echo \
-              "${MINGW_PACKAGE_PREFIX}-icu")
+              "${MINGW_PACKAGE_PREFIX}-icu" \
+              "${MINGW_PACKAGE_PREFIX}-icu-debug-libs")
         )
 optdepends=($([[ "$_variant" == "-shared" ]] && echo \
               "${MINGW_PACKAGE_PREFIX}-clang" \
@@ -618,7 +619,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-    /home/User/.go/bin/noti nice -n 19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+    /home/User/.go/bin/noti nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
 
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
