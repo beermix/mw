@@ -100,10 +100,10 @@ if [[ ${_hsarch} == "i686" ]]; then
 fi
 _hooks=('ghc-register.hook' 'ghc-unregister.hook' 'ghc-rebuild-doc-index.hook')
 
-source=("https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-src.tar.xz"{,.sig}
-        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-testsuite.tar.xz"{,.sig}
-        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-windows-extra-src.tar.xz"{,.sig}
-        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-${_hsarch}-unknown-mingw32.tar.xz"{,.sig}
+source=("https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-src.tar.xz"
+        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-testsuite.tar.xz"
+        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-windows-extra-src.tar.xz"
+        "https://downloads.haskell.org/~ghc/${pkgver}/ghc-${pkgver}-${_hsarch}-unknown-mingw32.tar.xz"
         'build.mk'
         'ghc-register.hook'
         'ghc-unregister.hook'
@@ -161,8 +161,7 @@ build() {
     --enable-distro-toolchain \
     --with-ffi-includes="$(cygpath -u $(pkg-config --variable=includedir libffi))"
 
-  /home/User/.go/bin/noti nice -n19 make
-  #make html
+  /home/User/.go/bin/noti nice -n19 make THREADS=7
 }
 
 check() {

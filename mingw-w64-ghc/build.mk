@@ -97,7 +97,7 @@ V=0
 
 # Build the "extra" packages (see ./packages). This enables more tests. See:
 # https://ghc.haskell.org/trac/ghc/wiki/Building/RunningTests/Running#AdditionalPackages
-#BUILD_EXTRA_PKGS=YES
+BUILD_EXTRA_PKGS=NO
 
 # Uncomment the following line to enable building DPH
 #BUILD_DPH=YES
@@ -109,6 +109,8 @@ V=0
 # Enable pretty hyperlinked sources
 #HADDOCK_DOCS = YES
 #EXTRA_HADDOCK_OPTS += --quickjump --hyperlinked-source
+
+THREADS=7
 
 # Don't strip debug and other unneeded symbols from libraries and executables.
 STRIP_CMD = :
