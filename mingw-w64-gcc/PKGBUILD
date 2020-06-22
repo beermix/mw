@@ -131,9 +131,10 @@ prepare() {
   apply_patch_with_msg \
     gcc-10-git.patch \
     010-documentation.patch
-
+    
 #    optimize.patch \
-#    optimize-at-least-some.patch \
+#    optimize-at-least-some.patch
+
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
@@ -214,8 +215,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-O2/-O3/}
+  CXXFLAGS=${CXXFLAGS/-O2/-O3/}
 #  LDLAGS=${LDLAGS/-pipe/}
 
 #  unset CFLAGS
