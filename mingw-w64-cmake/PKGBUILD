@@ -94,7 +94,6 @@ package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_BUILD_TYPE:STRING=Release \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
   install -d "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
   ${MINGW_PREFIX}/bin/emacs -batch -f batch-byte-compile \
