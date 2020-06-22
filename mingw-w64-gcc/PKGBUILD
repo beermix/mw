@@ -68,9 +68,14 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
         gnat1.exe.def
         010-documentation.patch
-        optimize.patch
         gcc-10-git.patch
         mpfr-4.0.2-p1.patch
+        openmp-vectorize-v2.patch
+        fortran-vector-v2.patch
+        optimize.patch
+        ipa-cp.patch
+        gomp-relax.patch
+        0001-x86-Add-mzero-caller.patch
         0130-libstdc++-in-out-new.patch
         optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
@@ -124,8 +129,14 @@ prepare() {
     gcc-10-git.patch \
     010-documentation.patch
     
-#    optimize.patch \
-#    optimize-at-least-some.patch
+  apply_patch_with_msg \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
+    0001-x86-Add-mzero-caller.patch
 
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
@@ -165,7 +176,7 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 
   echo ${pkgver} > gcc/BASE-VER
 }
