@@ -128,7 +128,7 @@ prepare() {
   apply_patch_with_msg \
     gcc-10-git.patch \
     010-documentation.patch
-    
+
   apply_patch_with_msg \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
@@ -136,7 +136,7 @@ prepare() {
     ipa-cp.patch \
     optimize-at-least-some.patch \
     gomp-relax.patch
-    
+
 #    0001-x86-Add-mzero-caller.patch
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
