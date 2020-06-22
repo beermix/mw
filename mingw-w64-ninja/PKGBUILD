@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=8948ec2de60249deb756e02cf3c742f62f12aafe
+pkgver=48a9fb5d0de6f7bb850863d122ba736b62546746
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -19,17 +19,19 @@ prepare () {
 
     MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_PREFIX}/bin/cmake \
-    -G'MSYS Makefiles' \
-    -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-    -DCMAKE_BUILD_TYPE=Release \
-    -Bbuild-mingw \
-    ../${_realname}-${pkgver}
+      -G'MSYS Makefiles' \
+      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_VERBOSE_MAKEFILE=ON \
+      -DCMAKE_CXX_FLAGS_RELEASE="-march=haswell -O2 -DNDEBUG" \
+      "${extra_config[@]}" \
+      ../${_realname}-${pkgver}
 
-  make -Cbuild-mingw -j7
+  make -j6
 }
 
 package() {
-  cd ${srcdir}/${_realname}-${pkgver}/build-mingw
+  cd ${srcdir}/${_realname}-${pkgver}
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin/
   mv ninja.exe "${pkgdir}${MINGW_PREFIX}"/bin/
 }
