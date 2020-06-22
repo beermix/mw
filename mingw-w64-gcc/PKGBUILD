@@ -52,8 +52,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         #"https://gmplib.org/download/gmp-${_gmpver}/gmp-${_gmpver}.tar.xz"
         #"https://ftp.gnu.org/gnu/mpfr/mpfr-${_mpfrver}.tar.xz"
         #"https://ftp.gnu.org/gnu/mpc/mpc-${_mpcver}.tar.gz"
-        "http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
-        #"gdbinit"
+        #"http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
+        "gdbinit"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
         0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch

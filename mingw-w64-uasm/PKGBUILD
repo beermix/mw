@@ -3,7 +3,7 @@
 _realname=uasm
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=aa3a16c0da26669c4903ea0158c985b62766db36
+pkgver=16a853bd6de807fe2c42569f8375a029684c0f22
 pkgrel=1
 pkgdesc="UASM is a free MASM-compatible assembler based on JWasm"
 arch=('any')
@@ -22,10 +22,9 @@ prepare() {
 
 build() {
   cd ${srcdir}/UASM-${pkgver}/
-  make -f GccWin.mak
+  make -f GccWin64.mak
 }
 
 package() {
   install -Dm744 ${srcdir}/UASM-${pkgver}/MinGWR/hjwasm.exe "${pkgdir}${MINGW_PREFIX}/bin/${_realname}.exe"
-  install -Dm644 ${srcdir}/UASM-${pkgver}/License.txt "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 }
