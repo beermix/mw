@@ -9,7 +9,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1rc1
-pkgrel=1
+pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -252,10 +252,10 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    #export CC='clang -stdlib=libc++'
-    #export CXX='clang++ -stdlib=libc++'
-    export CC='clang'
-    export CXX='clang++'
+    export CC='clang -stdlib=libc++'
+    export CXX='clang++ -stdlib=libc++'
+    #export CC='clang'
+    #export CXX='clang++'
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
