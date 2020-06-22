@@ -26,9 +26,7 @@ makedepends=('less'
              'libiconv-devel'
              'pcre2-devel'
              'python'
-             'rsync'
-             #'texinfo'
-             #'xmlto')
+             'rsync')
 optdepends=(#'tk: gitk and git gui'
             'python: various helper scripts'
             'subversion: git svn'
