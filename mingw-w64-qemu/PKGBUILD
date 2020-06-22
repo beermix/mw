@@ -49,14 +49,11 @@ prepare() {
 }
 
 build() {
-  #LDFLAGS+=" -fstack-protector"
+  LDFLAGS+=" -fstack-protector"
 
   cd "${srcdir}/${_realname}-${pkgver}"
   ./configure \
       --disable-werror \
-      --cc=clang \
-      --cxx=clang++ \
-      '--extra-cflags=-fsanitize=undefined -fno-sanitize=shift-base' \
       --disable-kvm \
       --disable-spice \
       --disable-libnfs \
