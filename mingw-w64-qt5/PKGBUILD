@@ -106,7 +106,7 @@ pkgbase="mingw-w64-${_realname}"
 if [ "${_variant}" = "-static" ]; then
   pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 else
-  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}" "${MINGW_PACKAGE_PREFIX}-${_realname}-debug")
+  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 fi
 _ver_base=5.15.0
 # use 5.6.1-1 hot fix : only the archive name was changed from *-5.6.1.tar.xz to *-5.6.1-1.tar.xz
