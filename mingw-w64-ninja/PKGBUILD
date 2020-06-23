@@ -15,23 +15,22 @@ makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python3" "${MINGW_PACKAGE_PREFIX}-c
 source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz")
 
 prepare () {
-  cd ${srcdir}/${_realname}-${pkgver}
+  cd ${srcdir}/ninja-${pkgver}
+  #linking assumes windows cmd line but we are bash :)
+  sed -i 's|cmd /c $ar cqs $out.tmp $in && move /Y $out.tmp $out|$ar crs $out $in|g' ${srcdir}/ninja-${pkgver}/configure.py
+}
 
-    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
-    ${MINGW_PREFIX}/bin/cmake \
-      -G'MSYS Makefiles' \
-      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_VERBOSE_MAKEFILE=ON \
-      -DCMAKE_CXX_FLAGS_RELEASE="-march=haswell -O2 -DNDEBUG" \
-      "${extra_config[@]}" \
-      ../${_realname}-${pkgver}
-
-  make -j6
+build() {
+  mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
+  cd ${srcdir}/ninja-${pkgver}
+  CXXFLAGS=${CFLAGS/-O2/-march=haswell -O2 -DNDEBUG -ffunction-sections -fdata-sections -flto}  LDFLAGS="-Wl,--gc-sections -s" ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform mingw --verbose
 }
 
 package() {
-  cd ${srcdir}/${_realname}-${pkgver}
-  mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin/
-  mv ninja.exe "${pkgdir}${MINGW_PREFIX}"/bin/
+  mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
+  #strip -s "${srcdir}/ninja-${pkgver}/ninja.exe"
+  mv "${srcdir}/ninja-${pkgver}/ninja.exe" "${pkgdir}${MINGW_PREFIX}"/bin/
+  mkdir -p "${pkgdir}${MINGW_PREFIX}"/lib
+  mv "${srcdir}/ninja-${pkgver}/build/libninja.a" "${pkgdir}${MINGW_PREFIX}"/lib/
 }
+

@@ -10,17 +10,16 @@ arch=('any')
 url="https://github.com/aria2/aria2"
 license=('GPL2')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
-             "${MINGW_PACKAGE_PREFIX}-pkg-config")
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
-         "${MINGW_PACKAGE_PREFIX}-gettext"
-         "${MINGW_PACKAGE_PREFIX}-cppunit"
-         "${MINGW_PACKAGE_PREFIX}-libxml2"
-         "${MINGW_PACKAGE_PREFIX}-sqlite3"
-	 "${MINGW_PACKAGE_PREFIX}-openssl"
-	 "${MINGW_PACKAGE_PREFIX}-c-ares"
-         "${MINGW_PACKAGE_PREFIX}-zlib"
-         )
-optdepends=("${MINGW_PACKAGE_PREFIX}-ruby: aria2rpc and aria2mon")
+             "${MINGW_PACKAGE_PREFIX}-pkg-config"
+             "${MINGW_PACKAGE_PREFIX}-ruby")
+             "${MINGW_PACKAGE_PREFIX}-gcc-libs"
+             "${MINGW_PACKAGE_PREFIX}-gettext"
+             "${MINGW_PACKAGE_PREFIX}-cppunit"
+             "${MINGW_PACKAGE_PREFIX}-libxml2"
+             "${MINGW_PACKAGE_PREFIX}-sqlite3"
+             "${MINGW_PACKAGE_PREFIX}-openssl"
+             "${MINGW_PACKAGE_PREFIX}-c-ares"
+             "${MINGW_PACKAGE_PREFIX}-zlib")
 source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/${pkgver}.tar.gz)
 sha256sums=('c4072deaf6b443be15f9710657aa6c53527f642bc7a3252bb81d2853161080ed')
 
