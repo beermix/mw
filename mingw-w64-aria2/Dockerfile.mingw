@@ -1,0 +1,114 @@
+# Dockerfile to build aria2 Windows binary using ubuntu mingw-w64
+# cross compiler chain.
+#
+# $ sudo docker build -t aria2-mingw - < Dockerfile.mingw
+#
+# After successful build, windows binary is located at
+# /aria2/src/aria2c.exe.  You can copy the binary using following
+# commands:
+#
+# $ id=$(sudo docker create aria2-mingw)
+# $ sudo docker cp $id:/aria2/src/aria2c.exe <dest>
+# $ sudo docker rm -v $id
+
+FROM debian:testing
+
+# Change HOST to x86_64-w64-mingw32 to build 64-bit binary
+ENV HOST x86_64-w64-mingw32
+
+# It would be better to use nearest ubuntu archive mirror for faster
+# downloads.
+# RUN sed -ie 's/archive\.ubuntu/ru.archive.ubuntu/g' /etc/apt/sources.list
+
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y \
+        make binutils autoconf automake autotools-dev libtool \
+        pkg-config git curl dpkg-dev gcc-mingw-w64 g++-mingw-w64 \
+        libnpth-mingw-w64-dev \
+        autopoint libcppunit-dev libxml2-dev icu-devtools libevent-2.1-7 libgcrypt20-dev libgnutls-dane0 \
+        libgnutls-openssl27 libgnutls28-dev libgnutlsxx28 libgpg-error-dev libicu-dev libidn2-dev libp11-kit-dev \
+        libtasn1-6-dev libunbound8 libxml2-dev nettle-dev lzip
+
+RUN curl -L -O https://gmplib.org/download/gmp/gmp-6.2.0.tar.lz && \
+    curl -L -O https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.bz2 && \
+    curl -L -O https://www.sqlite.org/2020/sqlite-autoconf-3320200.tar.gz && \
+    curl -L -O http://zlib.net/zlib-1.2.11.tar.gz && \
+    curl -L -O https://c-ares.haxx.se/download/c-ares-1.16.1.tar.gz
+
+RUN tar xf gmp-6.2.0.tar.lz && \
+    cd gmp-6.2.0 && \
+    ./configure \
+        --disable-shared \
+        --enable-static \
+        --prefix=/usr/local/$HOST \
+        --host=$HOST \
+        --disable-cxx \
+        --enable-fat \
+        CFLAGS="-mtune=generic -O2 -g0" && \
+    make install -j7
+
+RUN tar xf expat-2.2.9.tar.bz2 && \
+    cd expat-2.2.9 && \
+    ./configure \
+        --disable-shared \
+        --enable-static \
+        --prefix=/usr/local/$HOST \
+        --host=$HOST \
+        --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` && \
+    make install -j7
+
+RUN tar xf sqlite-autoconf-3320200.tar.gz && \
+    cd sqlite-autoconf-3320200 && \
+    ./configure \
+        --disable-shared \
+        --enable-static \
+        --prefix=/usr/local/$HOST \
+        --host=$HOST \
+        --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` && \
+    make install -j7
+
+RUN tar xf zlib-1.2.11.tar.gz && \
+    cd zlib-1.2.11 && \
+    CC=$HOST-gcc \
+    AR=$HOST-ar \
+    LD=$HOST-ld \
+    RANLIB=$HOST-ranlib \
+    STRIP=$HOST-strip \
+    ./configure \
+        --prefix=/usr/local/$HOST \
+        --libdir=/usr/local/$HOST/lib \
+        --includedir=/usr/local/$HOST/include \
+        --static && \
+    make install -j7
+
+RUN tar xf c-ares-1.16.1.tar.gz && \
+    cd c-ares-1.16.1 && \
+    ./configure \
+        --disable-shared \
+        --enable-static \
+        --without-random \
+        --prefix=/usr/local/$HOST \
+        --host=$HOST \
+        --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` \
+        LIBS="-lws2_32" && \
+    make install -j7
+
+RUN apt-get install wget -y && git clone --recursive --depth 1 https://github.com/libssh2/libssh2 && \
+    cd libssh2 && \
+    wget https://git.buildroot.net/buildroot/plain/package/libssh2/0001-drop-custom-buildconf-script.patch && \
+    patch -Np1 --verbose --force < 0001-drop-custom-buildconf-script.patch && \
+    autoreconf --verbose --install --force -I m4 && \
+    ./configure \
+        --disable-shared \
+        --enable-static \
+        --prefix=/usr/local/$HOST \
+        --host=$HOST \
+        --build=`dpkg-architecture -qDEB_BUILD_GNU_TYPE` \
+        --without-openssl \
+        --with-wincng \
+        LIBS="-lws2_32" && \
+    make install -j7
+ADD https://api.github.com/repos/aria2/aria2/git/refs/heads/master version.json
+RUN git clone https://github.com/aria2/aria2 && \
+    cd aria2 && autoreconf -i && ./mingw-config && make -j7 && \
+    $HOST-strip -s src/aria2c.exe
