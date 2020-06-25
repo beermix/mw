@@ -69,6 +69,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         gnat1.exe.def
         010-documentation.patch
         gcc-10-git.patch
+        gcc-stable-branch.patch
         mpfr-4.0.2-p1.patch
         openmp-vectorize-v2.patch
         fortran-vector-v2.patch
@@ -126,17 +127,17 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-10-git.patch \
+    gcc-stable-branch.patch \
     010-documentation.patch
 
   apply_patch_with_msg \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
     ipa-cp.patch \
-    optimize.patch \
-    optimize-at-least-some.patch \
     gomp-relax.patch
 
+#    optimize.patch \
+#    optimize-at-least-some.patch \
 #    0001-x86-Add-mzero-caller.patch
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
