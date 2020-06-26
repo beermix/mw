@@ -1,24 +1,25 @@
 # Maintainer: Alexey Pavlov <Alexpux@gmail.com>
+# https://invisible-mirror.net/archives/ncurses/current/?C=M;O=D
 
 pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
-_basever=6.0
-_date=20200215
-pkgver=${_basever}
+_basever=6.2
+_date=20200613
+pkgver=${_basever}.${_date}
+#pkgver=6.2
 pkgrel=1
 pkgdesc="System V Release 4.0 curses emulation library"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/ncurses/"
 license=('MIT')
-source=("${pkgbase}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/${pkgbase}-${_basever}.tar.gz")
-sha256sums=('28fea34e8f61ffd355b87c3195d20686c3a0a3f07be3b21cdd7294092dedd9cd')
+source=("${pkgbase}-${pkgver}.tar.gz"::"https://invisible-mirror.net/archives/ncurses/current/${pkgbase}-${_basever}-${_date}.tgz")
 
 prepare() {
-  cd ${srcdir}/${pkgbase}-${_basever}
+  cd ${srcdir}/${pkgbase}-${_basever}-${_date}
 }
 
 build() {
-  cd ${srcdir}/${pkgbase}-${_basever}
+  cd ${srcdir}/${pkgbase}-${_basever}-${_date}
 
   ./configure \
     --build=${CHOST} \
@@ -58,8 +59,7 @@ build() {
 }
 
 package_ncurses() {
-  depends=('msys2-runtime' 'gcc-libs')
-  groups=('base')
+  depends=('gcc-libs')
 
   mkdir -p ${pkgdir}/usr
   cp -rf $srcdir/dest/usr/bin ${pkgdir}/usr/
@@ -72,7 +72,7 @@ package_ncurses() {
 package_ncurses-devel() {
   groups=('development')
   options=('staticlibs')
-  depends=("ncurses=$pkgver")
+  depends=("ncurses=${pkgver}")
   pkgdesc="NCURSES headers and libraries"
 
   mkdir -p ${pkgdir}/usr/bin
