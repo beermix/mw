@@ -21,7 +21,7 @@ pkgver=10.1.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=9
+pkgrel=3
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -127,7 +127,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-stable-branch.patch \
+    gcc-10-git.patch \
     010-documentation.patch \
     optimize.patch \
     optimize-at-least-some.patch
