@@ -21,7 +21,7 @@ pkgver=10.1.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=3
+pkgrel=4
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -248,7 +248,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
@@ -326,13 +326,13 @@ package_mingw-w64-gcc() {
   cp bin/${MINGW_CHOST}-gcc-ranlib.exe                  ${pkgdir}${MINGW_PREFIX}/bin/
 
   #cp bin/{libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
-  #cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
+  cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
