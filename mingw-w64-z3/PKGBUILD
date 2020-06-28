@@ -98,6 +98,4 @@ package() {
 
   cd "${srcdir}"/build-${CARCH}-shared
   make install DESTDIR="${pkgdir}"
-
-  install -Dm644 ${srcdir}/${_realname}-${_realname}-${pkgver}/LICENSE.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE.txt
 }
