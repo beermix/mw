@@ -38,8 +38,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
-             "${MINGW_PACKAGE_PREFIX}-swig"
-             "${MINGW_PACKAGE_PREFIX}-isl"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
@@ -47,8 +45,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc"
-         "${MINGW_PACKAGE_PREFIX}-uasm")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1-rc2
@@ -419,8 +416,7 @@ package_lldb() {
   depends=("${MINGW_PACKAGE_PREFIX}-libxml2"
            "${MINGW_PACKAGE_PREFIX}-llvm"
            "${MINGW_PACKAGE_PREFIX}-python"
-           "${MINGW_PACKAGE_PREFIX}-readline"
-           "${MINGW_PACKAGE_PREFIX}-swig")
+           "${MINGW_PACKAGE_PREFIX}-readline")
 
   cd "${srcdir}/llvm-${pkgver}.src"
 
