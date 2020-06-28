@@ -75,6 +75,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         fortran-vector-v2.patch
         optimize.patch
         ipa-cp.patch
+        git-updates.diff
         gomp-relax.patch
         0001-x86-Add-mzero-caller.patch
         0130-libstdc++-in-out-new.patch
