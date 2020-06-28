@@ -20,7 +20,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
 makedepends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib" "git")
 options=('staticlibs' '!distcc' '!ccache') # 'debug' '!strip')
 #install=binutils.install
-source=("${_realname}"::"git+https://sourceware.org/git/binutils-gdb.git#branch=${_realname}-${_base_ver//./_}-branch"
+source=(#"${_realname}"::"git+https://sourceware.org/git/binutils-gdb.git#branch=${_realname}-${_base_ver//./_}-branch"
+        "${_realname}"::"git+https://sourceware.org/git/binutils-gdb.git"
         0001-enable-gold-on.mingw32.patch
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
@@ -79,12 +80,14 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --with-system-zlib \
+    --disable-cet \
+    --disable-sim \
+    --disable-gdb \
     --enable-targets=x86_64-*-mingw64 \
     --enable-silent-rules \
     --disable-shared
 
-  make
+  make MAKEINFO=true
 }
 
 check() {
@@ -97,7 +100,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make DESTDIR=${pkgdir} install
+  make MAKEINFO=true DESTDIR=${pkgdir} install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include
@@ -110,4 +113,27 @@ package() {
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
+
+#  ln -s addr2line.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-addr2line.exe
+#  ln -s ar.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ar.exe
+#  ln -s as.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-as.exe
+#  ln -s c++filt.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-c++filt.exe
+#  ln -s dlltool.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dlltool.exe
+#  ln -s dllwrap.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dllwrap.exe
+#  ln -s dwp.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-dwp.exe
+#  ln -s elfedit.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-elfedit.exe
+#  ln -s gprof.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-gprof.exe
+#  ln -s ld.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.exe
+#  ln -s ld.bfd.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.bfd.exe
+#  ln -s ld.gold.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ld.gold.exe
+#  ln -s nm.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-nm.exe
+#  ln -s objcopy.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objcopy.exe
+#  ln -s objdump.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-objdump.exe
+#  ln -s ranlib.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-ranlib.exe
+#  ln -s readelf.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-readelf.exe
+#  ln -s size.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-size.exe
+#  ln -s strings.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strings.exe
+#  ln -s strip.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-strip.exe
+#  ln -s windmc.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windmc.exe
+#  ln -s windres.exe ${pkgdir}${MINGW_PREFIX}/bin/${MINGW_CHOST}-windres.exe
 }

@@ -46,7 +46,7 @@ build() {
     --enable-ext-mouse \
     --disable-symlinks \
     --without-manpages \
-    --enable-warnings \
+    --disable-warnings \
     --enable-assertions \
     --disable-home-terminfo \
     --enable-database \
