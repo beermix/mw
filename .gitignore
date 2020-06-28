@@ -10,6 +10,7 @@
 *.log
 *.log.[0-9]*
 gcc-git
+binutils-git
 mingw-w64
 */src/
 /*/src/
@@ -28,7 +29,6 @@ mingw-w64
 */gcc/
 /mc/mc/
 /*/mingw-w64/
-/*/binutils/
 /*/gcc-git/
 /*/*/mingw-w64/
 /*/*/windows-default-manifest/

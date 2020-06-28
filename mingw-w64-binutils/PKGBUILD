@@ -43,9 +43,8 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0200-remove-provide-qualifiers.patch
         0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
         006_better_file_error.patch
-        013_bash_in_ld_testsuite.patch
-        130_gold_disable_testsuite_build.patch
         135_bfd_soversion.patch
+        000-branch-updates.patch
         binutils-2.29-filename-in-error-messages.patch
         binutils-export-demangle.h.patch
         binutils-add-LD_AS_NEEDED-global-env.patch
@@ -71,7 +70,7 @@ prepare() {
 
   patch -p1 -i "${srcdir}"/nodocs.patch
 
-  patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/000-branch-updates.patch
   patch -p1 -i "${srcdir}"/001-branch-version.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch

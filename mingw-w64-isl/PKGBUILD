@@ -36,7 +36,6 @@ build() {
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
-    --with-gcc-arch=haswell \
     --enable-static \
     --disable-shared \
     --with-gmp-prefix=${MINGW_PREFIX}
