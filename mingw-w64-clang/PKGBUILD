@@ -53,16 +53,12 @@ options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1-rc2
 source=(${_url}/llvm-${pkgver}.src.tar.xz
-        #${_url}/openmp-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}.src.tar.xz
         ${_url}/libcxx-${pkgver}.src.tar.xz
         ${_url}/libcxxabi-${pkgver}.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
-        #${_url}/lld-${pkgver}.src.tar.xz
-        #${_url}/lldb-${pkgver}.src.tar.xz
         ${_url}/libunwind-${pkgver}.src.tar.xz
-        #${_url}/polly-${pkgver}.src.tar.xz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -213,9 +209,6 @@ prepare() {
          projects/libcxxabi projects/libunwind projects/openmp projects/test-suite | true
   mv "${srcdir}/clang-${pkgver}.src"               tools/clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" tools/clang/tools/extra
-  #mv "${srcdir}/lld-${pkgver}.src"               tools/lld
-  #mv "${srcdir}/lldb-${pkgver}.src"              tools/lldb
-  #mv "${srcdir}/polly-${pkgver}.src"             tools/polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       projects/compiler-rt
   mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
   mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
@@ -252,7 +245,7 @@ build() {
     export CC='clang'
     export CXX='clang++'
   fi
-
+  
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
   if [ "${CARCH}" == "x86_64" ]; then
     export ASM_COMPILER_FLAGS=-win64
@@ -268,7 +261,7 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
