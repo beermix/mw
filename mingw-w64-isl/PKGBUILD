@@ -6,7 +6,7 @@ _realname=isl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=0.16.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Library for manipulating sets and relations of integer points bounded by linear constraints (mingw-w64)"
 arch=('any')
 url="https://isl.gforge.inria.fr/"
@@ -23,9 +23,9 @@ prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   patch -p1 -i ${srcdir}/isl-0.14.1-no-undefined.patch
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  unset LDFLAGS
+  unset CFLAGS
+  unset CXXFLAGS
+  unset LDFLAGS
 
   autoreconf -fi
 }
@@ -36,6 +36,7 @@ build() {
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
+    --with-gcc-arch=haswell \
     --enable-static \
     --disable-shared \
     --with-gmp-prefix=${MINGW_PREFIX}

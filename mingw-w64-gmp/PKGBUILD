@@ -4,7 +4,7 @@ _realname=gmp
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=6.2.0
-pkgrel=2
+pkgrel=1
 pkgdesc="A free library for arbitrary precision arithmetic (mingw-w64)"
 arch=('any')
 url="https://gmplib.org/"
@@ -29,7 +29,7 @@ prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   apply_patch_p2_with_msg gmp-6.2.0-1.src.patch
 
-  autoreconf -fi
+  #autoreconf -fi
 }
 
 build() {
