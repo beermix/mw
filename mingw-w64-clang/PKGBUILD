@@ -181,23 +181,6 @@ prepare() {
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch"
 
-#  cd "${srcdir}/lldb-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0502-Add-missing-declarations-for-linking-to-psapi.patch" \
-#      "0503-lldb-find-mingw-python.patch" \
-#      "0504-fix-lldb-library-name-mingw.patch"
-
-#  cd "${srcdir}/polly-${pkgver}.src"
-#  # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
-#  apply_patch_with_msg \
-#      "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
-
-#  cd "${srcdir}/openmp-${pkgver}.src"
-#  apply_patch_with_msg \
-#      "0901-openmp-kpm-lock.patch" \
-#      "0902-libomp-weak-mingw.patch" \
-#      "0903-Fix-implib-for-MinGW.patch"
-
   # At the present, clang must reside inside the LLVM source code tree to build
   # See https://bugs.llvm.org/show_bug.cgi?id=4840
 
@@ -210,7 +193,6 @@ prepare() {
   mv "${srcdir}/libcxxabi-${pkgver}.src"         projects/libcxxabi
   mv "${srcdir}/libcxx-${pkgver}.src"            projects/libcxx
   mv "${srcdir}/libunwind-${pkgver}.src"         projects/libunwind
-  #mv "${srcdir}/openmp-${pkgver}.src"            projects/openmp
   #mv "${srcdir}/testsuite-${pkgver}.src"         projects/test-suite
 }
 
@@ -243,11 +225,6 @@ build() {
     export CXX='clang++'
   fi
   
-#  export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
-#  if [ "${CARCH}" == "x86_64" ]; then
-#    export ASM_COMPILER_FLAGS=-win64
-  fi
-
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
@@ -257,6 +234,7 @@ build() {
     -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_OPTIMIZED_TABLEGEN=ON \
     -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -296,10 +274,10 @@ build() {
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
   #
-#  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
+  sed -i.orig '/\(clang\|lld\|lldb\|polly\)\/cmake_install.cmake/d' tools/cmake_install.cmake
   sed -i.orig '/\(extra\|scan-build\|scan-view\)\/cmake_install.cmake/d' tools/clang/tools/cmake_install.cmake
 # sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\)\/cmake_install.cmake/d' projects/cmake_install.cmake
-  #sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
+  sed -i.orig '/\(compiler-rt\|libcxxabi\|libcxx\|openmp\|libunwind\)\/cmake_install.cmake/d' projects/cmake_install.cmake
   # fix the bad command line parameters, use unix style
 }
 
@@ -548,7 +526,6 @@ package_mingw-w64-x86_64-libc++(){
 package_mingw-w64-x86_64-openmp(){
   package_openmp
 }
-
 
 package_mingw-w64-x86_64-lld(){
   package_lld
