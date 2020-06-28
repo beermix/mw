@@ -31,8 +31,8 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
-pkgver=10.0.1rc1
-pkgrel=3
+pkgver=10.0.1rc2
+pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -55,7 +55,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
-_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1-rc1
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.1-rc2
 source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/openmp-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
