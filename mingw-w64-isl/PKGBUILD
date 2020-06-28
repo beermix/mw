@@ -23,9 +23,9 @@ prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   patch -p1 -i ${srcdir}/isl-0.14.1-no-undefined.patch
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
+  #unset CFLAGS
+  #unset CXXFLAGS
+  #unset LDFLAGS
 
   autoreconf -fi
 }
