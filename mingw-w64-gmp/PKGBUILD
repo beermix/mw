@@ -28,8 +28,6 @@ apply_patch_p2_with_msg() {
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   apply_patch_p2_with_msg gmp-6.2.0-1.src.patch
-
-  #autoreconf -fi
 }
 
 build() {
@@ -41,7 +39,6 @@ build() {
     --build=${MINGW_CHOST} \
     --prefix=${MINGW_PREFIX} \
     --enable-cxx \
-    --enable-fat \
     --enable-static \
     --disable-shared
   make
