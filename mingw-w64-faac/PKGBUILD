@@ -31,7 +31,7 @@ build() {
     --enable-static \
     --disable-shared
 
-  make LDFLAGS=-static
+  make LDFLAGS=-static -j1
 }
 
 package() {
