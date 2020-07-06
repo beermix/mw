@@ -1,0 +1,40 @@
+# Maintainer: Zach Bacon <11doctorwhocanada@gmail.com>
+
+_realname=faac
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=b1d1bf69540af0af6cffe8195bf2b6c24ab556ee
+pkgrel=1
+pkgdesc="FAAC is an AAC audio encoder (mingw-w64)"
+arch=('any')
+url='https://github.com/knik0/faac'
+license=('GPL2')
+source=("https://github.com/knik0/faac/archive/${pkgver}.tar.gz")
+sha256sums=('adc387ce588cca16d98c03b6ec1e58f0ffd9fc6eadb00e254157d6b16203b2d2')
+
+prepare() {
+  cd ${srcdir}/${_realname}-${pkgver//\./_}
+
+  autoreconf -fiv
+}
+
+build() {
+  [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
+  cp -R "${_realname}-${pkgver//\./_}" "${srcdir}"/build-${CARCH}
+  cd "${srcdir}"/build-${CARCH}
+
+  ./configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST} \
+    --enable-static \
+    --disable-shared
+
+  make
+}
+
+package() {
+  cd "${srcdir}"/build-${CARCH}
+  make install DESTDIR="${pkgdir}"
+}
