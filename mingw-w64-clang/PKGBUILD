@@ -55,7 +55,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc"
 options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
 _url=https://github.com/llvm/llvm-project/archive
-source=(${_url}/llvmorg-10.0.1-rc3.zip
+source=(${_url}/llvmorg-10.0.1-rc3.tar.gz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -76,7 +76,7 @@ source=(${_url}/llvmorg-10.0.1-rc3.zip
         "0901-openmp-kpm-lock.patch"
         "0902-libomp-weak-mingw.patch"
         "0903-Fix-implib-for-MinGW.patch")
-noextract=(llvmorg-10.0.1-rc3.zip)
+noextract=(llvmorg-10.0.1-rc3.tar.gz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -87,7 +87,10 @@ apply_patch_with_msg() {
 }
 
 prepare() {
-  unzip llvmorg-10.0.1-rc3.zip -d "${srcdir}"
+#  unzip llvmorg-10.0.1-rc3.zip -d "${srcdir}"
+
+  [[ -d ${srcdir}/llvm-project-llvmorg-10.0.1-rc3 ]] && rm -rf ${srcdir}/llvm-project-llvmorg-10.0.1-rc3
+  [[ -d ${srcdir}/llvm-project-llvmorg-10.0.1-rc3 ]] || tar -xzf ${srcdir}/llvm-project-llvmorg-10.0.1-rc3.tar.gz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-project-llvmorg-10.0.1-rc3/llvm"
   apply_patch_with_msg \
@@ -187,11 +190,12 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -Wno-dev \
-    -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
     -DLLVM_ENABLE_WERROR=OFF \
+    -DLLVM_ENABLE_LIBXML2=ON \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_TARGETS_TO_BUILD="AMDGPU,X86" \
+    -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
@@ -201,7 +205,7 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -225,6 +229,10 @@ build() {
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
+    -DCLANG_BUILD_EXAMPLES=OFF \
+    -DCLANG_INCLUDE_DOCS=OFF \
+    -DCLANG_INCLUDE_TESTS=OFF \
+    -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm
