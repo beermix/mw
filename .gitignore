@@ -4,6 +4,8 @@
 *.tar.bz2
 *.tgz
 *.rar
+*.zip
+*.aria2
 *.part
 *.sig
 *.asc
