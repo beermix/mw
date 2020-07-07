@@ -21,7 +21,7 @@ pkgver=10.1.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=5
+pkgrel=6
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -251,7 +251,6 @@ build() {
     --disable-rpath \
     --disable-win32-registry \
     --disable-nls \
-    --disable-werror \
     --disable-symvers \
     --disable-plugin \
     --with-libiconv \
@@ -269,7 +268,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make V=1 all
+  noti nice -n19 make V=1 all
 
   #  "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2"
   rm -rf ${srcdir}${MINGW_PREFIX}
