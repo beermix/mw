@@ -90,7 +90,7 @@ prepare() {
 #  unzip llvmorg-10.0.1-rc3.zip -d "${srcdir}"
 
   [[ -d ${srcdir}/llvm-project-llvmorg-10.0.1-rc3 ]] && rm -rf ${srcdir}/llvm-project-llvmorg-10.0.1-rc3
-  [[ -d ${srcdir}/llvm-project-llvmorg-10.0.1-rc3 ]] || tar -xzf ${srcdir}/llvm-project-llvmorg-10.0.1-rc3.tar.gz -C ${srcdir} || true
+  [[ -d ${srcdir}/llvm-project-llvmorg-10.0.1-rc3 ]] || tar -xzf ${srcdir}/llvmorg-10.0.1-rc3.tar.gz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-project-llvmorg-10.0.1-rc3/llvm"
   apply_patch_with_msg \
@@ -194,7 +194,7 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_LIBXML2=ON \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
-    -DLLVM_TARGETS_TO_BUILD="AMDGPU,X86" \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
