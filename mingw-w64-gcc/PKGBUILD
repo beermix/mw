@@ -129,10 +129,9 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-stable-branch.patch \
-    010-documentation.patch
-
-#    optimize.patch \
-#    optimize-at-least-some.patch
+    010-documentation.patch\
+    optimize.patch \
+    optimize-at-least-some.patch
 
 #  apply_patch_with_msg \
 #    openmp-vectorize-v2.patch \
@@ -215,11 +214,11 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  #CFLAGS=${CFLAGS/-pipe/}
-  #CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
 
-  #CFLAGS=${CFLAGS/-O2/-O3}
-  #CXXFLAGS=${CFLAGS/-O2/-O3}
+  CFLAGS=${CFLAGS/-O2/-O3}
+  CXXFLAGS=${CFLAGS/-O2/-O3}
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
