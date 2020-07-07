@@ -16,14 +16,10 @@ license=('BSD')
 url="https://www.openssl.org"
 noextract=(${_realname}-${_ver}.tar.gz)
 source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
-        'openssl-1.1.1-relocation.patch'
-        '0001-tests-work-around-the-MSYS-vs-Windows-paths-problem.patch'
-        '0001-shlib_wrap.sh-accommodate-for-MINGW-builds-being-tes.patch')
+        'openssl-1.1.1-relocation.patch')
 sha256sums=('ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46'
             'SKIP'
-            '1c6bf1b9cf0f183c96349b1820df52b1c5f2bc193060d4d31a6c45230a857f5c'
-            'f2871bff59d19fe60086116c0549b54814e8e0af7a9ce3b96bb21604466ad556'
-            '8d370171d3fc47db8603097c56c247b1ea7a1364109ac202064c70cf1629deef')
+            '798d1b4dec28429d6cf2081c5b5b23b4344590a9b812e8089842389dbd175b77')
 
 validpgpkeys=('8657ABB260F056B1E5190839D9C4D26D0E604491'
               '7953AC1FBC3DC8B3B292393ED5E9E43F7DF9EE8C')
@@ -75,8 +71,6 @@ build() {
   fi
   cd "${srcdir}/build-${CARCH}"
   export MSYS2_ARG_CONV_EXCL="--prefix="
-  #export CC=clang
-  #export CXX=clang++
   ${srcdir}/${_realname}-${_ver}/Configure \
     --prefix=${MINGW_PREFIX} \
     --openssldir=ssl \

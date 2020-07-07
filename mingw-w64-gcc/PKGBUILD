@@ -78,6 +78,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         git-updates.diff
         gomp-relax.patch
         0001-x86-Add-mzero-caller.patch
+        gcc-lto-jobserver.diff
         0130-libstdc++-in-out-new.patch
         optimize-at-least-some.patch)
 sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
@@ -131,7 +132,8 @@ prepare() {
     gcc-stable-branch.patch \
     010-documentation.patch\
     optimize.patch \
-    optimize-at-least-some.patch
+    optimize-at-least-some.patch \
+    gcc-lto-jobserver.diff
 
 #  apply_patch_with_msg \
 #    openmp-vectorize-v2.patch \
