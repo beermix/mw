@@ -16,8 +16,6 @@ arch=('any')
 url="https://www.ruby-lang.org/en"
 license=("BSD, custom")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" 
-             "${MINGW_PACKAGE_PREFIX}-doxygen"
-             "${MINGW_PACKAGE_PREFIX}-graphviz"
              "${MINGW_PACKAGE_PREFIX}-pkg-config")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gdbm"
