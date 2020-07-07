@@ -190,7 +190,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -Wno-dev \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_LIBXML2=ON \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
