@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1rc3
-pkgrel=1
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -51,7 +51,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              )
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
-#options=('!debug' 'strip')
+options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
 _url=https://github.com/llvm/llvm-project/archive
 source=(${_url}/llvmorg-10.0.1-rc3.tar.gz
@@ -193,7 +193,7 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_LIBXML2=ON \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_TARGETS_TO_BUILD="AMDGPU;NVPTX;X86" \
     -DLLVM_CCACHE_BUILD=ON \
     -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
     -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
@@ -203,6 +203,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF \
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=OFF \
@@ -230,7 +232,6 @@ build() {
     -DCLANG_INCLUDE_DOCS=OFF \
     -DCLANG_INCLUDE_TESTS=OFF \
     -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm
@@ -239,7 +240,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
