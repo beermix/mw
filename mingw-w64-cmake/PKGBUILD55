@@ -41,6 +41,7 @@ sha256sums=('0bd60d512275dc9f6ef2a2865426a184642ceb3761794e6b65bff233b91d8c40'
             'd0aaa6fbf3e740341aaac2b43033f6c20f56a94ea0b2c509233f693cabe2a912'
             '94642670c922c9acfade79bc567c6b28f2d2f89e27aa391b562e8c90baa49ce1')
 
+
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -77,23 +78,28 @@ build() {
   mkdir -p "${srcdir}/build-${MINGW_CHOST}"
   cd "${srcdir}/build-${MINGW_CHOST}"
 
-  CC='clang' CXX='clang++' \
-  MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/configure  \
-    --prefix=${MINGW_PREFIX}                      \
-    --system-libs                                 \
-    --no-system-expat                             \
-    --no-qt-gui                                      \
-    --parallel=7
-  plain "Start building..."
-  make
+  export CC='ccache clang'
+  export CXX='ccache clang++'
+
+    MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
+    ${MINGW_PREFIX}/bin/cmake \
+      -G'MSYS Makefiles' \
+      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
+      -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
+      -DBUILD_QtDialog=0 \
+      -DCURL_WINDOWS_SSPI=1 \
+      -DCMAKE_VERBOSE_MAKEFILE=ON \
+      -DCMAKE_C_FLAGS="${CFLAGS}" \
+      -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+      "${extra_config[@]}" \
+      ../${_realname}-${pkgver}
+
+  make -j7
 }
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  CC='clang' CXX='clang++' \
-  ./bin/cmake.exe \
-     -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_VERBOSE_MAKEFILE=ON \
-     -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
+  make install DESTDIR="${pkgdir}"
 }
