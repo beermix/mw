@@ -4,7 +4,7 @@
 _realname=ccache
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.7.9
+pkgver=3.7.10
 pkgrel=1
 pkgdesc="Compiler cache that speeds up recompilation by caching previous compilations (mingw-w64)"
 arch=('any')
@@ -37,8 +37,8 @@ build() {
   #export LDFLAGS="-Wl,-z,now -Wl,-z,relro"
   #export CPPFLAGS="-D_FORTIFY_SOURCE=2"
 
-  export CC='clang'
-  export CXX='clang++'
+  #export CC='clang'
+  #export CXX='clang++'
 
   ../${_realname}-${pkgver}/configure \
       --prefix=${MINGW_PREFIX} \
