@@ -87,8 +87,8 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=stable \
-    --enable-ninja \
     --enable-extended \
+    --enable-optimize \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
