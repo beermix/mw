@@ -94,6 +94,5 @@ package() {
   CC='clang' CXX='clang++' \
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_VERBOSE_MAKEFILE=ON \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
 }
