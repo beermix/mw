@@ -3,7 +3,7 @@
 _realname=z3
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=tptp
+pkgver=688d38d8684fefc35c4e6baa46b90c32b5279c0e
 pkgrel=1
 pkgdesc="Z3 is a high-performance theorem prover being developed at Microsoft Research (mingw-w64)"
 arch=('any')
@@ -12,7 +12,7 @@ license=('MIT')
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
              "${MINGW_PACKAGE_PREFIX}-python3")
 options=('strip' 'staticlibs')
-source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/Z3Prover/z3/archive/z3-${pkgver}.tar.gz"
+source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/Z3Prover/z3/archive/${pkgver}.tar.gz"
         001-mingw-fixes.patch
         003-fix-dll-exports.patch
         004-fix-python-bindings-install.patch)
@@ -30,7 +30,7 @@ apply_patch_with_msg() {
 }
 
 prepare() {
-  cd "${srcdir}"/${_realname}-${_realname}-${pkgver}
+  cd "${srcdir}"/${_realname}-${pkgver}
   apply_patch_with_msg \
     001-mingw-fixes.patch \
     003-fix-dll-exports.patch \
@@ -62,7 +62,7 @@ build() {
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
-    ../${_realname}-${_realname}-${pkgver}
+    ../${_realname}-${pkgver}
 
   nice -n19 make
 
@@ -82,7 +82,7 @@ build() {
     -DBUILD_PYTHON_BINDINGS=ON \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
-    ../${_realname}-${_realname}-${pkgver}
+    ../${_realname}-${pkgver}
 
   nice -n19 make
 }

@@ -54,11 +54,11 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
-  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  patch -p1 -i "${srcdir}/0005-win32-config.patch"
+  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
 
 build() {
@@ -74,10 +74,11 @@ build() {
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
 
-   #export CC='clang'
-   #export CXX='clang++'
+  # export CC='clang'
+  # export CXX='clang++'
 
-  #CC='clang' CXX='clang++'
+  # CC='clang' CXX='clang++'
+
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
     --prefix=${MINGW_PREFIX} \
@@ -88,7 +89,6 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-extended \
-    --disable-optimize \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
@@ -97,7 +97,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
