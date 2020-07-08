@@ -66,6 +66,7 @@ build() {
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
   #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
+  # --enable-optimize
   OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
@@ -96,7 +97,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
