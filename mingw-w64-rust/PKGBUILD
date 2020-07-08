@@ -74,10 +74,10 @@ build() {
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
 
-   export CC='clang'
-   export CXX='clang++'
+   #export CC='clang'
+   #export CXX='clang++'
 
-  CC='clang' CXX='clang++' \
+  #CC='clang' CXX='clang++'
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
     --prefix=${MINGW_PREFIX} \
@@ -88,7 +88,7 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-extended \
-    --enable-optimize \
+    --disable-optimize \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
