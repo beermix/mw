@@ -3,7 +3,7 @@
 _realname=uasm
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=v2.50
+pkgver=16a853bd6de807fe2c42569f8375a029684c0f22
 pkgrel=1
 pkgdesc="UASM is a free MASM-compatible assembler based on JWasm"
 arch=('any')
@@ -17,16 +17,16 @@ source=(https://github.com/Terraspace/UASM/archive/${pkgver}.tar.gz
 sha256sums=('2892af8f95bf3e1a8457a550018d9e9b7c07934190b73fb650301ae30074b796')
 
 prepare() {
-  cd ${srcdir}/UASM-2.50/
+  cd ${srcdir}/UASM-${pkgver}/
   patch -p1 -i ${srcdir}/clang.patch
-  rm -rf MinGW-w64R
+  rm -rf MinGWR
 }
 
 build() {
-  cd ${srcdir}/UASM-2.50/
+  cd ${srcdir}/UASM-${pkgver}/
   make -f GccWin64.mak
 }
 
 package() {
-  install -Dm744 ${srcdir}/UASM-2.50/MinGW-w64R/hjwasm.exe "${pkgdir}${MINGW_PREFIX}/bin/${_realname}.exe"
+  install -Dm744 ${srcdir}/UASM-${pkgver}/MinGWR/hjwasm.exe "${pkgdir}${MINGW_PREFIX}/bin/${_realname}.exe"
 }
