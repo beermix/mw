@@ -57,46 +57,8 @@ prepare() {
   #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
-  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  patch -p1 -i "${srcdir}/0005-win32-config.patch"
-
-  cat >config.toml <<END
-[llvm]
-targets = "X86"
-release-debuginfo = false
-assertions = false
-ccache = true
-ccache = "/path/to/ccache"
-version-check = true
-optimize = true
-[build]
-target = ["x86_64-pc-windows-gnu"]
-host = ["x86_64-pc-windows-gnu"]
-full-bootstrap = false
-cargo = "/mingw64/bin/cargo"
-rustc = "/mingw64/bin/rustc"
-python = "/mingw64/bin/python2"
-extended = true
-sanitizers = false
-#profiler = true
-#vendor = true
-
-[install]
-prefix = "${MINGW_PREFIX}"
-sysconfdir = "${MINGW_PREFIX}/etc"
-localstatedir = "${MINGW_PREFIX}/var/lib"
-
-[rust]
-debug = false
-debug-assertions = false
-debuginfo-level = 0
-channel = "dev"
-codegen-tests = false
-deny-warnings = true
-
-[target.x86_64-pc-windows-gnu]
-llvm-config = "/mingw64/bin/llvm-config"
-END
+  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
 
 build() {
@@ -104,17 +66,44 @@ build() {
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
   #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  #OSTYPE="$CARCH-pc-windows-gnu"
+  # --enable-optimize
+  OSTYPE="$CARCH-pc-windows-gnu"
 
-  #local -a _rust_conf=()
-  #if [ "${_bootstrapping}" = "no" ]; then
-  #  _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
-  #fi
+  local -a _rust_conf=()
+  if [ "${_bootstrapping}" = "no" ]; then
+    _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
+  fi
+
+  # export CC='clang'
+  # export CXX='clang++'
+
+  # CC='clang' CXX='clang++'
+
+  MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
+  ../${_realname}c-${pkgver}-src/configure \
+    --prefix=${MINGW_PREFIX} \
+    --sysconfdir=${MINGW_PREFIX}/etc \
+    --localstatedir=${MINGW_PREFIX}/var/lib \
+    --build=$OSTYPE \
+    --host=$OSTYPE \
+    --target=$OSTYPE \
+    --release-channel=stable \
+    --enable-extended \
+    --disable-codegen-tests \
+    --python=${MINGW_PREFIX}/bin/python2 \
+    --llvm-root=${MINGW_PREFIX} \
+    ${_rust_conf}
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+}
+
+check() {
+  cd "${srcdir}/${CARCH}"
+  # it might fail on Windows
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {

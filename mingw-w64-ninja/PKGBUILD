@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=48a9fb5d0de6f7bb850863d122ba736b62546746
+pkgver=6c5e886aacd98766fe43539c2c8ae7f3ca2af2aa
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -22,8 +22,6 @@ prepare () {
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-      -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
       -DCMAKE_C_FLAGS="${CFLAGS}" \
       -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
       -DCMAKE_VERBOSE_MAKEFILE=ON \
