@@ -3,7 +3,7 @@
 # Contributor: Mateusz Mikuła <mati865@gmail.com
 
 _realname=rust
-_bootstrapping=yes
+_bootstrapping=no
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.44.1
@@ -62,15 +62,20 @@ prepare() {
 
   cat >config.toml <<END
 [llvm]
+skip-rebuild = true
+release-debuginfo = false
 assertions = false
-ccache = true
-ninja = true
+#ccache = true
+#ninja = true
+#targets = "X86"
+version-check = false
+#optimize = true
 
 [build]
 build = "x86_64-pc-windows-gnu"
 host = ["x86_64-pc-windows-gnu"]
 target = ["x86_64-pc-windows-gnu"]
-# full-bootstrap = false
+full-bootstrap = false
 cargo = "/mingw64/bin/cargo"
 rustc = "/mingw64/bin/rustc"
 python = "/mingw64/bin/python"
@@ -85,13 +90,12 @@ sysconfdir = "/mingw64/etc"
 localstatedir = "/mingw64/var/lib"
 
 [rust]
-debug = false
+#debug = false
 #debug-assertions = false
 debuginfo-level = 0
 channel = "stable"
-rpath = false
 codegen-tests = false
-deny-warnings = true
+#deny-warnings = true
 
 [target.x86_64-pc-windows-gnu]
 llvm-config = "/mingw64/bin/llvm-config"
@@ -111,33 +115,24 @@ build() {
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
 
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
-}
-
-check() {
-  cd "${srcdir}/${CARCH}"
-  # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+  DEP_NGHTTP_ROOT=/mingw64 \
+  DEP_OPENSSL_ROOT=/mingw64 \
+  DEP_Z_ROOT=/mingw64 \
+  /mingw64/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 package() {
-  cd "${srcdir}/${CARCH}"
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  cd ${srcdir}/${_realname}c-${pkgver}-src
+  DEP_NGHTTP_ROOT=/mingw64 \
+  DEP_OPENSSL_ROOT=/mingw64 \
+  DEP_Z_ROOT=/mingw64 \
+  DESTDIR=${pkgdir} /mingw64/bin/python3 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
-  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
-  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
-  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
+  rm -f ${pkgdir}/mingw64/bin/libgcc*.dll
+  rm -f ${pkgdir}/mingw64/bin/libstd*.dll
+  rm -f ${pkgdir}/mingw64/bin/libwinpthread*.dll
 
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
-
-  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+  install -d "${pkgdir}/mingw64/share/bash-completion/completions"
+  mv "${pkgdir}/mingw64/etc/bash_completion.d/cargo" \
+     "${pkgdir}/mingw64/share/bash-completion/completions/cargo"
 }
