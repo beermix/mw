@@ -54,11 +54,11 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
-  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
+  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
 
 build() {
@@ -66,18 +66,12 @@ build() {
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
   #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  # --enable-optimize
   OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
   if [ "${_bootstrapping}" = "no" ]; then
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
-
-  # export CC='clang'
-  # export CXX='clang++'
-
-  # CC='clang' CXX='clang++'
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -87,7 +81,8 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
+    --release-channel=dev \
+    --enable-ninja \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
@@ -97,7 +92,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build --stage 1 -j7 --verbose
 }
 
 check() {
@@ -116,9 +111,6 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
 
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
   mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
