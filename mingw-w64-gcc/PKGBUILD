@@ -130,15 +130,16 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     gcc-10-git.patch \
-    010-documentation.patch\
-    optimize.patch \
-    optimize-at-least-some.patch
+    010-documentation.patch
 
-  apply_patch_with_msg \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    ipa-cp.patch \
-    gomp-relax.patch
+#    optimize.patch \
+#    optimize-at-least-some.patch
+
+#  apply_patch_with_msg \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    ipa-cp.patch \
+#    gomp-relax.patch
 
 #    gcc-lto-jobserver.diff
 #    0022-gcc-plugin-ada-use-def.patch \
@@ -254,6 +255,7 @@ build() {
     --disable-rpath \
     --disable-win32-registry \
     --disable-nls \
+    --disable-werror \
     --disable-symvers \
     --disable-plugin \
     --with-libiconv \
@@ -334,7 +336,6 @@ package_mingw-w64-gcc() {
   cp bin/${MINGW_CHOST}-gcc-ranlib.exe                  ${pkgdir}${MINGW_PREFIX}/bin/
 
   #cp bin/{libgcc*,libgomp*,libquadmath*,libssp*,libstdc*}.dll ${pkgdir}${MINGW_PREFIX}/bin/
-  #cp -r include/c++                                           ${pkgdir}${MINGW_PREFIX}/include/
   mkdir -p ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/*.h        ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
