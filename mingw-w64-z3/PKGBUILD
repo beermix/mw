@@ -3,7 +3,7 @@
 _realname=z3
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=688d38d8684fefc35c4e6baa46b90c32b5279c0e
+pkgver=44ec259c4ca8bf97e780f75d0bc195b76d391c23
 pkgrel=1
 pkgdesc="Z3 is a high-performance theorem prover being developed at Microsoft Research (mingw-w64)"
 arch=('any')
@@ -54,10 +54,6 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"MSYS Makefiles" \
-    -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-    -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
-    -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
@@ -73,10 +69,6 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"MSYS Makefiles" \
-    -DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
-    -DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
-    -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=ON \
     -DBUILD_PYTHON_BINDINGS=ON \
