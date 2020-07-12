@@ -168,15 +168,15 @@ apply_patch_with_msg() {
 prepare() {
   plain "Extracting clang-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
-  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJvf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
-  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
-  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
