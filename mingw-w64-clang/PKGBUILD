@@ -141,10 +141,7 @@ sha256sums=('df83a44b3a9a71029049ec101fb0077ecbbdf5fe41e395215025779099a98fdf'
             'a633c38149772f90cc34f83b144185746b5a47f7d3d10a97cb060c31d140ab7e')
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
-noextract=(clang-${pkgver}.src.tar.xz
-           libcxx-${pkgver}.src.tar.xz
-           lldb-${pkgver}.src.tar.xz
-           test-suite-${pkgver}.src.tar.xz)
+noextract=(llvmorg-10.0.1-rc4.tar.gz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
