@@ -10,7 +10,6 @@ arch=('any')
 url='https://github.com/knik0/faac'
 license=('GPL2')
 source=("https://github.com/knik0/faac/archive/${pkgver}.tar.gz")
-sha256sums=('adc387ce588cca16d98c03b6ec1e58f0ffd9fc6eadb00e254157d6b16203b2d2')
 
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver//\./_}
@@ -22,9 +21,6 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   cp -R "${_realname}-${pkgver//\./_}" "${srcdir}"/build-${CARCH}
   cd "${srcdir}"/build-${CARCH}
-  
-  #CFLAGS=${CFLAGS/-O2/-O3}
-  #CXXFLAGS=${CFLAGS/-O2/-O3}
 
   ./configure \
     --prefix=${MINGW_PREFIX} \
@@ -32,7 +28,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --enable-static \
-    --disable-shared
+    --enable-shared
 
   make -j1
 }
