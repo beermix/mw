@@ -32,11 +32,10 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.0
-pkgrel=8
+pkgrel=9
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
-license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -344,6 +343,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD=X86
+    -DCOMPILER_RT_BUILD_SANITIZERS=ON
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
@@ -438,7 +439,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -524,8 +524,6 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -537,8 +535,6 @@ package_llvm() {
   cd "${srcdir}"/llvm-${pkgver}.src
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
