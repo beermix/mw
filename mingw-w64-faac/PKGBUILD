@@ -3,7 +3,7 @@
 _realname=faac
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=b1d1bf69540af0af6cffe8195bf2b6c24ab556ee
+pkgver=9a8b43fd079b71c647738612b6875a3c767dbf8f
 pkgrel=1
 pkgdesc="FAAC is an AAC audio encoder (mingw-w64)"
 arch=('any')
@@ -23,8 +23,8 @@ build() {
   cp -R "${_realname}-${pkgver//\./_}" "${srcdir}"/build-${CARCH}
   cd "${srcdir}"/build-${CARCH}
   
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CFLAGS/-O2/-O3}
+  #CFLAGS=${CFLAGS/-O2/-O3}
+  #CXXFLAGS=${CFLAGS/-O2/-O3}
 
   ./configure \
     --prefix=${MINGW_PREFIX} \
