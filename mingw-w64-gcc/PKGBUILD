@@ -129,6 +129,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
+    git-updates.diff \
     010-documentation.patch
 
 #     gcc-10-git.patch \
@@ -162,11 +163,11 @@ prepare() {
     0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
 
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
-
 #  apply_patch_with_msg \
-#    0130-libstdc++-in-out-new.patch
+#    0130-libstdc++-in-out.patch
+
+  apply_patch_with_msg \
+    0130-libstdc++-in-out-new.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
