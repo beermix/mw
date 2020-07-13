@@ -9,13 +9,14 @@
 _realname=ruby
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.7
-pkgrel=1
+pkgver=2.7.1
+pkgrel=2
 pkgdesc="An object-oriented language for quick and easy programming (mingw-w64)"
 arch=('any')
 url="https://www.ruby-lang.org/en"
 license=("BSD, custom")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" 
+             "${MINGW_PACKAGE_PREFIX}-graphviz"
              "${MINGW_PACKAGE_PREFIX}-pkg-config")
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gdbm"
@@ -25,7 +26,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-openssl"
          "${MINGW_PACKAGE_PREFIX}-tk")
 options=('staticlibs' 'strip')
-source=("https://cache.ruby-lang.org/pub/ruby/snapshot/snapshot-ruby_2_7.tar.gz"
+source=("https://cache.ruby-lang.org/pub/ruby/${pkgver%.*}/${_realname}-${pkgver}.tar.bz2"
         0001-mingw-w64-time-functions.patch
         0003-fix-check-types.patch
         0004-rbinstall-destdir.patch
@@ -79,18 +80,18 @@ provides=(
 )
 ## End of pkgupdprovs modifications
 
-sha256sums=('97ddf1b922f83c1f5c50e75bf54e27bba768d75fea7cda903b886c6745e60f0a'
+sha256sums=('d703d58a67e7ed822d6e4a6ea9e44255f689a5b6ea6752d17e8d031849822202'
             '329994d3bf7e692e18c1faffbedfbd076e5d00257b2100387a773b59b81ccd4e'
             'cbb083aece8e284fb1ae625e689f044a608aa9750bba9f7d399e895547eee39b'
             '02382ec3b9e42d7dbb58edad3e41c361d98871711bb2f0320082c2acc6a82e2e'
             '9fb5acb995255eedde0f0b0bf5cf2c02f00dc088d2538ff9ebb69627aafd1e42')
-noextract=(snapshot-ruby_2_7.tar.gz)
+noextract=(${_realname}-${pkgver}.tar.bz2)
 
 apply_patch_with_msg() {
   for _patch in "$@"
   do
     msg2 "Applying $_patch"
-    patch -Nbp1 -i "snapshot-ruby_2_7/$_patch"
+    patch -Nbp1 -i "${srcdir}/$_patch"
   done
 }
 
@@ -106,16 +107,16 @@ del_file_exists() {
 
 
 prepare() {
-  [[ -d snapshot-ruby_2_7/snapshot-ruby_2_7 ]] && rm -rf snapshot-ruby_2_7/snapshot-ruby_2_7
-  tar -xpvf snapshot-ruby_2_7/snapshot-ruby_2_7.tar.gz -C snapshot-ruby_2_7 || true
+  [[ -d ${srcdir}/${_realname}-${pkgver} ]] && rm -rf ${srcdir}/${_realname}-${pkgver}
+  tar -xjf ${srcdir}/${_realname}-${pkgver}.tar.bz2 -C ${srcdir} || true
 
-  cd snapshot-ruby_2_7/snapshot-ruby_2_7
+  cd ${srcdir}/${_realname}-${pkgver}
   # Pthread disabled in ruby configure for mingw
   # 0001-mingw-w64-time-functions.patch
   apply_patch_with_msg \
       0003-fix-check-types.patch \
       0005-rbinstall-rake-bash.patch
-    #  patch -p1 -i snapshot-ruby_2_7/0004-rbinstall-destdir.patch
+    #  patch -p1 -i ${srcdir}/0004-rbinstall-destdir.patch
   autoreconf -fi
 }
 
@@ -126,9 +127,9 @@ build() {
   CFLAGS+=" -I${MINGW_PREFIX}/include/pdcurses ${FFI_INC}"
   CXXFLAGS+=" -I${MINGW_PREFIX}/include/pdcurses ${FFI_INC}"
 
-  [[ -d "snapshot-ruby_2_7/build-${MINGW_CHOST}" ]] && rm -rf "snapshot-ruby_2_7/build-${MINGW_CHOST}"
-  mkdir -p "snapshot-ruby_2_7/build-${MINGW_CHOST}" && cd "snapshot-ruby_2_7/build-${MINGW_CHOST}"
-  ../snapshot-ruby_2_7/configure \
+  [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
+  mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
+  ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
@@ -137,15 +138,15 @@ build() {
 }
 
 check() {
-  cd "snapshot-ruby_2_7/build-${MINGW_CHOST}"
+  cd "${srcdir}/build-${MINGW_CHOST}"
   make test || true
 }
 
 package() {
-  cd "snapshot-ruby_2_7/build-${MINGW_CHOST}"
+  cd "${srcdir}/build-${MINGW_CHOST}"
   make DESTDIR="${pkgdir}" install-nodoc
   for script in {erb,gem,irb,rdoc,ri}; do
-    install snapshot-ruby_2_7/ruby-${pkgver}/bin/${script} \
+    install ${srcdir}/ruby-${pkgver}/bin/${script} \
       ${pkgdir}${MINGW_PREFIX}/bin/
   done
   local PREFIX_WIN
@@ -153,9 +154,4 @@ package() {
   PREFIX_WIN=$(cygpath -wm ${pkgdir}${MINGW_PREFIX})
   sed -e "s|\\\|/|g" -e "s|${MINGW_PREFIX}/bin/ruby.exe|ruby.exe|g" \
       -e "s|${PREFIX_WIN}/bin/rake|rake|g" -i "${pkgdir}${MINGW_PREFIX}/bin/rake.bat"
-
-  install -D -m644 snapshot-ruby_2_7/snapshot-ruby_2_7/COPYING \
-     "${pkgdir}${MINGW_PREFIX}/share/licenses/ruby/LICENSE"
-  install -D -m644 snapshot-ruby_2_7/snapshot-ruby_2_7/BSDL \
-     "${pkgdir}${MINGW_PREFIX}/share/licenses/ruby/BSDL"
 }
