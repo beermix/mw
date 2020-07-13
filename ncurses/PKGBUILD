@@ -54,7 +54,7 @@ build() {
     --with-build-cflags=-D_XOPEN_SOURCE_EXTENDED \
     --with-pkg-config-libdir=/usr/lib/pkgconfig
 
-  make
+  make -j1
   make DESTDIR=${srcdir}/dest install
 }
 
