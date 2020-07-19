@@ -4,8 +4,8 @@
 _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.17.3
-pkgrel=3
+pkgver=3.18.0
+pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://cmake.org/download/"
@@ -30,7 +30,7 @@ source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
-        "0007-Do-not-generate-import-libs-for-exes.patch"
+        "0007-Do-not-generate-import-libs-for-exes2.patch"
         "0008-Output-line-numbers-in-callstacks.patch"
 	"100-disable_qt_tests.patch")
 sha256sums=('0bd60d512275dc9f6ef2a2865426a184642ceb3761794e6b65bff233b91d8c40'
@@ -68,9 +68,8 @@ prepare() {
     0003-Disable-response-files-for-MSYS-Generator.patch \
     0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
-    0007-Do-not-generate-import-libs-for-exes.patch \
-    0008-Output-line-numbers-in-callstacks.patch \
-    100-disable_qt_tests.patch
+    0007-Do-not-generate-import-libs-for-exes2.patch \
+    0008-Output-line-numbers-in-callstacks.patch
 }
 
 build() {
