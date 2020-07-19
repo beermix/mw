@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.34
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -68,7 +68,7 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93')
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  #patch -p1 -i "${srcdir}"/nodocs.patch
+  patch -p1 -i "${srcdir}"/nodocs.patch
 
   #patch -p1 -i "${srcdir}"/binutils-stable-branch.patch
   #patch -p1 -i "${srcdir}"/001-branch-version.patch
@@ -79,7 +79,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/0020-binutils_2.31_mkdtemp_impl.patch
   patch -p1 -i "${srcdir}"/0110-binutils-mingw-gnu-print.patch
   patch -p1 -i "${srcdir}"/0120-windres-handle-spaces.patch
-
+  
   # Upstream patches
   patch -p1 -i "${srcdir}"/1000-PR24511.patch
   patch -p1 -i "${srcdir}"/1001-PR25447.patch
@@ -121,7 +121,6 @@ build() {
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
-    --disable-cet \
     --disable-sim \
     --disable-gdb \
     --enable-targets=x86_64-*-mingw* \

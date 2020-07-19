@@ -3,7 +3,7 @@
 # Contributor: Mateusz Mikuła <mati865@gmail.com
 
 _realname=rust
-_bootstrapping=no
+_bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.45.0
