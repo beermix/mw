@@ -3,10 +3,10 @@
 # Contributor: Mateusz Mikuła <mati865@gmail.com
 
 _realname=rust
-_bootstrapping=yes
+_bootstrapping=no
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.44.1
+pkgver=1.45.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -55,7 +55,7 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
@@ -108,7 +108,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  /home/User/.go/bin/noti nice -n19 DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
