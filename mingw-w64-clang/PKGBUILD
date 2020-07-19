@@ -36,6 +36,7 @@ pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
+license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -293,7 +294,6 @@ build() {
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
@@ -310,11 +310,6 @@ build() {
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
-    -DCLANG_BUILD_EXAMPLES=OFF \
-    -DCLANG_INCLUDE_DOCS=OFF \
-    -DCLANG_INCLUDE_TESTS=OFF \
-    -DLLVM_ENABLE_MODULE_DEBUGGING=OFF \
-    -DLLVM_USE_LINKER=lld \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}rc4.src
@@ -342,7 +337,6 @@ build() {
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
     -DLLVM_TARGETS_TO_BUILD="X86"
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
@@ -374,7 +368,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}rc4.src
 
-  nice -n19 ${_make_cmd} cxx
+  ${_make_cmd} cxx
 
   cd "${srcdir}"
 
@@ -392,7 +386,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}rc4.src
 
-  nice -n19 ${_make_cmd} unwind cxxabi cxx
+  ${_make_cmd} unwind cxxabi cxx
 }
 
 #check() {
