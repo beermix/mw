@@ -287,7 +287,6 @@ build() {
     -G"$_generator" \
     -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
-    -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=OFF \
