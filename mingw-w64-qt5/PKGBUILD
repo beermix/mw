@@ -9,7 +9,7 @@ _variant=-shared
 # Tune the following to decide how and what to build
 if [ "${_variant}" = "-static" ]; then
   _namesuff="-static"
-  _build_mode=("-debug-and-release")
+  _build_mode=("-release")
   _with_icu=no
   _with_fontconfig=no
   _with_openssl=no
@@ -25,7 +25,7 @@ if [ "${_variant}" = "-static" ]; then
   _system_libtiff=no
   _system_libwebp=no
   _build_examples=no # examples result in > 100 GiB
-  _build_tools=yes
+  _build_tools=no
   _build_tests=no
   _make_docs=no # docs in shared qt5 are sufficient
 #  _ltcg="yes"
@@ -332,10 +332,10 @@ prepare() {
   local _ARCH_TUNE=
   case ${MINGW_CHOST} in
     i686*)
-      _ARCH_TUNE="-march=i686 -mtune=core2"
+      _ARCH_TUNE="-march=i686 -mtune=haswell"
     ;;
     x86_64*)
-      _ARCH_TUNE="-march=nocona -mtune=core2"
+      _ARCH_TUNE="-march=nocona -mtune=haswell"
     ;;
   esac
 
@@ -659,8 +659,8 @@ package_it() {
   install -D -m644 LICENSE.LGPLv3  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.LGPLv3
   install -D -m644 LICENSE.QT-LICENSE-AGREEMENT  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.QT-LICENSE-AGREEMENT
 
-  #mv -f "${pkgdir}${_qt5_prefix}/lib"/*.debug "${pkgdir}${_qt5_prefix}/bin"/ || true
-  #rsync -armR --remove-source-files --include="*/" --include="*.debug" --exclude="*" --prune-empty-dirs ${pkgdir}/.${MINGW_PREFIX} ${srcdir}/${CARCH}-debug/
+#  mv -f "${pkgdir}${_qt5_prefix}/lib"/*.debug "${pkgdir}${_qt5_prefix}/bin"/ || true
+#  rsync -armR --remove-source-files --include="*/" --include="*.debug" --exclude="*" --prune-empty-dirs ${pkgdir}/.${MI#NGW_PREFIX} ${srcdir}/${CARCH}-debug/
 
   # Remove dlls from lib/
   rm -f "${pkgdir}${_qt5_prefix}/lib"/*.dll
