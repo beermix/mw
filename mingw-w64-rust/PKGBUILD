@@ -52,7 +52,7 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
@@ -62,36 +62,34 @@ build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  export PATH=/c/Users/User/.cargo/bin:$HOME/.bin:$PATH:$HOME/go/bin:$HOME/.go/bin:$HOME/jdk-11.0.7/bin
-
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  OSTYPE="$CARCH-pc-windows-gnu"
-
   local -a _rust_conf=()
   if [ "${_bootstrapping}" = "no" ]; then
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
 
-  MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
+  #MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir"
   ../${_realname}c-${pkgver}-src/configure \
     --prefix=${MINGW_PREFIX} \
     --sysconfdir=${MINGW_PREFIX}/etc \
     --localstatedir=${MINGW_PREFIX}/var/lib \
-    --build=$OSTYPE \
-    --host=$OSTYPE \
-    --target=$OSTYPE \
+    --build="x86_64-pc-windows-gnu" \
+    --host="x86_64-pc-windows-gnu" \
+    --target="x86_64-pc-windows-gnu" \
     --release-channel=stable \
     --enable-ninja \
     --enable-extended \
     --disable-codegen-tests \
+    --enable-clang \
+    --enable-local-rust \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
+  /home/User/.go/bin/noti nice -n19 \
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.go/bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 check() {

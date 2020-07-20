@@ -6,7 +6,7 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.44.1
+pkgver=1.45.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -33,7 +33,6 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
-        "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch")
 sha256sums=('75f6ac6c9da9f897f4634d5a07be4084692f7ccc2d2bb89337be86cfc18453a1'
@@ -54,35 +53,31 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
-  #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
-  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
+  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  patch -p1 -i "${srcdir}/0005-win32-config.patch"
 
   cat >config.toml <<END
 [llvm]
 assertions = false
-ccache = true
 ninja = true
 
 [build]
 build = "x86_64-pc-windows-gnu"
 host = ["x86_64-pc-windows-gnu"]
 target = ["x86_64-pc-windows-gnu"]
-# full-bootstrap = false
-cargo = "/mingw64/bin/cargo"
-rustc = "/mingw64/bin/rustc"
-python = "/mingw64/bin/python"
+#full-bootstrap = false
+python = "${MINGW_PREFIX}/bin/python2"
 extended = true
 sanitizers = false
 #profiler = true
 #vendor = true
 
 [install]
-prefix = "/mingw64"
-sysconfdir = "/mingw64/etc"
-localstatedir = "/mingw64/var/lib"
+prefix = "${MINGW_PREFIX}"
+sysconfdir = "${MINGW_PREFIX}/etc"
+localstatedir = "${MINGW_PREFIX}/var/lib"
 
 [rust]
 debug = false
@@ -94,7 +89,7 @@ codegen-tests = false
 deny-warnings = true
 
 [target.x86_64-pc-windows-gnu]
-llvm-config = "/mingw64/bin/llvm-config"
+llvm-config = "${MINGW_PREFIX}/bin/llvm-config"
 END
 }
 
@@ -133,11 +128,4 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
-
-  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
