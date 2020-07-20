@@ -55,17 +55,18 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc"
 options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-rc4
-source=(${_url}/llvm-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/openmp-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/clang-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/compiler-rt-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/libcxx-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/libcxxabi-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/clang-tools-extra-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/lld-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/lldb-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/libunwind-${pkgver}rc4.src.tar.xz{,.sig}
-        ${_url}/polly-${pkgver}rc4.src.tar.xz{,.sig}
+source=(${_url}/llvm-${pkgver}rc4.src.tar.xz
+        ${_url}/openmp-${pkgver}rc4.src.tar.xz
+        ${_url}/clang-${pkgver}rc4.src.tar.xz
+        ${_url}/compiler-rt-${pkgver}rc4.src.tar.xz
+        ${_url}/test-suite-${pkgver}.src.tar.xz
+        ${_url}/libcxx-${pkgver}rc4.src.tar.xz
+        ${_url}/libcxxabi-${pkgver}rc4.src.tar.xz
+        ${_url}/clang-tools-extra-${pkgver}rc4.src.tar.xz
+        ${_url}/lld-${pkgver}rc4.src.tar.xz
+        ${_url}/lldb-${pkgver}rc4.src.tar.xz
+        ${_url}/libunwind-${pkgver}rc4.src.tar.xz
+        ${_url}/polly-${pkgver}rc4.src.tar.xz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -153,7 +154,8 @@ validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Googl
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
 noextract=(clang-${pkgver}rc4.src.tar.xz
            libcxx-${pkgver}rc4.src.tar.xz
-           lldb-${pkgver}rc4.src.tar.xz)
+           lldb-${pkgver}rc4.src.tar.xz
+           test-suite-${pkgver}rc4.src.tar.xz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -289,6 +291,8 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
+    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
