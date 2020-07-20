@@ -140,11 +140,11 @@ prepare() {
 #    optimize.patch \
 #    optimize-at-least-some.patch
 
-  apply_patch_with_msg \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    ipa-cp.patch \
-    gomp-relax.patch
+#  apply_patch_with_msg \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    ipa-cp.patch \
+#    gomp-relax.patch
 
 #    gcc-lto-jobserver.diff
 #    0022-gcc-plugin-ada-use-def.patch \
