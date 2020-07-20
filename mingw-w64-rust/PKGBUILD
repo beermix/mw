@@ -82,7 +82,7 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-ninja \
-    --enable-optimize \
+    --disable-optimize \
     --enable-extended \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \

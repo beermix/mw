@@ -54,7 +54,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
-#_url=https://releases.llvm.org
+#_url=https://github.com/llvm/llvm-project/releases
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
 source=(${_url}/llvm-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/openmp-${pkgver}${rc_ver}.src.tar.xz
@@ -283,7 +283,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export TARGETS_TO_BUILD="AMDGPU;NVPTX;host"
+  export TARGETS_TO_BUILD="NVPTX;host"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
