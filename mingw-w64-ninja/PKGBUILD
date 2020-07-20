@@ -22,13 +22,11 @@ prepare () {
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_C_FLAGS="${CFLAGS}" \
-      -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
       -DCMAKE_VERBOSE_MAKEFILE=ON \
       "${extra_config[@]}" \
       ../${_realname}-${pkgver}
 
-  make -j6
+  make -j7
 }
 
 package() {
