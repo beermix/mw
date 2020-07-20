@@ -1,0 +1,47 @@
+# Maintainer: Frode Solheim <frode@fs-uae.net>
+# Contributor: Duong Pham <dthpham@gmail.com>
+# Contributor: Lara Maia <dev@lara.click>
+
+_realname=cx_Freeze
+pkgbase=mingw-w64-python-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-python-cx_Freeze")
+provides=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
+conflicts=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
+replaces=("${MINGW_PACKAGE_PREFIX}-python3-${_realname}")
+pkgver=6.2
+pkgrel=1
+pkgdesc="Python package for freezing scripts into executables (mingw-w64)"
+arch=('any')
+license=('PSF')
+url="https://github.com/marcelotduarte/cx_Freeze/"
+depends=("${MINGW_PACKAGE_PREFIX}-python")
+makedepends=("${MINGW_PACKAGE_PREFIX}-python-setuptools")
+options=('staticlibs' 'strip' '!debug')
+source=(cx_Freeze-${pkgver}.tar.gz::https://github.com/marcelotduarte/cx_Freeze/archive/${pkgver}.tar.gz)
+sha256sums=('4109a7a62015ccefc7ef58fc4fb487d970bf1a7ea94a13069460e60f5d504c73')
+
+prepare() {
+  rm -Rf python-cx_Freeze-${CARCH}
+  cp -a cx_Freeze-${pkgver} python-cx_Freeze-${CARCH}
+}
+
+build() {
+  echo "Building for Python"
+  cd python-cx_Freeze-${CARCH}
+  ${MINGW_PREFIX}/bin/python setup.py build
+}
+
+package() {
+  local _mingw_prefix=$(cygpath -am ${MINGW_PREFIX})
+  cd python-cx_Freeze-${CARCH}
+  MSYS2_ARG_CONV_EXCL="--prefix=;--install-scripts=;--install-platlib=" \
+    ${MINGW_PREFIX}/bin/python setup.py install --prefix=${MINGW_PREFIX} \
+    --root="${pkgdir}" --optimize=1 --skip-build
+
+  # fix python command in files
+  pushd "${pkgdir}${MINGW_PREFIX}"/bin > /dev/null
+  for filename in cxfreeze cxfreeze-quickstart; do
+    sed -e "s|${_mingw_prefix}/bin/|/usr/bin/env |g" -i ${filename}
+  done
+  popd > /dev/null
+}
