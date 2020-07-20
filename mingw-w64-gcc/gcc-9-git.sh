@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-url=git://gcc.gnu.org/git/gcc.git
+url=https://github.com/gcc-mirror/gcc
 package=gcc
-tag=gcc-9_2_0-release
-branch=gcc-9-branch
-out=gcc-stable-branch.patch
+tag=releases/gcc-9.3.0
+branch=releases/gcc-9
+out=$package-9-git.patch
 repo=$package.git
 
 # use filterdiff, etc to exclude bad chunks from diff
@@ -27,4 +27,3 @@ if cmp -s $out{,.tmp}; then
 	exit 0
 fi
 mv -f $out{.tmp,}
-

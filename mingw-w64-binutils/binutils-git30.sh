@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-url=git://gcc.gnu.org/git/gcc.git
-package=gcc
-tag=gcc-9_2_0-release
-branch=gcc-9-branch
-out=gcc-stable-branch.patch
+url=git://sourceware.org/git/binutils-gdb.git
+package=binutils
+tag=binutils-2_30
+branch=binutils-2_30-branch
+out=binutils-stable-branch_2_30.patch
 repo=$package.git
 
 # use filterdiff, etc to exclude bad chunks from diff
@@ -27,4 +27,7 @@ if cmp -s $out{,.tmp}; then
 	exit 0
 fi
 mv -f $out{.tmp,}
+
+#mv -fi 0000-binutils-git.patch /home/user/oe/packages/devel/binutils/patches/0000-git.patch
+
 

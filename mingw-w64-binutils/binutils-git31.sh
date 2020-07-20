@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
-url=git://gcc.gnu.org/git/gcc.git
-package=gcc
-tag=gcc-9_2_0-release
-branch=gcc-9-branch
-out=gcc-stable-branch.patch
+url=git://sourceware.org/git/binutils-gdb.git
+package=binutils
+tag=binutils-2_31_1
+branch=binutils-2_31-branch
+out=binutils-stable-31branch.patch
 repo=$package.git
 
 # use filterdiff, etc to exclude bad chunks from diff
