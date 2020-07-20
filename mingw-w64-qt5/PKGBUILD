@@ -48,7 +48,7 @@ else
   _system_libtiff=yes
   _system_libwebp=yes
   _build_examples=no
-  _build_tools=yes
+  _build_tools=no
   _build_tests=no
   _make_docs=no
   _ltcg=no

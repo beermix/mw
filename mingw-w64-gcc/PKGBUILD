@@ -227,14 +227,13 @@ build() {
   CFLAGS=${CFLAGS/-pipe/}
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
-
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CFLAGS/-O2/-O3}
+#  CFLAGS=${CFLAGS/-O2/-O3}
+#  CXXFLAGS=${CFLAGS/-O2/-O3}
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g -O3  -Wl,-z,max-page-size=0x1000"
-  export CXXFLAGS="-march=haswell -g -O3  -Wl,-z,max-page-size=0x1000"
+  export CFLAGS="-march=haswell -g -O3"
+  export CXXFLAGS="-march=haswell -g -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition "
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition "
   export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition "
