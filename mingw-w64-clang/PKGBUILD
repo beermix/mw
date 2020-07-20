@@ -59,7 +59,7 @@ source=(${_url}/llvm-${pkgver}rc4.src.tar.xz
         ${_url}/openmp-${pkgver}rc4.src.tar.xz
         ${_url}/clang-${pkgver}rc4.src.tar.xz
         ${_url}/compiler-rt-${pkgver}rc4.src.tar.xz
-        ${_url}/test-suite-${pkgver}.src.tar.xz
+        ${_url}/test-suite-${pkgver}rc4.src.tar.xz
         ${_url}/libcxx-${pkgver}rc4.src.tar.xz
         ${_url}/libcxxabi-${pkgver}rc4.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}rc4.src.tar.xz
