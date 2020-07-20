@@ -29,7 +29,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"{,.asc}
+source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -57,65 +57,48 @@ prepare() {
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-
-  cat >config.toml <<END
-[llvm]
-assertions = false
-ninja = true
-
-[build]
-build = "x86_64-pc-windows-gnu"
-host = ["x86_64-pc-windows-gnu"]
-target = ["x86_64-pc-windows-gnu"]
-#full-bootstrap = false
-python = "${MINGW_PREFIX}/bin/python2"
-extended = true
-sanitizers = false
-#profiler = true
-#vendor = true
-
-[install]
-prefix = "${MINGW_PREFIX}"
-sysconfdir = "${MINGW_PREFIX}/etc"
-localstatedir = "${MINGW_PREFIX}/var/lib"
-
-[rust]
-debug = false
-#debug-assertions = false
-debuginfo-level = 0
-channel = "stable"
-rpath = false
-codegen-tests = false
-deny-warnings = true
-
-[target.x86_64-pc-windows-gnu]
-llvm-config = "${MINGW_PREFIX}/bin/llvm-config"
-END
 }
 
 build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  # --enable-optimize
-  OSTYPE="$CARCH-pc-windows-gnu"
+ cat >config.toml <<END
+[llvm]
+link-shared = false
+ninja = true
+ccache = ["${MINGW_PREFIX}/bin/ccache"]
 
-  local -a _rust_conf=()
-  if [ "${_bootstrapping}" = "no" ]; then
-    _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
-  fi
+[build]
+build = ["x86_64-pc-windows-gnu"]
+host = ["x86_64-pc-windows-gnu"]
+target = ["x86_64-pc-windows-gnu"]
+tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
+python = ["${MINGW_PREFIX}/bin/python2"]
+extended = true
+sanitizers = false
+profiler = true
+vendor = true
 
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
-}
+[install]
+prefix = ["${MINGW_PREFIX}"]
+sysconfdir = ["${MINGW_PREFIX}/etc"]
+localstatedir = ["${MINGW_PREFIX}/var/lib"]
 
-check() {
-  cd "${srcdir}/${CARCH}"
-  # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+[rust]
+debug = false
+codegen-units-std = 1
+debuginfo-level = 0
+channel = ["stable"]
+rpath = false
+codegen-tests = false
+deny-warnings = true
+
+[target.x86_64-pc-windows-gnu]
+llvm-config = ["${MINGW_PREFIX}/bin/llvm-config"]
+END
+
+  /home/User/.go/bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 package() {
