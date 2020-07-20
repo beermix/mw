@@ -202,6 +202,8 @@ build() {
     -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
+    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_C_FLAGS="${CFLAGS} -Wno-error=unused-command-line-argument" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS} -Wno-error=unused-command-line-argument" \
