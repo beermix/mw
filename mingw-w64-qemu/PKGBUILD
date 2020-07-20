@@ -52,7 +52,6 @@ prepare() {
 build() {
   LDFLAGS+=" -fstack-protector"
 
-
   cd "${srcdir}/${_realname}-${pkgver}${_rc}"
   ./configure \
       --disable-werror \
@@ -78,7 +77,7 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  /home/User/.go/bin/noti nice -n19 make -j8
+  /home/User/.go/bin/noti nice -n19 make -j7
 }
 
 package() {
