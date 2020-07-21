@@ -87,10 +87,6 @@ build() {
     --release-channel=stable \
     --enable-ccache \
     --enable-extended \
-    --enable-llvm-link-shared \
-    --enable-option-checking \
-    --enable-locked-deps \
-    --enable-local-rust \
     --disable-docs \
     --tools="analysis,cargo,src" \
     --disable-codegen-tests \
@@ -105,7 +101,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 package() {
@@ -118,4 +114,8 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-}
+
+  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
+  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
+     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+}	
