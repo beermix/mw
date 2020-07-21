@@ -13,7 +13,7 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja"
+  _make_cmd="ninja -c"
 else
   _make_cmd="make"
 fi
@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1
 rc_ver=rc4
-pkgrel=3
+pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -55,7 +55,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
-_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
+#_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
+_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/openmp-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/clang-${pkgver}${rc_ver}.src.tar.xz
