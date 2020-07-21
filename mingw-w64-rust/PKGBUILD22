@@ -93,7 +93,7 @@ build() {
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
 
-  # Allow warnings instead of just aborting the build
+  # Allow warnings instead of just aborting the build export NO_LLVM_ASSERTIONS=1 export NO_DEBUG_ASSERTIONS=1
   sed 's/#deny-warnings = .*/deny-warnings = false/' -i config.toml
   sed 's|deny(warnings,|deny(|' -i ../${_realname}c-${pkgver}-src/src/bootstrap/lib.rs
 
@@ -101,7 +101,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  /home/User/.bin/noti nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 package() {
