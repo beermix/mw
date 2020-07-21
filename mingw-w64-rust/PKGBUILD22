@@ -89,7 +89,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7
 }
 
 check() {
@@ -103,7 +103,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
