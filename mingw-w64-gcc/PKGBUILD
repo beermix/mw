@@ -17,11 +17,11 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
         )
 #_snapshot=20200620
-pkgver=10.1.0
+pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=777
+pkgrel=2
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -101,8 +101,9 @@ sha256sums=('b6898a23844b656f1b68691c5c012036c2e694ac4b53a8918d4712ad876e7ea2'
             '4233a8d893787413b316de3ac320fd65c46844d463b98c0a98fdc17100cca505'
             '276ecc392c777d4b17d771a987e80dca50ff25d8f65671d5de139be73997064b'
             'c7359f4c7015bc1fb02bc13449fa9826669273bd1f0663ba898decb67e8487fc'
-            '441d63d95622ffcc2fa5dd688aecad20d2ab16d7d275c567865a754e1d3d4b7a'
+            '055289699c4222ef0b8125abdc8c9ceeff0712876c86e6d552a056fbacc14284'
             '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47')
+validpgpkeys=('33C235A34C46AA3FFB293709A328C3A2C3C45C06')
 
 # Helper macros to help make tasks easier #
 apply_patch_with_msg() {
@@ -131,9 +132,8 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    gcc-10-git.patch \
     010-documentation.patch
-    
+
 #    optimize.patch \
 #    optimize-at-least-some.patch
 
@@ -168,11 +168,8 @@ prepare() {
     0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
 
-#  apply_patch_with_msg \
-#    0130-libstdc++-in-out.patch
-
   apply_patch_with_msg \
-    0130-libstdc++-in-out-new.patch
+    0130-libstdc++-in-out.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
