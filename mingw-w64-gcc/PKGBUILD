@@ -81,7 +81,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         gomp-relax.patch
         0001-x86-Add-mzero-caller.patch
         gcc-lto-jobserver.diff
-        0130-libstdc++-in-out-new.patch
         optimize-at-least-some.patch)
 sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
             'SKIP'
