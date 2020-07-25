@@ -15,7 +15,7 @@ options=('strip' '!buildflags' 'staticlibs')
 license=('BSD')
 url="https://www.openssl.org"
 noextract=(${_realname}-${_ver}.tar.gz)
-source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz{,.asc}
+source=(https://www.openssl.org/source/${_realname}-${_ver}.tar.gz
         'openssl-1.1.1-relocation.patch')
 sha256sums=('ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46'
             'SKIP'
