@@ -361,6 +361,7 @@ build() {
     -DLLVM_ENABLE_LLD=ON
     -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi;libunwind"
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe)
+    -Wno-dev
 
   cd "${srcdir}"
 
