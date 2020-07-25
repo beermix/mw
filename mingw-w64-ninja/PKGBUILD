@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=6c5e886aacd98766fe43539c2c8ae7f3ca2af2aa
+pkgver=086a9b2f8833fd45f2119596f74f90b9f7e2cdf5
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -26,7 +26,7 @@ prepare () {
       "${extra_config[@]}" \
       ../${_realname}-${pkgver}
 
-  make -j7
+  make -j1
 }
 
 package() {
