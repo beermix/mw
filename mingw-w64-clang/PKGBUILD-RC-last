@@ -57,18 +57,18 @@ options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases
 #_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
-source=(${_url}/llvm-${pkgver}.src.tar.xz
-        ${_url}/openmp-${pkgver}.src.tar.xz
-        ${_url}/clang-${pkgver}.src.tar.xz
-        ${_url}/compiler-rt-${pkgver}.src.tar.xz
-        ${_url}/test-suite-${pkgver}.src.tar.xz
-        ${_url}/libcxx-${pkgver}.src.tar.xz
-        ${_url}/libcxxabi-${pkgver}.src.tar.xz
-        ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
-        ${_url}/lld-${pkgver}.src.tar.xz
-        ${_url}/lldb-${pkgver}.src.tar.xz
-        ${_url}/libunwind-${pkgver}.src.tar.xz
-        ${_url}/polly-${pkgver}.src.tar.xz
+source=(${_url}/llvm-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/openmp-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/clang-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/compiler-rt-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/test-suite-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/libcxx-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/libcxxabi-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/clang-tools-extra-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/lld-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/lldb-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/libunwind-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/polly-${pkgver}${rc_ver}.src.tar.xz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -154,10 +154,10 @@ sha256sums=('df83a44b3a9a71029049ec101fb0077ecbbdf5fe41e395215025779099a98fdf'
             'a633c38149772f90cc34f83b144185746b5a47f7d3d10a97cb060c31d140ab7e')
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
-noextract=(clang-${pkgver}.src.tar.xz
-           libcxx-${pkgver}.src.tar.xz
-           lldb-${pkgver}.src.tar.xz
-           test-suite-${pkgver}.src.tar.xz)
+noextract=(clang-${pkgver}${rc_ver}.src.tar.xz
+           libcxx-${pkgver}${rc_ver}.src.tar.xz
+           lldb-${pkgver}${rc_ver}.src.tar.xz
+           test-suite-${pkgver}${rc_ver}.src.tar.xz)
 
 apply_patch_with_msg() {
   for _patch in "$@"
@@ -168,19 +168,19 @@ apply_patch_with_msg() {
 }
 
 prepare() {
-  plain "Extracting clang-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-  [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
-  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting clang-${pkgver}${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/clang-${pkgver}${rc_ver} ]] && rm -rf ${srcdir}/clang-${pkgver}${rc_ver}
+  [[ -d ${srcdir}/clang-${pkgver}${rc_ver} ]] || tar -xJf ${srcdir}/clang-${pkgver}${rc_ver}.src.tar.xz -C ${srcdir} || true
 
-  plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-  [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
-  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting libcxx-${pkgver}${rc_ver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/libcxx-${pkgver}${rc_ver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}${rc_ver}
+  [[ -d ${srcdir}/libcxx-${pkgver}${rc_ver} ]] || tar -xJf ${srcdir}/libcxx-${pkgver}${rc_ver}.src.tar.xz -C ${srcdir} || true
 
-  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
-  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
-  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+  plain "Extracting lldb-${pkgver}${rc_ver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/lldb-${pkgver}${rc_ver} ]] && rm -rf ${srcdir}/lldb-${pkgver}${rc_ver}
+  [[ -d ${srcdir}/lldb-${pkgver}${rc_ver} ]] || tar -xJf ${srcdir}/lldb-${pkgver}${rc_ver}.src.tar.xz -C ${srcdir} || true
 
-  cd "${srcdir}/llvm-${pkgver}.src"
+  cd "${srcdir}/llvm-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
       "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
@@ -198,7 +198,7 @@ prepare() {
   apply_patch_with_msg \
       "0007-getLoadAddressWithOffset-assertion.patch"
 
-  cd "${srcdir}/clang-${pkgver}.src"
+  cd "${srcdir}/clang-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
@@ -206,26 +206,26 @@ prepare() {
       "0105-build-libclang-cpp-fix.patch" \
       "0106-fix-libunwind-extension.patch"
 
-  cd "${srcdir}/lld-${pkgver}.src"
+  cd "${srcdir}/lld-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0301-Fix-def-file-exporting-of-symbols-containing-periods.patch"
 
-  cd "${srcdir}/lldb-${pkgver}.src"
+  cd "${srcdir}/lldb-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0502-Add-missing-declarations-for-linking-to-psapi.patch" \
       "0503-lldb-find-mingw-python.patch" \
       "0504-fix-lldb-library-name-mingw.patch"
 
-  cd "${srcdir}/libunwind-${pkgver}.src"
+  cd "${srcdir}/libunwind-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0600-unwind-rename-__personality_routine-to-_Unwind_Personality_Fn.patch" \
 
-  cd "${srcdir}/polly-${pkgver}.src"
+  cd "${srcdir}/polly-${pkgver}${rc_ver}.src"
   # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
   apply_patch_with_msg \
       "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
 
-  cd "${srcdir}/openmp-${pkgver}.src"
+  cd "${srcdir}/openmp-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0901-openmp-kpm-lock.patch" \
       "0902-libomp-weak-mingw.patch" \
@@ -237,17 +237,17 @@ prepare() {
   cd "${srcdir}"
   rm -rf clang clang-tools-extra lld lldb polly compiler-rt libcxx \
          libcxxabi libunwind openmp test-suite | true
-  mv "${srcdir}/clang-${pkgver}.src"             clang
-  mv "${srcdir}/clang-tools-extra-${pkgver}.src" clang-tools-extra
-  mv "${srcdir}/lld-${pkgver}.src"               lld
-  mv "${srcdir}/lldb-${pkgver}.src"              lldb
-  mv "${srcdir}/polly-${pkgver}.src"             polly
-  mv "${srcdir}/compiler-rt-${pkgver}.src"       compiler-rt
-  mv "${srcdir}/libcxxabi-${pkgver}.src"         libcxxabi
-  mv "${srcdir}/libcxx-${pkgver}.src"            libcxx
-  mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
-  mv "${srcdir}/openmp-${pkgver}.src"            openmp
-  #mv "${srcdir}/testsuite-${pkgver}.src"         test-suite
+  mv "${srcdir}/clang-${pkgver}${rc_ver}.src"             clang
+  mv "${srcdir}/clang-tools-extra-${pkgver}${rc_ver}.src" clang-tools-extra
+  mv "${srcdir}/lld-${pkgver}${rc_ver}.src"               lld
+  mv "${srcdir}/lldb-${pkgver}${rc_ver}.src"              lldb
+  mv "${srcdir}/polly-${pkgver}${rc_ver}.src"             polly
+  mv "${srcdir}/compiler-rt-${pkgver}${rc_ver}.src"       compiler-rt
+  mv "${srcdir}/libcxxabi-${pkgver}${rc_ver}.src"         libcxxabi
+  mv "${srcdir}/libcxx-${pkgver}${rc_ver}.src"            libcxx
+  mv "${srcdir}/libunwind-${pkgver}${rc_ver}.src"         libunwind
+  mv "${srcdir}/openmp-${pkgver}${rc_ver}.src"            openmp
+  #mv "${srcdir}/testsuite-${pkgver}${rc_ver}.src"         test-suite
 }
 
 build() {
@@ -297,6 +297,7 @@ build() {
     -DLLVM_ENABLE_TERMINFO=ON \
     -DLLVM_BUILD_DOCS=OFF \
     -DLLVM_BUILD_EXAMPLES=OFF \
+    -DLLVM_ENABLE_CXX1Y=ON \
     -DLLVM_ENABLE_ZLIB=ON \
     -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
@@ -322,7 +323,7 @@ build() {
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
-    ../llvm-${pkgver}.src
+    ../llvm-${pkgver}${rc_ver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
@@ -377,9 +378,9 @@ build() {
     -DLIBUNWIND_ENABLE_STATIC=OFF \
     "${COMMON_CMAKE_ARGS[@]}" \
     ${extra_config[@]} \
-    ../llvm-${pkgver}.src
+    ../llvm-${pkgver}${rc_ver}.src
 
-  ${_make_cmd} cxx
+  nice -n19 ${_make_cmd} cxx
 
   cd "${srcdir}"
 
@@ -396,9 +397,9 @@ build() {
     -DLIBUNWIND_ENABLE_STATIC=ON \
     "${COMMON_CMAKE_ARGS[@]}" \
     ${extra_config[@]} \
-    ../llvm-${pkgver}.src
+    ../llvm-${pkgver}${rc_ver}.src
 
-  ${_make_cmd} unwind cxxabi cxx
+  nice -n19 ${_make_cmd} unwind cxxabi cxx
 }
 
 #check() {
@@ -417,7 +418,7 @@ package_clang() {
            "${MINGW_PACKAGE_PREFIX}-z3")
 
   cd "${srcdir}/clang"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
 
   # Install static libraries
   install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
@@ -431,8 +432,8 @@ package_clang-analyzer() {
            "${MINGW_PACKAGE_PREFIX}-python")
 
   cd "${srcdir}/clang"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
 
   # Use Python 2
   sed -i \
@@ -443,7 +444,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -451,7 +451,7 @@ package_clang-tools-extra() {
   url="https://clang.llvm.org/"
 
   cd "${srcdir}/clang-tools-extra"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
 }
 
 package_compiler-rt() {
@@ -460,7 +460,7 @@ package_compiler-rt() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/compiler-rt
-  ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
 }
 
 package_libcxx() {
@@ -469,8 +469,8 @@ package_libcxx() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxx"
-  ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
 
   install -Dm644 "${srcdir}/build-libcxx-static-${CARCH}/lib/libc++experimental.a" "${pkgdir}${MINGW_PREFIX}/lib/libc++experimental.a"
 }
@@ -480,7 +480,7 @@ package_openmp() {
   url="https://openmp.llvm.org/"
 
   cd "${srcdir}/openmp"
-  ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
 }
 
 package_libcxxabi() {
@@ -489,7 +489,7 @@ package_libcxxabi() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxxabi"
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
 }
 
 package_libunwind() {
@@ -497,7 +497,7 @@ package_libunwind() {
   url='https://llvm.org/'
 
   cd "${srcdir}/libunwind"
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
   install "${srcdir}/build-libcxx-static-${CARCH}/lib/libunwind.dll" "${pkgdir}${MINGW_PREFIX}/bin/libunwind.dll"
@@ -508,7 +508,7 @@ package_lld() {
   url="https://lld.llvm.org/"
 
   cd "${srcdir}/lld"
-  ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
 }
 
 package_lldb() {
@@ -523,14 +523,12 @@ package_lldb() {
 
   cd "${srcdir}/lldb"
 
-  ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
 
   # Compile Python scripts
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -539,16 +537,14 @@ package_llvm() {
            "${MINGW_PACKAGE_PREFIX}-z3"
            "${MINGW_PACKAGE_PREFIX}-gcc-libs") # "compiler-rt"
 
-  cd "${srcdir}"/llvm-${pkgver}.src
+  cd "${srcdir}"/llvm-${pkgver}${rc_ver}.src
 
-  ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
+  nice -n19 ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
-  install -Dm644 "${srcdir}"/llvm-${pkgver}.src/cmake/modules/*.cmake "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/modules/
-  install -Dm644 "${srcdir}"/llvm-${pkgver}.src/cmake/platforms/*.cmake "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/platforms/
+  install -Dm644 "${srcdir}"/llvm-${pkgver}${rc_ver}.src/cmake/modules/*.cmake "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/modules/
+  install -Dm644 "${srcdir}"/llvm-${pkgver}${rc_ver}.src/cmake/platforms/*.cmake "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/platforms/
 
   # FileCheck is needed to build rust.
   install -Dm755 "${srcdir}"/build-${CARCH}/bin/FileCheck.exe "${pkgdir}${MINGW_PREFIX}/bin/FileCheck.exe"
@@ -563,7 +559,7 @@ package_polly() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/polly
-  ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
+  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
   # fox cmake files.
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
   local SRC_WIN=$(cygpath -wm ${srcdir})
