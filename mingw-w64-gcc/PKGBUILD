@@ -230,13 +230,13 @@ build() {
   CFLAGS=${CFLAGS/-O2/-O3}
   CXXFLAGS=${CFLAGS/-O2/-O3}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g -O3"
-#  export CXXFLAGS="-march=haswell -g -O3"
-#  export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition "
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition "
-#  export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition "
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g -O3 -fstack-protector"
+  export CXXFLAGS="-march=haswell -g -O3"
+  export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition"
+# export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
