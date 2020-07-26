@@ -274,7 +274,6 @@ build() {
     --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
-    --with-isl=no \
     --with-gnu-as --with-gnu-ld \
     ${_conf}
 
