@@ -13,7 +13,7 @@ _compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
-  _make_cmd="ninja -c"
+  _make_cmd="ninja"
 else
   _make_cmd="make"
 fi
@@ -32,7 +32,6 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1
-rc_ver=rc4
 pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
@@ -54,8 +53,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
 depends=("${MINGW_PACKAGE_PREFIX}-gcc"
          "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
-#_url=https://github.com/llvm/llvm-project/releases
-#_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
+#_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/openmp-${pkgver}.src.tar.xz
@@ -401,6 +399,14 @@ build() {
 
   nice -n19 ${_make_cmd} unwind cxxabi cxx
 }
+
+#check() {
+#  cd "${srcdir}"/build-${CARCH}
+#  # Remove || true once testcase doesn't cause failures.
+#  make check || true
+#  make check-clang || true
+#  make check-polly || true
+#}
 
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
