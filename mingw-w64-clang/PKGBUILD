@@ -287,21 +287,21 @@ build() {
 
   extra_config+=(-DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}")
   extra_config+=(-DLLVM_USE_LINKER=lld)
-  extra_config+=(-DCLANG_BUILD_EXAMPLES=OFF)
-  extra_config+=(-DCLANG_INCLUDE_DOCS=OFF)
-  extra_config+=(-DCLANG_INCLUDE_TESTS=OFF)
-  extra_config+=(-DCLANG_BUILD_TOOLS=ON)
-  extra_config+=(-DLLVM_CCACHE_BUILD=OFF)
-  extra_config+=(-DLLVM_BUILD_EXAMPLES=OFF)
-  extra_config+=(-DLLVM_BUILD_DOCS=OFF)
-  extra_config+=(-DLLVM_BUILD_TESTS=OFF)
-  extra_config+=(-DLLVM_ENABLE_DOXYGEN=OFF)
-  extra_config+=(-DLLVM_ENABLE_OCAMLDOC=OFF)
-  extra_config+=(-DLLVM_INCLUDE_DOCS=OFF)
-  extra_config+=(-DLLVM_INCLUDE_GO_TESTS=OFF)
-  extra_config+=(-DLLVM_INCLUDE_TESTS=OFF)
-  extra_config+=(-DCOMPILER_RT_BUILD_SANITIZERS=ON)
-  extra_config+=(-Wno-dev)
+#  extra_config+=(-DCLANG_BUILD_EXAMPLES=OFF)
+#  extra_config+=(-DCLANG_INCLUDE_DOCS=OFF)
+#  extra_config+=(-DCLANG_INCLUDE_TESTS=OFF)
+#  extra_config+=(-DCLANG_BUILD_TOOLS=ON)
+#  extra_config+=(-DLLVM_CCACHE_BUILD=OFF)
+#  extra_config+=(-DLLVM_BUILD_EXAMPLES=OFF)
+#  extra_config+=(-DLLVM_BUILD_DOCS=OFF)
+#  extra_config+=(-DLLVM_BUILD_TESTS=OFF)
+#  extra_config+=(-DLLVM_ENABLE_DOXYGEN=OFF)
+#  extra_config+=(-DLLVM_ENABLE_OCAMLDOC=OFF)
+#  extra_config+=(-DLLVM_INCLUDE_DOCS=OFF)
+#  extra_config+=(-DLLVM_INCLUDE_GO_TESTS=OFF)
+#  extra_config+=(-DLLVM_INCLUDE_TESTS=OFF)
+#  extra_config+=(-DCOMPILER_RT_BUILD_SANITIZERS=ON)
+#  extra_config+=(-Wno-dev)
 
 #  extra_config+=(-DLLVM_ENABLE_TERMINFO=ON)
 
@@ -358,7 +358,6 @@ build() {
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
     -DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}"
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
