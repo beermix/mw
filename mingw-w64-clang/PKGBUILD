@@ -376,7 +376,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}.src
 
-  ${_make_cmd} cxx
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} cxx
 
   cd "${srcdir}"
 
@@ -394,7 +394,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}.src
 
-  ${_make_cmd} unwind cxxabi cxx
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} unwind cxxabi cxx
 }
 
 #check() {
@@ -413,7 +413,7 @@ package_clang() {
            "${MINGW_PACKAGE_PREFIX}-z3")
 
   cd "${srcdir}/clang"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
 
   # Install static libraries
   install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
@@ -427,8 +427,8 @@ package_clang-analyzer() {
            "${MINGW_PACKAGE_PREFIX}-python")
 
   cd "${srcdir}/clang"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
 
   # Use Python 2
   sed -i \
@@ -447,7 +447,7 @@ package_clang-tools-extra() {
   url="https://clang.llvm.org/"
 
   cd "${srcdir}/clang-tools-extra"
-  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
 }
 
 package_compiler-rt() {
@@ -456,7 +456,7 @@ package_compiler-rt() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/compiler-rt
-  ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
 }
 
 package_libcxx() {
@@ -465,8 +465,8 @@ package_libcxx() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxx"
-  ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
 
   install -Dm644 "${srcdir}/build-libcxx-static-${CARCH}/lib/libc++experimental.a" "${pkgdir}${MINGW_PREFIX}/lib/libc++experimental.a"
 }
@@ -476,7 +476,7 @@ package_openmp() {
   url="https://openmp.llvm.org/"
 
   cd "${srcdir}/openmp"
-  ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
 }
 
 package_libcxxabi() {
@@ -485,7 +485,7 @@ package_libcxxabi() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxxabi"
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
 }
 
 package_libunwind() {
@@ -493,7 +493,7 @@ package_libunwind() {
   url='https://llvm.org/'
 
   cd "${srcdir}/libunwind"
-  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
   install "${srcdir}/build-libcxx-static-${CARCH}/lib/libunwind.dll" "${pkgdir}${MINGW_PREFIX}/bin/libunwind.dll"
@@ -504,7 +504,7 @@ package_lld() {
   url="https://lld.llvm.org/"
 
   cd "${srcdir}/lld"
-  ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
 }
 
 package_lldb() {
@@ -519,7 +519,7 @@ package_lldb() {
 
   cd "${srcdir}/lldb"
 
-  ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
 
   # Compile Python scripts
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
@@ -537,7 +537,7 @@ package_llvm() {
 
   cd "${srcdir}"/llvm-${pkgver}.src
 
-  ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
   install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
@@ -559,7 +559,7 @@ package_polly() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/polly
-  ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
   # fox cmake files.
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
   local SRC_WIN=$(cygpath -wm ${srcdir})
