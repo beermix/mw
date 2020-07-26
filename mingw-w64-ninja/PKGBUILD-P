@@ -13,10 +13,10 @@ depends=()
 options=('strip' '!staticlibs')
 makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python3" "${MINGW_PACKAGE_PREFIX}-cmake")
 source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz"
-	"999-2--color.patch")
+	"color.patch")
 prepare () {
   cd ${srcdir}/ninja-${pkgver}
-  patch -p1 -i "${srcdir}"/999-2--color.patch
+  patch -p1 -i "${srcdir}"/color.patch
   #linking assumes windows cmd line but we are bash :)
   sed -i 's|cmd /c $ar cqs $out.tmp $in && move /Y $out.tmp $out|$ar crs $out $in|g' ${srcdir}/ninja-${pkgver}/configure.py
 }
