@@ -271,10 +271,9 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    #export CC='clang -stdlib=libc++'
-    #export CXX='clang++ -stdlib=libc++'
-    export CC='clang'
-    export CXX='clang++'
+    extra_config+=(-DCMAKE_CXX_COMPILER=clang++)
+    extra_config+=(-DCMAKE_C_COMPILER=clang)
+    extra_config+=(-DLLVM_USE_LINKER=lld)
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
@@ -285,13 +284,11 @@ build() {
   export TARGETS_TO_BUILD="X86"
 
   extra_config+=(-DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}")
-  extra_config+=(-DLLVM_USE_LINKER=lld)
 
 #  extra_config+=(-DCLANG_BUILD_EXAMPLES=OFF)
 #  extra_config+=(-DCLANG_INCLUDE_DOCS=OFF)
 #  extra_config+=(-DCLANG_INCLUDE_TESTS=OFF)
 #  extra_config+=(-DCLANG_BUILD_TOOLS=ON)
-#  extra_config+=(-DLLVM_CCACHE_BUILD=OFF)
 #  extra_config+=(-DLLVM_BUILD_EXAMPLES=OFF)
 #  extra_config+=(-DLLVM_BUILD_DOCS=OFF)
 #  extra_config+=(-DLLVM_BUILD_TESTS=OFF)
@@ -310,6 +307,7 @@ build() {
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
