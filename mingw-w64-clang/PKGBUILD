@@ -288,6 +288,7 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
+    -DLLVM_USE_LINKER=lld \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_ENABLE_TERMINFO=ON \
     -DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}" \
@@ -326,7 +327,6 @@ build() {
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
-    -DLLVM_USE_LINKER=lld \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     -Wno-dev \
