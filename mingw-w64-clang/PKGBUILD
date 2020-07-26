@@ -9,7 +9,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -326,6 +326,7 @@ build() {
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
+    -DLLVM_USE_LINKER=lld \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     -Wno-dev \
