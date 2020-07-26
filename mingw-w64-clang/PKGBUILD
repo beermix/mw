@@ -289,6 +289,7 @@ build() {
 #  extra_config+=(-DCLANG_INCLUDE_DOCS=OFF)
 #  extra_config+=(-DCLANG_INCLUDE_TESTS=OFF)
 #  extra_config+=(-DCLANG_BUILD_TOOLS=ON)
+
 #  extra_config+=(-DLLVM_BUILD_EXAMPLES=OFF)
 #  extra_config+=(-DLLVM_BUILD_DOCS=OFF)
 #  extra_config+=(-DLLVM_BUILD_TESTS=OFF)
@@ -297,14 +298,15 @@ build() {
 #  extra_config+=(-DLLVM_INCLUDE_DOCS=OFF)
 #  extra_config+=(-DLLVM_INCLUDE_GO_TESTS=OFF)
 #  extra_config+=(-DLLVM_INCLUDE_TESTS=OFF)
+
 #  extra_config+=(-DCOMPILER_RT_BUILD_SANITIZERS=ON)
-#  extra_config+=(-Wno-dev)
 
 #  extra_config+=(-DLLVM_ENABLE_TERMINFO=ON)
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
+    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
