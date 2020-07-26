@@ -12,6 +12,7 @@ url="https://cmake.org/download/"
 license=("MIT")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
+             "${MINGW_PACKAGE_PREFIX}-emacs"
              "${MINGW_PACKAGE_PREFIX}-ncurses"
              "${MINGW_PACKAGE_PREFIX}-xz"
              "${MINGW_PACKAGE_PREFIX}-zstd")
@@ -24,6 +25,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libuv"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
+optdepends=("${MINGW_PACKAGE_PREFIX}-emacs: for cmake emacs mode")
 options=('staticlibs') # '!strip' 'debug'
 source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
@@ -82,7 +84,7 @@ build() {
     --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                      \
-    --parallel=${NUMBER_OF_PROCESSORS}
+    --parallel=7
   plain "Start building..."
   make
 }
@@ -92,4 +94,11 @@ package() {
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
+  install -d "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
+  ${MINGW_PREFIX}/bin/emacs -batch -f batch-byte-compile \
+    "${pkgdir}${MINGW_PREFIX}"/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el
+  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el \
+    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
+  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.elc \
+    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
 }

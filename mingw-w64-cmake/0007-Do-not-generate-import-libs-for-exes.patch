@@ -8,10 +8,10 @@ Subject: [PATCH 7/8] Do not generate import libs for exes
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Modules/Platform/Windows-GNU.cmake b/Modules/Platform/Windows-GNU.cmake
-index a2e3811dd8..a77a44a04f 100644
+index f0e04cb56..5892108e7 100644
 --- a/Modules/Platform/Windows-GNU.cmake
 +++ b/Modules/Platform/Windows-GNU.cmake
-@@ -104,7 +104,7 @@ macro(__windows_compiler_gnu lang)
+@@ -105,7 +107,7 @@ macro(__windows_compiler_gnu lang)
    set(CMAKE_${lang}_CREATE_SHARED_LIBRARY
      "<CMAKE_${lang}_COMPILER> <CMAKE_SHARED_LIBRARY_${lang}_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_${lang}_FLAGS> -o <TARGET> -Wl,--out-implib,<TARGET_IMPLIB> ${CMAKE_GNULD_IMAGE_VERSION} <OBJECTS> <LINK_LIBRARIES>")
    set(CMAKE_${lang}_LINK_EXECUTABLE
