@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1
-pkgrel=2
+pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -46,7 +46,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
-               "${MINGW_PACKAGE_PREFIX}-clang")
+               "${MINGW_PACKAGE_PREFIX}-clang"
+               "${"${MINGW_PACKAGE_PREFIX}-lld")
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
@@ -282,7 +283,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export TARGETS_TO_BUILD="NVPTX;host"
+  export TARGETS_TO_BUILD="X86"
 
   extra_config+=(-DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}")
   extra_config+=(-DLLVM_USE_LINKER=lld)
@@ -300,15 +301,15 @@ build() {
   extra_config+=(-DLLVM_INCLUDE_GO_TESTS=OFF)
   extra_config+=(-DLLVM_INCLUDE_TESTS=OFF)
   extra_config+=(-DCOMPILER_RT_BUILD_SANITIZERS=ON)
-  extra_config+=(-DLLVM_ENABLE_TERMINFO=ON)
   extra_config+=(-Wno-dev)
+
+#  extra_config+=(-DLLVM_ENABLE_TERMINFO=ON)
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_ENABLE_TERMINFO=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -357,6 +358,7 @@ build() {
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
     -DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}"
+    -DCOMPILER_RT_BUILD_SANITIZERS=ON
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
@@ -369,7 +371,6 @@ build() {
     -DLIBUNWIND_ENABLE_SHARED=ON
     -DLIBUNWIND_USE_COMPILER_RT=ON
     -DLLVM_ENABLE_LLD=ON
-    -DLLVM_USE_LINKER=lld
     -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi;libunwind"
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe)
 
@@ -389,7 +390,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}.src
 
-  nice -n19 ${_make_cmd} cxx
+  ${_make_cmd} cxx
 
   cd "${srcdir}"
 
@@ -407,7 +408,7 @@ build() {
     ${extra_config[@]} \
     ../llvm-${pkgver}.src
 
-  nice -n19 ${_make_cmd} unwind cxxabi cxx
+  ${_make_cmd} unwind cxxabi cxx
 }
 
 #check() {
@@ -426,7 +427,7 @@ package_clang() {
            "${MINGW_PACKAGE_PREFIX}-z3")
 
   cd "${srcdir}/clang"
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
 
   # Install static libraries
   install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
@@ -440,8 +441,8 @@ package_clang-analyzer() {
            "${MINGW_PACKAGE_PREFIX}-python")
 
   cd "${srcdir}/clang"
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-build DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/scan-view DESTDIR="${pkgdir}" install
 
   # Use Python 2
   sed -i \
@@ -460,7 +461,7 @@ package_clang-tools-extra() {
   url="https://clang.llvm.org/"
 
   cd "${srcdir}/clang-tools-extra"
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
 }
 
 package_compiler-rt() {
@@ -469,7 +470,7 @@ package_compiler-rt() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/compiler-rt
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
 }
 
 package_libcxx() {
@@ -478,8 +479,8 @@ package_libcxx() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxx"
-  nice -n19 ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
-  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
 
   install -Dm644 "${srcdir}/build-libcxx-static-${CARCH}/lib/libc++experimental.a" "${pkgdir}${MINGW_PREFIX}/lib/libc++experimental.a"
 }
@@ -489,7 +490,7 @@ package_openmp() {
   url="https://openmp.llvm.org/"
 
   cd "${srcdir}/openmp"
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
 }
 
 package_libcxxabi() {
@@ -498,7 +499,7 @@ package_libcxxabi() {
   depends="${MINGW_PACKAGE_PREFIX}-libunwind"
 
   cd "${srcdir}/libcxxabi"
-  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}" install
 }
 
 package_libunwind() {
@@ -506,7 +507,7 @@ package_libunwind() {
   url='https://llvm.org/'
 
   cd "${srcdir}/libunwind"
-  nice -n19 ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
   install "${srcdir}/build-libcxx-static-${CARCH}/lib/libunwind.dll" "${pkgdir}${MINGW_PREFIX}/bin/libunwind.dll"
@@ -517,7 +518,7 @@ package_lld() {
   url="https://lld.llvm.org/"
 
   cd "${srcdir}/lld"
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
 }
 
 package_lldb() {
@@ -532,7 +533,7 @@ package_lldb() {
 
   cd "${srcdir}/lldb"
 
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/lldb DESTDIR="${pkgdir}" install
 
   # Compile Python scripts
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
@@ -550,7 +551,7 @@ package_llvm() {
 
   cd "${srcdir}"/llvm-${pkgver}.src
 
-  nice -n19 ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
   install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
@@ -572,7 +573,7 @@ package_polly() {
   depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/polly
-  nice -n19 ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
+  ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
   # fox cmake files.
   local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
   local SRC_WIN=$(cygpath -wm ${srcdir})
