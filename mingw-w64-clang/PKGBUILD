@@ -303,6 +303,9 @@ build() {
 
 #  extra_config+=(-DLLVM_ENABLE_TERMINFO=ON)
 
+#  export CFLAGS="${CFLAGS} -Wno-unused-variable"
+#  export CXXFLAGS="${CXXFLAGS} -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit"
+
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
@@ -310,6 +313,8 @@ build() {
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DCMAKE_C_FLAGS="${CFLAGS} -Wno-unused-variable" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \

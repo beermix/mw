@@ -228,7 +228,7 @@ build() {
 #  LDFLAGS=${LDFLAGS/-pipe/}
 
   CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CFLAGS/-O2/-O3}
+  CXXFLAGS=${CXXFLAGS/-O2/-O3}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
