@@ -19,7 +19,6 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-curl"
              "${MINGW_PACKAGE_PREFIX}-libffi"
-             "${MINGW_PACKAGE_PREFIX}-libssh2"
              "${MINGW_PACKAGE_PREFIX}-lldb"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
@@ -61,7 +60,7 @@ prepare() {
 
   #sed -i 's/\("files":{\)[^}]*/\1/' vendor/$1/.cargo-checksum.json
 
-  sed -i /LD_LIBRARY_PATH/d src/bootstrap/bootstrap.py
+  #sed -i /LD_LIBRARY_PATH/d src/bootstrap/bootstrap.py
 }
 
 build() {
@@ -88,7 +87,7 @@ build() {
     --enable-ccache \
     --enable-extended \
     --disable-docs \
-    --tools="analysis,cargo,src" \
+    --tools="cargo,src" \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
@@ -101,7 +100,7 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  /home/User/.bin/noti nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 package() {
@@ -118,4 +117,4 @@ package() {
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
   mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
      "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
-}	
+}
