@@ -287,7 +287,7 @@ build() {
 
   #/home/User/.go/bin/noti nice -n19 make "CFLAGS=-march=haswell -g0 -O2" "CXXFLAGS=-march=haswell -g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-march=haswell -g0 -O2" "BOOT_CXXFLAGS=-march=haswell -g0 -O2" all
 
-  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-g0 -O2" "CXXFLAGS_FOR_TARGET=-g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
+  /home/User/.go/bin/noti nice -n19 make "CFLAGS=-g0 -O2" "CXXFLAGS=-g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-g0 -O2" "BOOT_CXXFLAGS=-g0 -O2" all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
