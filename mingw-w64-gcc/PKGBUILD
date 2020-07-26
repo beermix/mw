@@ -223,9 +223,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
   CFLAGS=${CFLAGS/-O2/-O3}
   CXXFLAGS=${CXXFLAGS/-O2/-O3}
@@ -271,7 +271,7 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
-    --with-diagnostics-color=auto \
+    --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --with-gnu-as --with-gnu-ld \
