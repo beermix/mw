@@ -284,7 +284,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export TARGETS_TO_BUILD="host"
+  export TARGETS_TO_BUILD="X86"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
