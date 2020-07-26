@@ -59,7 +59,7 @@ build() {
     -Dforce_posix_threads=true \
     -Db_lto=true \
     "../glib-${pkgver}"
-    nice -n19 ninja -j8
+    nice -n19 ninja
 
   msg "Build shared version"
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
@@ -73,7 +73,7 @@ build() {
     -Dforce_posix_threads=true \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
-    nice -n19 ninja -j8
+    nice -n19 ninja
 }
 
 package() {

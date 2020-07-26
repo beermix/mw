@@ -284,7 +284,9 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.bin/noti nice -n19 make all
+  #/home/User/.bin/noti nice -n19 make all
+  
+  /home/User/.bin/noti nice -n19 make "CFLAGS=-march=haswell -g0 -O2" "CXXFLAGS=-march=haswell -g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-march=haswell -g0 -O2" "BOOT_CXXFLAGS=-march=haswell -g0 -O2" all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
