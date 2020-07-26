@@ -236,7 +236,7 @@ build() {
 #  export CXXFLAGS="-march=haswell -g -O3"
 #  export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition"
-# export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition"
+#  export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
