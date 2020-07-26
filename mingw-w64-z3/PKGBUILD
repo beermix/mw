@@ -3,14 +3,14 @@
 _realname=z3
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=a29809132207db34aa486e1a916698cca360c6e9
+pkgver=105f97d3eeadf17fab6e77835ed77734eba37354
 pkgrel=1
 pkgdesc="Z3 is a high-performance theorem prover being developed at Microsoft Research (mingw-w64)"
 arch=('any')
 url="https://github.com/Z3Prover/z3"
 license=('MIT')
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake"
-             "${MINGW_PACKAGE_PREFIX}-python3")
+             "${MINGW_PACKAGE_PREFIX}-python")
 options=('strip' 'staticlibs')
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/Z3Prover/z3/archive/${pkgver}.tar.gz"
         001-mingw-fixes.patch
@@ -56,11 +56,11 @@ build() {
     -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
+    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 make
+  make
 
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
@@ -72,11 +72,11 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=ON \
     -DBUILD_PYTHON_BINDINGS=ON \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
+    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 make
+  make
 }
 
 check() {
