@@ -271,7 +271,7 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
-    --with-diagnostics-color=always \
+    --with-diagnostics-color=auto \
     --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
     --with-isl=no \
     --with-gnu-as --with-gnu-ld \
