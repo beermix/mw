@@ -222,9 +222,10 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
+
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CFLAGS/-O2/-O3}
 
