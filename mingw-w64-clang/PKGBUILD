@@ -286,6 +286,7 @@ build() {
 
   extra_config+=(-DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}")
   extra_config+=(-DLLVM_USE_LINKER=lld)
+
 #  extra_config+=(-DCLANG_BUILD_EXAMPLES=OFF)
 #  extra_config+=(-DCLANG_INCLUDE_DOCS=OFF)
 #  extra_config+=(-DCLANG_INCLUDE_TESTS=OFF)
