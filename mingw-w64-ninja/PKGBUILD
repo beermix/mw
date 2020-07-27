@@ -29,7 +29,7 @@ prepare () {
       -DCMAKE_VERBOSE_MAKEFILE=ON \
       ../${_realname}-${pkgver}
 
-  make -j1
+   make -j7
 }
 
 package() {
