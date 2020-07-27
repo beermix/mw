@@ -3,7 +3,7 @@
 _realname=gtk3
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.24.20
+pkgver=3.24.21
 pkgrel=3
 pkgdesc="GObject-based multi-platform GUI toolkit (v3) (mingw-w64)"
 arch=('any')
