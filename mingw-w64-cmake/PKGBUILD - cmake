@@ -72,25 +72,23 @@ prepare() {
     0008-Output-line-numbers-in-callstacks.patch
 }
 
-build() {
-  mkdir -p "${srcdir}/build-${MINGW_CHOST}"
-  cd "${srcdir}/build-${MINGW_CHOST}"
+prepare () {
+  cd ${srcdir}/cmake-${pkgver}
 
-  MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/configure  \
-    --prefix=${MINGW_PREFIX}                      \
-    --system-libs                                 \
-    --no-system-expat                             \
-    --no-qt-gui                                      \
-    --enable-ccache                                      \
-    --parallel=8
-  plain "Start building..."
-  make
+  ${MINGW_PREFIX}/bin/cmake \
+      -G'MSYS Makefiles' \
+      -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
+      -DKWSYS_LFS_WORKS=TRUE \
+      -DKWSYS_CHAR_IS_SIGNED=TRUE \
+      -DCMAKE_USE_SYSTEM_LIBRARIES=1 \
+      -DCTEST_USE_XMLRPC=OFF \
+      -DBUILD_CursesDialog=OFF \
+      ../${_realname}-${pkgver}
+
+  make -j8
 }
 
-package() {
-  cd "${srcdir}/build-${MINGW_CHOST}"
-  ./bin/cmake.exe \
-     -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
-     -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
+package () {
+  cd ${srcdir}/cmake-${pkgver}
+  make DESTDIR=${pkgdir} install
 }

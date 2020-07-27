@@ -3,7 +3,7 @@
 _realname=libssh2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=master
+pkgver=5eaa7aa1c042e06cd4826a79af6af73ea5bf8370
 pkgrel=1
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts (mingw-w64)"
 arch=('any')
@@ -25,7 +25,13 @@ prepare () {
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
       -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_CXX_COMPILER=clang++ \
+      -DCMAKE_C_COMPILER=clang \
+      -DCMAKE_C_FLAGS_RELEASE="-march=haswell -O2 -DNDEBUG" \
+      -DCMAKE_CXX_FLAGS_RELEASE="-march=haswell -O2 -DNDEBUG" \
+      -DBUILD_EXAMPLES=0 \
       -DBUILD_SHARED_LIBS=1 \
+      -DBUILD_TESTING=0 \
       -DCMAKE_VERBOSE_MAKEFILE=ON \
       ../${_realname}-${pkgver}
 

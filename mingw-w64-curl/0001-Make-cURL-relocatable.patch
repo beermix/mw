@@ -1,7 +1,7 @@
-From 36ca5bb46d6f0b874fdd7f1f3ef4164b3bbb26f6 Mon Sep 17 00:00:00 2001
+From 5176fc67557291c1774c363640c72f80ad409563 Mon Sep 17 00:00:00 2001
 From: Ray Donnelly <mingw.android@gmail.com>
 Date: Wed, 22 Feb 2017 11:03:04 +0100
-Subject: [PATCH 1/2] Make cURL relocatable
+Subject: [PATCH] Make cURL relocatable
 
 This adds the ability to specify CA_BUNDLE paths that are relative to
 the MSYS2 pseudo-root directory.
@@ -16,28 +16,24 @@ versions supported by Cygwin (and therefore MSYS2).
 We also need to be extra careful to extend that path logic to the
 ca-bundle.crt used to validate HTTPS *proxies*, not only HTTPS servers.
 
-Note: we do explicitly *not* follow the rule of appending new source and
-header files to the list in Makefile.inc because that always conflicts
-with new goodies brought in by new cURL versions.
-
 Original-patch-by: Ray Donnelly <mingw.android@gmail.com>
 Signed-off-by: Johannes Schindelin <johannes.schindelin@gmx.de>
 ---
  configure.ac         |   1 +
- lib/Makefile.inc     |   4 +-
+ lib/Makefile.inc     |   5 +-
  lib/curl_config.h.in |   3 +
- lib/pathtools.c      | 556 +++++++++++++++++++++++++++++++++++++++++++
- lib/pathtools.h      |  57 +++++
- lib/url.c            |  26 +-
- 6 files changed, 644 insertions(+), 3 deletions(-)
+ lib/pathtools.c      | 533 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/pathtools.h      |  53 +++++
+ lib/url.c            |  26 ++-
+ 6 files changed, 618 insertions(+), 3 deletions(-)
  create mode 100644 lib/pathtools.c
  create mode 100644 lib/pathtools.h
 
 diff --git a/configure.ac b/configure.ac
-index 768f52f4c..017dcff31 100755
+index 798fa5f1e..2ed766c0d 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4020,6 +4020,7 @@ if test "xyes" = "x$longlong"; then
+@@ -3474,6 +3474,7 @@ if test "xyes" = "x$longlong"; then
    ])
  fi
  
@@ -46,10 +42,10 @@ index 768f52f4c..017dcff31 100755
  # check for ssize_t
  AC_CHECK_TYPE(ssize_t, ,
 diff --git a/lib/Makefile.inc b/lib/Makefile.inc
-index e3cf41891..d9add1ba2 100644
+index 69f9b403d..44e2dc039 100644
 --- a/lib/Makefile.inc
 +++ b/lib/Makefile.inc
-@@ -55,7 +55,7 @@ LIB_CFILES = altsvc.c amigaos.c asyn-ares.c asyn-thread.c base64.c            \
+@@ -55,7 +55,7 @@ LIB_CFILES = file.c timeval.c base64.c hostip.c progress.c formdata.c   \
    hostsyn.c http.c http2.c http_chunks.c http_digest.c http_negotiate.c       \
    http_ntlm.c http_proxy.c idn_win32.c if2ip.c imap.c inet_ntop.c inet_pton.c \
    krb5.c ldap.c llist.c md4.c md5.c memdebug.c mime.c mprintf.c mqtt.c        \
@@ -58,7 +54,7 @@ index e3cf41891..d9add1ba2 100644
    pop3.c progress.c psl.c doh.c rand.c rename.c rtsp.c security.c select.c    \
    sendf.c setopt.c sha256.c share.c slist.c smb.c smtp.c socketpair.c socks.c \
    socks_gssapi.c socks_sspi.c speedcheck.c splay.c strcase.c strdup.c         \
-@@ -74,7 +74,7 @@ LIB_HFILES = altsvc.h amigaos.h arpa_telnet.h asyn.h conncache.h connect.h    \
+@@ -74,7 +74,7 @@ LIB_HFILES = arpa_telnet.h netrc.h file.h timeval.h hostip.h progress.h \
    http2.h http_chunks.h http_digest.h http_negotiate.h http_ntlm.h            \
    http_proxy.h if2ip.h imap.h inet_ntop.h inet_pton.h llist.h memdebug.h      \
    mime.h mqtt.h multihandle.h multiif.h netrc.h non-ascii.h nonblock.h        \
@@ -68,10 +64,10 @@ index e3cf41891..d9add1ba2 100644
    smb.h smtp.h sockaddr.h socketpair.h socks.h speedcheck.h splay.h strcase.h \
    strdup.h strerror.h strtok.h strtoofft.h system_win32.h telnet.h tftp.h     \
 diff --git a/lib/curl_config.h.in b/lib/curl_config.h.in
-index abb6c0782..72c2ed7fa 100644
+index 0f2a80403..9bad51f8d 100644
 --- a/lib/curl_config.h.in
 +++ b/lib/curl_config.h.in
-@@ -15,6 +15,9 @@
+@@ -12,6 +12,9 @@
  /* Default SSL backend */
  #undef CURL_DEFAULT_SSL_BACKEND
  
@@ -83,10 +79,10 @@ index abb6c0782..72c2ed7fa 100644
  
 diff --git a/lib/pathtools.c b/lib/pathtools.c
 new file mode 100644
-index 000000000..c09458e95
+index 000000000..c66df924b
 --- /dev/null
 +++ b/lib/pathtools.c
-@@ -0,0 +1,556 @@
+@@ -0,0 +1,533 @@
 +/*
 +      .Some useful path tools.
 +        .ASCII only for now.
@@ -113,13 +109,6 @@ index 000000000..c09458e95
 +/* If you don't define this, then get_executable_path()
 +   can only use argv[0] which will often not work well */
 +#define IMPLEMENT_SYS_GET_EXECUTABLE_PATH
-+
-+/* We must include these headers, otherwise free()ing the
-+   buffer returned from get_relative_path() will cause a
-+   nasty crash */
-+#include "curl_setup.h"
-+#include "curl_memory.h"
-+#include "memdebug.h"
 +
 +#if defined(IMPLEMENT_SYS_GET_EXECUTABLE_PATH)
 +#if defined(__linux__)
@@ -178,15 +167,6 @@ index 000000000..c09458e95
 +  char * common_part;
 +  char * result;
 +  size_t count;
-+  size_t match_size_dirsep = 0;  /* The match size up to the last /. Always wind back to this - 1 */
-+  size_t match_size = 0;         /* The running (and final) match size. */
-+  size_t largest_size;
-+  int to_final_is_slash;
-+  char from_c;
-+  char to_c;
-+  size_t ndotdots = 0;
-+  char const* from_last;
-+  size_t size_result;
 +
 +  /* No to, return "./" */
 +  if (to_in == NULL)
@@ -212,8 +192,12 @@ index 000000000..c09458e95
 +
 +  result[0] = '\0';
 +
-+  largest_size = (from_size > to_size) ? from_size : to_size;
-+  to_final_is_slash = (to[to_size-1] == '/') ? 1 : 0;
++  size_t match_size_dirsep = 0;  /* The match size up to the last /. Always wind back to this - 1 */
++  size_t match_size = 0;         /* The running (and final) match size. */
++  size_t largest_size = (from_size > to_size) ? from_size : to_size;
++  int to_final_is_slash = (to[to_size-1] == '/') ? 1 : 0;
++  char from_c;
++  char to_c;
 +  for (match_size = 0; match_size < largest_size; ++match_size)
 +  {
 +    /* To simplify the logic, always pretend the strings end with '/' */
@@ -237,7 +221,8 @@ index 000000000..c09458e95
 +  common_part[match_size] = '\0';
 +  from += match_size;
 +  to += match_size;
-+  from_last = from + strlen(from) - 1;
++  size_t ndotdots = 0;
++  char const* from_last = from + strlen(from) - 1;
 +  while ((from = strchr (from, '/')) && from != from_last)
 +  {
 +    ++ndotdots;
@@ -253,7 +238,7 @@ index 000000000..c09458e95
 +  }
 +  /* Make sure that if to ends with '/' result does the same, and
 +     vice-versa. */
-+  size_result = strlen(result);
++  size_t size_result = strlen(result);
 +  if ((to_final_is_slash == 1)
 +      && (!size_result || result[size_result-1] != '/'))
 +  {
@@ -277,10 +262,8 @@ index 000000000..c09458e95
 +  size_t in_size = strlen (path);
 +  int it_ended_with_a_slash = (path[in_size - 1] == '/') ? 1 : 0;
 +  char * result = path;
-+  char * result_p;
-+  char const ** toks;
 +  sanitise_path(result);
-+  result_p = result;
++  char * result_p = result;
 +
 +  do
 +  {
@@ -289,7 +272,7 @@ index 000000000..c09458e95
 +  } while ((result_p = strchr (result_p, '/')) != NULL);
 +
 +  result_p = result;
-+  toks = (char const **) alloca (sizeof (char const*) * n_toks);
++  char const ** toks = (char const **) alloca (sizeof (char const*) * n_toks);
 +  n_toks = 0;
 +  do
 +  {
@@ -310,7 +293,7 @@ index 000000000..c09458e95
 +     with an earlier forward path (i.e. neither '.' nor '..') */
 +  for (i = 1; i < n_toks; ++i)
 +  {
-+    ssize_t removals[2] = { -1, -1 };
++    int removals[2] = { -1, -1 };
 +    if ( strcmp (toks[i], "." ) == 0)
 +    {
 +      removals[0] = i;
@@ -348,7 +331,7 @@ index 000000000..c09458e95
 +  for (i = 0; i < n_toks; ++i)
 +  {
 +    tok_size = strlen(toks[i]);
-+    memcpy (result_p, toks[i], tok_size);
++    memmove (result_p, toks[i], tok_size);
 +    result_p += tok_size;
 +    if ((!i || tok_size) && ((i < n_toks - 1) || it_ended_with_a_slash == 1))
 +    {
@@ -370,7 +353,7 @@ index 000000000..c09458e95
 +  return actual_to;
 +}
 +
-+ssize_t
++int
 +get_executable_path(char const * argv0, char * result, ssize_t max_size)
 +{
 +  char * system_result = (char *) alloca (max_size);
@@ -436,7 +419,7 @@ index 000000000..c09458e95
 +
 +#if defined(_WIN32)
 +int
-+get_dll_path(char * result, size_t max_size)
++get_dll_path(char * result, unsigned long max_size)
 +{
 +  HMODULE handle;
 +  char * p;
@@ -444,12 +427,12 @@ index 000000000..c09458e95
 +
 +  if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
 +      GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-+      (void *)(uintptr_t)&get_dll_path, &handle))
++      (LPCSTR) &get_dll_path, &handle))
 +    {
 +      return -1;
 +    }
 +
-+  ret = GetModuleFileNameA(handle, result, (DWORD)max_size);
++  ret = GetModuleFileNameA(handle, result, max_size);
 +  if (ret == 0 || ret == (int)max_size)
 +    {
 +      return -1;
@@ -471,7 +454,6 @@ index 000000000..c09458e95
 +char const *
 +strip_n_prefix_folders(char const * path, size_t n)
 +{
-+  char const * last = path;
 +  if (path == NULL)
 +  {
 +    return NULL;
@@ -482,6 +464,7 @@ index 000000000..c09458e95
 +    return path;
 +  }
 +
++  char const * last = path;
 +  while (n-- && path != NULL)
 +  {
 +    last = path;
@@ -517,8 +500,6 @@ index 000000000..c09458e95
 +  size_t path_count;
 +  size_t path_list_size;
 +  char const * path_list_p;
-+  char * all_memory;
-+  char const * next_path_list_p = 0;
 +
 +  path_list_p = path_list;
 +  if (path_list == NULL || path_list[0] == '\0')
@@ -536,7 +517,7 @@ index 000000000..c09458e95
 +  while ((path_list_p = strchr (path_list_p, split_char)) != NULL);
 +
 +  /* allocate everything in one go. */
-+  all_memory = (char *) malloc (sizeof (char *) * path_count + strlen(path_list) + 1);
++  char * all_memory = (char *) malloc (sizeof (char *) * path_count + strlen(path_list) + 1);
 +  if (all_memory == NULL)
 +    return 0;
 +  *arr = (char **)all_memory;
@@ -544,15 +525,15 @@ index 000000000..c09458e95
 +
 +  path_count = 0;
 +  path_list_p = path_list;
++  char const * next_path_list_p = 0;
 +  do
 +  {
-+    size_t this_size;
 +    next_path_list_p = strchr (path_list_p, split_char);
 +    if (next_path_list_p != NULL)
 +    {
 +      ++next_path_list_p;
 +    }
-+    this_size = (next_path_list_p != NULL)
++    size_t this_size = (next_path_list_p != NULL)
 +                       ? next_path_list_p - path_list_p - 1
 +                       : &path_list[path_list_size] - path_list_p;
 +    memcpy (all_memory, path_list_p, this_size);
@@ -569,31 +550,24 @@ index 000000000..c09458e95
 +{
 +  char exe_path[MAX_PATH];
 +  char * temp;
-+  char **arr = NULL;
-+  char split_char = ':';
-+  size_t count;
-+  size_t result_size;
-+  size_t exe_path_size;
-+  size_t i;
-+  size_t space_required;
-+  char * scratch;
-+  char * result;
-+
 +  get_executable_path (NULL, &exe_path[0], sizeof (exe_path) / sizeof (exe_path[0]));
 +  if ((temp = strrchr (exe_path, '/')) != NULL)
 +  {
 +    temp[1] = '\0';
 +  }
 +
++  char **arr = NULL;
 +  /* Ask Alexey why he added this. Are we not 100% sure
 +     that we're dealing with unix paths here? */
++  char split_char = ':';
 +  if (strchr (to_path_list, ';'))
 +  {
 +    split_char = ';';
 +  }
-+  count = split_path_list (to_path_list, split_char, &arr);
-+  result_size = 1 + (count - 1); /* count - 1 is for ; delim. */
-+  exe_path_size = strlen (exe_path);
++  size_t count = split_path_list (to_path_list, split_char, &arr);
++  int result_size = 1 + (count - 1); /* count - 1 is for ; delim. */
++  size_t exe_path_size = strlen (exe_path);
++  size_t i;
 +  /* Space required is:
 +     count * (exe_path_size + strlen (rel_to_datadir))
 +     rel_to_datadir upper bound is:
@@ -601,28 +575,27 @@ index 000000000..c09458e95
 +     + strlen(arr[i]) + 1.
 +     .. pathalogically num_slashes (from) is strlen (from)
 +     (from = ////////) */
-+  space_required = (count * (exe_path_size + 4 * strlen (from))) + count - 1;
++  size_t space_required = (count * (exe_path_size + 4 * strlen (from))) + count - 1;
 +  for (i = 0; i < count; ++i)
 +  {
 +    space_required += strlen (arr[i]);
 +  }
-+  scratch = (char *) alloca (space_required);
++  char * scratch = (char *) alloca (space_required);
 +  if (scratch == NULL)
 +    return NULL;
 +  for (i = 0; i < count; ++i)
 +  {
 +    char * rel_to_datadir = get_relative_path (from, arr[i]);
-+    size_t arr_i_size;
 +    scratch[0] = '\0';
 +    arr[i] = scratch;
 +    strcat (scratch, exe_path);
 +    strcat (scratch, rel_to_datadir);
 +    simplify_path (arr[i]);
-+    arr_i_size = strlen (arr[i]);
++    size_t arr_i_size = strlen (arr[i]);
 +    result_size += arr_i_size;
 +    scratch = arr[i] + arr_i_size + 1;
 +  }
-+  result = (char *) malloc (result_size + 1);
++  char * result = (char *) malloc (result_size);
 +  if (result == NULL)
 +  {
 +    return NULL;
@@ -645,10 +618,10 @@ index 000000000..c09458e95
 +}
 diff --git a/lib/pathtools.h b/lib/pathtools.h
 new file mode 100644
-index 000000000..dfabfaf10
+index 000000000..d4ff40f8a
 --- /dev/null
 +++ b/lib/pathtools.h
-@@ -0,0 +1,57 @@
+@@ -0,0 +1,53 @@
 +/*
 +      .Some useful path tools.
 +        .ASCII only for now.
@@ -677,11 +650,10 @@ index 000000000..dfabfaf10
 +
 +/* Uses a host OS specific function to determine the path of the executable,
 +   if IMPLEMENT_SYS_GET_EXECUTABLE_PATH is defined, otherwise uses argv0. */
-+ssize_t
-+get_executable_path(char const * argv0, char * result, ssize_t max_size);
++int get_executable_path(char const * argv0, char * result, ssize_t max_size);
 +
 +#if defined(_WIN32)
-+int get_dll_path(char * result, size_t max_size);
++int get_dll_path(char * result, unsigned long max_size);
 +#endif
 +
 +/* Where possible, in-place removes occourances of '.' and 'path/..' */
@@ -700,61 +672,80 @@ index 000000000..dfabfaf10
 +void
 +strip_n_suffix_folders(char * path, size_t n);
 +
-+char const *
-+get_relocated_path (char const * from, char const * to, char const * actual_from);
-+
 +char * get_relocated_path_list(char const * from, char const * to_path_list);
 +
 +#endif /* PATHTOOLS_H */
 diff --git a/lib/url.c b/lib/url.c
-index 03c274438..0fd707211 100644
+index 945d4e327..981e60d26 100644
 --- a/lib/url.c
 +++ b/lib/url.c
-@@ -122,6 +122,9 @@ bool curl_win32_idn_to_ascii(const char *in, char **out);
- #include "strdup.h"
+@@ -120,6 +120,9 @@
  #include "setopt.h"
  #include "altsvc.h"
+ #include "dynbuf.h"
 +#if defined(__MINGW32__)
 +#include "pathtools.h"
 +#endif
  
  /* The last 3 #include files should be in this order */
  #include "curl_printf.h"
-@@ -520,12 +523,33 @@ CURLcode Curl_init_userdefined(struct Curl_easy *data)
+@@ -498,21 +501,54 @@
     */
    if(Curl_ssl_backend() != CURLSSLBACKEND_SCHANNEL) {
  #if defined(CURL_CA_BUNDLE)
 +#if defined(__MINGW32__)
 +    const size_t path_max = PATH_MAX;
-+    char relocated[PATH_MAX + 1], *relative;
-+    get_dll_path(relocated, path_max);
-+    strip_n_suffix_folders(relocated, 1);
-+    strncat(relocated, "/", path_max);
-+    relative = get_relative_path(CURL_BINDIR, CURL_CA_BUNDLE);
-+    strncat(relocated, relative, path_max - 1);
-+    simplify_path(relocated);
-+    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_ORIG], relocated);
++    char relocated_bundle[path_max];
++    get_dll_path(relocated_bundle, path_max);
++    strip_n_suffix_folders(relocated_bundle, 1);
++    strncat(relocated_bundle, "/", path_max);
++    char *relative = get_relative_path(CURL_BINDIR, CURL_CA_BUNDLE);
++    strncat(relocated_bundle, relative, path_max);
++    free((void*)relative);
++    simplify_path(relocated_bundle);
++    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_ORIG], relocated_bundle);
 +#else
      result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_ORIG], CURL_CA_BUNDLE);
--    if(result)
 +#endif /* defined(__MINGW32__) */
-+    if(result) {
-+#if defined(__MINGW32__)
-+      free((void*)relative);
-+#endif /* defined(__MINGW32__) */
+     if(result)
        return result;
-+    }
+ 
+-    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY],
+-                            CURL_CA_BUNDLE);
++#if defined(__MINGW32__)
++    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY], relocated_bundle);
++#else
++    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY], CURL_CA_BUNDLE);
++#endif
+     if(result)
+       return result;
+ #endif
+ #if defined(CURL_CA_PATH)
++#if defined(__MINGW32__)
++    const size_t path_max = PATH_MAX;
++    char relocated_ca_path[path_max];
++    get_dll_path(relocated_ca_path, path_max);
++    strip_n_suffix_folders(relocated_ca_path, 1);
++    strncat(relocated_ca_path, "/", path_max);
++    char *relative = get_relative_path(CURL_BINDIR, CURL_CA_PATH);
++    strncat(relocated_ca_path, relative, path_max);
++    free((void*)relative);
++    simplify_path(relocated_ca_path);
++    result = Curl_setstropt(&set->str[STRING_SSL_CAPATH_ORIG], relocated_ca_path);
++#else
+     result = Curl_setstropt(&set->str[STRING_SSL_CAPATH_ORIG], CURL_CA_PATH);
++#endif /* defined(__MINGW32__) */
+     if(result)
+       return result;
  
 +#if defined(__MINGW32__)
-+    result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY], relocated);
-+    free((void*)relative);
++    result = Curl_setstropt(&set->str[STRING_SSL_CAPATH_PROXY], relocated_ca_path);
 +#else
-     result = Curl_setstropt(&set->str[STRING_SSL_CAFILE_PROXY],
-                             CURL_CA_BUNDLE);
+     result = Curl_setstropt(&set->str[STRING_SSL_CAPATH_PROXY], CURL_CA_PATH);
 +#endif
      if(result)
        return result;
  #endif
 -- 
-2.26.1.windows.1
+2.16.1.windows.4
 

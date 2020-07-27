@@ -1,0 +1,51 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+
+_realname=libssh2
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=5eaa7aa1c042e06cd4826a79af6af73ea5bf8370
+pkgrel=1
+pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts (mingw-w64)"
+arch=('any')
+url="https://libssh2.org"
+license=("BSD")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
+             "${MINGW_PACKAGE_PREFIX}-pkg-config")
+depends=("${MINGW_PACKAGE_PREFIX}-openssl"
+         "${MINGW_PACKAGE_PREFIX}-zlib")
+options=('staticlibs' 'strip')
+source=(https://github.com/libssh2/libssh2/archive/${pkgver}.tar.gz
+        fix-pkgconfig.patch
+        0001-drop-custom-buildconf-script.patch)
+sha256sums=('d5fb8bd563305fd1074dda90bd053fb2d29fc4bce048d182f96eaa466dfadafd'
+            '7a6545f6d457ad008aacefe04a60727c02d33927c8a903745bf191f69cc8ba55')
+
+prepare() {
+  cd ${_realname}-${pkgver}
+  #patch -p1 -i ${srcdir}/fix-pkgconfig.patch
+  #patch -p1 -i ${srcdir}/0001-drop-custom-buildconf-script.patch
+
+  autoreconf -fi
+}
+
+build() {
+  [[ -d "${srcdir}/build-${CARCH}" ]] && rm -rf "${srcdir}/build-${CARCH}"
+  mkdir -p "${srcdir}/build-${CARCH}" && cd "${srcdir}/build-${CARCH}"
+  ../${_realname}-${pkgver}/configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST} \
+    --with-crypto=openssl \
+    --disable-static \
+    --without-libz
+
+  make
+}
+
+package() {
+  cd "${srcdir}/build-${CARCH}"
+  make DESTDIR="${pkgdir}" install
+
+  install -Dm644 "${srcdir}"/${_realname}-${pkgver}/COPYING "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+}
