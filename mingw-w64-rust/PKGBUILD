@@ -1,6 +1,13 @@
-# Maintainer: Alexey Pavlov <alexpux@gmail.com>
-# Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
-# Contributor: Mateusz Mikuła <mati865@gmail.com
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Johannes Löthberg < johannes at kyriasis dot com >
+# Contributor: Alexander F Rødseth < xyproto at archlinux dot org >
+# Contributor: Daniel Micay < danielmicay at gmail dot com >
+# Contributor: userwithuid < userwithuid at gmail dot com >
+
+_pkgname=rust
+_date=2020-06-04
+_rustc=1.44.0
+_cargo=0.45.0
 
 _realname=rust
 _bootstrapping=yes
@@ -9,8 +16,8 @@ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.45.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
-arch=('any')
-url="https://www.rust-lang.org/"
+arch=('x86_64')
+url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("bison"
@@ -24,88 +31,79 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-python2"
-             $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
+             "${MINGW_PACKAGE_PREFIX}-libgit2"
              "${MINGW_PACKAGE_PREFIX}-zlib")
-options=('staticlibs')
-#install=rust.install
-source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
+options=('!strip' 'staticlibs' '!buildflags')
+source=("https://static.rust-lang.org/dist/rustc-${pkgver}-src.tar.xz"
+        "https://static.rust-lang.org/dist/${_date}/rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+        "https://static.rust-lang.org/dist/${_date}/rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+        "https://static.rust-lang.org/dist/${_date}/rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+        "https://static.rust-lang.org/dist/${_date}/cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz"
+        "mingw-config.toml"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch")
-sha256sums=('75f6ac6c9da9f897f4634d5a07be4084692f7ccc2d2bb89337be86cfc18453a1'
+noextract=("rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+           "rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+           "rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
+           "cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz"
+           "rustc-${pkgver}-src.tar.xz")
+sha256sums=('c436034db42bc0ea7e7f32816ac6555b70d1f76c834407597966dfaf2ec839d6'
             'SKIP'
-            '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
-            'c1b3a4d234ba10d2baf9cc1a15e830f1b722b10d80f37b316f47501f5274c9c5'
-            'e54e1da8428c484f41005bf4f9f7a8643253306e115b23e4dc17b24a6647ecab'
-            'b16f65dfdc79e7a722b3e2589e90a1431a971038dd5dfa1394ec0427e3c0a2b4'
-            '1a3d00f3bcf5c21beaa20ee729c45b7b3d76cd2a2c6b70562020f11c1e9dcc6d'
-            '061f1cf5374c926bc130a4afbde005dcd09fdbaee079469ad045fd23a7a88a2c'
-            'fcdd07eaf0790064223811aa710392bab15e489842619328e72f336290e06cdb')
+            '122b2a909fc185c6ae5a0110af6f60699f4332b4fb3c43698b14a873fbe65b6e'
+            'SKIP'
+            'fe1d8d81950eea1f67219abc49bc1ae88b2b27fd02d1bffa38b43bc5bff05124'
+            'SKIP'
+            '4ee5811bfb5fd0eb26fcf7f9b57f4e8fced458219ba52bff6d2474321ff39c18'
+            'SKIP'
+            'bed4a7d3d39ef1c996f4abb4199e2e65b5912c48d04ae73c036eea6698951d8c')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
-noextract=(${_realname}c-${pkgver}-src.tar.gz)
 
 prepare() {
-  [[ -d ${srcdir}/${_realname}c-${pkgver}-src ]] && rm -rf ${srcdir}/${_realname}c-${pkgver}-src
-  tar -xzf ${srcdir}/${_realname}c-${pkgver}-src.tar.gz -C ${srcdir} || true
+  tar -xJf ${srcdir}/rustc-${pkgver}-src.tar.xz -C ${srcdir} || true
+  cd "rustc-${pkgver}-src"
 
-  cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
-  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
-  patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  #patch -p1 -i "${srcdir}/70163.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  #patch -p1 -i "${srcdir}/0005-win32-config.patch"
+
+  cp "${srcdir}"/mingw-config.toml config.toml
+  sed -i "s|\@PREFIX\@|${MINGW_PREFIX}|" config.toml
+  # use level 0 to speed up xz packaging
+  sed -i 's|.preset(6)|.preset(0)|' "src/tools/rust-installer/src/tarballer.rs"
+  sed -i /LD_LIBRARY_PATH/d "src/bootstrap/bootstrap.py"
+
+  cd "${srcdir}"
+  mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
+  cp rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
 }
 
 build() {
-  [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
-  mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
+  cd "rustc-${pkgver}-src"
 
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
-  OSTYPE="$CARCH-pc-windows-gnu"
-
-  local -a _rust_conf=()
-  if [ "${_bootstrapping}" = "no" ]; then
-    _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
-  fi
-
-  MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
-  ../${_realname}c-${pkgver}-src/configure \
-    --prefix=${MINGW_PREFIX} \
-    --sysconfdir=${MINGW_PREFIX}/etc \
-    --localstatedir=${MINGW_PREFIX}/var/lib \
-    --build=$OSTYPE \
-    --host=$OSTYPE \
-    --target=$OSTYPE \
-    --release-channel=stable \
-    --enable-ninja \
-    --enable-extended \
-    --disable-codegen-tests \
-    --enable-ccache \
-    --python=${MINGW_PREFIX}/bin/python2 \
-    --llvm-root=${MINGW_PREFIX} \
-    ${_rust_conf}
-
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
-}
-
-check() {
-  cd "${srcdir}/${CARCH}"
-  # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
+#  /home/User/.bin/noti \
+#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
+#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
+#  DEP_Z_ROOT=${MINGW_PREFIX}
+  
+  /home/User/.bin/noti ${MINGW_PREFIX}/bin/python2 ./x.py build -j7 --verbose
 }
 
 package() {
-  cd "${srcdir}/${CARCH}"
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+  cd "rustc-${pkgver}-src"
+
+#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
+#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
+#  DEP_Z_ROOT=${MINGW_PREFIX}
+
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ./x.py install --keep-stage 0 --keep-stage 1 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
