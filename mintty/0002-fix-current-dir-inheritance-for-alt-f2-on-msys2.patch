@@ -1,0 +1,58 @@
+From 11b259b6e708a25ff1443e3ab50f1b083ef5893c Mon Sep 17 00:00:00 2001
+From: Mihail Konev <k.mvc@ya.ru>
+Date: Sun, 5 Mar 2017 22:58:09 +0500
+Subject: [PATCH 2/2] fix current dir inheritance for alt-f2 on msys2
+
+---
+ src/child.c   |  3 +++
+ src/winmain.c | 13 +++++++++++++
+ 2 files changed, 16 insertions(+)
+
+diff --git a/src/child.c b/src/child.c
+index befa396..23c1663 100644
+--- a/src/child.c
++++ b/src/child.c
+@@ -1153,6 +1153,9 @@ do_child_fork(int argc, char *argv[], int moni, bool launch)
+     else if (IsZoomed(wnd))
+       setenvi("MINTTY_MAXIMIZE", 1);
+ 
++    // tell alt-f2 mintty instance that it is such one
++    setenv("MINTTY_IS_CHILD", "1", 1);
++
+     //setenv("MINTTY_CHILD", "1", true);
+ 
+ #if CYGWIN_VERSION_DLL_MAJOR >= 1005
+diff --git a/src/winmain.c b/src/winmain.c
+index 257cc0a..c226846 100644
+--- a/src/winmain.c
++++ b/src/winmain.c
+@@ -4243,6 +4243,12 @@ opts[] = {
+   {0, 0, 0, 0}
+ };
+ 
++static int getenvi(const char *varname) {
++  char *s = getenv(varname);
++  if (s == NULL) { return 0; }
++  return atoi(s);
++}
++
+ int
+ main(int argc, char *argv[])
+ {
+@@ -5339,6 +5345,13 @@ main(int argc, char *argv[])
+       launcher_setup_env();
+       launcher_setup_argv();
+     }
++    // Ask /etc/post-install/05-home-dir.post not to "cd ~/" in an Alt-F2 window
++    {
++      if (getenvi("MINTTY_IS_CHILD")) {
++        putenv("CHERE_INVOKING=1");
++      }
++      unsetenv("MINTTY_IS_CHILD");
++    }
+ 
+     // Create child process.
+     child_create(
+-- 
+2.26.2
+
