@@ -3,7 +3,7 @@
 _realname=z3
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=ac39ddb43fd6a7126cdae85585ee94d7f5d81626
+pkgver=8857a67e4f15607f0dc6f2311d62dae48ab55ec5
 pkgrel=1
 pkgdesc="Z3 is a high-performance theorem prover being developed at Microsoft Research (mingw-w64)"
 arch=('any')
@@ -60,7 +60,7 @@ build() {
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  ninja
+  ninja -j7
 
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
@@ -76,7 +76,7 @@ build() {
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  ninja
+  ninja -j7
 }
 
 check() {
@@ -86,8 +86,8 @@ check() {
 
 package() {
   cd "${srcdir}"/build-${CARCH}-static
-  make install DESTDIR="${pkgdir}"
+  ninja install DESTDIR="${pkgdir}"
 
   cd "${srcdir}"/build-${CARCH}-shared
-  make install DESTDIR="${pkgdir}"
+  ninja install DESTDIR="${pkgdir}"
 }
