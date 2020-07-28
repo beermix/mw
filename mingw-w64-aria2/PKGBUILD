@@ -16,10 +16,9 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-c-ares"
              "${MINGW_PACKAGE_PREFIX}-cppunit"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
-             "${MINGW_PACKAGE_PREFIX}-libssh2"
              "${MINGW_PACKAGE_PREFIX}-libuv"
              "${MINGW_PACKAGE_PREFIX}-libxml2"
-             "${MINGW_PACKAGE_PREFIX}-openssl"
+             "${MINGW_PACKAGE_PREFIX}-gnutls"
              "${MINGW_PACKAGE_PREFIX}-sqlite3"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/${pkgver}.tar.gz)
@@ -41,9 +40,9 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --disable-shared \
+    --disable-rpath \
     --without-gnutls \
-    --without-wintls \
-    --with-openssl \
+    --with-wintls \
     --with-sqlite3 \
     --disable-libaria2 \
     --without-libcares \
