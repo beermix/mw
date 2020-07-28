@@ -3,7 +3,7 @@
 _realname=aria2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=9d0a48ac8147c5e56402706d5c17efa8bf6340f2
+pkgver=15cad965eb75c8b7f11bc2fc94354d1873bf6261
 pkgrel=1
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
@@ -11,18 +11,18 @@ url="https://github.com/aria2/aria2"
 license=('GPL2')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-ruby")
              "${MINGW_PACKAGE_PREFIX}-gcc-libs"
              "${MINGW_PACKAGE_PREFIX}-gettext"
-             "${MINGW_PACKAGE_PREFIX}-cppunit"
-             "${MINGW_PACKAGE_PREFIX}-libxml2"
-             "${MINGW_PACKAGE_PREFIX}-sqlite3"
-             "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-c-ares"
+             "${MINGW_PACKAGE_PREFIX}-cppunit"
+             "${MINGW_PACKAGE_PREFIX}-libiconv"
+             "${MINGW_PACKAGE_PREFIX}-libssh2"
+             "${MINGW_PACKAGE_PREFIX}-libuv"
+             "${MINGW_PACKAGE_PREFIX}-libxml2"
+             "${MINGW_PACKAGE_PREFIX}-openssl"
+             "${MINGW_PACKAGE_PREFIX}-sqlite3"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/${pkgver}.tar.gz)
-sha256sums=('c4072deaf6b443be15f9710657aa6c53527f642bc7a3252bb81d2853161080ed')
-
 prepare() {
   cd "${_realname}-${pkgver}"
   autoreconf -ifv || autoreconf -ifv
@@ -37,19 +37,21 @@ build() {
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-bashcompletiondir=${MINGW_PREFIX}/share/bash-completion/completions \
+    --with-cppunit-prefix=$PREFIX \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --disable-shared \
     --without-gnutls \
-    --with-wintls \
+    --without-wintls \
     --with-openssl \
+    --with-sqlite3 \
     --disable-libaria2 \
     --without-libcares \
     --without-libssh2 \
     --disable-nls \
     ARIA2_STATIC=yes
 
-  /home/User/.go/bin/noti.exe nice -n 19 make
+  /home/User/.go/bin/noti.exe nice -n19 make
 }
 
 package() {
