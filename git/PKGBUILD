@@ -2,7 +2,7 @@
 # Maintainer: Ray Donnelly <mingw.android@gmail.com>
 
 pkgname=git
-pkgver=2.27.0
+pkgver=2.28.0
 pkgrel=1
 pkgdesc="The fast distributed version control system"
 arch=('i686' 'x86_64')
