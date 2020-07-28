@@ -299,7 +299,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export TARGETS_TO_BUILD="host"
+  export TARGETS_TO_BUILD="NVPTX;host"
 
   export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format"
   export CXXFLAGS="${CFLAGS}"
@@ -307,14 +307,9 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_TARGETS_TO_BUILD="${TARGETS_TO_BUILD}" \
-    -DLLVM_CCACHE_BUILD=OFF \
-    -DLLVM_INCLUDE_DOCS=OFF \
-    -DLLVM_INCLUDE_TOOLS=OFF \
-    -DLLVM_INCLUDE_TESTS=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
@@ -349,7 +344,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -j7
+  /home/User/.go/bin/noti nice -n19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -461,6 +456,7 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
+  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -548,6 +544,8 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+
+  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -560,6 +558,7 @@ package_llvm() {
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
+  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
