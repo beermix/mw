@@ -248,7 +248,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export TARGETS_TO_BUILD="NVPTX;host"
+  export TARGETS_TO_BUILD="host"
 
   export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format"
   export CXXFLAGS="${CFLAGS}"
