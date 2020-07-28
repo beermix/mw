@@ -65,7 +65,8 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
-  CFLAGS+=" -DG_ENABLE_DEBUG -DG_DISABLE_CAST_CHECKS"
+  #CFLAGS+=" -DG_ENABLE_DEBUG -DG_DISABLE_CAST_CHECKS"
+  CFLAGS+=" -DG_DISABLE_CAST_CHECKS"
   meson \
     --buildtype=plain \
     -Dbroadway_backend=true \

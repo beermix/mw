@@ -131,7 +131,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    git-updates.diff \
+    gcc-10-git.patch \
     optimize.patch \
     optimize-at-least-some.patch
 
