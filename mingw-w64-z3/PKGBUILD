@@ -56,7 +56,7 @@ build() {
     -G"Ninja" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
@@ -72,7 +72,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=ON \
     -DBUILD_PYTHON_BINDINGS=ON \
-    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
+    -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
@@ -81,7 +81,7 @@ build() {
 
 check() {
  cd "${srcdir}"/build-${CARCH}-shared
- make test-z3 || true
+ ninja test-z3 || true
 }
 
 package() {
