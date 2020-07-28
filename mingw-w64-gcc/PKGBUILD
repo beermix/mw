@@ -4,8 +4,8 @@
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: wirx6 <wirx654@gmail.com>
 
-_enable_ada=yes
-_enable_objc=yes
+_enable_ada=no
+_enable_objc=no
 _threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
@@ -231,9 +231,8 @@ build() {
   unset CXXFLAGS
   export CFLAGS="-march=haswell -g -O3"
   export CXXFLAGS="-march=haswell -g -O3"
-  export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition"
-  export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
