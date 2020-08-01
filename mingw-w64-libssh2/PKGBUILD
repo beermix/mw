@@ -37,7 +37,9 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --with-crypto=openssl \
-    --enable-static --enable-shared
+    --with-pic \
+    --enable-static \
+    --enable-shared
 
   make
 }
