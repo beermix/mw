@@ -366,7 +366,7 @@ channel = "stable"
 # platforms to ensure that the compiler is usable by default from the build
 # directory (as it links to a number of dynamic libraries). This may not be
 # desired in distributions, for example.
-# rpath = true
+rpath = true
 
 # Emits extraneous output from tests to ensure that failures of the test
 # harness are debuggable just from logfiles.
@@ -409,7 +409,7 @@ lld = true
 # LLD will not be used if we're cross linking or running tests.
 #
 # Explicitly setting the linker for a target will override this option.
-use-lld = true
+use-lld = false
 
 # Indicates whether some LLVM tools, like llvm-objdump, will be made available in the
 # sysroot.
@@ -437,7 +437,7 @@ remap-debuginfo = false
 
 # Link the compiler against `jemalloc`, where on Linux and OSX it should
 # override the default allocator for rustc and LLVM.
-#jemalloc = true
+jemalloc = false
 
 # Run tests in various test suites with the "nll compare mode" in addition to
 # running the tests in normal mode. Largely only used on CI and during local
@@ -465,11 +465,10 @@ cxx = "x86_64-w64-mingw32-c++"
 # Archiver to be used to assemble static libraries compiled from C/C++ code.
 # Note: an absolute path should be used, otherwise LLVM build will break.
 ar = "x86_64-w64-mingw32-gcc-ar"
-# llvm-ar
+
 # Ranlib to be used to assemble static libraries compiled from C/C++ code.
 # Note: an absolute path should be used, otherwise LLVM build will break.
 ranlib = "x86_64-w64-mingw32-gcc-ranlib"
-# llvm-ranlib
 
 # Linker to be used to link Rust code. Note that the
 # default value is platform specific, and if not specified it may also depend on
