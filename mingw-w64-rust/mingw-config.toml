@@ -325,13 +325,13 @@ debug-assertions-std = false
 # Can be overriden for specific subsets of Rust code (rustc, std or tools).
 # Debuginfo for tests run with compiletest is not controlled by this option
 # and needs to be enabled separately with `debuginfo-level-tests`.
-debuginfo-level = 1
+debuginfo-level = 0
 
 # Debuginfo level for the compiler.
 debuginfo-level-rustc = 0
 
 # Debuginfo level for the standard library.
-debuginfo-level-std = 1
+debuginfo-level-std = 
 
 # Debuginfo level for the tools.
 debuginfo-level-tools = 0
@@ -352,12 +352,12 @@ parallel-compiler = false
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
 # Note that this is not the linker used to link said compiler.
-default-linker = "cc"
+default-linker = "x86_64-w64-mingw32-gcc"
 
 # The "channel" for the Rust build to produce. The stable/beta channels only
 # allow using stable features, whereas the nightly and dev channels allow using
 # nightly features
-channel = "beta"
+channel = "stable"
 
 # The root location of the MUSL installation directory.
 #musl-root = "..."
@@ -366,7 +366,7 @@ channel = "beta"
 # platforms to ensure that the compiler is usable by default from the build
 # directory (as it links to a number of dynamic libraries). This may not be
 # desired in distributions, for example.
-rpath = true
+# rpath = true
 
 # Emits extraneous output from tests to ensure that failures of the test
 # harness are debuggable just from logfiles.
@@ -409,7 +409,7 @@ lld = true
 # LLD will not be used if we're cross linking or running tests.
 #
 # Explicitly setting the linker for a target will override this option.
-use-lld = false
+use-lld = true
 
 # Indicates whether some LLVM tools, like llvm-objdump, will be made available in the
 # sysroot.
