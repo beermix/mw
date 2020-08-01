@@ -7,7 +7,7 @@ pkgver=5eaa7aa1c042e06cd4826a79af6af73ea5bf8370
 pkgrel=1
 pkgdesc="A library implementing the SSH2 protocol as defined by Internet Drafts (mingw-w64)"
 arch=('any')
-url="https://libssh2.org"
+url="https://github.com/libssh2/libssh2"
 license=("BSD")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-pkg-config")
@@ -37,7 +37,7 @@ build() {
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --with-crypto=openssl \
-    --disable-static
+    --enable-static --enable-shared
 
   make
 }
