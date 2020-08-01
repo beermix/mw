@@ -77,12 +77,12 @@ prepare() {
   #sed -i 's|.preset(6)|.preset(0)|' "src/tools/rust-installer/src/tarballer.rs"
   #sed -i /LD_LIBRARY_PATH/d "src/bootstrap/bootstrap.py"
 
-  #cd "${srcdir}"
-  #mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
-  #cp rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
-  #cp rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
-  #cp cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
-  #cp rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cd "${srcdir}"
+  mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
+  cp rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
+  cp rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz "rustc-${pkgver}-src/build/cache/${_date}"
 }
 
 build() {

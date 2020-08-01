@@ -331,7 +331,7 @@ debuginfo-level = 0
 debuginfo-level-rustc = 0
 
 # Debuginfo level for the standard library.
-debuginfo-level-std = 
+debuginfo-level-std = 0
 
 # Debuginfo level for the tools.
 debuginfo-level-tools = 0
@@ -437,7 +437,7 @@ remap-debuginfo = false
 
 # Link the compiler against `jemalloc`, where on Linux and OSX it should
 # override the default allocator for rustc and LLVM.
-jemalloc = false
+# jemalloc = false
 
 # Run tests in various test suites with the "nll compare mode" in addition to
 # running the tests in normal mode. Largely only used on CI and during local

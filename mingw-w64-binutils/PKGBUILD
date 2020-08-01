@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.35
-pkgrel=5
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -26,33 +26,7 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0120-windres-handle-spaces.patch
         1000-PR24511.patch
         1001-PR25447.patch
-        0300-default-secure-pe-flags.patch
-        0310-reproducible-import-libraries.patch
-        nodocs.patch
-        0015-bfd-install-config.h.patch
-        0003-enable-shared-bfd.all.patch
-        0003-link-to-libibtl-and-libiberty.mingw.patch
-        0004-libiberty-la.mingw.patch
-        0005-shared-opcodes.mingw.patch
-        0008-fix-libiberty-makefile.mingw.patch
-        0009-fix-libiberty-configure.mingw.patch
-        0013-dont-link-gas-to-libiberty.mingw.patch
-        0014-dont-link-binutils-to-libiberty.mingw.patch
-        0015-dont-link-ld-to-libiberty.mingw.patch
-        0017-fix-iconv-linking.all.patch
-        0200-remove-provide-qualifiers.patch
-        0003-MinGW-w64-winpthreads-doesnt-have-pthread_mutexattr_settype.patch
-        006_better_file_error.patch
-        135_bfd_soversion.patch
-        000-branch-updates.patch
-        binutils-2.29-filename-in-error-messages.patch
-        binutils-export-demangle.h.patch
-        binutils-add-LD_AS_NEEDED-global-env.patch
-        001-branch-version.patch
-        500-libctf-soname.patch
-        binutils-stable-branch.patch
-        binutils-stable-34branch.patch
-        000-git-binutils-2_34.patch)
+        nodocs.patch)
 sha256sums=('f00b0e8803dc9bab1e2165bd568528135be734df3fabf8d0161828cd56028952'
             'SKIP'
             '93296b909e1a4f9d8a4bbe2437aafa17ca565ef6642a9812b0360c05be228c9d'
@@ -107,6 +81,8 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-plugins \
+    --enable-targets=x86_64-*-mingw64 \
+    --with-system-zlib \
     --enable-silent-rules \
     --enable-gold \
     --disable-shared
