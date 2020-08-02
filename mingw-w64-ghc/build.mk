@@ -97,7 +97,7 @@ V=0
 
 # Build the "extra" packages (see ./packages). This enables more tests. See:
 # https://ghc.haskell.org/trac/ghc/wiki/Building/RunningTests/Running#AdditionalPackages
-#BUILD_EXTRA_PKGS=NO
+#BUILD_EXTRA_PKGS=YES
 
 # Uncomment the following line to enable building DPH
 #BUILD_DPH=YES
