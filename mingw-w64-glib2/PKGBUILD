@@ -48,8 +48,8 @@ prepare() {
   patch -Np1 -i "${srcdir}"/0001-win32-Make-the-static-build-work-with-MinGW-when-pos.patch
   patch -Np1 -i "${srcdir}"/0001-disable-some-tests-when-static.patch
   patch -Np1 -i "${srcdir}"/0002-disable_glib_compile_schemas_warning.patch
-  #patch -Np1 -i "${srcdir}"/002-no-tests.patch
-  #patch -Np1 -i "${srcdir}"/004-no-distutils.patch
+  patch -Np1 -i "${srcdir}"/002-no-tests.patch
+  patch -Np1 -i "${srcdir}"/004-no-distutils.patch
 }
 
 build() {
