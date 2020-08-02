@@ -60,7 +60,7 @@ build() {
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 ninja
+  nice -n19 ninja -j7
 
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
@@ -76,7 +76,7 @@ build() {
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 ninja
+  nice -n19 ninja -j7
 }
 
 check() {
