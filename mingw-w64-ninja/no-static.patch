@@ -1,0 +1,25 @@
+diff --git a/configure.py b/configure.py
+index 8eef7e6..0f9468e 100755
+--- a/configure.py
++++ b/configure.py
+@@ -371,7 +371,6 @@ libs = []
+ 
+ if platform.is_mingw():
+     cflags.remove('-fvisibility=hidden');
+-    ldflags.append('-static')
+ elif platform.is_solaris():
+     cflags.remove('-fvisibility=hidden')
+ elif platform.is_aix():
+diff --git a/misc/write_fake_manifests.py b/misc/write_fake_manifests.py
+index b3594de..a0b253d 100644
+--- a/misc/write_fake_manifests.py
++++ b/misc/write_fake_manifests.py
+@@ -179,7 +179,7 @@ def write_master_ninja(master_ninja, targets):
+     master_ninja.variable('cxx', 'c++')
+     master_ninja.variable('ld', '$cxx')
+     if sys.platform == 'darwin':
+-        master_ninja.variable('alink', 'libtool -static')
++        master_ninja.variable('alink')
+     else:
+         master_ninja.variable('alink', 'ar rcs')
+     master_ninja.newline()
