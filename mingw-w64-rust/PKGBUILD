@@ -86,7 +86,7 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j8 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j7 --verbose
 }
 
 package() {
@@ -97,8 +97,4 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }

@@ -38,7 +38,7 @@ assertions = false
 # Indicates whether ccache is used when building LLVM
 ccache = true
 # or alternatively ...
-# ccache = "/path/to/ccache"
+#ccache = "/path/to/ccache"
 
 # If an external LLVM root is specified, we automatically check the version by
 # default to make sure it's within the range that we're expecting, but setting
@@ -133,19 +133,19 @@ target = ["x86_64-pc-windows-gnu"] # defaults to just the build triple
 
 # Use this directory to store build artifacts.
 # You can use "$ROOT" to indicate the root of the git repository.
-# build-dir = "build"
+#build-dir = "build"
 
 # Instead of downloading the src/stage0.txt version of Cargo specified, use
 # this Cargo binary instead to build all Rust code
-# cargo = "/path/to/bin/cargo"
+#cargo = "/path/to/bin/cargo"
 
 # Instead of downloading the src/stage0.txt version of the compiler
 # specified, use this rustc binary instead as the stage0 snapshot compiler.
-# rustc = "/path/to/bin/rustc"
+#rustc = "/path/to/bin/rustc"
 
 # Instead of download the src/stage0.txt version of rustfmt specified,
 # use this rustfmt binary instead as the stage0 snapshot rustfmt.
-# rustfmt = "/path/to/bin/rustfmt"
+#rustfmt = "/path/to/bin/rustfmt"
 
 # Flag to specify whether any documentation is built. If false, rustdoc and
 # friends will still be compiled but they will not be used to generate any
@@ -157,11 +157,11 @@ docs = false
 compiler-docs = false
 
 # Indicate whether git submodules are managed and updated automatically.
-# submodules = true
+submodules = true
 
 # Update git submodules only when the checked out commit in the submodules differs
 # from what is committed in the main rustc repo.
-# fast-submodules = true
+fast-submodules = true
 
 # The path to (or name of) the GDB executable to use. This is only used for
 # executing the debuginfo test suite.
@@ -179,7 +179,7 @@ python = "python2"
 
 # Force Cargo to check that Cargo.lock describes the precise dependency
 # set that all the Cargo.toml files create, instead of updating it.
-# locked-deps = false
+locked-deps = false
 
 # Indicate whether the vendored sources are used for Rust dependencies or not
 vendor = true
@@ -201,20 +201,20 @@ extended = true
 # Installs chosen set of extended tools if `extended = true`. By default builds all.
 # If chosen tool failed to build the installation fails. If `extended = false`, this
 # option is ignored.
-tools = ["cargo"]
+tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
 
 # Verbosity level: 0 == not verbose, 1 == verbose, 2 == very verbose
 verbose = 0
 
 # Build the sanitizer runtimes
-# sanitizers = false
+sanitizers = false
 
 # Build the profiler runtime
-# profiler = false
+profiler = false
 
 # Indicates whether the native libraries linked into Cargo will be statically
 # linked or not.
-# cargo-native-static = false
+cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
@@ -223,15 +223,15 @@ low-priority = true
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
 # script.
-# configure-args = []
+configure-args = []
 
 # Indicates that a local rebuild is occurring instead of a full bootstrap,
 # essentially skipping stage0 as the local compiler is recompiling itself again.
-# local-rebuild = false
+local-rebuild = false
 
 # Print out how long each rustbuild step took (mostly intended for CI and
 # tracking over time)
-# print-step-timings = false
+print-step-timings = false
 
 # =============================================================================
 # General install configuration options
@@ -347,7 +347,7 @@ backtrace = true
 incremental = false
 
 # Build a multi-threaded rustc
-parallel-compiler = false
+parallel-compiler = true
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
@@ -378,7 +378,7 @@ optimize-tests = true
 # Flag indicating whether codegen tests will be run or not. If you get an error
 # saying that the FileCheck executable is missing, you may want to disable this.
 # Also see the target's llvm-filecheck option.
-codegen-tests = false
+codegen-tests = true
 
 # Flag indicating whether git info will be retrieved from .git automatically.
 # Having the git information can cause a lot of rebuilds during development.
@@ -437,7 +437,7 @@ remap-debuginfo = false
 
 # Link the compiler against `jemalloc`, where on Linux and OSX it should
 # override the default allocator for rustc and LLVM.
-# jemalloc = false
+jemalloc = false
 
 # Run tests in various test suites with the "nll compare mode" in addition to
 # running the tests in normal mode. Largely only used on CI and during local
