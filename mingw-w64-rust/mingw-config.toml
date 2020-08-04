@@ -47,7 +47,7 @@ ccache = true
 
 # Link libstdc++ statically into the librustc_llvm instead of relying on a
 # dynamic version to be available.
-# static-libstdcpp = true
+static-libstdcpp = true
 
 # Tell the LLVM build system to use Ninja instead of the platform default for
 # the generated build system. This can sometimes be faster than make, for
@@ -81,7 +81,9 @@ experimental-targets = ""
 
 # When invoking `llvm-config` this configures whether the `--shared` argument is
 # passed to prefer linking to shared libraries.
-# link-shared = false
+link-shared = false
+
+#llvm-root = "@PREFIX@"
 
 # When building llvm, this configures what is being appended to the version.
 # The default is "-rust-$version-$channel", except for dev channel where rustc
@@ -201,7 +203,7 @@ extended = true
 # Installs chosen set of extended tools if `extended = true`. By default builds all.
 # If chosen tool failed to build the installation fails. If `extended = false`, this
 # option is ignored.
-tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
+#tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
 
 # Verbosity level: 0 == not verbose, 1 == verbose, 2 == very verbose
 verbose = 0
@@ -378,7 +380,7 @@ optimize-tests = true
 # Flag indicating whether codegen tests will be run or not. If you get an error
 # saying that the FileCheck executable is missing, you may want to disable this.
 # Also see the target's llvm-filecheck option.
-codegen-tests = false
+#codegen-tests = false
 
 # Flag indicating whether git info will be retrieved from .git automatically.
 # Having the git information can cause a lot of rebuilds during development.

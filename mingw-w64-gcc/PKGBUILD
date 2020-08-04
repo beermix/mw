@@ -131,9 +131,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-10-git.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    gcc-10-git.patch
 
 #     gcc-10-git.patch \
 #    optimize.patch \
@@ -220,9 +218,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
@@ -266,8 +264,6 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
-    --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
@@ -352,7 +348,7 @@ package_mingw-w64-gcc() {
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
