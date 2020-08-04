@@ -1,0 +1,35 @@
+diff --git a/m4/ldap.m4 b/m4/ldap.m4
+index 053aa51d2..678bffefc 100644
+--- a/m4/ldap.m4
++++ b/m4/ldap.m4
+@@ -34,7 +34,7 @@ if test x$_ldap_with != xno ; then
+   _ldap_save_ldflags=$LDFLAGS
+   LDFLAGS="${LDAP_LDFLAGS} ${LDFLAGS}"
+ 
+-  for MY_LDAPLIBS in ${LDAPLIBS+"$LDAPLIBS"} "-lldap" "-lldap -llber" "-lldap -llber -lresolv" "-lwldap32"; do
++  for MY_LDAPLIBS in ${LDAPLIBS+"$LDAPLIBS"} "-lwldap32" "-lldap" "-lldap -llber" "-lldap -llber -lresolv"; do
+     _ldap_save_libs=$LIBS
+     LIBS="$MY_LDAPLIBS $1 $LIBS"
+ 
+diff --git a/scripts/mk-w32-dist b/scripts/mk-w32-dist
+index a0d5725a9..9de4b4a5a 100755
+--- a/scripts/mk-w32-dist
++++ b/scripts/mk-w32-dist
+@@ -226,7 +226,7 @@ for i in `(ls ${srcdir}/po/*.po; echo ${srcdir}/po/en.po) | sort`; do
+            ;;
+          *)
+            echo "$lang: converting from $fromset to utf-8" >&2
+-           iconv --silent --from-code=$fromset --to-code=utf-8 < $i | \
++           iconv -s --from-code=$fromset --to-code=utf-8 < $i | \
+              sed "/^\"Content-Type:/ s/charset=[a-zA-Z0-9_-]*/charset=utf-8/"|\
+              msgfmt --output-file=$lang.mo -
+            ;;
+@@ -240,7 +240,7 @@ done
+ 
+ 
+ # Create the option file for use with the NSIS installer.
+-cat <<EOF | iconv --silent --from-code=utf-8 --to-code=latin1 >opt.ini
++cat <<EOF | iconv -s --from-code=utf-8 --to-code=latin1 >opt.ini
+ [Settings]
+ NumFields=1
+ 

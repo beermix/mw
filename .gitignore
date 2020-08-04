@@ -37,3 +37,4 @@ mingw-w64
 */mingw-w64/
 /*/msys2-runtime/
 src
+/mingw-w64-git-1/git/
