@@ -73,9 +73,7 @@ prepare() {
 
   cp "${srcdir}"/mingw-config.toml config.toml
   sed -i "s|\@PREFIX\@|${MINGW_PREFIX}|" config.toml
-  # use level 0 to speed up xz packaging
-  #sed -i 's|.preset(6)|.preset(0)|' "src/tools/rust-installer/src/tarballer.rs"
-  #sed -i /LD_LIBRARY_PATH/d "src/bootstrap/bootstrap.py"
+  sed -i 's|.preset(6)|.preset(0)|' "src/tools/rust-installer/src/tarballer.rs"
 
   cd "${srcdir}"
   mkdir -p "${srcdir}/rustc-${pkgver}-src/build/cache/${_date}"
@@ -88,25 +86,17 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j8 --verbose
+  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j8 --verbose
 }
 
 package() {
   cd "rustc-${pkgver}-src"
 
-  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-  DEP_Z_ROOT=${MINGW_PREFIX} \
   DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
 
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
   mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
