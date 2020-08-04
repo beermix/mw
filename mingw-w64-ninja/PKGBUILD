@@ -4,7 +4,7 @@ _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=00968321d6ace10b6798855cab7620dc6a5620fd
-pkgrel=1
+pkgrel=2
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
 url="https://github.com/ninja-build/ninja"
@@ -26,7 +26,8 @@ prepare () {
 build() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
   cd ${srcdir}/ninja-${pkgver}
-  CC="clang" CXX="clang++" NM="llvm-nm" AR="llvm-ar" RANLIB="llvm-ranlib" STRIP="llvm-strip" ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform mingw --verbose
+  #CC="clang" CXX="clang++" NM="llvm-nm" AR="llvm-ar" RANLIB="llvm-ranlib" STRIP="llvm-strip"
+  ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform mingw --verbose
 }
 
 package() {
