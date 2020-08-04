@@ -1,0 +1,121 @@
+diff --git a/ld/ChangeLog b/ld/ChangeLog
+index 6dcd55ccd24..54e959cce4b 100644
+--- a/ld/ChangeLog
++++ b/ld/ChangeLog
+@@ -1,3 +1,10 @@
++2020-08-03  Alan Modra  <amodra@gmail.com>
++
++	PR 26328
++	* configure.ac: AC_CHECK_DECLS asprintf.
++	* configure: Regenerate.
++	* config.in: Regenerate.
++
+ 2020-07-24  Nick Clifton  <nickc@redhat.com>
+ 
+ 	* configure: Regenerate.
+diff --git a/ld/config.in b/ld/config.in
+index f1712107367..2f4e5ea33e3 100644
+--- a/ld/config.in
++++ b/ld/config.in
+@@ -49,6 +49,10 @@
+ /* Define to 1 if you have the `close' function. */
+ #undef HAVE_CLOSE
+ 
++/* Define to 1 if you have the declaration of `asprintf', and to 0 if you
++   don't. */
++#undef HAVE_DECL_ASPRINTF
++
+ /* Define to 1 if you have the declaration of `environ', and to 0 if you
+    don't. */
+ #undef HAVE_DECL_ENVIRON
+diff --git a/ld/configure b/ld/configure
+index f08ce9969ea..c3bc15dec3f 100755
+--- a/ld/configure
++++ b/ld/configure
+@@ -17372,35 +17372,35 @@ $as_echo "#define USE_BINARY_FOPEN 1" >>confdefs.h
+  ;;
+ esac
+ 
+-ac_fn_c_check_decl "$LINENO" "strstr" "ac_cv_have_decl_strstr" "$ac_includes_default"
+-if test "x$ac_cv_have_decl_strstr" = xyes; then :
++ac_fn_c_check_decl "$LINENO" "asprintf" "ac_cv_have_decl_asprintf" "$ac_includes_default"
++if test "x$ac_cv_have_decl_asprintf" = xyes; then :
+   ac_have_decl=1
+ else
+   ac_have_decl=0
+ fi
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define HAVE_DECL_STRSTR $ac_have_decl
++#define HAVE_DECL_ASPRINTF $ac_have_decl
+ _ACEOF
+-ac_fn_c_check_decl "$LINENO" "free" "ac_cv_have_decl_free" "$ac_includes_default"
+-if test "x$ac_cv_have_decl_free" = xyes; then :
++ac_fn_c_check_decl "$LINENO" "environ" "ac_cv_have_decl_environ" "$ac_includes_default"
++if test "x$ac_cv_have_decl_environ" = xyes; then :
+   ac_have_decl=1
+ else
+   ac_have_decl=0
+ fi
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define HAVE_DECL_FREE $ac_have_decl
++#define HAVE_DECL_ENVIRON $ac_have_decl
+ _ACEOF
+-ac_fn_c_check_decl "$LINENO" "sbrk" "ac_cv_have_decl_sbrk" "$ac_includes_default"
+-if test "x$ac_cv_have_decl_sbrk" = xyes; then :
++ac_fn_c_check_decl "$LINENO" "free" "ac_cv_have_decl_free" "$ac_includes_default"
++if test "x$ac_cv_have_decl_free" = xyes; then :
+   ac_have_decl=1
+ else
+   ac_have_decl=0
+ fi
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define HAVE_DECL_SBRK $ac_have_decl
++#define HAVE_DECL_FREE $ac_have_decl
+ _ACEOF
+ ac_fn_c_check_decl "$LINENO" "getenv" "ac_cv_have_decl_getenv" "$ac_includes_default"
+ if test "x$ac_cv_have_decl_getenv" = xyes; then :
+@@ -17412,15 +17412,25 @@ fi
+ cat >>confdefs.h <<_ACEOF
+ #define HAVE_DECL_GETENV $ac_have_decl
+ _ACEOF
+-ac_fn_c_check_decl "$LINENO" "environ" "ac_cv_have_decl_environ" "$ac_includes_default"
+-if test "x$ac_cv_have_decl_environ" = xyes; then :
++ac_fn_c_check_decl "$LINENO" "sbrk" "ac_cv_have_decl_sbrk" "$ac_includes_default"
++if test "x$ac_cv_have_decl_sbrk" = xyes; then :
+   ac_have_decl=1
+ else
+   ac_have_decl=0
+ fi
+ 
+ cat >>confdefs.h <<_ACEOF
+-#define HAVE_DECL_ENVIRON $ac_have_decl
++#define HAVE_DECL_SBRK $ac_have_decl
++_ACEOF
++ac_fn_c_check_decl "$LINENO" "strstr" "ac_cv_have_decl_strstr" "$ac_includes_default"
++if test "x$ac_cv_have_decl_strstr" = xyes; then :
++  ac_have_decl=1
++else
++  ac_have_decl=0
++fi
++
++cat >>confdefs.h <<_ACEOF
++#define HAVE_DECL_STRSTR $ac_have_decl
+ _ACEOF
+ 
+ 
+diff --git a/ld/configure.ac b/ld/configure.ac
+index 5a4938afdb0..172398ff847 100644
+--- a/ld/configure.ac
++++ b/ld/configure.ac
+@@ -305,7 +305,7 @@ fi
+ 
+ BFD_BINARY_FOPEN
+ 
+-AC_CHECK_DECLS([strstr, free, sbrk, getenv, environ])
++AC_CHECK_DECLS([asprintf, environ, free, getenv, sbrk, strstr])
+ 
+ # Link in zlib if we can.  This allows us to read and write
+ # compressed CTF sections.
