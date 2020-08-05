@@ -1,3 +1,52 @@
+diff --git a/build.sh b/build.sh
+index 4c88b53..cc1c790 100755
+--- a/build.sh
++++ b/build.sh
+@@ -103,7 +103,7 @@ convert ()
+     esac
+ 
+     fn="$top_srcdir/lib/${fn##*/}"
+-    [ -f "$fn" ] || { echo "Missing file: $fn"; exit 1; }
++    test -f "$fn" || { echo "Missing file: $fn"; exit 1; }
+ 
+     sed "/definitions* of $inc/r $fn" "$int" > "${int}_"
+     int=${int}_
+diff --git a/configure.ac b/configure.ac
+index cd49a2c..960991c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,7 +16,7 @@
+ # You should have received a copy of the GNU General Public License along with
+ # this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+-AC_INIT([GNU make],[4.3],[bug-make@gnu.org])
++AC_INIT([GNU make],[4.3.90],[bug-make@gnu.org])
+ 
+ AC_PREREQ([2.69])
+ 
+@@ -38,6 +38,9 @@ AM_INIT_AUTOMAKE([1.16.1 foreign -Werror -Wall])
+ AC_USE_SYSTEM_EXTENSIONS
+ AC_PROG_CC
+ 
++# GNU Gnulib requires C99, so I guess we might as well too...
++AC_PROG_CC_C99
++
+ # Configure gnulib
+ gl_EARLY
+ gl_INIT
+diff --git a/src/commands.c b/src/commands.c
+index 88c33a3..dd17999 100644
+--- a/src/commands.c
++++ b/src/commands.c
+@@ -508,7 +508,7 @@ fatal_error_signal (int sig)
+ #ifdef WINDOWS32
+   extern HANDLE main_thread;
+ 
+-  /* Windows creates a sperate thread for handling Ctrl+C, so we need
++  /* Windows creates a separate thread for handling Ctrl+C, so we need
+      to suspend the main thread, or else we will have race conditions
+      when both threads call reap_children.  */
+   if (main_thread)
 diff --git a/src/dir.c b/src/dir.c
 index 862a18e..a9c12eb 100644
 --- a/src/dir.c
@@ -30,9 +79,18 @@ index 862a18e..a9c12eb 100644
          return -1;
      }
 diff --git a/src/job.c b/src/job.c
-index ae1f18b..c4e7749 100644
+index ae1f18b..3bcec38 100644
 --- a/src/job.c
 +++ b/src/job.c
+@@ -504,7 +504,7 @@ block_sigs ()
+ static void
+ unblock_sigs ()
+ {
+-  sigsetmask (siggetmask (0) & ~fatal_signal_mask)
++  sigsetmask (siggetmask () & ~fatal_signal_mask);
+ }
+ 
+ void
 @@ -2381,6 +2381,18 @@ child_execute_job (struct childbase *child, int good_stdin, char **argv)
            break;
          }
@@ -88,7 +146,7 @@ index 27f5899..5d57b68 100644
        strcpy (p, SYMBOL_EXTENSION);
        symname = new;
 diff --git a/src/main.c b/src/main.c
-index 78a27d7..bcba2d1 100644
+index 78a27d7..c79a9f6 100644
 --- a/src/main.c
 +++ b/src/main.c
 @@ -227,12 +227,9 @@ int check_symlink_flag = 0;
@@ -303,10 +361,43 @@ index 78a27d7..bcba2d1 100644
    /* Read any stdin makefiles into temporary files.  */
  
    if (makefiles != 0)
+@@ -2189,11 +2188,20 @@ main (int argc, char **argv, char **envp)
+ 
+       DB (DB_BASIC, (_("Updating makefiles....\n")));
+ 
++      /* Count the makefiles, and reverse the order so that we attempt to
++         rebuild them in the order they were read.  */
+       {
+-        struct goaldep *d;
+         unsigned int num_mkfiles = 0;
+-        for (d = read_files; d != NULL; d = d->next)
+-          ++num_mkfiles;
++        struct goaldep *d = read_files;
++        read_files = NULL;
++        while (d != NULL)
++          {
++            struct goaldep *t = d;
++            d = d->next;
++            t->next = read_files;
++            read_files = t;
++            ++num_mkfiles;
++          }
+ 
+         makefile_mtimes = alloca (num_mkfiles * sizeof (FILE_TIMESTAMP));
+       }
 diff --git a/src/makeint.h b/src/makeint.h
-index c428a36..de9b3dd 100644
+index c428a36..b568b2a 100644
 --- a/src/makeint.h
 +++ b/src/makeint.h
+@@ -115,7 +115,7 @@ extern int errno;
+ #endif
+ 
+ /* Some systems define _POSIX_VERSION but are not really POSIX.1.  */
+-#if (defined (butterfly) || defined (__arm) || (defined (__mips) && defined (_SYSTYPE_SVR3)) || (defined (sequent) && defined (i386)))
++#if (defined (butterfly) || (defined (__mips) && defined (_SYSTYPE_SVR3)) || (defined (sequent) && defined (i386)))
+ # undef POSIX
+ #endif
+ 
 @@ -670,7 +670,7 @@ extern unsigned short stopchar_map[];
  extern int just_print_flag, run_silent, ignore_errors_flag, keep_going_flag;
  extern int print_data_base_flag, question_flag, touch_flag, always_make_flag;
@@ -444,10 +535,38 @@ index 525f292..eab175a 100644
  }
  
 diff --git a/src/read.c b/src/read.c
-index fa197fb..db52a55 100644
+index fa197fb..c55998c 100644
 --- a/src/read.c
 +++ b/src/read.c
-@@ -3215,10 +3215,10 @@ parse_file_seq (char **stringp, size_t size, int stopmap,
+@@ -263,10 +263,6 @@ read_all_makefiles (const char **makefiles)
+         {
+           /* No default makefile was found.  Add the default makefiles to the
+              'read_files' chain so they will be updated if possible.  */
+-          struct goaldep *tail = read_files;
+-          /* Add them to the tail, after any MAKEFILES variable makefiles.  */
+-          while (tail != 0 && tail->next != 0)
+-            tail = tail->next;
+           for (p = default_makefiles; *p != 0; ++p)
+             {
+               struct goaldep *d = alloc_goaldep ();
+@@ -274,14 +270,9 @@ read_all_makefiles (const char **makefiles)
+               /* Tell update_goal_chain to bail out as soon as this file is
+                  made, and main not to die if we can't make this file.  */
+               d->flags = RM_DONTCARE;
+-              if (tail == 0)
+-                read_files = d;
+-              else
+-                tail->next = d;
+-              tail = d;
++              d->next = read_files;
++              read_files = d;
+             }
+-          if (tail != 0)
+-            tail->next = 0;
+         }
+     }
+ 
+@@ -3215,10 +3206,10 @@ parse_file_seq (char **stringp, size_t size, int stopmap,
        /* Strip leading "this directory" references.  */
        if (NONE_SET (flags, PARSEFS_NOSTRIP))
  #ifdef VMS
@@ -772,6 +891,54 @@ index 81bff0c..0b07abb 100644
  
  &run_make_test('
  A = a
+diff --git a/tests/scripts/features/include b/tests/scripts/features/include
+index 0c63c06..7dd17b5 100644
+--- a/tests/scripts/features/include
++++ b/tests/scripts/features/include
+@@ -157,7 +157,7 @@ include inc1
+ include inc2
+ inc2:; echo > $@
+ !,
+-              '', "echo > inc2\necho > inc1\nDONE\n");
++              '', "echo > inc1\necho > inc2\nDONE\n");
+ 
+ rmfiles('inc1', 'inc2');
+ 
+@@ -209,7 +209,7 @@ inc1:; echo > $@
+ include inc1
+ include inc2
+ !,
+-                  '', "#MAKEFILE#:7: inc2: $ERR_no_such_file\n#MAKE#: *** No rule to make target 'inc2'.  Stop.\n", 512);
++                  '', "echo > inc1\n#MAKEFILE#:7: inc2: $ERR_no_such_file\n#MAKE#: *** No rule to make target 'inc2'.  Stop.\n", 512);
+ 
+     rmfiles('inc1');
+ 
+@@ -260,4 +260,25 @@ inc1:; @%s $@ && echo FOO := bar > $@
+     rmfiles('inc1');
+ }
+ 
++# Check that the order of remaking include files is correct: should remake
++# them in the same order they were encountered in the makefile.  SV 58735
++
++run_make_test(q!
++-include i1 i2
++-include i3
++-include i4
++%:;@echo $@
++all:;
++!,
++              '', "i1\ni2\ni3\ni4\n#MAKE#: 'all' is up to date.\n");
++rmfiles('foo');
++
++# Check the default makefiles... this requires us to invoke make with no
++# arguments.  Also check MAKEFILES
++
++$ENV{MAKEFILES} = 'foobar barfoo';
++run_make_with_options(undef, q!-E '%:;@echo $@' -E 'all:;' -E '-include bizbaz' -E '-include bazbiz'!, get_logfile(0));
++$answer = "bizbaz\nbazbiz\nfoobar\nbarfoo\nGNUmakefile\nmakefile\nMakefile\n#MAKE#: 'all' is up to date.\n";
++&compare_output(subst_make_string($answer), &get_logfile(1));
++
+ 1;
 diff --git a/tests/scripts/features/jobserver b/tests/scripts/features/jobserver
 index 73d10d9..35b5696 100644
 --- a/tests/scripts/features/jobserver
