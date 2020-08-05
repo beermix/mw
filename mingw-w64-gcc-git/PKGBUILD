@@ -63,6 +63,7 @@ source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
         "0016-Ensure-lmsvcrt-precede-lkernel32.patch"
         "0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch"
         "0022-gcc-plugin-ada-use-def.patch"
+        "010-documentation.patch"
         "0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch"
         "gnat1.exe.def")
 sha256sums=('SKIP'
