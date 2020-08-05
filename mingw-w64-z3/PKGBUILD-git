@@ -56,11 +56,15 @@ build() {
     -G"Ninja" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
+    -DZ3_USE_LIB_GMP=1 \
+    -DZ3_BUILD_EXECUTABLE=OFF \
+    -DZ3_BUILD_TEST_EXECUTABLES=OFF \
+    -DZ3_ENABLE_EXAMPLE_TARGETS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 ninja
+  nice -n19 ninja -j7
 
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
@@ -72,11 +76,15 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=ON \
     -DBUILD_PYTHON_BINDINGS=ON \
+    -DZ3_USE_LIB_GMP=1 \
+    -DZ3_BUILD_EXECUTABLE=OFF \
+    -DZ3_BUILD_TEST_EXECUTABLES=OFF \
+    -DZ3_ENABLE_EXAMPLE_TARGETS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${pkgver}
 
-  nice -n19 ninja
+  nice -n19 ninja -j7
 }
 
 check() {
