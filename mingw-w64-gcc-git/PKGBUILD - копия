@@ -20,7 +20,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-jit-git")
         )
-pkgver=11.0.0.d20200805.c0.g
+pkgver=11.0.0.d20200805.c15.gf0699540f37
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -51,25 +51,23 @@ _realpkgver="$(git archive --remote=git://gcc.gnu.org/git/gcc.git refs/heads/${_
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 source=(${_sourcedir}::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-        "gdbinit"
-        0002-Relocate-libintl.patch
-        0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
-        0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
-        0005-Windows-Don-t-ignore-native-system-header-dir.patch
-        0006-Windows-New-feature-to-allow-overriding.patch
-        0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
-        0008-Prettify-linking-no-undefined.patch
-        0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch
-        0010-Fix-using-large-PCH.patch
-        0011-Enable-shared-gnat-implib.patch
-        0012-Handle-spaces-in-path-for-default-manifest.patch
-        0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
-        0015-makedeps-properly-handle-win-paths.patch
-        0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
-        0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
-        0130-libstdc++-in-out.patch
-        010-documentation.patch
-        0140-gcc-8.2.0-diagnostic-color.patch)
+        "0002-Relocate-libintl.patch"
+        "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
+        "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
+        "0005-Windows-Don-t-ignore-native-system-header-dir.patch"
+        "0006-Windows-New-feature-to-allow-overriding.patch"
+        "0007-Build-EXTRA_GNATTOOLS-for-Ada.patch"
+        "0008-Prettify-linking-no-undefined.patch"
+        "0010-Fix-using-large-PCH.patch"
+        "0011-Enable-shared-gnat-implib.patch"
+        "0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch"
+        "0015-makedeps-properly-handle-win-paths.patch"
+        "0016-Ensure-lmsvcrt-precede-lkernel32.patch"
+        "0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch"
+        "0022-gcc-plugin-ada-use-def.patch"
+        "0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch"
+        "010-documentation.patch"
+        "gnat1.exe.def")
 sha256sums=('SKIP'
             'dcc6ec24d7946643b35fce57c50d9900bcdbeb8723981ee5e7ff2ae935137598'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -119,39 +117,28 @@ del_file_exists() {
 }
 # =========================================== #
 
-
 prepare() {
   cd ${srcdir}/${_sourcedir}
-  del_file_exists intl/canonicalize.c intl/canonicalize.h \
-    intl/relocatex.c intl/relocatex.h
+  _git_base_commit=$(git rev-parse HEAD)
+  GIT_AM="git am --committer-date-is-author-date"
+  ${GIT_AM} ${srcdir}/0002-Relocate-libintl.patch
+  ${GIT_AM} ${srcdir}/0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
+  ${GIT_AM} ${srcdir}/0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
+  ${GIT_AM} ${srcdir}/0005-Windows-Don-t-ignore-native-system-header-dir.patch
+  ${GIT_AM} ${srcdir}/0006-Windows-New-feature-to-allow-overriding.patch
+  ${GIT_AM} ${srcdir}/0007-Build-EXTRA_GNATTOOLS-for-Ada.patch
+  ${GIT_AM} ${srcdir}/0008-Prettify-linking-no-undefined.patch
+  ${GIT_AM} ${srcdir}/0010-Fix-using-large-PCH.patch
+  ${GIT_AM} ${srcdir}/0011-Enable-shared-gnat-implib.patch
+  ${GIT_AM} ${srcdir}/0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
+  ${GIT_AM} ${srcdir}/0015-makedeps-properly-handle-win-paths.patch
+  ${GIT_AM} ${srcdir}/0016-Ensure-lmsvcrt-precede-lkernel32.patch
+  ${GIT_AM} ${srcdir}/0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
+  ${GIT_AM} ${srcdir}/0022-gcc-plugin-ada-use-def.patch
+  ${GIT_AM} ${srcdir}/0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
 
-  apply_patch_with_msg \
-    0002-Relocate-libintl.patch \
-    0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
-    0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch \
-    0005-Windows-Don-t-ignore-native-system-header-dir.patch \
-    0006-Windows-New-feature-to-allow-overriding.patch \
-    0007-Build-EXTRA_GNATTOOLS-for-Ada.patch \
-    0008-Prettify-linking-no-undefined.patch \
-    0009-gcc-make-xmmintrin-header-cplusplus-compatible-depre.patch \
-    0010-Fix-using-large-PCH.patch \
-    0011-Enable-shared-gnat-implib.patch \
-    0012-Handle-spaces-in-path-for-default-manifest.patch \
-    0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
-    0015-makedeps-properly-handle-win-paths.patch \
-    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
-    0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
-
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
-
-  # Enable diagnostic color under mintty
-  # Вячеслав Петрищев <vyachemail@gmail.com>
-  apply_patch_with_msg \
-    0140-gcc-8.2.0-diagnostic-color.patch
-
-  # do not expect ${prefix}/mingw symlink - this should be superceded by
-  # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+  # do not expect $prefix/mingw symlink - this should be superceded by
+  # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
 
   # change hardcoded /mingw prefix to the real prefix .. isn't this rubbish?
