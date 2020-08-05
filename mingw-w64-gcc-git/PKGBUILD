@@ -18,7 +18,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          $([[ "$_enable_ada" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git")
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
         )
-pkgver=10.1.1.d20200619.c15.geb13d29d0cd
+pkgver=10.2.1.d20200805.c15.gdda1e9d0843
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -227,7 +227,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti --time nice -n19 make all
+  /home/User/.bin/noti --time nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
