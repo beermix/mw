@@ -36,7 +36,7 @@ release-debuginfo = false
 assertions = false
 
 # Indicates whether ccache is used when building LLVM
-#ccache = true
+ccache = true
 # or alternatively ...
 #ccache = "/path/to/ccache"
 
@@ -104,10 +104,10 @@ link-shared = false
 # use-libcxx = false
 
 # The value specified here will be passed as `-DLLVM_USE_LINKER` to CMake.
-#use-linker = "lld"
+use-linker = "lld"
 
 # Whether or not to specify `-DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=YES`
-# allow-old-toolchain = false
+allow-old-toolchain = false
 
 # =============================================================================
 # General build configuration options
@@ -165,11 +165,11 @@ fast-submodules = true
 
 # The path to (or name of) the GDB executable to use. This is only used for
 # executing the debuginfo test suite.
-# gdb = "gdb"
+gdb = "gdb"
 
 # The node.js executable to use. Note that this is only used for the emscripten
 # target when running tests, otherwise this can be omitted.
-# nodejs = "node"
+nodejs = "node"
 
 # Python interpreter to use for various tasks throughout the build, notably
 # rustdoc tests, the lldb python interpreter, and some dist bits and pieces.
@@ -214,7 +214,7 @@ profiler = false
 
 # Indicates whether the native libraries linked into Cargo will be statically
 # linked or not.
-# cargo-native-static = true
+cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
@@ -223,7 +223,7 @@ low-priority = true
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
 # script.
-# configure-args = []
+configure-args = []
 
 # Indicates that a local rebuild is occurring instead of a full bootstrap,
 # essentially skipping stage0 as the local compiler is recompiling itself again.
@@ -231,7 +231,7 @@ local-rebuild = false
 
 # Print out how long each rustbuild step took (mostly intended for CI and
 # tracking over time)
-# print-step-timings = false
+print-step-timings = false
 
 # =============================================================================
 # General install configuration options
@@ -341,7 +341,7 @@ debuginfo-level-tools = 0
 debuginfo-level-tests = 0
 
 # Whether or not `panic!`s generate backtraces (RUST_BACKTRACE)
-# backtrace = true
+backtrace = true
 
 # Whether to always use incremental compilation when building rustc
 incremental = false
@@ -409,7 +409,7 @@ codegen-backends = ["llvm"]
 # LLD will not be used if we're cross linking or running tests.
 #
 # Explicitly setting the linker for a target will override this option.
-use-lld = false
+use-lld = true
 
 # Indicates whether some LLVM tools, like llvm-objdump, will be made available in the
 # sysroot.
