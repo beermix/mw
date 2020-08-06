@@ -12,9 +12,9 @@ _prog_name=mingw32-make
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=4.3
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU make utility to maintain groups of programs (mingw-w64)"
-arch=('i686' 'x86_64')
+arch=('any')
 url="https://www.gnu.org/software/make"
 license=('GPL3')
 groups=("${MINGW_PACKAGE_PREFIX}-toolchain")
@@ -23,12 +23,15 @@ makedepends=('wget')
 source=("https://ftp.gnu.org/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         'make-getopt.patch'
         'make-linebuf-mingw.patch'
+        'make-4.3_undef-HAVE_STRUCT_DIRENT_D_TYPE.patch'
         'make-4.2.1-Makefile.am-gcc-only-link-libgnumake-1.dll.a.patch'
         'make-check-load-feature.mak'
+        'make-git.patch'
         'mk_temp.c')
 sha256sums=('e05fdde47c5f7ca45cb697e973894ff4f5d79e13b750ed57d7b66d8defc78e19'
             '15a86d5143c9ec6337bdd69fecb7c33c36e4fd925528dc1498b0bc4fbd31b0bb'
             'cbb8c0a1bdd6e8174febce01946bd42da26dfcb73a7338c0a1df89ac6b8e157b'
+            '5d71fccedb80e4713ed5a0cf73ca79d66f29894eeb6ad4b02037edecf81c2444'
             '85f8c3c555079026f3debab350c9ee27a717cdd08eca3f8bf9ac58e78544d21d'
             '3d6ece384425ff1c3f691efeb7c97e89bb11825bb6648995552dfcb52afe661d'
             '61d4f57c311cf2e27ccf4d1da847216730f304cf17c5c386721182ffe2d4b1aa')
@@ -48,8 +51,10 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
   pushd src
+    patch -p2 -i ${srcdir}/make-git.patch
     patch -p1 -i ${srcdir}/make-getopt.patch
     patch -p1 -i ${srcdir}/make-linebuf-mingw.patch
+    patch -p2 -i ${srcdir}/make-4.3_undef-HAVE_STRUCT_DIRENT_D_TYPE.patch
   popd
 
   if test "${_autotools}" = "yes"; then

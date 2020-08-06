@@ -201,7 +201,7 @@ extended = true
 # Installs chosen set of extended tools if `extended = true`. By default builds all.
 # If chosen tool failed to build the installation fails. If `extended = false`, this
 # option is ignored.
-# tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
+tools = ["cargo", "rls", "clippy", "miri", "rustfmt", "analysis", "src"]
 
 # Verbosity level: 0 == not verbose, 1 == verbose, 2 == very verbose
 verbose = 0
@@ -213,12 +213,12 @@ sanitizers = false
 profiler = false
 
 # Indicates whether the native libraries linked into Cargo will be statically
-# linked or not.
-cargo-native-static = true
+linked or not.
+#cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
-low-priority = false
+low-priority = true
 
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
@@ -325,13 +325,13 @@ debug-assertions-std = false
 # Can be overriden for specific subsets of Rust code (rustc, std or tools).
 # Debuginfo for tests run with compiletest is not controlled by this option
 # and needs to be enabled separately with `debuginfo-level-tests`.
-debuginfo-level = 1
+debuginfo-level = 0
 
 # Debuginfo level for the compiler.
 debuginfo-level-rustc = 0
 
 # Debuginfo level for the standard library.
-debuginfo-level-std = 1
+debuginfo-level-std = 0
 
 # Debuginfo level for the tools.
 debuginfo-level-tools = 0
@@ -341,13 +341,13 @@ debuginfo-level-tools = 0
 debuginfo-level-tests = 0
 
 # Whether or not `panic!`s generate backtraces (RUST_BACKTRACE)
-backtrace = true
+backtrace = false
 
 # Whether to always use incremental compilation when building rustc
 incremental = false
 
 # Build a multi-threaded rustc
-parallel-compiler = false
+#parallel-compiler = false
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
@@ -384,7 +384,7 @@ codegen-tests = false
 # Having the git information can cause a lot of rebuilds during development.
 # Note: If this attribute is not explicitly set (e.g. if left commented out) it
 # will default to true if channel = "dev", but will default to false otherwise.
-ignore-git = true
+# ignore-git = true
 
 # When creating source tarballs whether or not to create a source tarball.
 dist-src = false
@@ -437,7 +437,7 @@ remap-debuginfo = false
 
 # Link the compiler against `jemalloc`, where on Linux and OSX it should
 # override the default allocator for rustc and LLVM.
-jemalloc = false
+# jemalloc = false
 
 # Run tests in various test suites with the "nll compare mode" in addition to
 # running the tests in normal mode. Largely only used on CI and during local
