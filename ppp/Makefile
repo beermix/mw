@@ -14,12 +14,15 @@ update:
 	git -C $(GCCGIT) shortlog $(GCCTAG)..$(GCCBRANCH) > gcc-stable-branch.patch
 	cat new.patch~ >> gcc-stable-branch.patch
 	rm -f *.patch~
+	mv gcc-stable-branch.patch 000-gcc-stable-branch.patch
 
 
-#	test -d ~/binutils-gdb || git clone http://sourceware.org/git/binutils-gdb.git ~/binutils-gdb
-#	( \
-#		cd ~/git/binutils-gdb ; \
-#		git remote update -p > /dev/null 2>&1 ; \
-#		git diff binutils-2_35..origin/binutils-2_35-branch | filterdiff --exclude="*/bfd/version.h"; \
-#	) > binutils-stable-branch.patch
-#	git diff --exit-code binutils-stable-branch.patch
+
+	test -d ~/binutils-gdb || git clone http://sourceware.org/git/binutils-gdb.git ~/binutils-gdb
+	( \
+		cd ~/binutils-gdb ; \
+		git remote update -p > /dev/null 2>&1 ; \
+		git diff binutils-2_35..origin/binutils-2_35-branch | filterdiff --exclude="*/bfd/version.h"; \
+	) > binutils-stable-branch.patch
+	git diff --exit-code binutils-stable-branch.patch
+	mv binutils-stable-branch.patch 000-binutils-stable-branch.patch
