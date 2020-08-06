@@ -1,0 +1,58 @@
+diff --git a/mingw-w64-cmake/0009-Support-exporting-all-symbols-with-MinGW.patch b/mingw-w64-cmake/0009-Support-exporting-all-symbols-with-MinGW.patch
+new file mode 100644
+index 0000000000..390fc66040
+--- /dev/null
++++ b/mingw-w64-cmake/0009-Support-exporting-all-symbols-with-MinGW.patch
+@@ -0,0 +1,10 @@
++--- cmake-3.17.3/Modules/Platform/Windows-GNU.cmake.orig	2020-07-27 12:01:35.809999800 +0200
+++++ cmake-3.17.3/Modules/Platform/Windows-GNU.cmake	2020-07-27 12:02:15.917668500 +0200
++@@ -36,6 +36,7 @@
++ set(CMAKE_LINK_DEF_FILE_FLAG "") # Empty string: passing the file is enough
++ set(CMAKE_LINK_LIBRARY_SUFFIX "")
++ set(CMAKE_CREATE_WIN32_EXE  "-mwindows")
+++set(CMAKE_SUPPORT_WINDOWS_EXPORT_ALL_SYMBOLS 1)
++ 
++ set(CMAKE_GNULD_IMAGE_VERSION
++   "-Wl,--major-image-version,<TARGET_VERSION_MAJOR>,--minor-image-version,<TARGET_VERSION_MINOR>")
+diff --git a/mingw-w64-cmake/PKGBUILD b/mingw-w64-cmake/PKGBUILD
+index 85a5173a74..79cc274c23 100644
+--- a/mingw-w64-cmake/PKGBUILD
++++ b/mingw-w64-cmake/PKGBUILD
+@@ -5,7 +5,7 @@ _realname=cmake
+ pkgbase=mingw-w64-${_realname}
+ pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+ pkgver=3.17.3
+-pkgrel=1
++pkgrel=2
+ pkgdesc="A cross-platform open-source make system (mingw-w64)"
+ arch=('any')
+ url="https://www.cmake.org/"
+@@ -36,14 +36,16 @@ source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}.tar.gz
+         "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
+         "0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch"
+         "0007-Do-not-generate-import-libs-for-exes.patch"
+-        "0008-Output-line-numbers-in-callstacks.patch")
++        "0008-Output-line-numbers-in-callstacks.patch"
++        "0009-Support-exporting-all-symbols-with-MinGW.patch")
+ sha256sums=('0bd60d512275dc9f6ef2a2865426a184642ceb3761794e6b65bff233b91d8c40'
+             '1b68fe64e1b389134db44dc34368713f6e28d3463ab1e7fc3d93857c0459beb7'
+             '77763df03e8a9ca66c3f9368fe7e1fc36bb041455733258d73aeb40246a61354'
+             '7eb60d12b610c70413412521dcc860d1948c169e721f3525d9be99b3913dc37e'
+             'b3905abed55c012108b0254c69cb4027a739f15772500b0a99c400d9dfdf50a7'
+             'd0aaa6fbf3e740341aaac2b43033f6c20f56a94ea0b2c509233f693cabe2a912'
+-            '94642670c922c9acfade79bc567c6b28f2d2f89e27aa391b562e8c90baa49ce1')
++            '94642670c922c9acfade79bc567c6b28f2d2f89e27aa391b562e8c90baa49ce1'
++            'b30a065087875473db97afd61f783a57cd776ff57c58655e8490e9ccd93bf297')
+ 
+ 
+ # Helper macros to help make tasks easier #
+@@ -74,7 +76,8 @@ prepare() {
+     0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
+     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
+     0007-Do-not-generate-import-libs-for-exes.patch \
+-    0008-Output-line-numbers-in-callstacks.patch
++    0008-Output-line-numbers-in-callstacks.patch \
++    0009-Support-exporting-all-symbols-with-MinGW.patch
+ }
+ 
+ build() {
