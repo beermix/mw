@@ -65,22 +65,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
-        0016-Ensure-lmsvcrt-precede-lkernel32.patch
-        0022-gcc-plugin-ada-use-def.patch
-        0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
-        gnat1.exe.def
         010-documentation.patch
-        gcc-10-git.patch
-        gcc-stable-branch.patch
-        mpfr-4.0.2-p1.patch
-        openmp-vectorize-v2.patch
-        fortran-vector-v2.patch
-        optimize.patch
-        ipa-cp.patch
-        000-gcc-stable-branch.patch
-        gomp-relax.patch
-        gcc-lto-jobserver.diff
-        optimize-at-least-some.patch)
+        000-gcc-stable-branch.patch)
 sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
