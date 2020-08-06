@@ -9,7 +9,7 @@
 
 
 # We can switch to clang when it fully works with mingw-w64
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -282,13 +282,19 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format"
+  export CXXFLAGS="${CFLAGS}"
+
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
+    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
+    -DDLLVM_OPTIMIZED_TABLEGEN=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_USE_LINKER=lld \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \

@@ -400,7 +400,7 @@ codegen-backends = ["llvm"]
 
 # Indicates whether LLD will be compiled and made available in the sysroot for
 # rustc to execute.
-lld = true
+#lld = true
 
 # Indicates whether LLD will be used to link Rust crates during bootstrap on
 # supported platforms. The LLD from the bootstrap distribution will be used
