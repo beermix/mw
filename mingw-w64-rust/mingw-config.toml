@@ -81,7 +81,7 @@ experimental-targets = ""
 
 # When invoking `llvm-config` this configures whether the `--shared` argument is
 # passed to prefer linking to shared libraries.
-link-shared = true
+#link-shared = true
 
 # When building llvm, this configures what is being appended to the version.
 # The default is "-rust-$version-$channel", except for dev channel where rustc
