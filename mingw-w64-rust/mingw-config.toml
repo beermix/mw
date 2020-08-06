@@ -18,7 +18,7 @@
 # this is `false` then the compiler's LLVM will be rebuilt whenever the built
 # version doesn't have the correct hash. If it is `true` then LLVM will never
 # be rebuilt. The default value is `false`.
-# skip-rebuild = false
+skip-rebuild = false
 
 # Indicates whether the LLVM build is a Release or Debug build
 optimize = true
@@ -101,10 +101,10 @@ link-shared = false
 # platforms already use libc++ as the default C++ library, but this option
 # allows you to use libc++ even on platforms when it's not. You need to ensure
 # that your host compiler ships with libc++.
-# use-libcxx = false
+use-libcxx = false
 
 # The value specified here will be passed as `-DLLVM_USE_LINKER` to CMake.
-use-linker = "lld"
+#use-linker = "lld"
 
 # Whether or not to specify `-DLLVM_TEMPORARILY_ALLOW_OLD_TOOLCHAIN=YES`
 allow-old-toolchain = false
@@ -218,7 +218,7 @@ cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
-low-priority = true
+low-priority = false
 
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
@@ -347,17 +347,17 @@ backtrace = true
 incremental = false
 
 # Build a multi-threaded rustc
-# parallel-compiler = true
+parallel-compiler = false
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
 # Note that this is not the linker used to link said compiler.
-# default-linker = "x86_64-w64-mingw32-gcc"
+#default-linker = "x86_64-w64-mingw32-gcc"
 
 # The "channel" for the Rust build to produce. The stable/beta channels only
 # allow using stable features, whereas the nightly and dev channels allow using
 # nightly features
-channel = "stable"
+channel = "beta"
 
 # The root location of the MUSL installation directory.
 #musl-root = "..."
@@ -400,7 +400,7 @@ codegen-backends = ["llvm"]
 
 # Indicates whether LLD will be compiled and made available in the sysroot for
 # rustc to execute.
-# lld = true
+lld = true
 
 # Indicates whether LLD will be used to link Rust crates during bootstrap on
 # supported platforms. The LLD from the bootstrap distribution will be used
@@ -409,7 +409,7 @@ codegen-backends = ["llvm"]
 # LLD will not be used if we're cross linking or running tests.
 #
 # Explicitly setting the linker for a target will override this option.
-use-lld = true
+use-lld = false
 
 # Indicates whether some LLVM tools, like llvm-objdump, will be made available in the
 # sysroot.
