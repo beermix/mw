@@ -5,8 +5,8 @@
 _realname=isl
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=0.16.1
-pkgrel=2
+pkgver=0.22.1
+pkgrel=1
 pkgdesc="Library for manipulating sets and relations of integer points bounded by linear constraints (mingw-w64)"
 arch=('any')
 url="https://isl.gforge.inria.fr/"
@@ -34,6 +34,7 @@ build() {
     --disable-silent-rules \
     --enable-static \
     --disable-shared \
+    --disable-silent-rules \
     --with-gcc-arch=haswell \
     --with-gmp-prefix=${MINGW_PREFIX}
 
