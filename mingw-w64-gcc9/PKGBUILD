@@ -242,7 +242,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti nice -n19 make all
+  /home/User/.go/bin/noti --time nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

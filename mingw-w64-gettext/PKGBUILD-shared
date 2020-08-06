@@ -102,7 +102,7 @@ build() {
   # to make relocate() in gnulib-lib work
   sed -s "s|${MINGW_PREFIX}|$(cygpath -m ${MINGW_PREFIX})|g" -i gettext-tools/config.h
 
-  noti make
+  noti --time make
 }
 
 package() {

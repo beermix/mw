@@ -50,7 +50,7 @@ build() {
     --disable-nls \
     ARIA2_STATIC=yes
 
-  /home/User/.go/bin/noti.exe nice -n19 make
+  /home/User/.go/bin/noti --time nice -n19 make
 }
 
 package() {

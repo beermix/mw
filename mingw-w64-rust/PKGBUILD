@@ -86,7 +86,7 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  /home/User/.bin/noti nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j8 --verbose
+  /home/User/.bin/noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j8 --verbose
 }
 
 package() {
