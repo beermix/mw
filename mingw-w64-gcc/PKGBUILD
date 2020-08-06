@@ -77,7 +77,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         fortran-vector-v2.patch
         optimize.patch
         ipa-cp.patch
-        git-updates.diff
+        000-gcc-stable-branch.patch
         gomp-relax.patch
         gcc-lto-jobserver.diff
         optimize-at-least-some.patch)
@@ -131,7 +131,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-10-git.patch
+    000-gcc-stable-branch.patch
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
@@ -180,6 +180,9 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
+  # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+
   echo ${pkgver} > gcc/BASE-VER
 
   #ln -s ../isl-${_islver} isl
@@ -217,9 +220,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
