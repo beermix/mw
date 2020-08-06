@@ -226,7 +226,6 @@ build() {
 
 #  CFLAGS=${CFLAGS/-O2/-O3}
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
-
 #  unset CFLAGS
 #  unset CXXFLAGS
 #  export CFLAGS="-march=haswell -g -O3"
@@ -281,7 +280,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  /home/User/.go/bin/noti --time nice -n19 make all
+  noti --time nice -n19 make all
 
   #/home/User/.go/bin/noti nice -n19 make "CFLAGS=-march=haswell -g0 -O2" "CXXFLAGS=-march=haswell -g0 -O2" "CFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "CXXFLAGS_FOR_TARGET=-march=haswell -g0 -O2" "BOOT_CFLAGS=-march=haswell -g0 -O2" "BOOT_CXXFLAGS=-march=haswell -g0 -O2" all
 
