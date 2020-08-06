@@ -5,7 +5,7 @@ _realname=qemu
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 _base_ver=5.1.0
-_rc=-rc2
+_rc=-rc3
 #pkgver=${_base_ver}${_rc//-/.}
 pkgver=${_base_ver}
 pkgrel=1
@@ -51,7 +51,7 @@ prepare() {
 }
 
 build() {
-  LDFLAGS+=" -fstack-protector"
+  # LDFLAGS+=" -fstack-protector"
 
   cd "${srcdir}/${_realname}-${pkgver}${_rc}"
   ./configure \
@@ -78,7 +78,7 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  /home/User/.go/bin/noti --time nice -n19 make -j7
+  noti --time nice -n19 make -j7
 }
 
 package() {
