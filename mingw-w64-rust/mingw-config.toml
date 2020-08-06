@@ -36,7 +36,7 @@ release-debuginfo = false
 assertions = false
 
 # Indicates whether ccache is used when building LLVM
-ccache = true
+ccache = false
 # or alternatively ...
 #ccache = "/path/to/ccache"
 
