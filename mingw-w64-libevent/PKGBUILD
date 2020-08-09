@@ -5,7 +5,7 @@ _realname=libevent
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=2.1.12
-pkgrel=1
+pkgrel=4
 pkgdesc="An event notification library (mingw-w64)"
 arch=('any')
 url="https://libevent.org"
@@ -29,24 +29,13 @@ prepare() {
 build() {
   [[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
   mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
-
-#  export CC="clang"
-#  export CXX="clang++"
-#  export NM="llvm-nm"
-#  export AR="llvm-ar"
-#  export RANLIB="llvm-ranlib"
-#  export STRIP="llvm-strip"
-
   ../${_realname}-${pkgver}-stable/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
     --sysconfdir=${MINGW_PREFIX}/etc \
-    --disable-libevent-regress \
-    --disable-debug-mode \
-    --disable-samples \
-    --disable-silent-rules
+    --disable-libevent-regress
 
   make
 }
