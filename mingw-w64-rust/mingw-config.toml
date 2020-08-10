@@ -347,7 +347,7 @@ backtrace = false
 #incremental = false
 
 # Build a multi-threaded rustc
-#parallel-compiler = false
+parallel-compiler = true
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
