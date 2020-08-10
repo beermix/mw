@@ -1,0 +1,78 @@
+# Maintainer: pingplug < aur at pingplug dot me >
+# Contributor: Johannes Löthberg < johannes at kyriasis dot com >
+# Contributor: Alexander F Rødseth < xyproto at archlinux dot org >
+# Contributor: Daniel Micay < danielmicay at gmail dot com >
+# Contributor: userwithuid < userwithuid at gmail dot com >
+
+_pkgname=rust
+_date=2020-06-04
+_rustc=1.44.0
+_cargo=0.45.0
+
+_realname=rust
+_bootstrapping=yes
+pkgbase=mingw-w64-${_realname}
+pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
+pkgver=1.45.2
+pkgrel=7
+pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
+arch=('x86_64')
+url="https://www.rust-lang.org/ru/"
+license=('MIT' 'Apache')
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
+makedepends=("bison"
+             "flex"
+             "git"
+             "${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
+             "${MINGW_PACKAGE_PREFIX}-curl"
+             "${MINGW_PACKAGE_PREFIX}-libffi"
+             "${MINGW_PACKAGE_PREFIX}-lldb"
+             "${MINGW_PACKAGE_PREFIX}-llvm"
+             "${MINGW_PACKAGE_PREFIX}-ninja"
+             "${MINGW_PACKAGE_PREFIX}-openssl"
+             "${MINGW_PACKAGE_PREFIX}-python2"
+             "${MINGW_PACKAGE_PREFIX}-libgit2"
+             "${MINGW_PACKAGE_PREFIX}-zlib")
+options=('!strip' 'staticlibs' '!buildflags')
+source=("https://github.com/rust-lang/rust/archive/master.tar.gz"
+        "mingw-config.toml"
+        "force-curl-rust.patch"
+        "0001-add-missing-libs.patch"
+        "0002-fix-install-msys2.patch"
+        "0004-unbundle-gcc.patch"
+        "0005-win32-config.patch")
+noextract=("master.tar.gz")
+
+prepare() {
+  tar -xzf ${srcdir}/master.tar.gz -C ${srcdir} || true
+  cd "rust-master"
+
+  patch -p1 -i "${srcdir}/force-curl-rust.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  patch -p1 -i "${srcdir}/0005-win32-config.patch"
+
+  cp "${srcdir}"/mingw-config.toml config.toml
+  sed -i "s|\@PREFIX\@|${MINGW_PREFIX}|" config.toml
+}
+
+build() {
+  cd "rust-master"
+
+  noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j7 --verbose
+}
+
+package() {
+  cd "rust-master"
+
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install --verbose
+
+  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
+  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
+  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
+  
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
+  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
+  "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+}
