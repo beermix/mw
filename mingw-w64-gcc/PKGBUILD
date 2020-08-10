@@ -66,7 +66,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
         010-documentation.patch
-        000-gcc-stable-branch.patch)
+        000-gcc10-stable-branch.patch)
 sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -117,7 +117,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc-stable-branch.patch
+    000-gcc10-stable-branch.patch
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
@@ -167,7 +167,7 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
-  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
+  # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 
   echo ${pkgver} > gcc/BASE-VER
 

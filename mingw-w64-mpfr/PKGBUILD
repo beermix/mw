@@ -19,7 +19,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gmp")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp")
 source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz
         #https://www.mpfr.org/mpfr-current/${_realname}-${_pkgver}.tar.xz
-        001-only_src.patch
+        #001-only_src.patch
         )
 sha256sums=('1d3be708604eae0e42d578ba93b390c2a145f17743a744d8f3f8c2ad5855a38a'
             'SKIP')
@@ -29,7 +29,7 @@ prepare() {
   cd "${srcdir}/${_realname}-${_pkgver}"
 
   if [ -n "${_patchlevel}" ]; then
-    patch -p1 -i ${srcdir}/001-only_src.patch
+    patch -p1 -i ${srcdir}/${_realname}-${_pkgver}-${_patchlevel}.patch
   fi
 }
 
