@@ -18,10 +18,10 @@
 # this is `false` then the compiler's LLVM will be rebuilt whenever the built
 # version doesn't have the correct hash. If it is `true` then LLVM will never
 # be rebuilt. The default value is `false`.
-skip-rebuild = false
+#skip-rebuild = false
 
 # Indicates whether the LLVM build is a Release or Debug build
-optimize = true
+#optimize = true
 
 # Indicates whether LLVM should be built with ThinLTO. Note that this will
 # only succeed if you use clang, lld, llvm-ar, and llvm-ranlib in your C/C++
@@ -30,13 +30,13 @@ optimize = true
 #thin-lto = false
 
 # Indicates whether an LLVM Release build should include debug info
-release-debuginfo = false
+#release-debuginfo = false
 
 # Indicates whether the LLVM assertions are enabled or not
-assertions = false
+#assertions = false
 
 # Indicates whether ccache is used when building LLVM
-ccache = true
+#ccache = true
 # or alternatively ...
 #ccache = "/path/to/ccache"
 
@@ -63,13 +63,13 @@ ccache = true
 # support. You'll need to write a target specification at least, and most
 # likely, teach rustc about the C ABI of the target. Get in touch with the
 # Rust team and file an issue if you need assistance in porting!
-targets = "X86"
+#targets = "X86"
 
 # LLVM experimental targets to build support for. These targets are specified in
 # the same format as above, but since these targets are experimental, they are
 # not built by default and the experimental Rust compilation targets that depend
 # on them will not work unless the user opts in to building them.
-experimental-targets = ""
+#experimental-targets = ""
 
 # Cap the number of parallel linker invocations when compiling LLVM.
 # This can be useful when building LLVM with debug info, which significantly
@@ -165,11 +165,11 @@ fast-submodules = true
 
 # The path to (or name of) the GDB executable to use. This is only used for
 # executing the debuginfo test suite.
-gdb = "gdb"
+#gdb = "gdb"
 
 # The node.js executable to use. Note that this is only used for the emscripten
 # target when running tests, otherwise this can be omitted.
-nodejs = "node"
+#nodejs = "node"
 
 # Python interpreter to use for various tasks throughout the build, notably
 # rustdoc tests, the lldb python interpreter, and some dist bits and pieces.
@@ -189,7 +189,7 @@ vendor = true
 # would rather to perform a full bootstrap, compiling the compiler three times,
 # then you can set this option to true. You shouldn't ever need to set this
 # option to true.
-full-bootstrap = false
+#full-bootstrap = false
 
 # Enable a build of the extended Rust tool set which is not only the compiler
 # but also tools such as Cargo. This will also produce "combined installers"
@@ -223,11 +223,11 @@ low-priority = false
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
 # script.
-configure-args = []
+#configure-args = []
 
 # Indicates that a local rebuild is occurring instead of a full bootstrap,
 # essentially skipping stage0 as the local compiler is recompiling itself again.
-local-rebuild = false
+#local-rebuild = false
 
 # Print out how long each rustbuild step took (mostly intended for CI and
 # tracking over time)
@@ -366,7 +366,7 @@ channel = "beta"
 # platforms to ensure that the compiler is usable by default from the build
 # directory (as it links to a number of dynamic libraries). This may not be
 # desired in distributions, for example.
-rpath = true
+#rpath = true
 
 # Emits extraneous output from tests to ensure that failures of the test
 # harness are debuggable just from logfiles.
@@ -409,20 +409,20 @@ dist-src = false
 # LLD will not be used if we're cross linking or running tests.
 #
 # Explicitly setting the linker for a target will override this option.
-use-lld = false
+#use-lld = false
 
 # Indicates whether some LLVM tools, like llvm-objdump, will be made available in the
 # sysroot.
-llvm-tools = false
+#llvm-tools = false
 
 # Whether to deny warnings in crates
 deny-warnings = false
 
 # Print backtrace on internal compiler errors during bootstrap
-backtrace-on-ice = false
+#backtrace-on-ice = false
 
 # Whether to verify generated LLVM IR
-verify-llvm-ir = false
+#verify-llvm-ir = false
 
 # Compile the compiler with a non-default ThinLTO import limit. This import
 # limit controls the maximum size of functions imported by ThinLTO. Decreasing
@@ -445,7 +445,7 @@ remap-debuginfo = false
 #test-compare-mode = false
 
 # Use LLVM libunwind as the implementation for Rust's unwinder.
-llvm-libunwind = false
+#llvm-libunwind = false
 
 # Enable Windows Control Flow Guard checks in the standard library.
 # This only applies from stage 1 onwards, and only for Windows targets.
