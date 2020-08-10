@@ -33,8 +33,6 @@ options=('!strip' 'staticlibs' '!buildflags')
 source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
         "mingw-config.toml"
         "force-curl-rust.patch"
-        "0001-add-missing-libs.patch"
-        "0002-fix-install-msys2.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch")
 noextract=("rustc-${pkgver}-src.tar.xz")
@@ -54,8 +52,6 @@ prepare() {
   cd "rustc-${pkgver}-src"
 
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
 
@@ -72,12 +68,12 @@ build() {
 package() {
   cd "rustc-${pkgver}-src"
 
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-  
+
 # mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
 #  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
 #  "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
