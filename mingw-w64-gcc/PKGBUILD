@@ -44,7 +44,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         #"http://isl.gforge.inria.fr/isl-${_islver}.tar.xz"
