@@ -62,13 +62,13 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j7 --verbose
+  noti --time nice -n19 ${MINGW_PREFIX}/bin/python ./x.py build -j7 --verbose
 }
 
 package() {
   cd "rustc-${pkgver}-src"
 
-  DESTDIR=${pkgdir} noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} noti --time nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
