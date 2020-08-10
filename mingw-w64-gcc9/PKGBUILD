@@ -62,6 +62,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         optimize.patch
         optimize-at-least-some.patch
         000-gcc9-stable-branch.patch
+        libiberty-sync.patch
         0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
         0140-gcc-8.2.0-diagnostic-color.patch)
 sha256sums=('71e197867611f6054aa1119b13a0c0abac12834765fe2d81f35ac57f84f742d1'
@@ -111,6 +112,7 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     000-gcc9-stable-branch.patch \
+    libiberty-sync.patch \
     optimize.patch \
     optimize-at-least-some.patch
 

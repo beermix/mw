@@ -214,7 +214,7 @@ profiler = false
 
 # Indicates whether the native libraries linked into Cargo will be statically
 # linked or not.
-cargo-native-static = true
+#cargo-native-static = true
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
@@ -344,10 +344,10 @@ debuginfo-level-tests = 0
 backtrace = false
 
 # Whether to always use incremental compilation when building rustc
-incremental = false
+#incremental = false
 
 # Build a multi-threaded rustc
-parallel-compiler = false
+#parallel-compiler = false
 
 # The default linker that will be hard-coded into the generated compiler for
 # targets that don't specify linker explicitly in their target specifications.
@@ -437,12 +437,12 @@ remap-debuginfo = false
 
 # Link the compiler against `jemalloc`, where on Linux and OSX it should
 # override the default allocator for rustc and LLVM.
-jemalloc = false
+#jemalloc = false
 
 # Run tests in various test suites with the "nll compare mode" in addition to
 # running the tests in normal mode. Largely only used on CI and during local
 # development of NLL
-test-compare-mode = false
+#test-compare-mode = false
 
 # Use LLVM libunwind as the implementation for Rust's unwinder.
 llvm-libunwind = false
@@ -494,7 +494,7 @@ llvm-config = "/msys/mingw64/bin/llvm-config"
 # this target is a host for rustc, this will also affect the linkage of the
 # compiler itself. This is useful for building rustc on targets that normally
 # only use static libraries. If unset, the target's default linkage is used.
-crt-static = true
+#crt-static = true
 
 # The root location of the MUSL installation directory. The library directory
 # will also need to contain libunwind.a for an unwinding implementation. Note

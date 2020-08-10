@@ -5,16 +5,12 @@
 # Contributor: userwithuid < userwithuid at gmail dot com >
 
 _pkgname=rust
-_date=2020-07-16
-_rustc=beta
-_cargo=beta
-
 _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=beta
-pkgrel=7
+pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('x86_64')
 url="https://www.rust-lang.org/ru/"
@@ -34,19 +30,14 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-libgit2"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('!strip' 'staticlibs' '!buildflags')
-source=("https://static.rust-lang.org/dist/rustc-${pkgver}-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
         "mingw-config.toml"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch")
-noextract=("rust-std-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
-           "rustc-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
-           "rust-mingw-${_rustc}-x86_64-pc-windows-gnu.tar.gz"
-           "cargo-${_cargo}-x86_64-pc-windows-gnu.tar.gz"
-           "rustfmt-nightly-x86_64-pc-windows-gnu.tar.gz"
-           "rustc-${pkgver}-src.tar.xz")
+noextract=("rustc-${pkgver}-src.tar.xz")
 sha256sums=('c436034db42bc0ea7e7f32816ac6555b70d1f76c834407597966dfaf2ec839d6'
             'SKIP'
             '122b2a909fc185c6ae5a0110af6f60699f4332b4fb3c43698b14a873fbe65b6e'
@@ -75,13 +66,13 @@ prepare() {
 build() {
   cd "rustc-${pkgver}-src"
 
-  noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j7
+  noti --time nice -n19 ${MINGW_PREFIX}/bin/python2 ./x.py build -j7 --verbose
 }
 
 package() {
   cd "rustc-${pkgver}-src"
 
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
