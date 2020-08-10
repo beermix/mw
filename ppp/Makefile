@@ -1,8 +1,8 @@
 GCCGIT = ~/gcc.git
-GCCVER = 9.3.0
+GCCVER = 10.2.0
 
 GCCTAG = releases/gcc-$(GCCVER)
-GCCBRANCH = releases/gcc-9
+GCCBRANCH = releases/gcc-10
 
 update:
 	git -C $(GCCGIT) remote update -p
