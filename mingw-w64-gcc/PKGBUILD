@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=13
+pkgrel=14
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -215,8 +215,8 @@ build() {
 #  CXXFLAGS=${CXXFLAGS/-O2/-O3}
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
   export CFLAGS_FOR_TARGET="$CFLAGS"
   export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
 
