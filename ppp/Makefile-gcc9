@@ -15,4 +15,3 @@ update:
 	cat new.patch~ >> gcc-stable-branch.patch
 	rm -f *.patch~
 	mv gcc-stable-branch.patch 000-gcc9-stable-branch.patch
-	cp -r 000-gcc-stable-branch.patch /home/User/mw-my/mingw-w64-gcc9/000-gcc9-stable-branch.patch
