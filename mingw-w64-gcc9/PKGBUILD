@@ -114,9 +114,9 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc9-stable-branch.patch
+    000-gcc9-stable-branch.patch \
+    libiberty-sync.patch
 
-    #libiberty-sync.patch \
     #optimize.patch \
     #optimize-at-least-some.patch
 
@@ -188,9 +188,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
