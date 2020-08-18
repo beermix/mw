@@ -6,7 +6,7 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=beta
+pkgver=1.45.2
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -29,15 +29,13 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
-        "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
-        "0005-win32-config.patch"
-        "70163.patch")
-sha256sums=('75f6ac6c9da9f897f4634d5a07be4084692f7ccc2d2bb89337be86cfc18453a1'
+        "0005-win32-config.patch")
+sha256sums=('b7a3fc1e3ee367260ef945da867da0957f8983705f011ba2a73715375e50e308'
             'SKIP'
             '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
             'c1b3a4d234ba10d2baf9cc1a15e830f1b722b10d80f37b316f47501f5274c9c5'
@@ -47,16 +45,16 @@ sha256sums=('75f6ac6c9da9f897f4634d5a07be4084692f7ccc2d2bb89337be86cfc18453a1'
             '061f1cf5374c926bc130a4afbde005dcd09fdbaee079469ad045fd23a7a88a2c'
             'fcdd07eaf0790064223811aa710392bab15e489842619328e72f336290e06cdb')
 validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
-noextract=("rustc-${pkgver}-src.tar.xz")
+noextract=(${_realname}c-${pkgver}-src.tar.gz)
 
 prepare() {
   [[ -d ${srcdir}/${_realname}c-${pkgver}-src ]] && rm -rf ${srcdir}/${_realname}c-${pkgver}-src
-  tar -xJf ${srcdir}/rustc-${pkgver}-src.tar.xz -C ${srcdir} || true
+  tar -xzf ${srcdir}/${_realname}c-${pkgver}-src.tar.gz -C ${srcdir} || true
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
 }
@@ -81,23 +79,17 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=beta \
-    --enable-ninja \
+    --release-channel=stable \
     --disable-docs \
     --enable-llvm-link-shared \
-    --enable-locked-deps \
     --enable-extended \
     --disable-codegen-tests \
+    --disable-cargo-native-static \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-#  DEP_Z_ROOT=${MINGW_PREFIX} \
-#  RUST_BACKTRACE=1 \
-
-  noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 check() {
@@ -109,18 +101,9 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}"
 
-#  RUST_BACKTRACE=1 \
-#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-#  DEP_Z_ROOT=${MINGW_PREFIX} \
-
-  DESTDIR=${pkgdir} noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-#  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-#  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
-#     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
