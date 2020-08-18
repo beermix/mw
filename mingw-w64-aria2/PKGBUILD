@@ -18,7 +18,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-libiconv"
              "${MINGW_PACKAGE_PREFIX}-libuv"
              "${MINGW_PACKAGE_PREFIX}-libxml2"
-             "${MINGW_PACKAGE_PREFIX}-gnutls"
              "${MINGW_PACKAGE_PREFIX}-sqlite3"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/${pkgver}.tar.gz)
@@ -50,7 +49,7 @@ build() {
     --disable-nls \
     ARIA2_STATIC=yes
 
-  /home/User/.go/bin/noti --time nice -n19 make
+  noti --time nice -n19 make
 }
 
 package() {
