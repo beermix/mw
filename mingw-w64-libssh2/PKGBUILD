@@ -16,14 +16,14 @@ depends=("${MINGW_PACKAGE_PREFIX}-openssl"
 options=('staticlibs' 'strip')
 source=(https://github.com/libssh2/libssh2/archive/${pkgver}.tar.gz
         fix-pkgconfig.patch
-        0001-drop-custom-buildconf-script.patch)
+        470.diff)
 sha256sums=('d5fb8bd563305fd1074dda90bd053fb2d29fc4bce048d182f96eaa466dfadafd'
             '7a6545f6d457ad008aacefe04a60727c02d33927c8a903745bf191f69cc8ba55')
 
 prepare() {
   cd ${_realname}-${pkgver}
   #patch -p1 -i ${srcdir}/fix-pkgconfig.patch
-  #patch -p1 -i ${srcdir}/0001-drop-custom-buildconf-script.patch
+  patch -p1 -i ${srcdir}/470.diff
 
   autoreconf -fi
 }
@@ -36,10 +36,7 @@ build() {
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --target=${MINGW_CHOST} \
-    --with-crypto=openssl \
-    --with-pic \
-    --enable-static \
-    --enable-shared
+    --with-crypto=openssl
 
   make
 }

@@ -165,17 +165,17 @@ fast-submodules = true
 
 # The path to (or name of) the GDB executable to use. This is only used for
 # executing the debuginfo test suite.
-#gdb = "gdb"
+gdb = "gdb"
 
 # The node.js executable to use. Note that this is only used for the emscripten
 # target when running tests, otherwise this can be omitted.
-#nodejs = "node"
+nodejs = "node"
 
 # Python interpreter to use for various tasks throughout the build, notably
 # rustdoc tests, the lldb python interpreter, and some dist bits and pieces.
 #
 # Defaults to the Python interpreter used to execute x.py.
-python = "python"
+python = "python2"
 
 # Force Cargo to check that Cargo.lock describes the precise dependency
 # set that all the Cargo.toml files create, instead of updating it.
@@ -207,10 +207,10 @@ extended = true
 verbose = 0
 
 # Build the sanitizer runtimes
-sanitizers = false
+# sanitizers = false
 
 # Build the profiler runtime
-profiler = false
+# profiler = false
 
 # Indicates whether the native libraries linked into Cargo will be statically
 # linked or not.
@@ -218,7 +218,7 @@ profiler = false
 
 # Run the build with low priority, by setting the process group's "nice" value
 # to +10 on Unix platforms, and by using a "low priority" job object on Windows.
-low-priority = false
+low-priority = true
 
 # Arguments passed to the `./configure` script, used during distcheck. You
 # probably won't fill this in but rather it's filled in by the `./configure`
@@ -325,23 +325,23 @@ debug-assertions-std = false
 # Can be overriden for specific subsets of Rust code (rustc, std or tools).
 # Debuginfo for tests run with compiletest is not controlled by this option
 # and needs to be enabled separately with `debuginfo-level-tests`.
-debuginfo-level = 0
+# debuginfo-level = 0
 
 # Debuginfo level for the compiler.
-debuginfo-level-rustc = 0
+# debuginfo-level-rustc = 0
 
 # Debuginfo level for the standard library.
-debuginfo-level-std = 0
+# debuginfo-level-std = 0
 
 # Debuginfo level for the tools.
-debuginfo-level-tools = 0
+# debuginfo-level-tools = 0
 
 # Debuginfo level for the test suites run with compiletest.
 # FIXME(#61117): Some tests fail when this option is enabled.
-debuginfo-level-tests = 0
+# debuginfo-level-tests = 0
 
 # Whether or not `panic!`s generate backtraces (RUST_BACKTRACE)
-backtrace = false
+# backtrace = false
 
 # Whether to always use incremental compilation when building rustc
 #incremental = false
