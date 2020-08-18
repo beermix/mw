@@ -89,7 +89,7 @@ build() {
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 check() {
