@@ -25,7 +25,9 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
          "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-lldb"
-         "${MINGW_PACKAGE_PREFIX}-llvm")
+         "${MINGW_PACKAGE_PREFIX}-llvm"
+         "${MINGW_PACKAGE_PREFIX}-openmp"
+         "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1
 pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
@@ -49,12 +51,14 @@ options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz
+        ${_url}/openmp-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}.src.tar.xz
         ${_url}/test-suite-${pkgver}.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
         ${_url}/lld-${pkgver}.src.tar.xz
         ${_url}/lldb-${pkgver}.src.tar.xz
+        ${_url}/polly-${pkgver}.src.tar.xz
         "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
@@ -211,6 +215,17 @@ prepare() {
       "0503-lldb-find-mingw-python.patch" \
       "0504-fix-lldb-library-name-mingw.patch"
 
+  cd "${srcdir}/polly-${pkgver}.src"
+  # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
+  apply_patch_with_msg \
+      "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
+
+  cd "${srcdir}/openmp-${pkgver}.src"
+  apply_patch_with_msg \
+      "0901-openmp-kpm-lock.patch" \
+      "0902-libomp-weak-mingw.patch" \
+      "0903-Fix-implib-for-MinGW.patch"
+
   cd "${srcdir}/clang-tools-extra-${pkgver}.src"
   apply_patch_with_msg \
       "1001-Prevent-linking-to-duplicate-.a-libs-and-dylib.patch"
@@ -225,7 +240,13 @@ prepare() {
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" clang-tools-extra
   mv "${srcdir}/lld-${pkgver}.src"               lld
   mv "${srcdir}/lldb-${pkgver}.src"              lldb
+  mv "${srcdir}/polly-${pkgver}.src"             polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       compiler-rt
+  #mv "${srcdir}/libcxxabi-${pkgver}.src"         libcxxabi
+  #mv "${srcdir}/libcxx-${pkgver}.src"            libcxx
+  #mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
+  mv "${srcdir}/openmp-${pkgver}.src"            openmp
+  #mv "${srcdir}/testsuite-${pkgver}.src"         test-suite
 }
 
 build() {
@@ -287,18 +308,19 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_COMPILER_RT=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb" \
+    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
-  # sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
-  # sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
   noti --time nice -n19 ${_make_cmd} -j7
 
@@ -364,6 +386,15 @@ package_compiler-rt() {
 }
 
 
+package_openmp() {
+  pkgdesc="OpenMP library (mingw-w64)"
+  url="https://openmp.llvm.org/"
+
+  cd "${srcdir}/openmp"
+  ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
+}
+
+
 package_lld() {
   pkgdesc="Linker tools for LLVM (mingw-w64)"
   url="https://lld.llvm.org/"
@@ -420,6 +451,21 @@ package_llvm() {
   sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}|g" -i ${pkgdir}/${MINGW_PREFIX}/lib/cmake/llvm/LLVMExports.cmake
 }
 
+package_polly() {
+  pkgdesc="Polly - Polyhedral optimizations for LLVM (mingw-w64)"
+  url="https://polly.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
+
+  cd "${srcdir}"/polly
+  ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
+  # fox cmake files.
+  local PREFIX_WIN=$(cygpath -wm ${MINGW_PREFIX})
+  local SRC_WIN=$(cygpath -wm ${srcdir})
+  sed -e "s|${PREFIX_WIN}|${MINGW_PREFIX}/|g" \
+    -e "s|${SRC_WIN}/build-${CARCH}/lib|${MINGW_PREFIX}/lib|g" \
+    -i "${pkgdir}/${MINGW_PREFIX}/lib/cmake/polly/PollyConfig.cmake"
+}
+
 # Wrappers
 package_mingw-w64-i686-clang(){
   package_clang
@@ -437,6 +483,11 @@ package_mingw-w64-i686-compiler-rt(){
   package_compiler-rt
 }
 
+
+package_mingw-w64-i686-openmp(){
+  package_openmp
+}
+
 package_mingw-w64-i686-lld(){
   package_lld
 }
@@ -447,6 +498,10 @@ package_mingw-w64-i686-lldb(){
 
 package_mingw-w64-i686-llvm(){
   package_llvm
+}
+
+package_mingw-w64-i686-polly(){
+  package_polly
 }
 
 package_mingw-w64-x86_64-clang(){
@@ -465,6 +520,10 @@ package_mingw-w64-x86_64-compiler-rt(){
   package_compiler-rt
 }
 
+package_mingw-w64-x86_64-openmp(){
+  package_openmp
+}
+
 package_mingw-w64-x86_64-lld(){
   package_lld
 }
@@ -477,3 +536,6 @@ package_mingw-w64-x86_64-llvm(){
   package_llvm
 }
 
+package_mingw-w64-x86_64-polly(){
+  package_polly
+}
