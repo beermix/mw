@@ -81,6 +81,7 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --disable-docs \
+    --disable-compiler-docs \
     --enable-llvm-link-shared \
     --enable-extended \
     --disable-codegen-tests \
