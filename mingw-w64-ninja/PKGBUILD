@@ -26,8 +26,8 @@ prepare () {
 build() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
   cd ${srcdir}/ninja-${pkgver}
-  #CC="clang" CXX="clang++" NM="llvm-nm" AR="llvm-ar" RANLIB="llvm-ranlib" STRIP="llvm-strip"
-  ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform mingw --verbose
+  #CC="clang" CXX=clang++ NM="llvm-nm" AR="llvm-ar" RANLIB="llvm-ranlib" STRIP="llvm-strip"
+  ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform mingw
 }
 
 package() {
