@@ -84,12 +84,14 @@ build() {
     --disable-compiler-docs \
     --enable-llvm-link-shared \
     --enable-extended \
+    --enable-vendor \
+    --disable-sanitizers \
     --disable-codegen-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
