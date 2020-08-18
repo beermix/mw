@@ -45,7 +45,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc"
+         "${MINGW_PACKAGE_PREFIX}-uasm")
 options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
@@ -267,7 +268,6 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=OFF \
@@ -284,6 +284,8 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
+    -DLLVM_ENABLE_LLD=ON \
+    -DLLVM_ENABLE_LIBCXX=OFF \
     -DLLVM_ENABLE_COMPILER_RT=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb" \
     -DLLVM_ENABLE_SPHINX=OFF \
@@ -341,7 +343,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -391,7 +392,6 @@ package_lldb() {
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
 
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -403,8 +403,6 @@ package_llvm() {
   cd "${srcdir}"/llvm-${pkgver}.src
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
