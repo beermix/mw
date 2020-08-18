@@ -45,8 +45,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc"
-         "${MINGW_PACKAGE_PREFIX}-uasm")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
