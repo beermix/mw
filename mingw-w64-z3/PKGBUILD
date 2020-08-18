@@ -53,18 +53,14 @@ build() {
   msg "Build static z3"
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
-    -G"Ninja" \
+    -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=OFF \
-    -DZ3_USE_LIB_GMP=1 \
-    -DZ3_BUILD_EXECUTABLE=OFF \
-    -DZ3_BUILD_TEST_EXECUTABLES=OFF \
-    -DZ3_ENABLE_EXAMPLE_TARGETS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${_realname}-${pkgver}
 
-  nice -n19 ninja
+  make
 
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir -p "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
@@ -72,30 +68,28 @@ build() {
   msg "Build shared z3"
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
-    -G"Ninja" \
+    -G"MSYS Makefiles" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DZ3_BUILD_LIBZ3_SHARED=ON \
     -DBUILD_PYTHON_BINDINGS=ON \
-    -DZ3_USE_LIB_GMP=1 \
-    -DZ3_BUILD_EXECUTABLE=OFF \
-    -DZ3_BUILD_TEST_EXECUTABLES=OFF \
-    -DZ3_ENABLE_EXAMPLE_TARGETS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python3.exe \
     "${extra_config[@]}" \
     ../${_realname}-${_realname}-${pkgver}
 
-  nice -n19 ninja
+  make
 }
 
 check() {
  cd "${srcdir}"/build-${CARCH}-shared
- ninja test-z3 || true
+ make test-z3 || true
 }
 
 package() {
   cd "${srcdir}"/build-${CARCH}-static
-  DESTDIR="${pkgdir}" ninja install
+  make install DESTDIR="${pkgdir}"
 
   cd "${srcdir}"/build-${CARCH}-shared
-  DESTDIR="${pkgdir}" ninja install
+  make install DESTDIR="${pkgdir}"
+
+  install -Dm644 ${srcdir}/${_realname}-${_realname}-${pkgver}/LICENSE.txt ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE.txt
 }
