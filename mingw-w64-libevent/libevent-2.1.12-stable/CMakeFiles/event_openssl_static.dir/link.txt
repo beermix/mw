@@ -1,2 +1,0 @@
-G:/msys/mingw64/bin/ar.exe qc lib/libevent_openssl.a  CMakeFiles/event_openssl_static.dir/bufferevent_openssl.c.obj
-G:/msys/mingw64/bin/ranlib.exe lib/libevent_openssl.a
