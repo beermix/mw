@@ -42,7 +42,6 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-libc++"
              "${MINGW_PACKAGE_PREFIX}-lld"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
-             "${MINGW_PACKAGE_PREFIX}-python-sphinx"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
@@ -291,6 +290,7 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
+    export CCACHE_CPP2=yes
     export CC='clang'
     export CXX='clang++'
   fi
@@ -309,12 +309,13 @@ build() {
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_CCACHE_BUILD=OFF \
-    -DLLVM_TARGETS_TO_BUILD="host" \
-    -DLLVM_OPTIMIZED_TABLEGEN=ON \
+    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD="" \
+    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
+    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -348,7 +349,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  nice -n19 ${_make_cmd} -j8
+  nice -n19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -366,6 +367,8 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD="X86"
+    -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=""
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
