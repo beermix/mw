@@ -6,7 +6,7 @@
 _realname=glib2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.64.4
+pkgver=2.65.2
 pkgrel=1
 url="https://www.gtk.org/"
 arch=('any')
@@ -64,7 +64,7 @@ build() {
     -Db_lto=false \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
-    nice -n19 ninja
+    nice -n19 ninja -j7
 
   msg "Build shared version"
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
@@ -72,13 +72,13 @@ build() {
 
   meson \
     --buildtype=plain \
-    -Db_lto=false \
+    -Db_lto=true \
     -Ddefault_library=shared \
     -Dman=false \
     -Dforce_posix_threads=true \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
-    nice -n19 ninja
+    nice -n19 ninja -j7
 }
 
 package() {

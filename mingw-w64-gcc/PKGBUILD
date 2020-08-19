@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=15
+pkgrel=16
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -123,13 +123,11 @@ prepare() {
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
-
 #  apply_patch_with_msg \
 #    openmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
 #    ipa-cp.patch \
 #    gomp-relax.patch
-
 #    gcc-lto-jobserver.diff
 #    0022-gcc-plugin-ada-use-def.patch \
 #    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
@@ -203,9 +201,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -248,7 +246,7 @@ build() {
     --disable-nls \
     --disable-werror \
     --disable-symvers \
-    --disable-plugin \
+    --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
     --with-diagnostics-color=always \
@@ -329,7 +327,7 @@ package_mingw-w64-gcc() {
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/ssp     ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/include-fixed   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/install-tools   ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
-  #cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
+  cp -r lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/plugin          ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/cc1.exe            ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/collect2.exe       ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
   cp lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/crt*.o             ${pkgdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/
