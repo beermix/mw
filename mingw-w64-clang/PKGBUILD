@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=10.0.1
-pkgrel=6
+pkgrel=7
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -332,7 +332,7 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_LLD=ON \
-    -DLLVM_ENABLE_LIBCXX=ON \
+    -DLLVM_ENABLE_LIBCXX=OFF \
     -DLLVM_ENABLE_COMPILER_RT=ON \
     -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
