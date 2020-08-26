@@ -7,7 +7,7 @@ _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=beta
-pkgrel=1
+pkgrel=2
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/"
@@ -68,37 +68,26 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=beta \
+    --release-channel="beta" \
+    --enable-local-rust \
     --disable-docs \
     --disable-compiler-docs \
     --enable-ccache \
-    --enable-optimize-llvm  \
-    --enable-optimize-tests \
-    --enable-optimize \
     --enable-extended \
-    --enable-vendor \
     --enable-ninja \
     --enable-locked-deps \
-    --enable-manage-submodules \
-    --enable-full-bootstrap \
     --enable-parallel-compiler \
-    --disable-llvm-release-debuginfo \
+    --enable-cargo-native-static \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
 
   nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
-check() {
-  cd "${srcdir}/${CARCH}"
-  # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py test || true
-}
-
 package() {
   cd "${srcdir}/${CARCH}"
 
-  DESTDIR=${pkgdir} nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j8 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
