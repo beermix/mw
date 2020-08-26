@@ -84,7 +84,7 @@ build() {
     --release-channel=stable \
     --disable-docs \
     --disable-compiler-docs \
-    --enable-llvm-link-shared \
+    --enable-ccache \
     --enable-extended \
     --enable-vendor \
     --enable-ninja \
