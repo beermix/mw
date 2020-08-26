@@ -85,6 +85,8 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-ccache \
+    --enable-optimize-llvm  \
+    --enable-optimize \
     --enable-extended \
     --enable-vendor \
     --enable-ninja \
