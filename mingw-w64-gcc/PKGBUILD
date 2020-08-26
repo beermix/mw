@@ -119,7 +119,9 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch
+    000-gcc10-stable-branch.patch \
+    optimize.patch \
+    optimize-at-least-some.patch
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
@@ -205,12 +207,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="$CFLAGS"
+  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+  export FFLAGS_FOR_TARGET="$FFLAGS"
 
 #  export CC='ccache gcc'
 #  export CXX='ccache g++'
