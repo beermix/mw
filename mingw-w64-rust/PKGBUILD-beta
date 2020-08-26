@@ -73,15 +73,16 @@ build() {
     --disable-compiler-docs \
     --enable-ccache \
     --enable-optimize-llvm  \
+    --enable-optimize-tests \
     --enable-optimize \
     --enable-extended \
     --enable-vendor \
     --enable-ninja \
     --enable-locked-deps \
+    --enable-manage-submodules \
+    --enable-full-bootstrap \
     --enable-parallel-compiler \
     --disable-llvm-release-debuginfo \
-    --enable-full-bootstrap \
-    --enable-optimize-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
 
