@@ -79,7 +79,7 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
+    --release-channel=beta \
     --disable-docs \
     --disable-compiler-docs \
     --enable-ccache \
