@@ -66,7 +66,6 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
         010-documentation.patch
-        gcc-10-git.patch
         optimize.patch
         optimize-at-least-some.patch
         000-gcc10-stable-branch.patch)
@@ -120,7 +119,7 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    gcc-10-git.patch
+    000-gcc10-stable-branch.patch
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
