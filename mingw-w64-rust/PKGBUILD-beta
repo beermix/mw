@@ -26,7 +26,6 @@ makedepends=("bison"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
-#install=rust.install
 source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
@@ -76,7 +75,6 @@ build() {
     --enable-extended \
     --enable-ninja \
     --enable-locked-deps \
-    --enable-parallel-compiler \
     --enable-cargo-native-static \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
@@ -92,4 +90,8 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
+
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+  install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
+  mv "${pkgdir}${MINGW_PREFIX}/bash_completion.d/cargo" "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
