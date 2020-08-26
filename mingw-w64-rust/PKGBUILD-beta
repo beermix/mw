@@ -10,7 +10,7 @@ pkgver=beta
 pkgrel=2
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
-url="https://www.rust-lang.org/"
+url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
 depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("bison"
@@ -69,16 +69,14 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel="stable" \
-    --disable-local-rust \
+    --release-channel="beta" \
+    --enable-ccache \
+    --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
-    --enable-ccache \
-    --tools="analysis,src" \
     --enable-extended \
-    --enable-ninja \
     --enable-locked-deps \
-    --enable-vendor \
+    --tools="analysis,src" \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
 
