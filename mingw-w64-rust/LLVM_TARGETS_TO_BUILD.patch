@@ -1,0 +1,13 @@
+diff --git a/src/bootstrap/native.rs b/src/bootstrap/native.rs
+index 97d9dbdd63..a81ebe42b0 100644
+--- a/src/bootstrap/native.rs
++++ b/src/bootstrap/native.rs
+@@ -169,7 +169,7 @@ impl Step for Llvm {
+             .define("LLVM_INCLUDE_TESTS", "OFF")
+             .define("LLVM_INCLUDE_DOCS", "OFF")
+             .define("LLVM_INCLUDE_BENCHMARKS", "OFF")
+-            .define("WITH_POLLY", "OFF")
++            .define("LLVM_TARGETS_TO_BUILD", "X86")
+             .define("LLVM_ENABLE_TERMINFO", "OFF")
+             .define("LLVM_ENABLE_LIBEDIT", "OFF")
+             .define("LLVM_ENABLE_BINDINGS", "OFF")
