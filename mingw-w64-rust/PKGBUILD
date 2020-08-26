@@ -88,6 +88,8 @@ build() {
     --enable-ninja \
     --enable-locked-deps \
     --enable-parallel-compiler \
+    --disable-llvm-release-debuginfo \
+    --enable-full-bootstrap \
     --enable-optimize-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
@@ -104,7 +106,7 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}"
 
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
