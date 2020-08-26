@@ -86,7 +86,6 @@ build() {
     --enable-extended \
     --enable-vendor \
     --enable-ninja \
-    --disable-sanitizers \
     --enable-locked-deps \
     --enable-parallel-compiler \
     --enable-optimize-tests \
