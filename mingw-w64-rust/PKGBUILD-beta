@@ -20,8 +20,6 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-curl"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-libssh2"
-             "${MINGW_PACKAGE_PREFIX}-lldb"
-             "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-python2"
@@ -33,7 +31,6 @@ source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
-        "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch"
         "70163.patch")
@@ -82,22 +79,23 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=beta \
-    --enable-ninja \
     --disable-docs \
-    --enable-llvm-link-shared \
-    --enable-locked-deps \
+    --disable-compiler-docs \
+    --enable-ccache \
+    --enable-optimize-llvm  \
+    --enable-optimize \
     --enable-extended \
-    --disable-codegen-tests \
+    --enable-vendor \
+    --enable-ninja \
+    --enable-locked-deps \
+    --enable-parallel-compiler \
+    --disable-llvm-release-debuginfo \
+    --enable-full-bootstrap \
+    --enable-optimize-tests \
     --python=${MINGW_PREFIX}/bin/python2 \
-    --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-#  DEP_Z_ROOT=${MINGW_PREFIX} \
-#  RUST_BACKTRACE=1 \
-
-  noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
@@ -109,12 +107,7 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}"
 
-#  RUST_BACKTRACE=1 \
-#  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
-#  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
-#  DEP_Z_ROOT=${MINGW_PREFIX} \
-
-  DESTDIR=${pkgdir} noti nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
