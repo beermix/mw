@@ -22,10 +22,10 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
         0020-binutils_2.31_mkdtemp_impl.patch
-        0110-binutils-mingw-gnu-print2.patch
+        0110-binutils-mingw-gnu-print.patch
         0120-windres-handle-spaces.patch
         version-fix.patch
-        000-binutils-stable-branch.patch
+        000-binutils35-stable-branch.patch
         nodocs.patch)
 sha256sums=('1b11659fb49e20e18db460d44485f09442c8c56d5df165de9461eb09c8302f85'
             'SKIP'
@@ -41,7 +41,7 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93'
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i "${srcdir}"/000-binutils-stable-branch.patch
+  patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
   patch -p1 -i "${srcdir}"/version-fix.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
 
@@ -86,6 +86,7 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-install-libiberty \
+    --enable-targets=x86_64-*-mingw64 \
     --enable-plugins \
     --enable-gold \
     --disable-shared
