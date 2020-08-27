@@ -83,6 +83,8 @@ build() {
     --enable-extended \
     --disable-codegen-tests \
     --enable-locked-deps \
+    --disable-sanitizers \
+    --tools="analysis,cargo,src" \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
@@ -101,5 +103,5 @@ package() {
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/bash_completion.d/cargo" "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
