@@ -7,7 +7,7 @@ _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=beta
-pkgrel=2
+pkgrel=0826
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -26,7 +26,7 @@ makedepends=("bison"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
-source=("https://static.rust-lang.org/dist/2020-07-16/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-08-26/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -43,7 +43,7 @@ prepare() {
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
   #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/LLVM_TARGETS_TO_BUILD.patch"
@@ -60,6 +60,8 @@ build() {
   if [ "${_bootstrapping}" = "no" ]; then
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
+  
+#  --tools="analysis,cargo,src" \
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -70,25 +72,27 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel="beta" \
-    --experimental-targets="" \
     --enable-ccache \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --tools="analysis,src" \
+    --disable-codegen-tests \
+    --enable-verbose-tests \
     --enable-locked-deps \
-    --enable-vendor \
+    --disable-sanitizers \
+    --tools="analysis,cargo,src" \
     --python=${MINGW_PREFIX}/bin/python2 \
+    --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-  nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
 
-  DESTDIR=${pkgdir} nice -n 19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j8 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j8 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
