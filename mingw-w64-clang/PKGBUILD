@@ -290,10 +290,10 @@ build() {
     export CXX='clang++'
   fi
 
-#  export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
-#  if [ "${CARCH}" == "x86_64" ]; then
-#    export ASM_COMPILER_FLAGS=-win64
-#  fi
+  export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
+  if [ "${CARCH}" == "x86_64" ]; then
+    export ASM_COMPILER_FLAGS=-win64
+  fi
 
   export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
   export CXXFLAGS="${CFLAGS}"
@@ -331,7 +331,6 @@ build() {
     -DLLVM_ENABLE_LLD=ON \
     -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
-    -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
