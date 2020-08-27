@@ -29,7 +29,6 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-lldb"
          "${MINGW_PACKAGE_PREFIX}-llvm"
-         "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
 rc_ver=rc2
@@ -60,7 +59,6 @@ options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
 source=(${_url}/llvm-${pkgver}${rc_ver}.src.tar.xz
-        ${_url}/openmp-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/clang-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/test-suite-${pkgver}${rc_ver}.src.tar.xz
@@ -241,7 +239,7 @@ prepare() {
   mv "${srcdir}/libcxxabi-${pkgver}${rc_ver}.src"         libcxxabi
   mv "${srcdir}/libcxx-${pkgver}${rc_ver}.src"            libcxx
   mv "${srcdir}/libunwind-${pkgver}${rc_ver}.src"         libunwind
-  mv "${srcdir}/openmp-${pkgver}${rc_ver}.src"            openmp
+  #mv "${srcdir}/openmp-${pkgver}${rc_ver}.src"            openmp
   #mv "${srcdir}/testsuite-${pkgver}${rc_ver}.src"         test-suite
 }
 
@@ -296,14 +294,11 @@ build() {
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
-    -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
-    -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
-    -DLIBOMP_FORTRAN_MODULES=ON \
     -DLLDB_ENABLE_LIBEDIT=OFF \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
@@ -311,7 +306,7 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_LLD=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
+    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -322,8 +317,8 @@ build() {
     ../llvm-${pkgver}${rc_ver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
-  sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
-  sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
+  #sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
   nice -n19 ${_make_cmd} -j8
 
@@ -396,14 +391,6 @@ build() {
   ${_make_cmd} unwind cxxabi cxx
 }
 
-#check() {
-#  cd "${srcdir}"/build-${CARCH}
-#  # Remove || true once testcase doesn't cause failures.
-#  make check || true
-#  make check-clang || true
-#  make check-polly || true
-#}
-
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
@@ -415,8 +402,8 @@ package_clang() {
   ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
 
   # Install static libraries
-  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
-  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang_static.a
+  #install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang.a
+  #install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}${MINGW_PREFIX}/lib/libclang_static.a
 }
 
 package_clang-analyzer() {
@@ -438,7 +425,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -468,14 +454,6 @@ package_libcxx() {
   ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
 
   install -Dm644 "${srcdir}/build-libcxx-static-${CARCH}/lib/libc++experimental.a" "${pkgdir}${MINGW_PREFIX}/lib/libc++experimental.a"
-}
-
-package_openmp() {
-  pkgdesc="OpenMP library (mingw-w64)"
-  url="https://openmp.llvm.org/"
-
-  cd "${srcdir}/openmp"
-  ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
 }
 
 package_libcxxabi() {
@@ -524,8 +502,6 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -537,8 +513,6 @@ package_llvm() {
   cd "${srcdir}"/llvm-${pkgver}${rc_ver}.src
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
@@ -590,10 +564,6 @@ package_mingw-w64-i686-libc++abi(){
 
 package_mingw-w64-i686-libc++(){
   package_libcxx
-}
-
-package_mingw-w64-i686-openmp(){
-  package_openmp
 }
 
 package_mingw-w64-i686-lld(){
