@@ -23,6 +23,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-clang-analyzer"
          "${MINGW_PACKAGE_PREFIX}-clang-tools-extra"
          "${MINGW_PACKAGE_PREFIX}-compiler-rt"
+         "${MINGW_PACKAGE_PREFIX}-libunwind"
          "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-lldb"
          "${MINGW_PACKAGE_PREFIX}-llvm"
@@ -218,6 +219,10 @@ prepare() {
       "0503-lldb-find-mingw-python.patch" \
       "0504-fix-lldb-library-name-mingw.patch"
 
+  cd "${srcdir}/libunwind-${pkgver}.src"
+  apply_patch_with_msg \
+      "0600-unwind-rename-__personality_routine-to-_Unwind_Personality_Fn.patch" \
+
   cd "${srcdir}/polly-${pkgver}.src"
   # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
   apply_patch_with_msg \
@@ -245,9 +250,7 @@ prepare() {
   mv "${srcdir}/lldb-${pkgver}.src"              lldb
   mv "${srcdir}/polly-${pkgver}.src"             polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       compiler-rt
-  #mv "${srcdir}/libcxxabi-${pkgver}.src"         libcxxabi
-  #mv "${srcdir}/libcxx-${pkgver}.src"             
-  #mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
+  mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
   mv "${srcdir}/openmp-${pkgver}.src"            openmp
   #mv "${srcdir}/testsuite-${pkgver}.src"         test-suite
 }
@@ -317,7 +320,8 @@ build() {
     -DLLVM_ENABLE_LLD=ON \
     -DLLVM_ENABLE_COMPILER_RT=ON \
     -DLLVM_ENABLE_LIBUNWIND=ON \
-    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
+    -DLIBUNWIND_USE_COMPILER_RT=ON \
+    -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly,libunwind" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
@@ -408,6 +412,17 @@ package_openmp() {
 
   cd "${srcdir}/openmp"
   ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
+}
+
+package_libunwind() {
+  pkgdesc='A new implementation of a stack unwinder for C++ exceptions (mingw-w64)'
+  url='https://llvm.org/'
+
+  cd "${srcdir}/libunwind"
+  ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
+
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/bin"
+  install "${srcdir}/build-libcxx-static-${CARCH}/lib/libunwind.dll" "${pkgdir}${MINGW_PREFIX}/bin/libunwind.dll"
 }
 
 package_lld() {
@@ -510,6 +525,10 @@ package_mingw-w64-i686-lldb(){
   package_lldb
 }
 
+package_mingw-w64-i686-libunwind(){
+  package_libunwind
+}
+
 package_mingw-w64-i686-llvm(){
   package_llvm
 }
@@ -544,6 +563,10 @@ package_mingw-w64-x86_64-lld(){
 
 package_mingw-w64-x86_64-lldb(){
   package_lldb
+}
+
+package_mingw-w64-x86_64-libunwind(){
+  package_libunwind
 }
 
 package_mingw-w64-x86_64-llvm(){
