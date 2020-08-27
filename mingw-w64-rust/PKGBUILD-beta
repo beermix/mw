@@ -76,8 +76,9 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-locked-deps \
     --tools="analysis,src" \
+    --enable-locked-deps \
+    --enable-vendor \
     --python=${MINGW_PREFIX}/bin/python2 \
     ${_rust_conf}
 

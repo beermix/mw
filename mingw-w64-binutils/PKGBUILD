@@ -87,6 +87,7 @@ build() {
     --disable-multilib \
     --enable-install-libiberty \
     --enable-targets=x86_64-*-mingw64 \
+    --enable-silent-rules \
     --enable-plugins \
     --enable-gold \
     --disable-shared
