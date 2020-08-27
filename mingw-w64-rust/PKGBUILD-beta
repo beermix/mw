@@ -74,12 +74,11 @@ build() {
     --release-channel="beta" \
     --enable-ninja \
     --disable-docs \
-    --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
     --enable-locked-deps \
     --disable-sanitizers \
-    --tools="analysis,cargo,src" \
+    --enable-parallel-compiler \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}

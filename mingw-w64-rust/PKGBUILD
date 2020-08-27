@@ -66,7 +66,7 @@ build() {
 #    --enable-optimize \
 #    --enable-extended \
 #    --enable-vendor \
-#     --enable-local-rust \
+#    --enable-local-rust \
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -79,12 +79,11 @@ build() {
     --release-channel="stable" \
     --enable-ninja \
     --disable-docs \
-    --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
     --enable-locked-deps \
     --disable-sanitizers \
-    --tools="analysis,cargo,src" \
+    --enable-parallel-compiler \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
