@@ -285,8 +285,8 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
- # export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
-  #export CXXFLAGS="${CFLAGS}"
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CXXFLAGS="${CFLAGS}"
 
   #export CCACHE_HARDLINK=true
   #export CCACHE_SLOPPINESS=pch_defines,file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
