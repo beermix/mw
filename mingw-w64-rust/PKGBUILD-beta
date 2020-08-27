@@ -72,7 +72,6 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel="beta" \
-    --enable-ccache \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
@@ -86,13 +85,13 @@ build() {
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
 
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j8 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll

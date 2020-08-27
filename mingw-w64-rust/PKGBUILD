@@ -66,6 +66,7 @@ build() {
 #    --enable-optimize \
 #    --enable-extended \
 #    --enable-vendor \
+#     --enable-local-rust \
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -75,24 +76,24 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --enable-local-rust \
     --release-channel="stable" \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
+    --enable-locked-deps \
     --python=${MINGW_PREFIX}/bin/python2 \
     --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
 
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j8 --verbose
+  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
 
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j8 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
