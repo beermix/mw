@@ -9,7 +9,7 @@
 
 
 # We use Clang with libc++ because libstdc++ suffers from winpthreads bugs
-_compiler=clang
+_compiler=gcc
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -26,16 +26,14 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-lld"
          "${MINGW_PACKAGE_PREFIX}-llvm")
 pkgver=10.0.1
-pkgrel=10
+pkgrel=12
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
 license=("custom:University of Illinois/NCSA Open Source License")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
-             "${MINGW_PACKAGE_PREFIX}-compiler-rt"
-             "${MINGW_PACKAGE_PREFIX}-libc++"
-             "${MINGW_PACKAGE_PREFIX}-lld"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
+             "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-swig"
              "tar"
@@ -50,11 +48,17 @@ options=('!debug' 'strip')
 #_url=https://releases.llvm.org
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz
+        ${_url}/openmp-${pkgver}.src.tar.xz
         ${_url}/clang-${pkgver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}.src.tar.xz
         ${_url}/test-suite-${pkgver}.src.tar.xz
+        ${_url}/libcxx-${pkgver}.src.tar.xz
+        ${_url}/libcxxabi-${pkgver}.src.tar.xz
         ${_url}/clang-tools-extra-${pkgver}.src.tar.xz
         ${_url}/lld-${pkgver}.src.tar.xz
+        ${_url}/lldb-${pkgver}.src.tar.xz
+        ${_url}/libunwind-${pkgver}.src.tar.xz
+        ${_url}/polly-${pkgver}.src.tar.xz
         "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
@@ -152,6 +156,8 @@ sha256sums=('c5d8e30b57cbded7128d78e5e8dad811bff97a8d471896812f57fa99ee82cdf3'
 validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
               '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
 noextract=(clang-${pkgver}.src.tar.xz
+           libcxx-${pkgver}.src.tar.xz
+           lldb-${pkgver}.src.tar.xz
            test-suite-${pkgver}.src.tar.xz)
 
 apply_patch_with_msg() {
@@ -167,9 +173,17 @@ prepare() {
   [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
   [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
 
+  plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
+
+  plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
+  [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
+  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+
   cd "${srcdir}/llvm-${pkgver}.src"
+  sed -i "s|Support|TableGen|g" utils/TableGen/GlobalISel/CMakeLists.txt
   apply_patch_with_msg \
-      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch" \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
       "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
       "0005-add-pthread-as-system-lib-for-mingw.patch" \
@@ -192,12 +206,34 @@ prepare() {
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
-      "0105-build-libclang-cpp-fix.patch" \
-      "0106-fix-libunwind-extension.patch"
+      "0105-build-libclang-cpp-fix.patch"
+
+#"0106-fix-libunwind-extension.patch"
 
   cd "${srcdir}/lld-${pkgver}.src"
   apply_patch_with_msg \
       "0301-Fix-def-file-exporting-of-symbols-containing-periods.patch"
+
+  cd "${srcdir}/lldb-${pkgver}.src"
+  apply_patch_with_msg \
+      "0502-Add-missing-declarations-for-linking-to-psapi.patch" \
+      "0503-lldb-find-mingw-python.patch" \
+      "0504-fix-lldb-library-name-mingw.patch"
+
+  cd "${srcdir}/libunwind-${pkgver}.src"
+  apply_patch_with_msg \
+      "0600-unwind-rename-__personality_routine-to-_Unwind_Personality_Fn.patch" \
+
+  cd "${srcdir}/polly-${pkgver}.src"
+  # With LLVM_LINK_LLVM_DYLIB=ON it's build before LLVM and fails with undefined references to LLVM functions
+  apply_patch_with_msg \
+      "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
+
+  cd "${srcdir}/openmp-${pkgver}.src"
+  apply_patch_with_msg \
+      "0901-openmp-kpm-lock.patch" \
+      "0902-libomp-weak-mingw.patch" \
+      "0903-Fix-implib-for-MinGW.patch"
 
   cd "${srcdir}/clang-tools-extra-${pkgver}.src"
   apply_patch_with_msg \
@@ -212,7 +248,14 @@ prepare() {
   mv "${srcdir}/clang-${pkgver}.src"             clang
   mv "${srcdir}/clang-tools-extra-${pkgver}.src" clang-tools-extra
   mv "${srcdir}/lld-${pkgver}.src"               lld
+  mv "${srcdir}/lldb-${pkgver}.src"              lldb
+  mv "${srcdir}/polly-${pkgver}.src"             polly
   mv "${srcdir}/compiler-rt-${pkgver}.src"       compiler-rt
+  mv "${srcdir}/libcxxabi-${pkgver}.src"         libcxxabi
+  mv "${srcdir}/libcxx-${pkgver}.src"            libcxx
+  mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
+  mv "${srcdir}/openmp-${pkgver}.src"            openmp
+  #mv "${srcdir}/testsuite-${pkgver}.src"         test-suite
 }
 
 build() {
@@ -254,6 +297,9 @@ build() {
   #export CCACHE_HARDLINK=true
   #export CCACHE_SLOPPINESS=pch_defines,file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
+#    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
+#    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
+
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
@@ -271,9 +317,6 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
-    -DLLVM_ENABLE_LLD=ON \
-    -DLLVM_ENABLE_COMPILER_RT=ON \
-    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
