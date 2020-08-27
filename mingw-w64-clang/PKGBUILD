@@ -295,7 +295,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
   export CXXFLAGS="${CFLAGS}"
 
 #export CCACHE_HARDLINK=true
@@ -311,9 +311,6 @@ build() {
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DCLANG_ANALYZER_BUILD_Z3=ON \
-    -DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
-    -DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
@@ -329,7 +326,6 @@ build() {
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
     -DLLVM_ENABLE_LLD=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
@@ -338,6 +334,7 @@ build() {
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPYTHON_EXECUTABLE=${MINGW_PREFIX}/bin/python.exe \
     "${extra_config[@]}" \
+    -Wno-dev \
     ../llvm-${pkgver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
