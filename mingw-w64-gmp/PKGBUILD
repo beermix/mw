@@ -15,6 +15,11 @@ validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298') # Niels Möller <nisse
 sha256sums=('258e6cd51b3fbdfc185c716d55f82c08aff57df0c6fbd143cf6ed561267a1526'
             'SKIP')
 
+#prepare() {
+#  cd "${srcdir}/${_realname}-${pkgver}"
+#  autoreconf -fi
+#}
+
 build() {
   cd "${srcdir}/${_realname}-${pkgver}"
 
