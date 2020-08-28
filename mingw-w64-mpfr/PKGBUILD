@@ -41,7 +41,6 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --enable-static \
     --disable-shared \
-    --enable-thread-safe \
     --with-gmp=${MINGW_PREFIX}
 
   make
