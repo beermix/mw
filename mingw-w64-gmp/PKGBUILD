@@ -58,12 +58,8 @@ build() {
 }
 
 check() {
-  msg2 "Testing statuc ${MINGW_CHOST}"
   cd "${srcdir}/static-${MINGW_CHOST}"
   make check
-#  msg2 "Testing shared ${MINGW_CHOST}"
-#  cd "${srcdir}/shared-${MINGW_CHOST}"
-#  make check
 }
 
 package() {
