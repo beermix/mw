@@ -20,33 +20,44 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-curl"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-libssh2"
+             "${MINGW_PACKAGE_PREFIX}-lldb"
+             "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
-             "${MINGW_PACKAGE_PREFIX}-python2"
+             "${MINGW_PACKAGE_PREFIX}-python3"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.xz"
+source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
+        "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
-        "0005-win32-config.patch"
-        "LLVM_TARGETS_TO_BUILD.patch")
-noextract=(${_realname}c-${pkgver}-src.tar.xz)
+        "0005-win32-config.patch")
+sha256sums=('2d6a3b7196db474ba3f37b8f5d50a1ecedff00738d7846840605b42bfc922728'
+            'SKIP'
+            '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
+            '336b9b5a5d094404846d563a29a0f51018dcadd76665adea52c0a0e44cc1e69b'
+            '13cb1817ef83b396e16fe271172a77648bffe5e90efbbe98eb5fefc5a8d91860'
+            'b16f65dfdc79e7a722b3e2589e90a1431a971038dd5dfa1394ec0427e3c0a2b4'
+            '1a3d00f3bcf5c21beaa20ee729c45b7b3d76cd2a2c6b70562020f11c1e9dcc6d'
+            '061f1cf5374c926bc130a4afbde005dcd09fdbaee079469ad045fd23a7a88a2c')
+validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
+noextract=(${_realname}c-${pkgver}-src.tar.gz)
 
 prepare() {
   [[ -d ${srcdir}/${_realname}c-${pkgver}-src ]] && rm -rf ${srcdir}/${_realname}c-${pkgver}-src
-  tar -xJf ${srcdir}/${_realname}c-${pkgver}-src.tar.xz -C ${srcdir} || true
+  tar -xzf ${srcdir}/${_realname}c-${pkgver}-src.tar.gz -C ${srcdir} || true
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  patch -p1 -i "${srcdir}/LLVM_TARGETS_TO_BUILD.patch"
 }
 
 build() {
@@ -60,13 +71,8 @@ build() {
   if [ "${_bootstrapping}" = "no" ]; then
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
-  
-#    --tools="analysis,cargo,src" \
-#    --enable-optimize-llvm  \
-#    --enable-optimize \
-#    --enable-extended \
-#    --enable-vendor \
-#    --enable-local-rust \
+
+  export LIBSSH2_SYS_USE_PKG_CONFIG=1
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -84,23 +90,40 @@ build() {
     --enable-locked-deps \
     --disable-sanitizers \
     --enable-parallel-compiler \
-    --python=${MINGW_PREFIX}/bin/python2 \
-    --llvm-root=${MINGW_PREFIX} \
+    --python=${MINGW_PREFIX}/bin/python3 \
     ${_rust_conf}
+    # i686 builds fails with (exit code: 0xc0000139, STATUS_ENTRYPOINT_NOT_FOUND)
+    # Probably we have to apply one of Rust's LLVM patches to our LLVM package.
+    # --llvm-root=${MINGW_PREFIX} \
 
-  nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
+  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
+  DEP_Z_ROOT=${MINGW_PREFIX} \
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+}
+
+check() {
+  cd "${srcdir}/${CARCH}"
+  # it might fail on Windows
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py test || true
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
-
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python2 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
+  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
+  DEP_Z_ROOT=${MINGW_PREFIX} \
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
 
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
+
   mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
-  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+  mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
+     "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
 }
