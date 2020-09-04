@@ -85,10 +85,9 @@ build() {
     --release-channel="stable" \
     --enable-ninja \
     --disable-docs \
+    --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-locked-deps \
-    --disable-sanitizers \
     --enable-parallel-compiler \
     --python=${MINGW_PREFIX}/bin/python3 \
     ${_rust_conf}
