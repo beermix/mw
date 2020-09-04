@@ -82,7 +82,7 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-parallel-compiler \
+    --experimental-targets= \
     --python=${MINGW_PREFIX}/bin/python3 \
     ${_rust_conf}
     # i686 builds fails with (exit code: 0xc0000139, STATUS_ENTRYPOINT_NOT_FOUND)
