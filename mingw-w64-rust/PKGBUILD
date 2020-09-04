@@ -82,7 +82,7 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel="stable" \
+    --release-channel=stable \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
