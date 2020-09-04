@@ -51,7 +51,7 @@ prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
   #patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
-  patch -p1 -i "${srcdir}"/version-fix.patch
+  #patch -p1 -i "${srcdir}"/version-fix.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
 
   patch -p1 -i "${srcdir}"/0001-enable-gold-on.mingw32.patch
