@@ -31,11 +31,8 @@ build() {
   ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
-    --disable-silent-rules \
     --enable-static \
     --disable-shared \
-    --disable-silent-rules \
-    --with-gcc-arch=haswell \
     --with-gmp-prefix=${MINGW_PREFIX}
 
   make

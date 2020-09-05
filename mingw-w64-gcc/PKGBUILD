@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=20
+pkgrel=21
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -183,7 +183,7 @@ build() {
 
   declare -a extra_config
   if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
+    extra_config+=("--disable-libstdcxx-debug --disable-libstdcxx-verbose")
   else
     extra_config+=("--enable-libstdcxx-debug")
   fi
