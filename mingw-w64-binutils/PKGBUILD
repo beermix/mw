@@ -100,7 +100,6 @@ build() {
     --disable-rpath \
     --disable-multilib \
     --enable-silent-rules \
-    --enable-targets=x86_64-*-mingw* \
     --enable-install-libiberty \
     --enable-plugins \
     --enable-gold \
