@@ -1,0 +1,33 @@
+~/repo/mw/mingw-w64-glib2;mg -i --noconfirm;
+~/repo/mw/mingw-w64-dbus;mg -i --noconfirm;
+~/repo/mw/mingw-w64-libxslt;mg -i --noconfirm;
+~/repo/mw/mingw-w64-cairo;mg -i --noconfirm;
+~/repo/mw/mingw-w64-gtk3;mg -i --noconfirm;
+~/repo/mw/mingw-w64-python-cx_Freeze;mg -i --noconfirm
+
+
+~/repo/mw/mingw-w64-xz;mg -i --noconfirm
+~/repo/mw/mingw-w64-pcre;mg -i --noconfirm
+~/repo/mw/mingw-w64-bzip2;mg -i --noconfirm
+~/repo/mw/mingw-w64-librsvg;mg -i --noconfirm
+~/repo/mw/mingw-w64-libxml2;mg -i --noconfirm
+~/repo/mw/mingw-w64-libffi;mg -i --noconfirm
+~/repo/mw/mingw-w64-libpng;mg -i --noconfirm
+~/repo/mw/mingw-w64-harfbuzz;mg -i --noconfirm
+~/repo/mw/mingw-w64-atk;mg -i --noconfirm
+~/repo/mw/mingw-w64-libepoxy;mg -i --noconfirm
+~/repo/mw/mingw-w64-fontconfig;mg -i --noconfirm
+~/repo/mw/mingw-w64-fribidi;mg -i --noconfirm
+~/repo/mw/mingw-w64-pango;mg -i --noconfirm
+~/repo/mw/mingw-w64-pixman;mg -i --noconfirm
+~/repo/mw/mingw-w64-freetype;mg -i --noconfirm
+
+
+~/repo/mw/mingw-w64-gobject-introspection;mg -i --noconfirm;
+~/repo/mw/mingw-w64-pygobject;mg -i --noconfirm;
+~/repo/mw/mingw-w64-python-pytest;mg -i --noconfirm;
+~/repo/mw/mingw-w64-gtksourceview4;mg -i --noconfirm;
+~/repo/mw/mingw-w64-gsettings-desktop-schemas;mg -i --noconfirm
+
+
+glib-compile-schemas data && python3 setup_win32.py bdist_dumb --bdist-dir build\bdist.mingw\msi --keep-temp bdist_msi --keep-temp

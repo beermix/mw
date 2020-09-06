@@ -28,3 +28,15 @@ index 2e9bb4022270..a15c34fdbb6b 100644
  
  if (LLDB_ENABLE_LIBEDIT)
    list(APPEND LLDB_LIBEDIT_LIBS ${LibEdit_LIBRARIES})
+diff --git a/source/Plugins/Process/Windows/Common/CMakeLists.txt b/source/Plugins/Process/Windows/Common/CMakeLists.txt
+index 876bc8cab966..e77c204fd61e 100644
+--- a/source/Plugins/Process/Windows/Common/CMakeLists.txt
++++ b/source/Plugins/Process/Windows/Common/CMakeLists.txt
+@@ -29,6 +29,7 @@ add_lldb_library(lldbPluginProcessWindowsCommon PLUGIN
+     lldbTarget
+     ws2_32
+     rpcrt4
++    psapi
+   LINK_COMPONENTS
+     Support
+   )
