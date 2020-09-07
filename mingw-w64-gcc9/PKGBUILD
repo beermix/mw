@@ -21,7 +21,7 @@ pkgver=9.3.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=6
+pkgrel=7
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -61,6 +61,7 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
+        0150-gcc-10.2.0-libgcc-ldflags.patch
         010-documentation.patch
         optimize.patch
         optimize-at-least-some.patch
@@ -117,9 +118,6 @@ prepare() {
     000-gcc9-stable-branch.patch \
     libiberty-sync.patch
 
-    #optimize.patch \
-    #optimize-at-least-some.patch
-
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
     0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch \
@@ -144,6 +142,9 @@ prepare() {
   apply_patch_with_msg \
     0140-gcc-8.2.0-diagnostic-color.patch
 
+  apply_patch_with_msg \
+    0150-gcc-10.2.0-libgcc-ldflags.patch
+
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -162,7 +163,7 @@ build() {
 
   declare -a extra_config
   if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug")
+    extra_config+=("--disable-libstdcxx-debug --disable-libstdcxx-verbose")
   else
     extra_config+=("--enable-libstdcxx-debug")
   fi
@@ -188,9 +189,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -198,9 +199,13 @@ build() {
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
-#  export CC='ccache gcc'
-#  export CXX='ccache g++'
+  local _LDFLAGS_FOR_TARGET="$LDFLAGS"
+  LDFLAGS+=" -Wl,--disable-dynamicbase"
+  if [ "${CARCH}" = 'x86_64' ]; then
+    LDFLAGS+=",--image-base=0x400000"
+  fi
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -236,9 +241,13 @@ build() {
     --enable-plugin \
     --with-libiconv \
     --with-system-zlib \
+    --enable-silent-rules \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
+    --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \
+    LDFLAGS_FOR_TARGET="${_LDFLAGS_FOR_TARGET}" \
+    --enable-linker-plugin-flags='LDFLAGS=-static-libstdc++\ -static-libgcc\ '"${_LDFLAGS_FOR_TARGET// /\\ }"'\ -Wl,--stack,12582912' \
     ${_conf}
 
   # While we're debugging -fopenmp problems at least.
@@ -248,7 +257,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti --time nice -n19 make V=1 all
+  noti --time nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 

@@ -30,4 +30,4 @@
 ~/repo/mw/mingw-w64-gsettings-desktop-schemas;mg -i --noconfirm
 
 
-glib-compile-schemas data && python3 setup_win32.py bdist_dumb --bdist-dir build\bdist.mingw\msi --keep-temp bdist_msi --keep-temp --optimize=1
+glib-compile-schemas data && python3 setup_win32.py bdist_dumb --bdist-dir build\bdist.mingw\msi --keep-temp
