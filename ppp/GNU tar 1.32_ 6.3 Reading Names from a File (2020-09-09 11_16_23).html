@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html401/loose.dtd"> <html><!--
+ Page saved with SingleFile 
+ url: https://www.gnu.org/software/tar/manual/html_node/files.html#SEC108 
+ saved date: Wed Sep 09 2020 11:16:23 GMT+0300 (Москва, стандартное время)
+--><meta charset=utf-8>
+<title>GNU tar 1.32: 6.3 Reading Names from a File</title>
+<meta name=description content="GNU tar 1.32: 6.3 Reading Names from a File">
+<meta name=keywords content="GNU tar 1.32: 6.3 Reading Names from a File">
+<meta name=resource-type content=document>
+<meta name=distribution content=global>
+<meta name=Generator content="texi2html 1.76">
+<style><!--pre.smallexample{font-size:smaller}--></style>
+<link type=image/x-icon rel="shortcut icon" href=data:image/vnd.microsoft.icon;base64,AAABAAEAEhIAAAEACADYBQAAFgAAACgAAAASAAAAJAAAAAEACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgYGAAkJCQALCwsAExMTACEhIQAkJCQAJycnADMzMwA5OTkAOjo6AD09PQA/Pz8AQEBAAEZGRgBHR0cASkpKAE9PTwBSUlIAW1tbAGFhYQBmZmYAbW1tAHFxcQBzc3MAd3d3AHl5eQB+fn4Af39/AIGBgQCEhIQAh4eHAIyMjACNjY0Aj4+PAJCQkACRkZEAlZWVAJeXlwCampoAm5ubAJycnAChoaEAoqKiAKWlpQCnp6cAqKioAK2trQCvr68AsLCwALGxsQCysrIAs7OzALa2tgC7u7sAvb29AL+/vwDBwcEAwsLCAMPDwwDExMQAxcXFAMbGxgDHx8cAycnJAMrKygDLy8sAzMzMAM3NzQDOzs4A0NDQANHR0QDT09MA1NTUANXV1QDW1tYA19fXANjY2ADZ2dkA2traANzc3ADd3d0A39/fAOHh4QDi4uIA4+PjAOTk5ADm5uYA6OjoAOnp6QDr6+sA7OzsAO3t7QDu7u4A7+/vAPHx8QDz8/MA9PT0APX19QD29vYA9/f3APj4+AD5+fkA+/v7APz8/AD+/v4A////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAampqampqampqampqampqampqAABqampqampqalQQAQdmampqamoAAGpqampqamFqFiUaMmpqampqagAAampqampDaDQSaltLampqampqAABqampqUVleImpqQCQxampqamoAAGpqamo5aihgakBEPCpQampqagAAampqajteUWpmR2ppUUFqampqAABqamceHj5gaFhWJ1hqP2pqamoAAGpqajRqRkhdajRIVDY0SVpqagAAampYOlVqLGplX2piKmNITmpqAABqV0MPI2pqWwxKZRE9agY5TGoAAGpPAxUIZFwXajhYH1UiDQQwagAAakAJV0oOGC8uTTk7HBRXLSFqAABqNRNcakMIAAAoNwILVGpKGmoAAGpQBVtqalQjIz0mIFJqaiUjagAAakwZGjlQRVdqampYSkczCkNqAABqak8rHRtCVmpqalxBKSNTZ2oAAGpqampqampqampqampqampqagAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA><link rel=canonical href=https://www.gnu.org/software/tar/manual/html_node/files.html#SEC108></head>
+<body lang=en bgcolor=#FFFFFF text=#000000 link=#0000FF vlink=#800080 alink=#FF0000>
+<a name=files></a>
+<a name=SEC108></a>
+<table cellpadding=1 cellspacing=1 border=0>
+<tbody><tr><td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Selecting-Archive-Members.html#SEC107 title="Previous section in reading order"> &lt; </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/nul.html#SEC109 title="Next section in reading order"> &gt; </a>]</td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Choosing.html#SEC105 title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Choosing.html#SEC105 title="Up section"> Up </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html#SEC121 title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/index.html#SEC_Top title="Cover (top) of document">Top</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/tar_toc.html#SEC_Contents title="Table of contents">Contents</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Index-of-Command-Line-Options.html#SEC203 title=Index>Index</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/tar_abt.html#SEC_About title="About (help)"> ? </a>]</td>
+</table>
+<hr size=1>
+<h2 class=section> 6.3 Reading Names from a File </h2>
+<p>Instead of giving the names of files or archive members on the command
+line, you can put the names into a file, and then use the
+<samp>`--files-from=<var>file-of-names</var>'</samp> (<samp>`-T
+<var>file-of-names</var>'</samp>) option to <code>tar</code>. Give the name of the
+file which contains the list of files to include as the argument to
+<samp>`--files-from'</samp>. In the list, the file names should be separated by
+newlines. You will frequently use this option when you have generated
+the list of files to archive with the <code>find</code> utility.
+</p>
+<dl compact>
+<dd><a name=IDX387></a>
+</dd>
+<dt> <samp>`--files-from=<var>file-name</var>'</samp></dt>
+<dt> <samp>`-T <var>file-name</var>'</samp></dt>
+<dd><p>Get names to extract or create from file <var>file-name</var>.
+</p></dd>
+</dl>
+<p>If you give a single dash as a file name for <samp>`--files-from'</samp>, (i.e.,
+you specify either <code>--files-from=-</code> or <code>-T -</code>), then the file
+names are read from standard input.
+</p>
+<p>Unless you are running <code>tar</code> with <samp>`--create'</samp>, you cannot use
+both <code>--files-from=-</code> and <code>--file=-</code> (<code>-f -</code>) in the same
+command.
+</p>
+<p>Any number of <samp>`-T'</samp> options can be given in the command line.
+</p>
+<p>The following example shows how to use <code>find</code> to generate a list of
+files smaller than 400K in length and put that list into a file
+called <tt>`small-files'</tt>. You can then use the <samp>`-T'</samp> option to
+<code>tar</code> to specify the files from that file, <tt>`small-files'</tt>, to
+create the archive <tt>`little.tgz'</tt>. (The <samp>`-z'</samp> option to
+<code>tar</code> compresses the archive with <code>gzip</code>; see section <a href=https://www.gnu.org/software/tar/manual/html_node/gzip.html#SEC135>Creating and Reading Compressed Archives</a> for
+more information.)
+</p>
+<table><tbody><tr><td>&nbsp;<td><pre class=smallexample>$ <kbd>find . -size -400 -print &gt; small-files</kbd>
+$ <kbd>tar -c -v -z -T small-files -f little.tgz</kbd>
+</pre></table>
+<p>By default, each line read from the file list is first stripped off
+any leading and trailing whitespace. If the resulting string begins
+with <samp>`-'</samp> character, it is considered a <code>tar</code> option and is
+processed accordingly<a name=DOCF15 href=https://www.gnu.org/software/tar/manual/html_node/tar_fot.html#FOOT15>(15)</a>. For example,
+the common use of this feature is to change to another directory by
+specifying <samp>`-C'</samp> option:
+</p>
+<table><tbody><tr><td>&nbsp;<td><pre class=smallexample>$ <kbd>cat list</kbd>
+-C/etc
+passwd
+hosts
+-C/lib
+libc.a
+$ <kbd>tar -c -f foo.tar --files-from list</kbd>
+</pre></table>
+<p>In this example, <code>tar</code> will first switch to <tt>`/etc'</tt>
+directory and add files <tt>`passwd'</tt> and <tt>`hosts'</tt> to the
+archive. Then it will change to <tt>`/lib'</tt> directory and will archive
+the file <tt>`libc.a'</tt>. Thus, the resulting archive <tt>`foo.tar'</tt> will
+contain:
+</p>
+<table><tbody><tr><td>&nbsp;<td><pre class=smallexample>$ <kbd>tar tf foo.tar</kbd>
+passwd
+hosts
+libc.a
+</pre></table>
+<p>Note, that any options used in the file list remain in effect for the
+rest of the command line. For example, using the same <tt>`list'</tt>
+file as above, the following command
+</p>
+<table><tbody><tr><td>&nbsp;<td><pre class=smallexample>$ <kbd>tar -c -f foo.tar --files-from list libcurses.a</kbd>
+</pre></table>
+<p>will look for file <tt>`libcurses.a'</tt> in the directory <tt>`/lib'</tt>,
+because it was used with the last <samp>`-C'</samp> option
+(see section <a href=https://www.gnu.org/software/tar/manual/html_node/Position_002dSensitive-Options.html#SEC44>Position-Sensitive Options</a>).
+</p>
+<p><a name=verbatim_002dfiles_002dfrom></a>
+<a name=IDX388></a>
+If such option handling is undesirable, use the
+<samp>`--verbatim-files-from'</samp> option. When this option is in effect,
+each line read from the file list is treated as a file name. Notice,
+that this means, in particular, that no whitespace trimming is
+performed.
+</p>
+<p><a name=no_002dverbatim_002dfiles_002dfrom></a>
+<a name=IDX389></a>
+The <samp>`--verbatim-files-from'</samp> affects all <samp>`-T'</samp> options
+that follow it in the command line. The default behavior can be
+restored using <samp>`--no-verbatim-files-from'</samp> option.
+</p>
+<a name=IDX390></a>
+<p>To disable option handling for a single file name, use the
+<samp>`--add-file'</samp> option, e.g.: <code>--add-file=--my-file</code>.
+</p>
+<p>You can use any <acronym>GNU</acronym> <code>tar</code> command line options in the file list file,
+including <samp>`--files-from'</samp> option itself. This allows for
+including contents of a file list into another file list file.
+Note however, that options that control file list processing, such as
+<samp>`--verbatim-files-from'</samp> or <samp>`--null'</samp> won't affect the
+file they appear in. They will affect next <samp>`--files-from'</samp>
+option, if there is any.
+</p>
+<table class=menu border=0 cellspacing=0>
+<tbody><tr><td align=left valign=top><a href=https://www.gnu.org/software/tar/manual/html_node/nul.html#SEC109>6.3.1 <code>NUL</code>-Terminated File Names</a><td>&nbsp;&nbsp;<td align=left valign=top>
+</tr>
+</table>
+<hr size=1>
+<table cellpadding=1 cellspacing=1 border=0>
+<tbody><tr><td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Selecting-Archive-Members.html#SEC107 title="Previous section in reading order"> &lt; </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/nul.html#SEC109 title="Next section in reading order"> &gt; </a>]</td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Choosing.html#SEC105 title="Beginning of this chapter or previous chapter"> &lt;&lt; </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Choosing.html#SEC105 title="Up section"> Up </a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html#SEC121 title="Next chapter"> &gt;&gt; </a>]</td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left> &nbsp; </td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/index.html#SEC_Top title="Cover (top) of document">Top</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/tar_toc.html#SEC_Contents title="Table of contents">Contents</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/Index-of-Command-Line-Options.html#SEC203 title=Index>Index</a>]</td>
+<td valign=middle align=left>[<a href=https://www.gnu.org/software/tar/manual/html_node/tar_abt.html#SEC_About title="About (help)"> ? </a>]</td>
+</table>
+<p>
+ <font size=-1>
+ This document was generated on <i>February, 23 2019</i> using <a href=http://texi2html.cvshome.org/><i>texi2html 1.76</i></a>.
+ </font>
+ <br>
+</p>
