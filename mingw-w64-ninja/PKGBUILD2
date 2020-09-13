@@ -13,12 +13,10 @@ depends=()
 options=('strip' 'staticlibs')
 makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python")
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz"
-	"color.patch"
 	"no-static.patch")
 
 prepare () {
   cd ${srcdir}/ninja-${pkgver}
-  #patch -p1 -i "${srcdir}"/color.patch
   patch -p1 -i "${srcdir}"/no-static.patch
 }
 
