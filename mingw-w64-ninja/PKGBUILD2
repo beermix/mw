@@ -3,18 +3,19 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=9ddd3c917793bb97eb19d571429cdedf07501c03
-pkgrel=2
+pkgver=8cd857188eca587ca2ce45953f8d5164ea1705cf
+pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
 url="https://github.com/ninja-build/ninja"
 license=('Apache')
 depends=()
-options=('strip' '!staticlibs')
-makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python3" "${MINGW_PACKAGE_PREFIX}-cmake")
-source=("${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz"
+options=('strip' 'staticlibs')
+makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python")
+source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz"
 	"color.patch"
 	"no-static.patch")
+
 prepare () {
   cd ${srcdir}/ninja-${pkgver}
   #patch -p1 -i "${srcdir}"/color.patch

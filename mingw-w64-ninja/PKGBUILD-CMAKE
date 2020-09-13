@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=67f960be1be8099ea1727af8d3361d38274b2bd1
+pkgver=8cd857188eca587ca2ce45953f8d5164ea1705cf
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -30,6 +30,4 @@ build () {
 package() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
   mv "${srcdir}/ninja-${pkgver}/ninja.exe" "${pkgdir}${MINGW_PREFIX}"/bin/
-  #mkdir -p "${pkgdir}${MINGW_PREFIX}"/lib
-  #mv "${srcdir}/ninja-${pkgver}/build/libninja.a" "${pkgdir}${MINGW_PREFIX}"/lib/
 }
