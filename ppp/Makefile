@@ -1,4 +1,4 @@
-GCCGIT = ~/gcc.git2
+GCCGIT = ~/gcc.git
 GCCVER = 10.2.0
 
 GCCTAG = releases/gcc-$(GCCVER)
