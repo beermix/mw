@@ -13,7 +13,7 @@ update:
 	cat new.patch~ >> gcc-stable-branch.patch
 	rm -f *.patch~
 	mv gcc-stable-branch.patch 000-gcc10-stable-branch.patch
-	mv -r 000-gcc10-stable-branch.patch /home/User/mw-my/mingw-w64-gcc/000-gcc10-stable-branch.patch
+	mv -f 000-gcc10-stable-branch.patch /home/User/mw-my/mingw-w64-gcc/000-gcc10-stable-branch.patch
 
 
 	test -d ~/binutils-gdb || git clone http://sourceware.org/git/binutils-gdb.git ~/binutils-gdb
@@ -24,4 +24,4 @@ update:
 	) > binutils-stable-branch.patch
 	git diff --exit-code binutils-stable-branch.patch
 	mv binutils-stable-branch.patch 000-binutils35-stable-branch.patch
-	mv -r 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils35-stable-branch.patch
+	mv -f 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils35-stable-branch.patch
