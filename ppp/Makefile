@@ -1,13 +1,11 @@
-GCCGIT = ~/gcc.git
+GCCGIT = ~/gcc.git2
 GCCVER = 10.2.0
 
 GCCTAG = releases/gcc-$(GCCVER)
 GCCBRANCH = releases/gcc-10
 
 update:
-	git -C $(GCCGIT) remote update -p
-	git -C $(GCCGIT) rev-parse --verify --quiet refs/tags/$(GCCTAG) > /dev/null
-	git -C $(GCCGIT) rev-parse --verify --quiet $(GCCBRANCH) > /dev/null
+	git -C $(GCCGIT) fetch origin +$(GCCBRANCH):$(GCCBRANCH) +refs/tags/$(GCCTAG):refs/tags/$(GCCTAG)
 	git -C $(GCCGIT) diff $(GCCTAG)..$(GCCBRANCH) -- \* ':!*/DATESTAMP' > new.patch~
 	git show HEAD:gcc-stable-branch.patch | sed -n '/^diff --git/,$$p' > current.patch~
 	! diff current.patch~ new.patch~ > /dev/null
@@ -15,7 +13,7 @@ update:
 	cat new.patch~ >> gcc-stable-branch.patch
 	rm -f *.patch~
 	mv gcc-stable-branch.patch 000-gcc10-stable-branch.patch
-	cp -r 000-gcc10-stable-branch.patch /home/User/mw-my/mingw-w64-gcc/000-gcc10-stable-branch.patch
+	mv -r 000-gcc10-stable-branch.patch /home/User/mw-my/mingw-w64-gcc/000-gcc10-stable-branch.patch
 
 
 	test -d ~/binutils-gdb || git clone http://sourceware.org/git/binutils-gdb.git ~/binutils-gdb
@@ -26,4 +24,4 @@ update:
 	) > binutils-stable-branch.patch
 	git diff --exit-code binutils-stable-branch.patch
 	mv binutils-stable-branch.patch 000-binutils35-stable-branch.patch
-	cp -r 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils35-stable-branch.patch
+	mv -r 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils35-stable-branch.patch
