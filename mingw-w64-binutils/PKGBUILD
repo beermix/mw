@@ -80,7 +80,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/2002-Don-t-crash-if-asked-to-create-an-empty-implib.patch
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
-  #sed -i '/^development=/s/true/false/' bfd/development.sh
+  sed -i '/^development=/s/true/false/' bfd/development.sh
 }
 
 build() {
