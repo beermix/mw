@@ -2,7 +2,7 @@
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
 
 pkgname=make
-pkgver=2848422269d326f4ce46b214e78a1df6cf63016b
+pkgver=06719f9faf9be32fecd12520660ef0b69115abb2
 pkgrel=1
 pkgdesc="GNU make utility to maintain groups of programs"
 arch=('i686' 'x86_64')
@@ -10,7 +10,7 @@ url="https://github.com/rocky/remake"
 license=('GPL3')
 groups=('base-devel')
 depends=('libintl' 'sh')
-makedepends=('gettext' 'procps')
+makedepends=('gettext' 'procps' 'texinfo')
 install=${pkgname}.install
 options=() # 'debug' '!strip')
 source=("https://github.com/rocky/remake/archive/${pkgver}.tar.gz")
@@ -28,6 +28,7 @@ build() {
     --without-libintl-prefix \
     --without-libiconv-prefix \
     --without-guile \
+    --enable-maintainer-mode \
     ac_cv_dos_paths=yes
 
   make -j1 all
@@ -41,4 +42,5 @@ check() {
 package() {
   cd ${srcdir}/remake-${pkgver}
   make DESTDIR=${pkgdir} install
+  mv "${pkgdir}/usr/bin/remake.exe" "${pkgdir}/usr/bin/make.exe"
 }
