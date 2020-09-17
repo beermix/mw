@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=24
+pkgrel=30
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -124,9 +124,11 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    000-gcc10-stable-branch.patch
+    
+    
+#    optimize.patch \
+#    optimize-at-least-some.patch
 
 #    apply_patch_with_msg \
 #    openmp-vectorize-v2.patch \
@@ -175,6 +177,20 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
+
+  rm -rf gcc-*/gcc/testsuite/ada
+  rm -rf gcc-*/gcc/testsuite/brig.dg
+  rm -rf gcc-*/gcc/testsuite/c-c++-common
+  rm -rf gcc-*/gcc/testsuite/ChangeLog*
+  rm -rf gcc-*/gcc/testsuite/config
+  rm -rf gcc-*/gcc/testsuite/g*
+  rm -rf gcc-*/gcc/testsuite/jit.dg
+  rm -rf gcc-*/gcc/testsuite/lib
+  rm -rf gcc-*/gcc/testsuite/o*
+
+  rm -rf gcc/ada/*.ad*
+  rm -rf libjava
+
 }
 
 build() {
@@ -213,13 +229,13 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="$CFLAGS"
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-  export FFLAGS_FOR_TARGET="$FFLAGS"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O2"
+#  export CXXFLAGS="-march=haswell -g1 -O2"
+#  export CFLAGS_FOR_TARGET="$CFLAGS"
+#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
+#  export FFLAGS_FOR_TARGET="$FFLAGS"      --enable-checking=release \
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
@@ -250,7 +266,6 @@ build() {
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
-    --enable-checking=release \
     --disable-rpath \
     --disable-win32-registry \
     --disable-nls \
