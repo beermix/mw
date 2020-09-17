@@ -5,7 +5,7 @@ pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.73.0
 _boostver=${pkgver//./_}
-pkgrel=1
+pkgrel=4
 pkgdesc="Free peer-reviewed portable C++ source libraries (mingw-w64)"
 arch=('any')
 url="https://www.boost.org/"
@@ -153,9 +153,9 @@ build() {
 
   ./b2 \
     address-model=${_model} \
-    link=static \
+    link=shared,static \
     pch=off \
-    runtime-link=static \
+    runtime-link=shared \
     threading=multi \
     threadapi=win32 \
     toolset=gcc \
@@ -207,8 +207,8 @@ package() {
 
   ./b2 \
       address-model=${_model} \
-      link=static \
-      runtime-link=static \
+      link=shared,static \
+      runtime-link=shared \
       threading=multi \
       threadapi=win32 \
       toolset=gcc \
@@ -237,7 +237,7 @@ package() {
       install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/bin
-  #mv ${pkgdir}${MINGW_PREFIX}/lib/*.dll ${pkgdir}${MINGW_PREFIX}/bin
+  mv ${pkgdir}${MINGW_PREFIX}/lib/*.dll ${pkgdir}${MINGW_PREFIX}/bin
 
   # install b2 and bjam
   install -Dm755 b2.exe "${pkgdir}${MINGW_PREFIX}"/bin/b2.exe
