@@ -178,19 +178,18 @@ prepare() {
 
   echo ${pkgver} > gcc/BASE-VER
 
-  rm -rf gcc-*/gcc/testsuite/ada
-  rm -rf gcc-*/gcc/testsuite/brig.dg
-  rm -rf gcc-*/gcc/testsuite/c-c++-common
-  rm -rf gcc-*/gcc/testsuite/ChangeLog*
-  rm -rf gcc-*/gcc/testsuite/config
-  rm -rf gcc-*/gcc/testsuite/g*
-  rm -rf gcc-*/gcc/testsuite/jit.dg
-  rm -rf gcc-*/gcc/testsuite/lib
-  rm -rf gcc-*/gcc/testsuite/o*
+#  rm -rf gcc-*/gcc/testsuite/ada
+#  rm -rf gcc-*/gcc/testsuite/brig.dg
+#  rm -rf gcc-*/gcc/testsuite/c-c++-common
+#  rm -rf gcc-*/gcc/testsuite/ChangeLog*
+#  rm -rf gcc-*/gcc/testsuite/config
+#  rm -rf gcc-*/gcc/testsuite/g*
+#  rm -rf gcc-*/gcc/testsuite/jit.dg
+#  rm -rf gcc-*/gcc/testsuite/lib
+#  rm -rf gcc-*/gcc/testsuite/o*
 
-  rm -rf gcc/ada/*.ad*
-  rm -rf libjava
-
+#  rm -rf gcc/ada/*.ad*
+#  rm -rf libjava
 }
 
 build() {
@@ -235,7 +234,7 @@ build() {
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"      --enable-checking=release \
+#  export FFLAGS_FOR_TARGET="$FFLAGS"   
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
@@ -266,6 +265,7 @@ build() {
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
+    --enable-checking=release \
     --disable-rpath \
     --disable-win32-registry \
     --disable-nls \
