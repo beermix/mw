@@ -10,7 +10,7 @@ pkgver=${_pkgver}
 if [ -n "${_patchlevel}" ]; then
   pkgver+=.${_patchlevel}
 fi
-pkgrel=2
+pkgrel=3
 pkgdesc="Multiple-precision floating-point library (mingw-w64)"
 arch=('any')
 license=('LGPL')
@@ -19,7 +19,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gmp")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp")
 source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz{,.sig}
         #https://www.mpfr.org/mpfr-current/${_realname}-${_pkgver}.tar.xz{,.asc}
-        001-only_src.patch
+        #mpfr-${_pkgver}-${_patchlevel}.patch
         )
 sha256sums=('0c98a3f1732ff6ca4ea690552079da9c597872d30e96ec28414ee23c95558a7f'
             'SKIP')
@@ -29,7 +29,7 @@ prepare() {
   cd "${srcdir}/${_realname}-${_pkgver}"
 
   if [ -n "${_patchlevel}" ]; then
-    patch -p1 -i ${srcdir}/001-only_src.patch
+    patch -p1 -i ${srcdir}/${_realname}-${_pkgver}-${_patchlevel}.patch
   fi
 }
 
@@ -42,7 +42,6 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --enable-static \
     --disable-shared \
-    --enable-thread-safe \
     --with-gmp=${MINGW_PREFIX}
 
   make
