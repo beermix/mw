@@ -48,7 +48,7 @@ else
   _system_libtiff=yes
   _system_libwebp=yes
   _build_examples=no
-  _build_tools=yes
+  _build_tools=no
   _build_tests=no
   _make_docs=no
   _ltcg=no
@@ -332,10 +332,10 @@ prepare() {
   local _ARCH_TUNE=
   case ${MINGW_CHOST} in
     i686*)
-      _ARCH_TUNE="-march=i686 -mtune=haswell"
+      _ARCH_TUNE="-march=i686 -mtune=core2"
     ;;
     x86_64*)
-      _ARCH_TUNE="-march=nocona -mtune=haswell"
+      _ARCH_TUNE="-march=nocona -mtune=core2"
     ;;
   esac
 
@@ -618,7 +618,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-    noti --time nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+  noti nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
 
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
