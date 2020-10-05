@@ -13,7 +13,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-mpfr")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp" "${MINGW_PACKAGE_PREFIX}-mpfr")
 options=('staticlibs' '!emptydirs')
 source=(#"http://www.multiprecision.org/mpc/download/${_realname}-${pkgver}.tar.gz"
-        https://ftp.gnu.org/gnu/mpc/${_realname}-${pkgver}.tar.gz{,.sig})
+        https://ftp.gnu.org/gnu/mpc/${_realname}-${pkgver}.tar.gz)
 sha256sums=('e90f2d99553a9c19911abdb4305bf8217106a957e3994436428572c8dfe8fda6'
             'SKIP')
 validpgpkeys=('AD17A21EF8AED8F1CC02DBD9F7D5C9BF765C61E3')

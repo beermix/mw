@@ -17,7 +17,7 @@ license=('LGPL')
 options=('staticlibs')
 depends=("${MINGW_PACKAGE_PREFIX}-gmp")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gmp")
-source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz{,.sig}
+source=(https://ftp.gnu.org/gnu/mpfr/${_realname}-${_pkgver}.tar.xz
         #https://www.mpfr.org/mpfr-current/${_realname}-${_pkgver}.tar.xz{,.asc}
         #mpfr-${_pkgver}-${_patchlevel}.patch
         )
