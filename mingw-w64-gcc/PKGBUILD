@@ -238,9 +238,6 @@ build() {
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
-  if [ "${CARCH}" = 'x86_64' ]; then
-    LDFLAGS+=",--default-image-base-low"
-  fi
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
