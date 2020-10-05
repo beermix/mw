@@ -257,11 +257,13 @@ build() {
     --enable-shared --enable-static \
     --enable-libatomic \
     --enable-threads=${_threads} \
+    --enable-graphite \
     --enable-fully-dynamic-string \
     --enable-libstdcxx-filesystem-ts=yes \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
     ${extra_config} \
+    --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
     --disable-multilib \
@@ -276,7 +278,7 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --with-{gmp,mpfr,mpc}=${MINGW_PREFIX} \
+    --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
     --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \
     LDFLAGS_FOR_TARGET="${_LDFLAGS_FOR_TARGET}" \
