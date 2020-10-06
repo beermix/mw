@@ -37,6 +37,8 @@ build() {
     --sysconfdir=${MINGW_PREFIX}/etc \
     --disable-libevent-regress \
     --disable-debug-mode \
+    --enable-static \
+    --disable-shared \
     --disable-samples 
 
   make
