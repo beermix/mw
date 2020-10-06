@@ -4,7 +4,7 @@
 _realname=libevent
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.1.11
+pkgver=2.1.12
 pkgrel=5
 pkgdesc="An event notification library (mingw-w64)"
 arch=('any')
@@ -37,6 +37,8 @@ build() {
     --sysconfdir=${MINGW_PREFIX}/etc \
     --disable-libevent-regress \
     --disable-debug-mode \
+    --disable-shared \
+    --enable-static \
     --disable-samples 
 
   make
