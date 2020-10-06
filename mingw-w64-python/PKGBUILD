@@ -335,8 +335,8 @@ build() {
     _extra_config+=("--with-pydebug")
   fi
 
-  CFLAGS=${CFLAGS/-O2/-O3}
-  CXXFLAGS=${CFLAGS/-O2/-O3}
+    CFLAGS=${CFLAGS/-O2/-O3}
+    CXXFLAGS=${CFLAGS/-O2/-O3}
 
   # Workaround for conftest error on 64-bit builds
   export ac_cv_working_tzset=no
