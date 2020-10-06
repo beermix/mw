@@ -24,11 +24,10 @@ build () {
   ${MINGW_PREFIX}/bin/cmake \
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_VERBOSE_MAKEFILE=1 \
+      -DCMAKE_BUILD_TYPE="" \
       ../${_realname}-${pkgver}
 
-   make -j1
+   make -j7
 }
 
 package() {
