@@ -3,7 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=9a77d919525a6f844a5c18a1bcf2c2eeb9393ad7
+pkgver=67f960be1be8099ea1727af8d3361d38274b2bd1
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
@@ -18,14 +18,15 @@ sha256sums=('5d7ec75828f8d3fd1a0c2f31b5b0cea780cdfe1031359228c428c1a48bfcd5b9')
 
 prepare () {
   cd ${srcdir}/${_realname}-${pkgver}
-
- #patch -p1 -i ${srcdir}/1678.patch
-
+  
+   
     MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
     ${MINGW_PREFIX}/bin/cmake \
     -G'MSYS Makefiles' \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_TESTING=0 \
+    -DCMAKE_VERBOSE_MAKEFILE=0 \
     -H. \
     -Bbuild-mingw \
     ../${_realname}-${pkgver}
