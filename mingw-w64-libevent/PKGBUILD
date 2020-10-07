@@ -5,7 +5,7 @@ _realname=libevent
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=2.1.11
-pkgrel=5
+pkgrel=6
 pkgdesc="An event notification library (mingw-w64)"
 arch=('any')
 url="https://github.com/libevent/libevent/releases"
@@ -39,6 +39,7 @@ build() {
     --disable-debug-mode \
     --enable-static \
     --disable-shared \
+    --disable-clock-gettime \
     --disable-samples 
 
   make
