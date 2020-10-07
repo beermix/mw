@@ -24,7 +24,7 @@ build () {
   ${MINGW_PREFIX}/bin/cmake \
       -G'MSYS Makefiles' \
       -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
-      -DCMAKE_BUILD_TYPE="" \
+      -DBUILD_TESTING=0 \
       ../${_realname}-${pkgver}
 
    make -j7
