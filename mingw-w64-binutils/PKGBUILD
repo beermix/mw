@@ -62,7 +62,7 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93'
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  #patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
+  patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
   #patch -p1 -i "${srcdir}"/version-fix.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
 
@@ -79,7 +79,7 @@ prepare() {
   patch -p1 -i "${srcdir}"/1003-Pass-disable-reloc-section-on-PE-targets-for-PR-2566.patch
   patch -p1 -i "${srcdir}"/1004-Fix-a-segfault-when-creating-an-import-library-with-.patch
   patch -p1 -i "${srcdir}"/1005-After-preventing-creating-an-import-library-for-an-e.patch
-  patch -p1 -i "${srcdir}"/1006-Import-patch-from-mainline-to-fix-decoding-DWARF-inf.patch
+  #patch -p1 -i "${srcdir}"/1006-Import-patch-from-mainline-to-fix-decoding-DWARF-inf.patch
 
   # Temporarily revert defaults change while testing.
   patch -p1 -i "${srcdir}"/2000-Temporarily-revert-default-dll-characteristics.patch
