@@ -7,7 +7,7 @@ _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=beta
-pkgrel=0826
+pkgrel=1007
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -29,7 +29,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/2020-08-26/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-10-07/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
