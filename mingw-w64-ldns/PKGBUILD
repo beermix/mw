@@ -26,7 +26,6 @@ prepare() {
   [[ -d ${srcdir}/ldns-${pkgver} ]] || tar -xzf ${srcdir}/ldns-${pkgver}.tar.gz -C ${srcdir} || true
   
   cd ${srcdir}/${_realname}-${pkgver}
-  
   patch -p1 -i ${srcdir}/ldns-1.6.17-relocate.patch
 
   WANT_AUTOMAKE=latest autoreconf -fiv
@@ -47,7 +46,7 @@ build() {
     --prefix=${MINGW_PREFIX} \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
-    --enable-shared \
+    --disable-shared \
     --enable-static \
     --sysconfdir=${MINGW_PREFIX}/etc \
     --localstatedir=${MINGW_PREFIX}/var \
