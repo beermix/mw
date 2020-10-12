@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=31
+pkgrel=32
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -176,19 +176,6 @@ prepare() {
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
   echo ${pkgver} > gcc/BASE-VER
-
-#  rm -rf gcc-*/gcc/testsuite/ada
-#  rm -rf gcc-*/gcc/testsuite/brig.dg
-#  rm -rf gcc-*/gcc/testsuite/c-c++-common
-#  rm -rf gcc-*/gcc/testsuite/ChangeLog*
-#  rm -rf gcc-*/gcc/testsuite/config
-#  rm -rf gcc-*/gcc/testsuite/g*
-#  rm -rf gcc-*/gcc/testsuite/jit.dg
-#  rm -rf gcc-*/gcc/testsuite/lib
-#  rm -rf gcc-*/gcc/testsuite/o*
-
-#  rm -rf gcc/ada/*.ad*
-#  rm -rf libjava
 }
 
 build() {
@@ -197,7 +184,7 @@ build() {
 
   declare -a extra_config
   if check_option "debug" "n"; then
-    extra_config+=("--disable-libstdcxx-debug --disable-libstdcxx-verbose")
+    extra_config+=("--disable-libstdcxx-debug")
   else
     extra_config+=("--enable-libstdcxx-debug")
   fi
