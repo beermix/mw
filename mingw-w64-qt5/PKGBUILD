@@ -3,8 +3,8 @@
 
 # Please keep this file exactly the same (except _variant=)
 # as {mingw-w64-qt5/PKGBUILD,mingw-w64-qt5-static/PKGBUILD}
-_variant=-static
-#_variant=-shared
+#_variant=-static
+_variant=-shared
 
 # Tune the following to decide how and what to build
 if [ "${_variant}" = "-static" ]; then
@@ -32,7 +32,7 @@ if [ "${_variant}" = "-static" ]; then
   _ltcg="no"
 else
   _namesuff=
-  _build_mode=("-release")
+  _build_mode=("-release" "-force-debug-info" "-separate-debug-info")
   _with_icu=yes
   _with_fontconfig=yes
   _with_openssl=yes
@@ -340,13 +340,13 @@ prepare() {
   local _HARD_FLAGS=
   case ${MINGW_CHOST} in
     i686*)
-      _ARCH_TUNE="-march=i686 -mtune=core2"
+      _ARCH_TUNE="-march=haswell"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--nxcompat,--no-seh"
       fi
     ;;
     x86_64*)
-      _ARCH_TUNE="-march=nocona -mtune=core2"
+      _ARCH_TUNE="-march=haswell"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--high-entropy-va,--nxcompat,--default-image-base-high"
       fi

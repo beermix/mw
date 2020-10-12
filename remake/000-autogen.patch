@@ -1,0 +1,12 @@
+diff --git a/autogen.sh b/autogen.sh
+index e64addc9..a5e6cb68 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -15,7 +15,3 @@ fi
+ 
+ # Add our target descriptions to po/Makefile.in.in
+ patch -p0 < po/Makefile.in.in.patch
+-
+-./configure --enable-maintainer-mode "$@"
+-${MAKE} po-update
+-(cd doc && ${MAKE} stamp-1 stamp-vti)
