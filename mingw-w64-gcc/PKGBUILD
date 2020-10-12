@@ -21,8 +21,8 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=34
-_islver=0.16.1
+pkgrel=35
+_islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -124,9 +124,10 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    000-gcc10-stable-branch.patch
+    
+#    optimize.patch \
+#    optimize-at-least-some.patch
 
 #  apply_patch_with_msg \
 #    openmp-vectorize-v2.patch \
