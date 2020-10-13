@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=36
+pkgrel=37
 _islver=0.22.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -212,9 +212,9 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -222,7 +222,7 @@ build() {
 #  export CXXFLAGS="-march=haswell -g1 -O2"
 #  export CFLAGS_FOR_TARGET="$CFLAGS"
 #  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"   
+#  export FFLAGS_FOR_TARGET="$FFLAGS"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
