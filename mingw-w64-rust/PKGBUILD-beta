@@ -12,7 +12,9 @@ pkgdesc="Systems programming language focused on safety, speed and concurrency (
 arch=('any')
 url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc"
+	"${MINGW_PACKAGE_PREFIX}-libgit2"
+	"${MINGW_PACKAGE_PREFIX}-libssh2")
 makedepends=("bison"
              "flex"
              "git"
@@ -25,6 +27,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-python3"
+             "${MINGW_PACKAGE_PREFIX}-libgit2"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
@@ -76,16 +79,19 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=beta \
+    --release-channel="beta" \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
     --experimental-targets= \
+    --enable-locked-deps \
+    --tools="cargo,rls,clippy,miri,rustfmt,analysis,src" \
     --enable-optimize \
     --enable-optimize-llvm \
     --python=${MINGW_PREFIX}/bin/python3 \
+    --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
     # i686 builds fails with (exit code: 0xc0000139, STATUS_ENTRYPOINT_NOT_FOUND)
     # Probably we have to apply one of Rust's LLVM patches to our LLVM package.
@@ -95,7 +101,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 library/std --verbose
+  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
 }
 
 check() {
@@ -114,9 +120,6 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
-
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
-  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
