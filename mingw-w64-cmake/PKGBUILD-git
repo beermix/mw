@@ -4,11 +4,11 @@
 _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.19.0
+pkgver=3.19
 pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
-url="https://www.cmake.org/"
+url="https://cmake.org/download/"
 license=("MIT")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
@@ -24,10 +24,10 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-libuv"
          "${MINGW_PACKAGE_PREFIX}-rhash"
          "${MINGW_PACKAGE_PREFIX}-zlib")
-optdepends=("${MINGW_PACKAGE_PREFIX}-qt5: CMake Qt GUI"
-            "${MINGW_PACKAGE_PREFIX}-emacs: for cmake emacs mode")
 options=('staticlibs') # '!strip' 'debug'
-source=("https://www.cmake.org/files/v${pkgver%.*}/${_realname}-${pkgver}-rc1.tar.gz"
+# source=(https://github.com/Kitware/CMake/archive/${pkgver}.tar.gz
+# source=("cmake-git"::"git+https://github.com/Kitware/CMake.git#branch=release"
+source=("cmake-git"::"git+https://github.com/Kitware/CMake.git#branch=master"
         "0001-Windows-Add-missing-stringapiset.h-include.patch"
         "0003-Disable-response-files-for-MSYS-Generator.patch"
         "0005-Do-not-install-Qt-bundle-in-cmake-gui.patch"
@@ -57,16 +57,15 @@ del_file_exists() {
 
 
 prepare() {
-  cd ${_realname}-${pkgver}-rc1
+  cd cmake-git
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
     0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes2.patch \
-    0008-Output-line-numbers-in-callstacks.patch
-
-#    0009-Support-exporting-all-symbols-with-MinGW.patch
+    0008-Output-line-numbers-in-callstacks.patch \
+    0009-Support-exporting-all-symbols-with-MinGW.patch
 }
 
 build() {
@@ -74,19 +73,14 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}-rc1/configure  \
+    "${srcdir}"/cmake-git/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                      \
-    --parallel=7
+    --parallel=8
   plain "Start building..."
   nice -n19 make
-}
-
-check() {
-  cd "${srcdir}/build-${MINGW_CHOST}"
-  ./bin/ctest.exe -j$(($(nproc)+1))
 }
 
 package() {
