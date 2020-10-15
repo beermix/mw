@@ -36,9 +36,7 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch"
-        "LLVM_TARGETS_TO_BUILD.patch"
-        "72049.patch"
-        "75603.patch")
+        "LLVM_TARGETS_TO_BUILD.patch")
 sha256sums=('3185df064c4747f2c8b9bb8c4468edd58ff4ad6d07880c879ac1b173b768d81d'
             'SKIP'
             '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
@@ -64,8 +62,6 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/LLVM_TARGETS_TO_BUILD.patch"
-  # patch -p1 -i "${srcdir}/72049.patch"
-  # patch -p1 -i "${srcdir}/75603.patch"
 }
 
 build() {
@@ -96,13 +92,11 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --experimental-targets= \
     --enable-locked-deps \
     --tools="cargo,rls,clippy,miri,rustfmt,analysis,src" \
     --enable-optimize \
     --enable-optimize-llvm \
     --python=${MINGW_PREFIX}/bin/python \
-    --llvm-root=${MINGW_PREFIX} \
     ${_rust_conf}
     # i686 builds fails with (exit code: 0xc0000139, STATUS_ENTRYPOINT_NOT_FOUND)
     # Probably we have to apply one of Rust's LLVM patches to our LLVM package.
@@ -124,6 +118,7 @@ check() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
+  nice -n19 \
   ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 || true
 }
 
