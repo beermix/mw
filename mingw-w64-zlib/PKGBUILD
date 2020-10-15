@@ -56,8 +56,8 @@ prepare() {
 build() {
   cd ${srcdir}/${_realname}-${pkgver}
   #CFLAGS=${CFLAGS/-O2/-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4}
-
-  CC=clang CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
+  CFLAGS=${CFLAGS/-O2/-O3}
+  CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
   make -j1 all
 
   # build minizip
