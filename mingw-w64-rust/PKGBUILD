@@ -87,6 +87,7 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel="stable" \
+    --enable-local-rust \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
