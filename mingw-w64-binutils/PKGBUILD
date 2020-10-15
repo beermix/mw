@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.35.1
-pkgrel=2
+pkgrel=3
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -91,6 +91,8 @@ prepare() {
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
   sed -i '/^development=/s/true/false/' bfd/development.sh
+
+  #     --enable-targets=x86_64-*-mingw* \
 }
 
 build() {
@@ -122,7 +124,6 @@ build() {
     --disable-multilib \
     --enable-silent-rules \
     --enable-install-libiberty \
-    --enable-targets=x86_64-*-mingw* \
     --enable-silent-rules \
     --enable-plugins \
     --enable-gold \
