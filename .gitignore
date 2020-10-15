@@ -33,7 +33,7 @@ mingw-w64
 /*/mingw-w64/
 /*/gcc-git/
 /*/*/mingw-w64/
-/*/*/src-git/
+/*/cmake-git/
 /*/*/windows-default-manifest/
 */mingw-w64/
 /*/msys2-runtime/

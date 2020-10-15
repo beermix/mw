@@ -12,7 +12,6 @@ url="https://cmake.org/download/"
 license=("MIT")
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-bzip2"
-             "${MINGW_PACKAGE_PREFIX}-emacs"
              "${MINGW_PACKAGE_PREFIX}-ncurses"
              "${MINGW_PACKAGE_PREFIX}-xz"
              "${MINGW_PACKAGE_PREFIX}-zstd")
@@ -58,7 +57,7 @@ del_file_exists() {
 
 
 prepare() {
-  cd ${_realname}-${pkgver}
+  cd cmake-git
   apply_patch_with_msg \
     0001-Windows-Add-missing-stringapiset.h-include.patch \
     0003-Disable-response-files-for-MSYS-Generator.patch \
@@ -74,14 +73,14 @@ build() {
   cd "${srcdir}/build-${MINGW_CHOST}"
 
   MSYSTEM=MINGW FC=${MINGW_PREFIX}/bin/gfortran.exe \
-    "${srcdir}"/${_realname}-${pkgver}/configure  \
+    "${srcdir}"/cmake-git/configure  \
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                      \
-    --parallel=7
+    --parallel=8
   plain "Start building..."
-  make
+  nice -n19 make
 }
 
 package() {
@@ -89,11 +88,4 @@ package() {
   ./bin/cmake.exe \
      -DCMAKE_INSTALL_PREFIX:PATH=${pkgdir}${MINGW_PREFIX} \
      -DCMAKE_INSTALL_LOCAL_ONLY:BOOL=OFF -P cmake_install.cmake
-  install -d "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
-  ${MINGW_PREFIX}/bin/emacs -batch -f batch-byte-compile \
-    "${pkgdir}${MINGW_PREFIX}"/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el
-  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.el \
-    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
-  ln -s ${pkgdir}${MINGW_PREFIX}/share/cmake-${pkgver%.*}/editors/emacs/cmake-mode.elc \
-    "${pkgdir}${MINGW_PREFIX}"/share/emacs/site-lisp/
 }
