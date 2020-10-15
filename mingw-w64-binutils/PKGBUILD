@@ -91,8 +91,6 @@ prepare() {
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
   sed -i '/^development=/s/true/false/' bfd/development.sh
-
-  #     --enable-targets=x86_64-*-mingw* \
 }
 
 build() {
@@ -125,6 +123,7 @@ build() {
     --enable-silent-rules \
     --enable-install-libiberty \
     --enable-silent-rules \
+    --enable-targets=x86_64-*-mingw* \
     --enable-plugins \
     --enable-gold \
     --disable-shared

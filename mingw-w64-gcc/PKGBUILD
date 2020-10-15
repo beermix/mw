@@ -175,7 +175,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-#  echo ${pkgver} > gcc/BASE-VER
+  echo ${pkgver} > gcc/BASE-VER
 
 #  ln -s ../isl-${_islver} isl
 }
@@ -216,13 +216,13 @@ build() {
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDFLAGS=${LDFLAGS/-pipe/}
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2"
-#  export CXXFLAGS="-march=haswell -g1 -O2"
-#  export CFLAGS_FOR_TARGET="$CFLAGS"
-#  export CXXFLAGS_FOR_TARGET="$CXXFLAGS"
-#  export FFLAGS_FOR_TARGET="$FFLAGS"
+unset CFLAGS
+unset CXXFLAGS
+export CFLAGS="-march=haswell -g -O3 -pipe -Wl,-z,max-page-size=0x1000"
+export CXXFLAGS="-march=haswell -g -O3 -pipe -Wl,-z,max-page-size=0x1000"
+export CFLAGS_FOR_TARGET="$CFLAGS -fno-semantic-interposition "
+export CXXFLAGS_FOR_TARGET="$CXXFLAGS -fno-semantic-interposition "
+export FFLAGS_FOR_TARGET="$FFLAGS -fno-semantic-interposition "
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
