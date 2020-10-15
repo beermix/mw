@@ -229,9 +229,6 @@ build() {
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
 
-  #export CC="ccache x86_64-w64-mingw32-gcc"
-  #export CXX="ccache x86_64-w64-mingw32-g++"
-
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
     --with-local-prefix=${MINGW_PREFIX}/local \
