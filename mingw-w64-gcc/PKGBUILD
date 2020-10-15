@@ -68,6 +68,11 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         0150-gcc-10.2.0-libgcc-ldflags.patch
         010-documentation.patch
         optimize.patch
+        ipa-cp.patch
+        gomp-relax.patch
+        tune-inline.patch
+        openmp-vectorize-v2.patch
+        fortran-vector-v2.patch
         optimize-at-least-some.patch
         000-gcc10-stable-branch.patch)
 sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
@@ -124,19 +129,14 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch
-
-#    optimize.patch \
-#    optimize-at-least-some.patch
-
-#  apply_patch_with_msg \
-#    openmp-vectorize-v2.patch \
-#    fortran-vector-v2.patch \
-#    ipa-cp.patch \
-#    gomp-relax.patch
-#    gcc-lto-jobserver.diff
-#    0022-gcc-plugin-ada-use-def.patch \
-#    0023-ALL_ADAFLAGS-filter-out-Wno-pedantic-ms-format.patch
+    000-gcc10-stable-branch.patch \
+    openmp-vectorize-v2.patch \
+    fortran-vector-v2.patch \
+    optimize.patch \
+    ipa-cp.patch \
+    optimize-at-least-some.patch \
+    gomp-relax.patch \
+    tune-inline.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -175,7 +175,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+#  echo ${pkgver} > gcc/BASE-VER
 
 #  ln -s ../isl-${_islver} isl
 }
