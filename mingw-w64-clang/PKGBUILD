@@ -39,6 +39,7 @@ url="https://llvm.org/"
 license=("custom:Apache 2.0 with LLVM Exception")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
+             "${MINGW_PACKAGE_PREFIX}-libxml2"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
@@ -276,7 +277,7 @@ build() {
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
