@@ -55,9 +55,12 @@ prepare() {
 
 build() {
   cd ${srcdir}/${_realname}-${pkgver}
-  CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4" \
+  #CFLAGS="-O2 -g -pipe -Wall -Wp,-D_FORTIFY_SOURCE=2 -fexceptions --param=ssp-buffer-size=4"
+
+  cp contrib/gcc_gvmat64/gvmat64.S ./match.S
+  CFLAGS=${CFLAGS/-O2/-O3 -DASMV}
   CHOST=${MINGW_CHOST} ./configure --prefix=${MINGW_PREFIX} --shared
-  make -j1
+  make OBJA=match.o PIC_OBJA=match.lo -j1
 
   # build minizip
   if [ "${_external_minizip}" != "yes" ]; then

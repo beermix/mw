@@ -122,15 +122,13 @@ build() {
     --disable-multilib \
     --enable-silent-rules \
     --enable-install-libiberty \
-    --enable-deterministic-archives \
-    --enable-targets=x86_64-w64-mingw32 \
-    --with-lib-path=/mingw64/lib:/usr/lib \
+    --enable-targets=x86_64-w64-mingw32,i686-w64-mingw32 \
     --enable-plugins \
     --enable-gold \
-    --enable-secureplt \
     --without-debuginfod \
-    --enable-shared \
-    --disable-static
+    --disable-sim \
+    --disable-gdb \
+    --disable-shared
 
   make MAKEINFO=true
 }
@@ -145,7 +143,7 @@ check() {
 
 package() {
   cd ${srcdir}/build-${MINGW_CHOST}
-  make MAKEINFO=true DESTDIR=${pkgdir} install
+  make DESTDIR=${pkgdir} MAKEINFO=true install
 
   mkdir -p ${pkgdir}${MINGW_PREFIX}/{lib,include}/${_realname}
   mkdir -p ${pkgdir}${MINGW_PREFIX}/${MINGW_CHOST}/include

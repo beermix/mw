@@ -130,14 +130,14 @@ prepare() {
   apply_patch_with_msg \
     010-documentation.patch \
     000-gcc10-stable-branch.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    gomp-relax.patch
+    tune-inline.patch
 
-#    tune-inline.patch
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    gomp-relax.patch \
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -222,13 +222,16 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g -O3"
-  export CXXFLAGS="-march=haswell -g -O3"
-  export CFLAGS_FOR_TARGET="$CFLAGS "
-  export CXXFLAGS_FOR_TARGET="$CXXFLAGS "
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
+
+  #export CC="ccache x86_64-w64-mingw32-gcc"
+  #export CXX="ccache x86_64-w64-mingw32-g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -239,7 +242,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
+    --with-arch=westmere \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -266,9 +269,7 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --disable-libunwind-exceptions \
     --disable-cet \
-    --disable-vtable-verify \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
     --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \
@@ -283,7 +284,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti --time nice -n19 make all
+  noti --time nice -n19 make V=1 all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
