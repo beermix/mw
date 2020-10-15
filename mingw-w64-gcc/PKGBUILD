@@ -135,8 +135,9 @@ prepare() {
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    gomp-relax.patch \
-    tune-inline.patch
+    gomp-relax.patch
+
+#    tune-inline.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \

@@ -122,11 +122,15 @@ build() {
     --disable-multilib \
     --enable-silent-rules \
     --enable-install-libiberty \
-    --enable-silent-rules \
-    --enable-targets=x86_64-*-mingw* \
+    --enable-deterministic-archives \
+    --enable-targets=x86_64-w64-mingw32 \
+    --with-lib-path=/mingw64/lib:/usr/lib \
     --enable-plugins \
     --enable-gold \
-    --disable-shared
+    --enable-secureplt \
+    --without-debuginfod \
+    --enable-shared \
+    --disable-static
 
   make MAKEINFO=true
 }
