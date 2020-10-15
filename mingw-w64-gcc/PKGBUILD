@@ -265,6 +265,9 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
+    --disable-libunwind-exceptions \
+    --disable-cet \
+    --disable-vtable-verify \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
     --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \
