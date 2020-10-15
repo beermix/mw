@@ -46,7 +46,7 @@ build() {
       --host=${MINGW_CHOST} \
       --target=${MINGW_CHOST} \
       --disable-man \
-      --with-bundled-zlib=yes
+      --with-bundled-zlib=no
 
   make
 }

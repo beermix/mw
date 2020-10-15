@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=1
+pkgrel=3
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -66,6 +66,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/lldb-${pkgver}.src.tar.xz
         ${_url}/libunwind-${pkgver}.src.tar.xz
         ${_url}/polly-${pkgver}.src.tar.xz
+        "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -171,6 +172,7 @@ prepare() {
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
+      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch" \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
       "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
       "0005-add-pthread-as-system-lib-for-mingw.patch" \
@@ -259,14 +261,15 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
-  export CXXFLAGS="${CFLAGS}"
-
-#export CCACHE_HARDLINK=true
-#export CCACHE_SLOPPINESS=pch_defines,file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
+# CFLAGS+=-fno-split-stack
+# export CCACHE_HARDLINK=true
+# export CCACHE_SLOPPINESS=pch_defines,file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
 #-DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
 #-DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
+
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -274,13 +277,15 @@ build() {
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
-    -DCOMPILER_RT_BUILD_LIBFUZZER=ON \
-    -DCOMPILER_RT_BUILD_PROFILE=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
-    -DCOMPILER_RT_BUILD_XRAY=ON \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DLIBCLANG_BUILD_STATIC=ON \
@@ -326,6 +331,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD="X86"
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
