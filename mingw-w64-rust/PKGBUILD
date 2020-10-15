@@ -86,16 +86,14 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
-    --enable-ninja \
+    --release-channel="stable" \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
     --enable-locked-deps \
     --tools="cargo,rls,clippy,miri,rustfmt,analysis,src" \
-    --enable-optimize \
-    --enable-optimize-llvm \
+    --enable-option-checking \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
