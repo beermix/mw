@@ -9,7 +9,7 @@
 
 
 # Profiler lib now requires Clang to build
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -266,8 +266,8 @@ build() {
 # export CCACHE_HARDLINK=true
 # export CCACHE_SLOPPINESS=pch_defines,file_macro,time_macros,include_file_mtime,include_file_ctime,file_stat_matches
 
-#-DCMAKE_C_FLAGS_RELEASE="-O2 -DNDEBUG" \
-#-DCMAKE_CXX_FLAGS_RELEASE="-O2 -DNDEBUG" \
+#-DCMAKE_C_FLAGS_RELEASE="-DNDEBUG" \
+#-DCMAKE_CXX_FLAGS_RELEASE="-DNDEBUG" \
 
   export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
   export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
@@ -283,10 +283,10 @@ build() {
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
-    -DCOMPILER_RT_BUILD_LIBFUZZER=ON \
-    -DCOMPILER_RT_BUILD_PROFILE=ON \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
-    -DCOMPILER_RT_BUILD_XRAY=ON \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DLIBCLANG_BUILD_STATIC=ON \
