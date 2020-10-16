@@ -179,9 +179,8 @@ prepare() {
       "0008-enable-emutls-for-mingw.patch" \
       "0009-empty-target-prefix-only-msvc.patch" \
       "0010-mbig-obj-for-all.patch" \
-      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
-
-#      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
+      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch" \
+      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -297,6 +296,7 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
+    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
