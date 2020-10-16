@@ -4,8 +4,8 @@
 _realname=cmake
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=3.17.3
-pkgrel=4
+pkgver=3.17.5
+pkgrel=1
 pkgdesc="A cross-platform open-source make system (mingw-w64)"
 arch=('any')
 url="https://www.cmake.org/"
@@ -64,8 +64,9 @@ prepare() {
     0005-Do-not-install-Qt-bundle-in-cmake-gui.patch \
     0006-pkg-config-Add-dont-define-prefix-when-PKG_CONFIG_WI.patch \
     0007-Do-not-generate-import-libs-for-exes.patch \
-    0008-Output-line-numbers-in-callstacks.patch \
-    0009-Support-exporting-all-symbols-with-MinGW.patch
+    0008-Output-line-numbers-in-callstacks.patch
+    
+#    0009-Support-exporting-all-symbols-with-MinGW.patch
 }
 
 build() {
