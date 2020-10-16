@@ -222,10 +222,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2 "
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2 "
+  export CFLAGS="-march=haswell -g1 -O2 -pipe"
+  export CXXFLAGS="-march=haswell -g1 -O2 -pipe"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
