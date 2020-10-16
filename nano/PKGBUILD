@@ -1,7 +1,7 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
 pkgname=nano
-pkgver=5.2
+pkgver=5.3
 pkgrel=1
 pkgdesc="Pico editor clone with enhancements"
 arch=('i686' 'x86_64')
