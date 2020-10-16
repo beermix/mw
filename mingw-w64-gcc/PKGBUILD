@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=39
+pkgrel=40
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -212,8 +212,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
+  # CFLAGS=${CFLAGS/-pipe/}
+  # CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
   #  --with-arch=${_arch} 
@@ -222,10 +222,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g -O3"
-  export CXXFLAGS="-march=haswell -g -O3"
-  export CFLAGS_FOR_TARGET="-march=haswell -g -O3 "
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g -O3 "
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2 "
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2 "
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
@@ -239,7 +239,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
+    --with-arch=westmere \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
@@ -266,8 +266,6 @@ build() {
     --with-system-zlib \
     --enable-silent-rules \
     --with-diagnostics-color=always \
-    --disable-cet \
-    --with-system-libunwind \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
     --with-boot-ldflags="${LDFLAGS} -static-libstdc++ -static-libgcc" \

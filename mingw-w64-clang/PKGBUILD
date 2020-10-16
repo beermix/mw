@@ -179,8 +179,7 @@ prepare() {
       "0008-enable-emutls-for-mingw.patch" \
       "0009-empty-target-prefix-only-msvc.patch" \
       "0010-mbig-obj-for-all.patch" \
-      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch" \
-      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
+      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -253,8 +252,6 @@ build() {
 
   if [ "${_compiler}" == "clang" ]; then
     export CCACHE_CPP2=yes
-    #export CC='clang -stdlib=libc++'
-    #export CXX='clang++ -stdlib=libc++'
     export CC='clang'
     export CXX='clang++'
   fi
@@ -264,8 +261,9 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
-  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+
+  LDFLAGS+=" -Wl,--disable-dynamicbase"
+  CFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -273,9 +271,8 @@ build() {
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DCLANG_ANALYZER_BUILD_Z3=ON \
+    -DLLVM_ENABLE_Z3_SOLVER=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -290,14 +287,11 @@ build() {
     -DLIBOMP_FORTRAN_MODULES=ON \
     -DLLD_DEFAULT_LD_LLD_IS_MINGW=ON \
     -DLLDB_ENABLE_LIBEDIT=OFF \
-    -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
-    -DLLVM_ENABLE_COMPILER_RT=ON \
-    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
@@ -331,7 +325,6 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
-    -DLLVM_TARGETS_TO_BUILD="X86"
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
