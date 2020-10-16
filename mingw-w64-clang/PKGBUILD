@@ -263,7 +263,7 @@ build() {
 
   LDFLAGS+=" -Wl,--disable-dynamicbase"
   CFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
-  CXXFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+#  CXXFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -326,9 +326,11 @@ build() {
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
+    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
     -DLIBCXXABI_ENABLE_NEW_DELETE_DEFINITIONS=OFF
     -DLIBCXXABI_ENABLE_SHARED=OFF
+    -DLIBCXXABI_ENABLE_STATIC=ON
     -DLIBUNWIND_ENABLE_SHARED=ON
     -DLIBUNWIND_USE_COMPILER_RT=ON
     -DLLVM_ENABLE_LLD=ON
