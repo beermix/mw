@@ -251,7 +251,7 @@ build() {
   # https://github.com/martine/ninja/issues/932
 
   if [ "${_compiler}" == "clang" ]; then
-    export CCACHE_CPP2=yes
+    #export CCACHE_CPP2=yes
     export CC='clang'
     export CXX='clang++'
   fi
@@ -261,9 +261,9 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  LDFLAGS+=" -Wl,--disable-dynamicbase"
-  CFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
-#  CXXFLAGS+=" -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export LDFLAGS="${LDFLAGS} -Wl,--disable-dynamicbase"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -282,10 +282,12 @@ build() {
     -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
     -DLLD_DEFAULT_LD_LLD_IS_MINGW=ON \
     -DLLDB_ENABLE_LIBEDIT=OFF \
+    -DLLDB_RELOCATABLE_PYTHON=ON \
     -DLLDB_USE_SYSTEM_SIX=ON \
     -DLLVM_BUILD_LLVM_DYLIB=ON \
     -DLLVM_BUILD_STATIC=OFF \
