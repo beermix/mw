@@ -9,7 +9,7 @@
 
 
 # Profiler lib now requires Clang to build
-_compiler=gcc
+_compiler=clang
 _generator="MSYS Makefiles"
 #_generator="Ninja"
 if [ "${_generator}" = "Ninja" ]; then
@@ -32,13 +32,14 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=5
+pkgrel=4
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
 license=("custom:Apache 2.0 with LLVM Exception")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
+             "${MINGW_PACKAGE_PREFIX}-libxml2"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
@@ -47,8 +48,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
-               "${MINGW_PACKAGE_PREFIX}-clang" \
-               "${MINGW_PACKAGE_PREFIX}-compiler-rt")
+               "${MINGW_PACKAGE_PREFIX}-clang")
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
@@ -88,6 +88,63 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0304-ignore-new-bfd-options.patch"
         "0504-fix-lldb-library-name-mingw.patch"
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch")
+# Some patch notes :)
+#0001-0099 -> llvm
+#0101-0199 -> clang
+#0201-0299 -> rt
+#0301-0399 -> lld
+#0401-0499 -> libc++
+#0501-0599 -> lldb
+#0601-0699 -> libunwind
+#0701-0799 -> libc++abi
+#0801-0899 -> polly
+#0901-0999 -> openmp
+sha256sums=('913f68c898dfb4a03b397c5e11c6a2f39d0f22ed7665c9cefa87a34423a72469'
+            'SKIP'
+            '2d704df8ca67b77d6d94ebf79621b0f773d5648963dd19e0f78efef4404b684c'
+            'SKIP'
+            '0f96acace1e8326b39f220ba19e055ba99b0ab21c2475042dbc6a482649c5209'
+            'SKIP'
+            '374aff82ff573a449f9aabbd330a5d0a441181c535a3599996127378112db234'
+            'SKIP'
+            'add4fc302628b89f238ae95cb594061b57b6482ddf6e92f930718d87fda58619'
+            'SKIP'
+            '6c1ee6690122f2711a77bc19241834a9219dda5036e1597bfa397f341a9b8b7a'
+            'SKIP'
+            '58697d4427b7a854ec7529337477eb4fba16407222390ad81a40d125673e4c15'
+            'SKIP'
+            'fed318f75d560d0e0ae728e2fb8abce71e9d0c60dd120c9baac118522ce76c09'
+            'SKIP'
+            'efe7be4a7b7cdc6f3bcf222827c6f837439e6e656d12d6c885d5c8a80ff4fd1c'
+            'SKIP'
+            '8570c09f57399e21e0eea0dcd66ae0231d47eafc7a04d6fe5c4951b13c4d2c72'
+            'SKIP'
+            '8455011c33b14abfe57b2fd9803fb610316b16d4c9818bec552287e2ba68922f'
+            'SKIP'
+            'dcfadb8d11f2ea0743a3f19bab3b43ee1cb855e136bc81c76e2353cd76148440'
+            'SKIP'
+            '9b6d3ecb0ef4a38d34aefaefff8c6257ff22d366d84630020d7f079dc8065d97'
+            '1f318c0370357fdf9c54ae6d31bad761b0caa58ac099998937b636309ecb6590'
+            '7f0c64cd87b61e894be632f180ae5291e1aa9f1d9d382608f659067eeeda7146'
+            '2c2431997e664c5b42b359f4134a4773578753e5e25c505ba30de42d357f3057'
+            '1887ea21fcd591a50dd10559774e872ce1183177e672b028133d9b669e3cac32'
+            'e1c5f6fa15d6ce9af24dde2b038f0c2fb26a18f2f1200c65405adca6f8d15a6a'
+            '33400d16d5f6671a8fd60345c3ae44b9777a7d600061957889d14305eb2ad709'
+            '1c9efccd40a0e7834c3aa9d819aa25cfdd2cec389d1bd3e8a89bc9ff670a0129'
+            'a2f0e8090a9450abe51e43ba9e9c8ff4b2a4024ba394deea4b8aff547e30fc33'
+            'ddc43bc16f5edaf5290adabd71ce6a8a593fc3f824d7d99acd247bcce88aaf03'
+            '01b029f2a21bd998ce374a90d41d214c891dfbb611dfbd9ca147517cd2c228ea'
+            '53646dd01af2862473e9719c5223366486268891ccbff86413943a432a8342e9'
+            'a60f7328d84628a56a9f626e4dc26ffd0c35292c79eeba62ac3d4f25aef2fe5c'
+            '0098da33ce4cfea2a6b6943c15e769345f89b84ebea28facff4cc8b92a17bc8f'
+            '0b996f438f7c7bf42c789729dfd588a65d5016386e7032e03e8cd52f1dc8bc73'
+            'c74c313e442a5b8fed7c6372ac8ff8f3598c9e33db1b520f1297949e18042e55'
+            '2e1705274dfc55466cc8977e61d569a685e18ce07895cbec2ccf3b848eafd8ee'
+            '778e0db0a5b0657ab05e2a81d83241347a4a41af2b0f9903422f651fa58e8d40'
+            'bed7ae642486a8fd0db5afb0b9afcd8a87605de318ad891bf4c9378a2eb09dc2'
+            'bc394e597f8939b6f6630bd88c990f951738aaadacded2f3be71c658e9608fe7')
+validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
+              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
 noextract=(clang-${pkgver}.src.tar.xz
            libcxx-${pkgver}.src.tar.xz
            lldb-${pkgver}.src.tar.xz
@@ -122,9 +179,7 @@ prepare() {
       "0008-enable-emutls-for-mingw.patch" \
       "0009-empty-target-prefix-only-msvc.patch" \
       "0010-mbig-obj-for-all.patch" \
-      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch" 
-
-#      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
+      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -139,7 +194,7 @@ prepare() {
       "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch" \
-      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch" 
+      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch"
 
   cd "${srcdir}/lld-${pkgver}.src"
   apply_patch_with_msg \
@@ -199,7 +254,6 @@ build() {
     export CCACHE_CPP2=yes
     export CC='clang'
     export CXX='clang++'
-    extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON -DLLVM_ENABLE_LIBCXX=ON)
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
@@ -207,21 +261,26 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument"
-  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument"
+#  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+#  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-unused-command-line-argument -Wno-unknown-#pragmas -Wno-empty-translation-unit -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+#  export LDFLAGS="${LDFLAGS} -Wl,--disable-dynamicbase"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
-    -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCLANG_ANALYZER_BUILD_Z3=ON \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
+    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+    -DCOMPILER_RT_BUILD_PROFILE=OFF \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_XRAY=OFF \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
@@ -234,6 +293,7 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
+    -DLLVM_ENABLE_LIBCXX=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
@@ -248,7 +308,7 @@ build() {
   sed -i.orig 's/\/c  \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  nice -n19 ${_make_cmd} -j7
+  nice -n19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -372,6 +432,7 @@ package_clang-tools-extra() {
 package_compiler-rt() {
   pkgdesc="Runtime libraries for Clang and LLVM (mingw-w64)"
   url="https://compiler-rt.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/compiler-rt
   ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install
@@ -450,10 +511,8 @@ package_lldb() {
 package_llvm() {
   pkgdesc="Low Level Virtual Machine (mingw-w64)"
   depends=("${MINGW_PACKAGE_PREFIX}-libffi"
-           "${MINGW_PACKAGE_PREFIX}-gcc-libs"
            "${MINGW_PACKAGE_PREFIX}-z3"
-            $([[ "$_compiler" == "clang" ]] && echo "${MINGW_PACKAGE_PREFIX}-libc++")
-           )
+           "${MINGW_PACKAGE_PREFIX}-libc++")
 
   cd "${srcdir}"/llvm-${pkgver}.src
 
