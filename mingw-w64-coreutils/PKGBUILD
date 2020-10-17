@@ -1,0 +1,55 @@
+# Maintainer: Zach Bacon <11doctorwhocanada@gmail.com>
+
+_realname=coreutils
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=8.31
+pkgrel=1
+pkgdesc="FAAC is an AAC audio encoder (mingw-w64)"
+arch=('any')
+url='https://github.com/knik0/faac'
+license=('GPL2')
+source=(https://ftp.gnu.org/gnu/coreutils/coreutils-${pkgver}.tar.xz
+	coreutils.patch)
+
+prepare() {
+  cd ${srcdir}/${_realname}-${pkgver}
+  
+  patch -p1 -i ${srcdir}/coreutils.patch
+  
+  # Missing <sys/wait.h>.
+  echo "/* ignore */" > lib/savewd.c
+
+  # Missing <pwd.h> and <grp.h>.
+  echo "/* ignore */" > lib/idcache.c
+  echo "/* ignore */" > lib/userspec.c
+
+  # Missing fpathconf().
+  echo "/* ignore */" > lib/backupfile.c
+  
+  echo "/* ignore */" > lib/mountlist.c
+
+#  echo "ac_cv_header_pthread_h=no" > config.site
+#  export CONFIG_SITE=/c/temp/gcc/build/config.site
+
+   #autoreconf -fiv
+}
+
+build() {
+  [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
+  cp -R "${_realname}-${pkgver}" "${srcdir}"/build-${CARCH}
+  cd "${srcdir}"/build-${CARCH}
+
+  ./configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST}
+
+  make
+}
+
+package() {
+  cd "${srcdir}"/build-${CARCH}
+  make install DESTDIR="${pkgdir}"
+}

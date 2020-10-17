@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=40
+pkgrel=50
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -129,14 +129,15 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
     optimize.patch \
     ipa-cp.patch \
     optimize-at-least-some.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
     tune-inline.patch
+
+#    000-gcc10-stable-branch.patch \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    gomp-relax.patch \
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -222,10 +223,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2 -pipe"
-  export CXXFLAGS="-march=haswell -g1 -O2 -pipe"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
+  export CFLAGS="-march=haswell -g1 -O3 -pipe"
+  export CXXFLAGS="-march=haswell -g1 -O3 -pipe"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O3 -pipe "
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O3 -pipe "
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
