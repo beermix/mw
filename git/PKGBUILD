@@ -2,7 +2,7 @@
 # Maintainer: Ray Donnelly <mingw.android@gmail.com>
 
 pkgname=git
-pkgver=2.28.0
+pkgver=2.29.1
 pkgrel=1
 pkgdesc="The fast distributed version control system"
 arch=('i686' 'x86_64')
@@ -11,6 +11,7 @@ license=('GPL2')
 groups=('VCS')
 depends=('curl'
          'expat>=2.0'
+         #'info'
          'libpcre2_8'
          'openssh'
          'openssl'
@@ -44,9 +45,9 @@ source=("${pkgname}-${pkgver}.tar.gz"::https://github.com/git/git/archive/v${pkg
         git-2.8.2-Cygwin-Allow-DOS-paths.patch
         git-tcsh-completion-fixes.patch
         git-zsh-completion-fixes.patch)
-sha256sums=('9c856565ffb7268c8e85c91a0f747beac20dcf2d1292d35952046467abd969ce'
+sha256sums=('ba2c36747abd2f07ed8ba61481cbb2290188f7a784d5d6ba2a052b56b139dd9f'
             'c5e735d829e11f79e2d508b663d0924030498f48fc716881031fb975dbf187a5'
-            '7b396dfd36dede1796c3f80f66270ebab4a2f2cbdc23e8adae9c482439b46e77'
+            '47f5ff7840fa00665702fa70e5cc744de23b63ce2d9d787e2f86d2c54d57cc7a'
             '340d289f8a9d82975b34bd635e8c734c0c8529d5ac1ad9bbc8a77ed752502b02'
             'f67412f829e026b677d4c3ceacfb21da0549ad4636fb07c283e52c3fd5aa3e22'
             '905e35e145be34f6affad830155a193d869da4898e46726f36cef2e89c073d23'
@@ -133,6 +134,4 @@ package() {
     "${pkgdir}"/usr/lib/git-core/git-p4 \
     "${pkgdir}"/usr/share/git/remote-helpers/git-remote-bzr \
     "${pkgdir}"/usr/share/git/remote-helpers/git-remote-hg
-  sed -i 's|#![ ]*/usr/bin/python$|#!/usr/bin/python|' \
-    "${pkgdir}"/usr/share/git/svn-fe/svnrdump_sim.py
 }
