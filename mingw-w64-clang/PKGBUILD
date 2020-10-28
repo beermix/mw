@@ -88,7 +88,8 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch"
         "0304-ignore-new-bfd-options.patch"
         "0504-fix-lldb-library-name-mingw.patch"
-        "0801-Don-t-build-LLVMPolly-on-WIN32.patch")
+        "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
+        "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch")
 # Some patch notes :)
 #0001-0099 -> llvm
 #0101-0199 -> clang
@@ -174,6 +175,7 @@ prepare() {
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
+      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch" \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
       "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
       "0005-add-pthread-as-system-lib-for-mingw.patch" \
@@ -289,6 +291,8 @@ build() {
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_ENABLE_COMPILER_RT=ON \
+    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
