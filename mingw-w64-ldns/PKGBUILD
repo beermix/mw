@@ -10,7 +10,7 @@ arch=('any')
 url='https://www.nlnetlabs.nl/projects/ldns/'
 license=('custom:BSD')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
-             "${MINGW_PACKAGE_PREFIX}-python3")
+             "${MINGW_PACKAGE_PREFIX}-python")
 depends=("${MINGW_PACKAGE_PREFIX}-openssl")
 optdepends=("${MINGW_PACKAGE_PREFIX}-dnssec-anchors")
 options=(strip staticlibs)
@@ -64,5 +64,4 @@ build() {
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
   make -j1 DESTDIR="${pkgdir}" install
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/LICENSE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
 }
