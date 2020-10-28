@@ -216,18 +216,18 @@ build() {
 
   # CFLAGS=${CFLAGS/-pipe/}
   # CXXFLAGS=${CXXFLAGS/-pipe/}
-  # LDFLAGS=${LDFLAGS/-pipe/}
+  LDFLAGS=${LDFLAGS/-pipe/}
 
   #  --with-arch=${_arch} 
   #  --with-system-libunwind \
   #  --disable-vtable-verify --disable-libunwind-exceptions \
 
-#  unset CFLAGS
-#  unset CXXFLAGS
-#  export CFLAGS="-march=haswell -g1 -O2 -pipe"
-#  export CXXFLAGS="-march=haswell -g1 -O2 -pipe"
-#  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
-#  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2 -pipe "
+  unset CFLAGS
+  unset CXXFLAGS
+  export CFLAGS="-march=haswell -g1 -O3"
+  export CXXFLAGS="-march=haswell -g1 -O3"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O3 "
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O3 "
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
