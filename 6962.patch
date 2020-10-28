@@ -1,0 +1,164 @@
+From 5e9305330cf520c2fdec4b220f8ccd95dfeca712 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kirill=20M=C3=BCller?= <krlmlr@mailbox.org>
+Date: Wed, 9 Sep 2020 04:52:00 +0200
+Subject: [PATCH 1/4] Fix libbacktrace on mingw64
+
+---
+ mingw-w64-gcc/0150-libbacktrace-seh.patch | 28 +++++++++++++++++++++++
+ mingw-w64-gcc/PKGBUILD                    | 12 ++++++++--
+ 2 files changed, 38 insertions(+), 2 deletions(-)
+ create mode 100644 mingw-w64-gcc/0150-libbacktrace-seh.patch
+
+diff --git a/mingw-w64-gcc/0150-libbacktrace-seh.patch b/mingw-w64-gcc/0150-libbacktrace-seh.patch
+new file mode 100644
+index 0000000000..279d67047b
+--- /dev/null
++++ b/mingw-w64-gcc/0150-libbacktrace-seh.patch
+@@ -0,0 +1,28 @@
++From 685cb271ea39438c8afced53e11c2c8144197c9b Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Kirill=20M=C3=BCller?= <krlmlr@mailbox.org>
++Date: Sun, 6 Sep 2020 10:01:46 +0200
++Subject: [PATCH] =?UTF-8?q?Fix=20=5FUnwind=5FBacktrace()=20for=20SEH,=20us?=
++ =?UTF-8?q?ing=20simpler=20variant=20proposed=20by=20Martin=20Storsj=C3=B6?=
++ =?UTF-8?q?=20<martin@martin.st>?=
++MIME-Version: 1.0
++Content-Type: text/plain; charset=UTF-8
++Content-Transfer-Encoding: 8bit
++
++---
++ libgcc/unwind-seh.c | 3 +++
++ 1 file changed, 3 insertions(+)
++
++diff --git a/libgcc/unwind-seh.c b/libgcc/unwind-seh.c
++index 8c6aade9a3b3..d40d16702a9e 100644
++--- a/libgcc/unwind-seh.c
+++++ b/libgcc/unwind-seh.c
++@@ -466,6 +466,9 @@ _Unwind_Backtrace(_Unwind_Trace_Fn trace,
++ 			    &gcc_context.disp->HandlerData,
++ 			    &gcc_context.disp->EstablisherFrame, NULL);
++ 
+++      gcc_context.cfa = ms_context.Rsp;
+++      gcc_context.ra = ms_context.Rip;
+++
++       /* Call trace function.  */
++       if (trace (&gcc_context, trace_argument) != _URC_NO_REASON)
++ 	return _URC_FATAL_PHASE1_ERROR;
+diff --git a/mingw-w64-gcc/PKGBUILD b/mingw-w64-gcc/PKGBUILD
+index fed9163f9b..56f923bded 100644
+--- a/mingw-w64-gcc/PKGBUILD
++++ b/mingw-w64-gcc/PKGBUILD
+@@ -3,6 +3,7 @@
+ # Contributor: Ray Donnelly <mingw.android@gmail.com>
+ # Contributor: Renato Silva <br.renatosilva@gmail.com>
+ # Contributor: wirx6 <wirx654@gmail.com>
++# Contributor: Kirill Müller <krlmlr@mailbox.org>
+ 
+ _enable_ada=yes
+ _enable_objc=yes
+@@ -63,7 +64,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
+         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
+         0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
+         0130-libstdc++-in-out.patch
+-        0140-gcc-8.2.0-diagnostic-color.patch)
++        0140-gcc-8.2.0-diagnostic-color.patch
++        0150-libbacktrace-seh.patch)
+ sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
+             'SKIP'
+             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
+@@ -83,7 +85,8 @@ sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
+             '276ecc392c777d4b17d771a987e80dca50ff25d8f65671d5de139be73997064b'
+             'c7359f4c7015bc1fb02bc13449fa9826669273bd1f0663ba898decb67e8487fc'
+             '055289699c4222ef0b8125abdc8c9ceeff0712876c86e6d552a056fbacc14284'
+-            '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47')
++            '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47'
++            '89b4d7257b2666d74f10eab38276f9537f14918a0c00e7254117e6cf56d01515')
+ validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
+               86CFFCA918CF3AF47147588051E8B148A9999C34  # evangelos@foutrelis.com
+               13975A70E63C361C73AE69EF6EEB81F8981C74C7  # richard.guenther@gmail.com
+@@ -139,6 +142,11 @@ prepare() {
+   apply_patch_with_msg \
+     0140-gcc-8.2.0-diagnostic-color.patch
+ 
++  # ensure libbacktrace works with SEH
++  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96948
++  apply_patch_with_msg \
++    0150-libbacktrace-seh.patch
++
+   # do not expect ${prefix}/mingw symlink - this should be superceded by
+   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
+   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
+
+From aeb4143bdcc45deeaf676e5edbe016f85c7f7773 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kirill=20M=C3=BCller?= <krlmlr@mailbox.org>
+Date: Wed, 9 Sep 2020 05:00:28 +0200
+Subject: [PATCH 2/4] Replace by official patch
+
+---
+ mingw-w64-gcc/0150-libbacktrace-seh.patch | 25 +++++++++--------------
+ 1 file changed, 10 insertions(+), 15 deletions(-)
+
+diff --git a/mingw-w64-gcc/0150-libbacktrace-seh.patch b/mingw-w64-gcc/0150-libbacktrace-seh.patch
+index 279d67047b..7b2b5b44e3 100644
+--- a/mingw-w64-gcc/0150-libbacktrace-seh.patch
++++ b/mingw-w64-gcc/0150-libbacktrace-seh.patch
+@@ -1,27 +1,22 @@
+-From 685cb271ea39438c8afced53e11c2c8144197c9b Mon Sep 17 00:00:00 2001
+-From: =?UTF-8?q?Kirill=20M=C3=BCller?= <krlmlr@mailbox.org>
+-Date: Sun, 6 Sep 2020 10:01:46 +0200
+-Subject: [PATCH] =?UTF-8?q?Fix=20=5FUnwind=5FBacktrace()=20for=20SEH,=20us?=
+- =?UTF-8?q?ing=20simpler=20variant=20proposed=20by=20Martin=20Storsj=C3=B6?=
+- =?UTF-8?q?=20<martin@martin.st>?=
+-MIME-Version: 1.0
+-Content-Type: text/plain; charset=UTF-8
+-Content-Transfer-Encoding: 8bit
+-
++libgcc/Changelog:
++        * unwind-seh.c (_Unwind_Backtrace): Set the ra and cfa pointers
++        before calling the callback.
+ ---
+- libgcc/unwind-seh.c | 3 +++
+- 1 file changed, 3 insertions(+)
++ libgcc/unwind-seh.c | 5 +++++
++ 1 file changed, 5 insertions(+)
+ 
+ diff --git a/libgcc/unwind-seh.c b/libgcc/unwind-seh.c
+-index 8c6aade9a3b3..d40d16702a9e 100644
++index 1a70180cfaa..275d782903a 100644
+ --- a/libgcc/unwind-seh.c
+ +++ b/libgcc/unwind-seh.c
+-@@ -466,6 +466,9 @@ _Unwind_Backtrace(_Unwind_Trace_Fn trace,
++@@ -466,6 +466,11 @@ _Unwind_Backtrace(_Unwind_Trace_Fn trace,
+  			    &gcc_context.disp->HandlerData,
+  			    &gcc_context.disp->EstablisherFrame, NULL);
+  
+-+      gcc_context.cfa = ms_context.Rsp;
+++      /* Set values that the callback can inspect via _Unwind_GetIP
+++       * and _Unwind_GetCFA. */
+ +      gcc_context.ra = ms_context.Rip;
+++      gcc_context.cfa = ms_context.Rsp;
+ +
+        /* Call trace function.  */
+        if (trace (&gcc_context, trace_argument) != _URC_NO_REASON)
+
+From a35f201ccc3e929e1345384df9a08cbd50d801da Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kirill=20M=C3=BCller?= <krlmlr@mailbox.org>
+Date: Wed, 9 Sep 2020 05:04:11 +0200
+Subject: [PATCH 3/4] Fix SHA
+
+---
+ mingw-w64-gcc/PKGBUILD | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mingw-w64-gcc/PKGBUILD b/mingw-w64-gcc/PKGBUILD
+index 56f923bded..cd21892655 100644
+--- a/mingw-w64-gcc/PKGBUILD
++++ b/mingw-w64-gcc/PKGBUILD
+@@ -86,7 +86,7 @@ sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
+             'c7359f4c7015bc1fb02bc13449fa9826669273bd1f0663ba898decb67e8487fc'
+             '055289699c4222ef0b8125abdc8c9ceeff0712876c86e6d552a056fbacc14284'
+             '5240a9e731b45c17a164066c7eb193c1fbee9fd8d9a2a5afa2edbcde9510da47'
+-            '89b4d7257b2666d74f10eab38276f9537f14918a0c00e7254117e6cf56d01515')
++            '88c1d65e763e631ad49f9a077ed631f4acac9ef4732e2818ccddaefc883b1811')
+ validpgpkeys=(F3691687D867B81B51CE07D9BBE43771487328A9  # bpiotrowski@archlinux.org
+               86CFFCA918CF3AF47147588051E8B148A9999C34  # evangelos@foutrelis.com
+               13975A70E63C361C73AE69EF6EEB81F8981C74C7  # richard.guenther@gmail.com
