@@ -39,19 +39,20 @@ arch=('any')
 url="https://llvm.org/"
 license=("custom:Apache 2.0 with LLVM Exception")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
+             "${MINGW_PACKAGE_PREFIX}-compiler-rt"
+             "${MINGW_PACKAGE_PREFIX}-libc++"
+             "${MINGW_PACKAGE_PREFIX}-lld"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-pkg-config"
              "${MINGW_PACKAGE_PREFIX}-python"
              "${MINGW_PACKAGE_PREFIX}-swig"
-             "${MINGW_PACKAGE_PREFIX}-libxml2"
              "${MINGW_PACKAGE_PREFIX}-uasm"
              "tar"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-clang" \
                "${MINGW_PACKAGE_PREFIX}-compiler-rt" \
-               "${MINGW_PACKAGE_PREFIX}-lld" \
                "${MINGW_PACKAGE_PREFIX}-libc++")
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
@@ -71,6 +72,7 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         ${_url}/lldb-${pkgver}.src.tar.xz
         ${_url}/libunwind-${pkgver}.src.tar.xz
         ${_url}/polly-${pkgver}.src.tar.xz
+        "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0005-add-pthread-as-system-lib-for-mingw.patch"
@@ -79,7 +81,11 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0008-enable-emutls-for-mingw.patch"
         "0009-empty-target-prefix-only-msvc.patch"
         "0010-mbig-obj-for-all.patch"
+        "0012-fix-testplugin-linking.patch"
         "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
+        "0014-Disable-linking-llvm-exegesis-to-dylib.patch"
+        "0015-Avoid-linking-llvm-cfi-verify-to-duplicate-libs.patch"
+        "0016-Add-ffi-to-system-libraries-list-if-enabled.patch"
         "0101-Allow-build-static-clang-library-for-mingw.patch"
         "0102-fix-libclang-name-for-mingw.patch"
         "0104-link-pthread-with-mingw.patch"
@@ -91,7 +97,10 @@ source=(${_url}/llvm-${pkgver}.src.tar.xz
         "0304-ignore-new-bfd-options.patch"
         "0504-fix-lldb-library-name-mingw.patch"
         "0801-Don-t-build-LLVMPolly-on-WIN32.patch"
-        "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch")
+        "0901-openmp-kpm-lock.patch"
+        "0902-libomp-weak-mingw.patch"
+        "0903-Fix-implib-for-MinGW.patch"
+        "1001-Prevent-linking-to-duplicate-.a-libs-and-dylib.patch")
 # Some patch notes :)
 #0001-0099 -> llvm
 #0101-0199 -> clang
@@ -177,14 +186,14 @@ prepare() {
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
+      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch" \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
       "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
       "0005-add-pthread-as-system-lib-for-mingw.patch" \
       "0008-enable-emutls-for-mingw.patch" \
       "0009-empty-target-prefix-only-msvc.patch" \
       "0010-mbig-obj-for-all.patch" \
-      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch" \
-      "0001-Add-options-to-link-LLVM-with-compiler-rt-and-libunw.patch"
+      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -255,7 +264,7 @@ build() {
   if [ "${_compiler}" == "clang" ]; then
     export CC='clang'
     export CXX='clang++'
-    extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON -DLLVM_ENABLE_LIBCXX=OFF)
+    # extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON -DLLVM_ENABLE_LIBCXX=OFF)
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
@@ -263,7 +272,7 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function"
+  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
   export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
@@ -271,15 +280,14 @@ build() {
     -G"$_generator" \
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
+    -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_CCACHE_BUILD=ON \
-    -DHAVE_STEADY_CLOCK=0 \
-    -DLLVM_INCLUDE_TESTS=OFF \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
-    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
+    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
     -DLIBOMP_FORTRAN_MODULES=ON \
@@ -290,13 +298,14 @@ build() {
     -DLLVM_BUILD_STATIC=OFF \
     -DLLVM_ENABLE_ASSERTIONS=OFF \
     -DLLVM_ENABLE_FFI=ON \
+    -DLLVM_ENABLE_LIBCXX=OFF \
+    -DLLVM_ENABLE_COMPILER_RT=ON \
+    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;openmp;polly" \
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
-    -DLLVM_INCLUDE_DOCS=OFF \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
-    -DLLVM_ENABLE_LIBUNWIND=ON \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
@@ -308,7 +317,7 @@ build() {
   sed -i.orig 's/\/c \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.bin/noti.exe --time nice -n19 ${_make_cmd} -j8
+  /home/User/.bin/noti --time nice -n19 ${_make_cmd} -j8
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -326,13 +335,15 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
-    -DLLVM_INCLUDE_TESTS=OFF
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
+    -DLIBCXX_USE_COMPILER_RT=ON
     -DLIBCXXABI_ENABLE_NEW_DELETE_DEFINITIONS=OFF
     -DLIBCXXABI_ENABLE_SHARED=OFF
     -DLIBCXXABI_ENABLE_STATIC=ON
+    -DLIBCXXABI_USE_COMPILER_RT=ON
+    -DLIBCXXABI_USE_LLVM_UNWINDER=ON
     -DLIBUNWIND_ENABLE_SHARED=ON
     -DLIBUNWIND_USE_COMPILER_RT=ON
     -DLLVM_ENABLE_LLD=ON
@@ -420,7 +431,6 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
-  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
@@ -505,8 +515,6 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -518,8 +526,6 @@ package_llvm() {
   cd "${srcdir}"/llvm-${pkgver}.src
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
-
-  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
