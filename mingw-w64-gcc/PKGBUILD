@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=52
+pkgrel=53
 _islver=0.16.1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -222,10 +222,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g -O2"
-  export CXXFLAGS="-march=haswell -g -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g -O2"
+  export CFLAGS="-march=haswell -g -O3"
+  export CXXFLAGS="-march=haswell -g -O3"
+  export CFLAGS_FOR_TARGET="-march=haswell -g -O3"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g -O3"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
