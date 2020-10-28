@@ -132,11 +132,11 @@ prepare() {
     000-gcc10-stable-branch.patch \
     optimize.patch \
     optimize-at-least-some.patch \
-    tune-inline.patch \
     ipa-cp.patch \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
-    gomp-relax.patch
+    gomp-relax.patch \
+    tune-inline.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -212,8 +212,8 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  # CFLAGS=${CFLAGS/-pipe/}
-  # CXXFLAGS=${CXXFLAGS/-pipe/}
+  CFLAGS=${CFLAGS/-pipe/}
+  CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
   #  --with-arch=${_arch} 
