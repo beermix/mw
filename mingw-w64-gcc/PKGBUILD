@@ -75,7 +75,8 @@ source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${p
         openmp-vectorize-v2.patch
         fortran-vector-v2.patch
         optimize-at-least-some.patch
-        000-gcc10-stable-branch.patch)
+        000-gcc10-stable-branch.patch
+        0150-libbacktrace-seh.patch21:29 28.10.2020)
 sha256sums=('b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c'
             'SKIP'
             'bce81824fc89e5e62cca350de4c17a27e27a18a1a1ad5ca3492aec1fc5af3234'
@@ -245,8 +246,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=haswell \
     --with-tune=haswell \
+    --with-arch=westmere \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
