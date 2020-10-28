@@ -252,7 +252,7 @@ build() {
   FFI_INCLUDE_DIR=$(echo $FFI_INCLUDE_DIR | sed 's|-I||g')
 
   if [ "${_compiler}" == "clang" ]; then
-    export CCACHE_CPP2=yes
+    #export CCACHE_CPP2=yes
     export CC='clang'
     export CXX='clang++'
     extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON -DLLVM_ENABLE_LIBCXX=ON)
