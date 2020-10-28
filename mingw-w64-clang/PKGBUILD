@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=10
+pkgrel=12
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -49,8 +49,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "groff"
              $([[ "$_compiler" == "clang" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-clang" \
-               "${MINGW_PACKAGE_PREFIX}-compiler-rt" \
-               "${MINGW_PACKAGE_PREFIX}-libc++")
+               "${MINGW_PACKAGE_PREFIX}-compiler-rt")
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
              )
@@ -254,7 +253,8 @@ build() {
     export CCACHE_CPP2=yes
     export CC='clang'
     export CXX='clang++'
-    extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON -DLLVM_ENABLE_LIBCXX=ON)
+    extra_config+=(-DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON)
+    #  -DLLVM_ENABLE_LIBCXX=OFF
   fi
 
   export ASM_COMPILER="${MINGW_PREFIX}/bin/uasm.exe"
