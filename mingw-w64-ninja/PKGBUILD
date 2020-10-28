@@ -23,7 +23,7 @@ prepare () {
 build() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
   cd ${srcdir}/ninja-${pkgver}
-  ${MINGW_PREFIX}/bin/python3 configure.py --bootstrap --platform=mingw --host=mingw --verbose
+  ${MINGW_PREFIX}/bin/python configure.py --bootstrap --platform=mingw
 }
 
 package() {
