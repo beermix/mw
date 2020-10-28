@@ -79,7 +79,7 @@ build() {
     --system-libs                                 \
     --no-system-expat                             \
     --no-qt-gui                                      \
-    --parallel=7
+    --parallel=8
   plain "Start building..."
   nice -n19 make
 }
