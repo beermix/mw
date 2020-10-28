@@ -25,9 +25,9 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-lldb"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
-             "${MINGW_PACKAGE_PREFIX}-openssl"
-             "${MINGW_PACKAGE_PREFIX}-python3"
              "${MINGW_PACKAGE_PREFIX}-libgit2"
+             "${MINGW_PACKAGE_PREFIX}-openssl"
+             "${MINGW_PACKAGE_PREFIX}-python"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
@@ -69,7 +69,7 @@ build() {
     _rust_conf+=("--local-rust-root=$(cygpath -m ${MINGW_PREFIX})")
   fi
 
-  export LIBSSH2_SYS_USE_PKG_CONFIG=1
+  # export LIBSSH2_SYS_USE_PKG_CONFIG=1
 
   MSYS2_ARG_CONV_EXCL="--prefix;--sysconfdir;--localstatedir" \
   ../${_realname}c-${pkgver}-src/configure \
@@ -88,10 +88,9 @@ build() {
     --experimental-targets= \
     --enable-locked-deps \
     --tools="cargo,rls,clippy,miri,rustfmt,analysis,src" \
-    --enable-optimize \
-    --enable-optimize-llvm \
-    --python=${MINGW_PREFIX}/bin/python3 \
+    --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
+    --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
     # i686 builds fails with (exit code: 0xc0000139, STATUS_ENTRYPOINT_NOT_FOUND)
     # Probably we have to apply one of Rust's LLVM patches to our LLVM package.
@@ -101,21 +100,31 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py build -j7 --verbose
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
 }
 
 check() {
   cd "${srcdir}/${CARCH}"
+
+  # export LIBSSH2_SYS_USE_PKG_CONFIG=1
+
   # it might fail on Windows
-  ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py test || true
+  DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
+  DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
+  DEP_Z_ROOT=${MINGW_PREFIX} \
+  nice -n19 \
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || true
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
+
+  # export LIBSSH2_SYS_USE_PKG_CONFIG=1
+
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python3 ../${_realname}c-${pkgver}-src/x.py install -j7 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll

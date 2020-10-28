@@ -12,7 +12,9 @@ pkgdesc="Systems programming language focused on safety, speed and concurrency (
 arch=('any')
 url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc"
+	"${MINGW_PACKAGE_PREFIX}-libgit2"
+	"${MINGW_PACKAGE_PREFIX}-libssh2")
 makedepends=("bison"
              "flex"
              "git"

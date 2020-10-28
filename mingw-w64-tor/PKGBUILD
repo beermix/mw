@@ -29,7 +29,8 @@ build() {
 #  CFLAGS="-fsanitize-blacklist=contrib/clang/sanitize_blacklist.txt -fsanitize=undefined -fsanitize=address -fno-sanitize-recover=all -fno-omit-frame-pointer -fno-optimize-sibling-calls -fno-inline" \
   
   CPPFLAGS="-isystem ${MINGW_PREFIX}/include"
-  CFLAGS="-pipe -O3 -fomit-frame-pointer -funroll-loops"
+  # CFLAGS="-pipe -O3 -fomit-frame-pointer -funroll-loops"
+  CFLAGS="-O3"
   LDFLAGS="-s -Wl,-s"
   CC=clang  "${srcdir}/${_realname}-${pkgver}/configure" \
     --prefix="${MINGW_PREFIX}" \
