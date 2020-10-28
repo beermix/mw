@@ -155,8 +155,8 @@ prepare() {
     0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
 
-  apply_patch_with_msg \
-    0130-libstdc++-in-out.patch
+#  apply_patch_with_msg \
+#    0130-libstdc++-in-out.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
@@ -222,10 +222,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g -O2"
+  export CXXFLAGS="-march=haswell -g -O2"
+  export CFLAGS_FOR_TARGET="-march=haswell -g -O2"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g -O2"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
@@ -239,7 +239,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=westmere \
+    --with-arch=haswell \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
