@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=13
+pkgrel=14
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -269,8 +269,8 @@ build() {
     -DCMAKE_VERBOSE_MAKEFILE=OFF \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_INCLUDE_DOCS=OFF \
-    -DLLVM_CCACHE_BUILD=ON \
-    -DLLVM_TARGETS_TO_BUILD="host;NVPTX" \
+    -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -293,7 +293,7 @@ build() {
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
-    -DLLVM_LINK_LLVM_DYLIB=ON \
+    -DLLVM_LINK_LLVM_DYLIB=OFF \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
@@ -305,7 +305,7 @@ build() {
   sed -i.orig 's/\/c \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.bin/noti --time nice -n19 ${_make_cmd} -j8
+  /home/User/.bin/noti --time nice -n19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -323,6 +323,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD="X86"
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
