@@ -1,0 +1,150 @@
+From a97b62a4fa9b4d0be5a0950a80627c8d1ca97006 Mon Sep 17 00:00:00 2001
+From: Konstantin Podsvirov <konstantin@podsvirov.pro>
+Date: Wed, 1 Apr 2020 13:15:40 +0300
+Subject: [PATCH] git: Gui fixes
+
+Some fixes to allow using `git gui` command in `mingw` subsystems.
+---
+ git/PKGBUILD                   |  9 ++--
+ git/git-2.26.0-gui-fixes.patch | 91 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 97 insertions(+), 3 deletions(-)
+ create mode 100644 git/git-2.26.0-gui-fixes.patch
+
+diff --git a/git/PKGBUILD b/git/PKGBUILD
+index 0f71bd293..548a259f6 100644
+--- a/git/PKGBUILD
++++ b/git/PKGBUILD
+@@ -3,7 +3,7 @@
+ 
+ pkgname=git
+ pkgver=2.26.0
+-pkgrel=1
++pkgrel=2
+ pkgdesc="The fast distributed version control system"
+ arch=('i686' 'x86_64')
+ url="https://git-scm.com/"
+@@ -51,7 +51,8 @@ source=("${pkgname}-${pkgver}.tar.gz"::https://github.com/git/git/archive/v${pkg
+         git-2.3.5-mingw-pwd.patch
+         git-2.8.2-Cygwin-Allow-DOS-paths.patch
+         git-tcsh-completion-fixes.patch
+-        git-zsh-completion-fixes.patch)
++        git-zsh-completion-fixes.patch
++        git-2.26.0-gui-fixes.patch)
+ sha256sums=('2a93b9a3276464507922134bfba9be466427ab6a843e3773849050e3d05250d0'
+             'c5e735d829e11f79e2d508b663d0924030498f48fc716881031fb975dbf187a5'
+             '2c0301076a7b60b5be2491433560f6f87c510ec64d2d8f9db5a75c1295893885'
+@@ -59,7 +60,8 @@ sha256sums=('2a93b9a3276464507922134bfba9be466427ab6a843e3773849050e3d05250d0'
+             'f67412f829e026b677d4c3ceacfb21da0549ad4636fb07c283e52c3fd5aa3e22'
+             '905e35e145be34f6affad830155a193d869da4898e46726f36cef2e89c073d23'
+             'b28b3e13de08911f027d19a557967fc21128318a8d6ca74b20b26ee997a9b992'
+-            '261438a4bedd5563c702533c34792581ccfa46db873ca3e105e6c1ab803a3107')
++            '261438a4bedd5563c702533c34792581ccfa46db873ca3e105e6c1ab803a3107'
++            '2abac7cbdd224521cf071a7a10623662629f3221f0eb82647e0c10701f8b767e')
+ 
+ prepare() {
+   cd "${srcdir}/${pkgname}-${pkgver}"
+@@ -72,6 +74,7 @@ prepare() {
+   patch -p1 -i "${srcdir}"/git-2.8.2-Cygwin-Allow-DOS-paths.patch
+   patch -p1 -i "${srcdir}"/git-tcsh-completion-fixes.patch
+   patch -p1 -i "${srcdir}"/git-zsh-completion-fixes.patch
++  patch -p1 -i "${srcdir}"/git-2.26.0-gui-fixes.patch
+   
+ 
+   local _arch=
+diff --git a/git/git-2.26.0-gui-fixes.patch b/git/git-2.26.0-gui-fixes.patch
+new file mode 100644
+index 000000000..174c40bdc
+--- /dev/null
++++ b/git/git-2.26.0-gui-fixes.patch
+@@ -0,0 +1,91 @@
++--- a/git-gui/git-gui.sh	2020-03-23 02:50:46.000000000 +0300
+++++ b/git-gui/git-gui.sh	2020-04-01 12:24:15.278000000 +0300
++@@ -46,12 +46,41 @@
++ 
++ ######################################################################
++ ##
+++## platform detection
+++
+++set _iscygwin {}
+++
+++proc is_Cygwin {} {
+++	global _iscygwin
+++	if {$_iscygwin eq {}} {
+++		if {$::tcl_platform(platform) eq {windows}} {
+++			if {[catch {set p [exec cygpath --windir]} err]} {
+++				set _iscygwin 0
+++			} else {
+++				set _iscygwin 1
+++			}
+++		} else {
+++			set _iscygwin 0
+++		}
+++	}
+++	return $_iscygwin
+++}
+++
+++######################################################################
+++##
++ ## locate our library
++ 
++ if { [info exists ::env(GIT_GUI_LIB_DIR) ] } {
++ 	set oguilib $::env(GIT_GUI_LIB_DIR)
++ } else {
++-	set oguilib {@@GITGUI_LIBDIR@@}
+++	if {[is_Cygwin]} {
+++		set oguilib [exec cygpath \
+++			--windows \
+++			--absolute \
+++			@@GITGUI_LIBDIR@@]
+++	} else {
+++		set oguilib {@@GITGUI_LIBDIR@@}
+++	}
++ }
++ set oguirel {@@GITGUI_RELATIVE@@}
++ if {$oguirel eq {1}} {
++@@ -163,7 +192,6 @@
++ set _gitexec {}
++ set _githtmldir {}
++ set _reponame {}
++-set _iscygwin {}
++ set _search_path {}
++ set _shellpath {@@SHELL_PATH@@}
++ 
++@@ -266,26 +294,6 @@
++ 	return 0
++ }
++ 
++-proc is_Cygwin {} {
++-	global _iscygwin
++-	if {$_iscygwin eq {}} {
++-		if {$::tcl_platform(platform) eq {windows}} {
++-			if {[catch {set p [exec cygpath --windir]} err]} {
++-				set _iscygwin 0
++-			} else {
++-				set _iscygwin 1
++-				# Handle MSys2 which is only cygwin when MSYSTEM is MSYS.
++-				if {[info exists ::env(MSYSTEM)] && $::env(MSYSTEM) ne "MSYS"} {
++-					set _iscygwin 0
++-				}
++-			}
++-		} else {
++-			set _iscygwin 0
++-		}
++-	}
++-	return $_iscygwin
++-}
++-
++ proc is_enabled {option} {
++ 	global enabled_options
++ 	if {[catch {set on $enabled_options($option)}]} {return 0}
++@@ -4140,7 +4148,9 @@
++ 	if {$spell_dict ne {}} {
++ 		lappend spell_cmd --master=$spell_dict
++ 	}
++-	lappend spell_cmd --mode=none
+++	if {![is_Cygwin]} {
+++		lappend spell_cmd --mode=none
+++	}
++ 	lappend spell_cmd --encoding=utf-8
++ 	lappend spell_cmd pipe
++ 	if {$spell_dict eq {none}
