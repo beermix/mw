@@ -32,7 +32,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/2020-10-07/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-10-16/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -49,12 +49,12 @@ prepare() {
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
-  patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
+  #patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
   patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
-  patch -p1 -i "${srcdir}/LLVM_TARGETS_TO_BUILD.patch"
+  #patch -p1 -i "${srcdir}/LLVM_TARGETS_TO_BUILD.patch"
 }
 
 build() {
@@ -85,9 +85,7 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --experimental-targets= \
     --enable-locked-deps \
-    --tools="cargo,rls,clippy,miri,rustfmt,analysis,src" \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
@@ -100,7 +98,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
 }
 
 check() {
@@ -113,7 +111,7 @@ check() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j8 || true
 }
 
 package() {
@@ -124,11 +122,12 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j8
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
+  rm -f ${pkgdir}${MINGW_PREFIX}/bin/libLLV*.dll
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
