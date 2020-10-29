@@ -3,7 +3,6 @@
 # Contributor: Ray Donnelly <mingw.android@gmail.com>
 # Contributor: Renato Silva <br.renatosilva@gmail.com>
 # Contributor: wirx6 <wirx654@gmail.com>
-# Contributor: Kirill Müller <krlmlr@mailbox.org>
 
 _enable_ada=no
 _enable_objc=no
@@ -45,7 +44,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+        #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         "http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
         0002-Relocate-libintl.patch
@@ -284,7 +284,7 @@ build() {
     --enable-linker-plugin-flags='LDFLAGS=-static-libstdc++\ -static-libgcc\ '"${_LDFLAGS_FOR_TARGET// /\\ }"'\ -Wl,--stack,12582912' \
     ${_conf}
 
-  # While we're debugging -fopenmp problems at least.     --with-isl \
+  # While we're debugging -fopenmp problems at least.
   # .. we may as well not strip anything.
   if check_option "strip" "n"; then
     sed -i 's,^STRIP = .*$,STRIP = true,g'                   Makefile
