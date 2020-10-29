@@ -226,9 +226,9 @@ build() {
 #  CXXFLAGS=${CXXFLAGS/-pipe/}
 #  LDFLAGS=${LDFLAGS/-pipe/}
 
-  #  --with-arch=${_arch} 
-  #  --with-system-libunwind \
-  #  --disable-vtable-verify --disable-libunwind-exceptions \
+#  --with-arch=${_arch} 
+#  --with-system-libunwind \
+#  --disable-vtable-verify --disable-libunwind-exceptions \
 
 #  unset CFLAGS
 #  unset CXXFLAGS
@@ -291,11 +291,11 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti --time nice -n19 make all
+  noti --time nice -n19 remake all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
-  make -j1 DESTDIR=${srcdir} install
+  remake -j1 DESTDIR=${srcdir} install
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi

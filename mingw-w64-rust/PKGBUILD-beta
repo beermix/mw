@@ -86,6 +86,9 @@ build() {
     --enable-extended \
     --disable-codegen-tests \
     --enable-locked-deps \
+    --enable-parallel-compiler \
+    --enable-ccache \
+    --disable-sanitizers \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \

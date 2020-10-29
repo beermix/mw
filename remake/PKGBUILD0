@@ -1,0 +1,48 @@
+# Maintainer: Alexey Pavlov <alexpux@gmail.com>
+# Contributor: Ray Donnelly <mingw.android@gmail.com>
+
+pkgname=make
+pkgver=2848422269d326f4ce46b214e78a1df6cf63016b
+pkgrel=1
+pkgdesc="GNU make utility to maintain groups of programs"
+arch=('i686' 'x86_64')
+url="https://github.com/rocky/remake"
+license=('GPL3')
+groups=('base-devel')
+depends=('libintl' 'sh')
+makedepends=('gettext' 'procps' 'texinfo')
+install=${pkgname}.install
+options=() # 'debug' '!strip')
+source=("https://github.com/rocky/remake/archive/${pkgver}.tar.gz"
+	000-autogen.patch
+	Makefile.in.in.patch)
+
+prepare() {
+  cd ${srcdir}/remake-${pkgver}
+  #patch -p1 -i "${srcdir}"/000-autogen.patch
+  ./autogen.sh
+}
+
+build() {
+  cd ${srcdir}/remake-${pkgver}
+  ./configure \
+    --build=${CHOST} \
+    --prefix=/usr \
+    --without-libintl-prefix \
+    --without-libiconv-prefix \
+    --without-guile \
+    ac_cv_dos_paths=yes
+
+  make -j1 all
+}
+
+check() {
+  cd ${srcdir}/remake-${pkgver}
+  make check
+}
+
+package() {
+  cd ${srcdir}/remake-${pkgver}
+  make DESTDIR=${pkgdir} install
+  cp "${pkgdir}/usr/bin/remake.exe" "${pkgdir}/usr/bin/make.exe"
+}
