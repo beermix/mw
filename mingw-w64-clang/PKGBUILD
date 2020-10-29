@@ -274,10 +274,7 @@ build() {
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
-    -DCOMPILER_RT_BUILD_SANITIZERS=ON \
-    -DCOMPILER_RT_BUILD_LIBFUZZER=ON \
-    -DCOMPILER_RT_BUILD_PROFILE=ON \
-    -DCOMPILER_RT_BUILD_XRAY=ON \
+    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DFFI_INCLUDE_DIR="${FFI_INCLUDE_DIR}" \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLIBOMP_ASMFLAGS="${ASM_COMPILER_FLAGS}" \
@@ -576,6 +573,9 @@ package_mingw-w64-i686-lldb(){
   package_lldb
 }
 
+package_mingw-w64-i686-libunwind(){
+  package_libunwind
+}
 
 package_mingw-w64-i686-llvm(){
   package_llvm
