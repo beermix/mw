@@ -3,32 +3,26 @@
 _realname=aria2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.35.0
-pkgrel=3
+pkgver=15cad965eb75c8b7f11bc2fc94354d1873bf6261
+pkgrel=1
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
 url="https://github.com/aria2/aria2"
 license=('GPL2')
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
-             "${MINGW_PACKAGE_PREFIX}-pkg-config")
-depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
-         "${MINGW_PACKAGE_PREFIX}-gettext"
-         "${MINGW_PACKAGE_PREFIX}-c-ares"
-         "${MINGW_PACKAGE_PREFIX}-cppunit"
-         "${MINGW_PACKAGE_PREFIX}-libiconv"
-         "${MINGW_PACKAGE_PREFIX}-libssh2"
-         "${MINGW_PACKAGE_PREFIX}-libuv"
-         "${MINGW_PACKAGE_PREFIX}-libxml2"
-         "${MINGW_PACKAGE_PREFIX}-openssl"
-         "${MINGW_PACKAGE_PREFIX}-sqlite3"
-         "${MINGW_PACKAGE_PREFIX}-zlib"
-         )
-optdepends=("${MINGW_PACKAGE_PREFIX}-ruby: aria2rpc and aria2mon")
-source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/release-${pkgver}.tar.gz)
-sha256sums=('c4072deaf6b443be15f9710657aa6c53527f642bc7a3252bb81d2853161080ed')
-
+             "${MINGW_PACKAGE_PREFIX}-pkg-config"
+             "${MINGW_PACKAGE_PREFIX}-gcc-libs"
+             "${MINGW_PACKAGE_PREFIX}-gettext"
+             "${MINGW_PACKAGE_PREFIX}-c-ares"
+             "${MINGW_PACKAGE_PREFIX}-cppunit"
+             "${MINGW_PACKAGE_PREFIX}-libiconv"
+             "${MINGW_PACKAGE_PREFIX}-libuv"
+             "${MINGW_PACKAGE_PREFIX}-libxml2"
+             "${MINGW_PACKAGE_PREFIX}-sqlite3"
+             "${MINGW_PACKAGE_PREFIX}-zlib")
+source=(${_realname}-${pkgver}.tar.gz::https://github.com/tatsuhiro-t/aria2/archive/${pkgver}.tar.gz)
 prepare() {
-  cd "${_realname}-release-${pkgver}"
+  cd "${_realname}-${pkgver}"
   autoreconf -ifv || autoreconf -ifv
 }
 
@@ -38,35 +32,31 @@ build() {
   cd build-${MINGW_CHOST}
 
   # disabling gnutls and wintls so we will fall back to openssl
-  ../${_realname}-release-${pkgver}/configure \
+  ../${_realname}-${pkgver}/configure \
     --prefix=${MINGW_PREFIX} \
+    --with-bashcompletiondir=${MINGW_PREFIX}/share/bash-completion/completions \
     --with-cppunit-prefix=$PREFIX \
     --build=${MINGW_CHOST} \
     --host=${MINGW_CHOST} \
     --disable-shared \
     --disable-rpath \
-    --without-openssl \
-    --with-gnutls \
+    --without-gnutls \
     --with-wintls \
     --with-sqlite3 \
-    --with-libz \
-    --with-libgmp \
-    --disable-nls \
-    --without-libcares \
-    --without-libgcrypt \
-    --without-libnettle \
     --disable-libaria2 \
+    --without-libcares \
     --without-libssh2 \
+    --disable-nls \
     ARIA2_STATIC=yes
 
-  noti --time nice -n19 remake -j8
+  noti --time nice -n19 make
 }
 
 package() {
   cd "build-${MINGW_CHOST}"
-  remake DESTDIR="${pkgdir}" install
+  make DESTDIR="${pkgdir}" install
 
-  cd "../${_realname}-release-${pkgver}"
+  cd "../${_realname}-${pkgver}"
 
   install -Dm0755 doc/xmlrpc/aria2rpc "${pkgdir}"${MINGW_PREFIX}/bin/aria2rpc
   install -Dm0755 doc/xmlrpc/aria2mon "${pkgdir}"${MINGW_PREFIX}/bin/aria2mon
