@@ -72,7 +72,7 @@ build() {
 
   meson \
     --buildtype=plain \
-    -Db_lto=true \
+    -Db_lto=false \
     -Ddefault_library=shared \
     -Dman=false \
     -Dforce_posix_threads=true \
