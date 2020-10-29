@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=14
+pkgrel=15
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -293,7 +293,7 @@ build() {
     -DLLVM_ENABLE_SPHINX=OFF \
     -DLLVM_ENABLE_THREADS=ON \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
-    -DLLVM_LINK_LLVM_DYLIB=OFF \
+    -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
