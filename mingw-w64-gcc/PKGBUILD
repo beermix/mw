@@ -21,7 +21,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=56
+pkgrel=5
 _islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -127,10 +127,9 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-  # Enable clear linux patches
+  # Enable clear linux patches     000-gcc10-stable-branch.patch \
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
     optimize.patch \
     optimize-at-least-some.patch \
     ipa-cp.patch \
@@ -156,8 +155,8 @@ prepare() {
     0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
 
-#  apply_patch_with_msg \
-#    0130-libstdc++-in-out.patch
+  apply_patch_with_msg \
+    0130-libstdc++-in-out.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
