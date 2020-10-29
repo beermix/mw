@@ -22,7 +22,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=55
+pkgrel=56
 _islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -222,20 +222,20 @@ build() {
     _languages+=",objc,obj-c++"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
   #  --with-arch=${_arch} 
   #  --with-system-libunwind \
   #  --disable-vtable-verify --disable-libunwind-exceptions \
 
-  unset CFLAGS
-  unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O3"
-  export CXXFLAGS="-march=haswell -g1 -O3"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
+#  unset CFLAGS
+#  unset CXXFLAGS
+#  export CFLAGS="-march=haswell -g1 -O3"
+#  export CXXFLAGS="-march=haswell -g1 -O3"
+#  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
+#  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O3"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
