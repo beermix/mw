@@ -37,14 +37,18 @@ build() {
     --build="${MINGW_CHOST}" \
     --with-zlib-dir="${MINGW_PREFIX}" \
     --with-libevent-dir="${MINGW_PREFIX}" \
+    ac_cv_func_mallinfo=no \
+    --disable-module-relay \
     --disable-asciidoc \
     --disable-manpage \
     --disable-html-manual \
     --disable-unittests \
     --disable-seccomp \
     --disable-libscrypt \
-    --enable-lzma \
-    --enable-zstd \
+    --disable-lzma \
+    --disable-zstd \
+    --enable-pic \
+    --disable-gcc-hardening \
     --enable-static-zlib \
     --enable-static-libevent
 
