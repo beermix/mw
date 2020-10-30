@@ -33,7 +33,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.0
-pkgrel=15
+pkgrel=16
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -196,7 +196,7 @@ prepare() {
       "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch" \
-      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch" 
+      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch"
 
   cd "${srcdir}/lld-${pkgver}.src"
   apply_patch_with_msg \
@@ -512,7 +512,7 @@ package_llvm() {
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
 
-  # Install CMake stuff
+  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
