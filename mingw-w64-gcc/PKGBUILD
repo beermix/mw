@@ -304,6 +304,7 @@ build() {
   if [ "$_enable_ada" == "yes" ]; then
     mv ${srcdir}${MINGW_PREFIX}/lib/gcc/${MINGW_CHOST}/${pkgver%%+*}/adalib/*.dll ${srcdir}${MINGW_PREFIX}/bin/
   fi
+
   # libbacktrace is not installed by default
   strip -d -o ${srcdir}${MINGW_PREFIX}/lib/libbacktrace.a libbacktrace/.libs/libbacktrace.a
   mkdir -p ${srcdir}${MINGW_PREFIX}/include/backtrace
