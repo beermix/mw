@@ -32,7 +32,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/2020-10-16/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-10-21/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -101,7 +101,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j6
 }
 
 check() {
@@ -114,7 +114,7 @@ check() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j8 || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j6 || true
 }
 
 package() {
