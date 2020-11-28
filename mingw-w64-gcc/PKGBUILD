@@ -281,6 +281,7 @@ build() {
     --with-libiconv \
     --with-system-zlib \
     --enable-silent-rules \
+    --enable-host-shared \
     --with-diagnostics-color=always \
     --with-{gmp,mpfr,mpc,isl}=${MINGW_PREFIX} \
     --with-gnu-as --with-gnu-ld \
