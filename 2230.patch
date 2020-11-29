@@ -1,0 +1,2426 @@
+From 1eb28f67064ba19fcd93fb0b9ea34986fd72311d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
+Date: Wed, 4 Nov 2020 21:27:44 +0100
+Subject: [PATCH 1/2] Add packages for bootstrapping Clang subsystem
+
+---
+ ...-GetHostTriple-for-mingw-w64-in-msys.patch |  29 +
+ ...-for-unversioned-shared-lib-on-win32.patch |  37 ++
+ clang/0006-add-coff-exported-flag.patch       |  14 +
+ ...7-getLoadAddressWithOffset-assertion.patch |  45 ++
+ .../0009-empty-target-prefix-only-msvc.patch  |  11 +
+ clang/0010-mbig-obj-for-all.patch             |  13 +
+ clang/0011-Msysize.patch                      | 499 ++++++++++++++++++
+ clang/0012-Add-minimal-msys-target.patch      |  99 ++++
+ ...build-static-clang-library-for-mingw.patch |  22 +
+ clang/0102-fix-libclang-name-for-mingw.patch  |  23 +
+ clang/0105-build-libclang-cpp-fix.patch       |  10 +
+ ...of-attribute-plugin-example-on-Windo.patch |  31 ++
+ clang/0107-Msysize.patch                      | 277 ++++++++++
+ clang/0108-Add-minimal-msys-target.patch      | 197 +++++++
+ ...ut-if-creating-a-DLL-with-too-many-e.patch |  81 +++
+ ...w-configuring-default-ld.lld-backend.patch |  59 +++
+ ...-tests-when-ld.lld-defaults-to-MinGW.patch |  53 ++
+ clang/0304-ignore-new-bfd-options.patch       |  13 +
+ clang/0305-Msysize.patch                      |  25 +
+ clang/PKGBUILD                                | 217 ++++++++
+ mingw-w64-cross-clang/PKGBUILD                | 153 ++++++
+ mingw-w64-cross-compiler-rt/PKGBUILD          |  68 +++
+ .../0005-handle-ctor_list-internally.patch    |  61 ---
+ mingw-w64-cross-crt-git/PKGBUILD              |  32 +-
+ mingw-w64-cross-headers-git/PKGBUILD          |  32 +-
+ 25 files changed, 2012 insertions(+), 89 deletions(-)
+ create mode 100644 clang/0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch
+ create mode 100644 clang/0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch
+ create mode 100644 clang/0006-add-coff-exported-flag.patch
+ create mode 100644 clang/0007-getLoadAddressWithOffset-assertion.patch
+ create mode 100644 clang/0009-empty-target-prefix-only-msvc.patch
+ create mode 100644 clang/0010-mbig-obj-for-all.patch
+ create mode 100644 clang/0011-Msysize.patch
+ create mode 100644 clang/0012-Add-minimal-msys-target.patch
+ create mode 100644 clang/0101-Allow-build-static-clang-library-for-mingw.patch
+ create mode 100644 clang/0102-fix-libclang-name-for-mingw.patch
+ create mode 100644 clang/0105-build-libclang-cpp-fix.patch
+ create mode 100644 clang/0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch
+ create mode 100644 clang/0107-Msysize.patch
+ create mode 100644 clang/0108-Add-minimal-msys-target.patch
+ create mode 100644 clang/0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch
+ create mode 100644 clang/0302-LLD-Allow-configuring-default-ld.lld-backend.patch
+ create mode 100644 clang/0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch
+ create mode 100644 clang/0304-ignore-new-bfd-options.patch
+ create mode 100644 clang/0305-Msysize.patch
+ create mode 100644 clang/PKGBUILD
+ create mode 100644 mingw-w64-cross-clang/PKGBUILD
+ create mode 100644 mingw-w64-cross-compiler-rt/PKGBUILD
+ delete mode 100644 mingw-w64-cross-crt-git/0005-handle-ctor_list-internally.patch
+
+diff --git a/clang/0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch b/clang/0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch
+new file mode 100644
+index 000000000..675eb391b
+--- /dev/null
++++ b/clang/0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch
+@@ -0,0 +1,29 @@
++From b47a00af69f3c662e54dc54e482fc9b0d4ba6480 Mon Sep 17 00:00:00 2001
++From: Martell Malone <martellmalone@gmail.com>
++Date: Sun, 28 Jun 2015 20:14:51 +0100
++Subject: [PATCH 2/5] Fix GetHostTriple for mingw-w64 in msys
++
++---
++ cmake/modules/GetHostTriple.cmake | 4 ++--
++ 1 file changed, 2 insertions(+), 2 deletions(-)
++
++diff --git a/cmake/modules/GetHostTriple.cmake b/cmake/modules/GetHostTriple.cmake
++index 0cad1db4eff..47e9f986e15 100644
++--- a/cmake/modules/GetHostTriple.cmake
+++++ b/cmake/modules/GetHostTriple.cmake
++@@ -8,11 +8,11 @@
++     else()
++       set( value "i686-pc-windows-msvc" )
++     endif()
++-  elseif( MINGW AND NOT MSYS )
+++  elseif( MINGW )
++     if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
++       set( value "x86_64-w64-windows-gnu" )
++     else()
++-      set( value "i686-pc-windows-gnu" )
+++      set( value "i686-w64-windows-gnu" )
++     endif()
++   else( MSVC )
++     set(config_guess ${LLVM_MAIN_SRC_DIR}/cmake/config.guess)
++2.13.3
++
+diff --git a/clang/0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch b/clang/0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch
+new file mode 100644
+index 000000000..555160e76
+--- /dev/null
++++ b/clang/0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch
+@@ -0,0 +1,37 @@
++From 56c0371a3cbc98ef5dc039324ad43c153ff601c4 Mon Sep 17 00:00:00 2001
++From: Mateusz Mikula <mati865@gmail.com>
++Date: Thu, 2 Feb 2017 11:48:25 +0100
++Subject: [PATCH 4/5] llvm-config: look for unversioned shared lib on win32
++
++---
++ tools/llvm-config/llvm-config.cpp | 8 +++++---
++ 1 file changed, 5 insertions(+), 3 deletions(-)
++
++diff --git a/tools/llvm-config/llvm-config.cpp b/tools/llvm-config/llvm-config.cpp
++index 08b096afb05..e388d9e5d3f 100644
++--- a/tools/llvm-config/llvm-config.cpp
+++++ b/tools/llvm-config/llvm-config.cpp
++@@ -353,10 +353,11 @@ int main(int argc, char **argv) {
++   const Triple HostTriple(Triple::normalize(LLVM_HOST_TRIPLE));
++   if (HostTriple.isOSWindows()) {
++     SharedExt = "dll";
++-    SharedVersionedExt = LLVM_DYLIB_VERSION ".dll";
+++    SharedVersionedExt = ".dll";
++     if (HostTriple.isOSCygMing()) {
++       StaticExt = "a";
++       StaticPrefix = "lib";
+++      SharedPrefix = "lib";
++     } else {
++       StaticExt = "lib";
++       DirSep = "\\";
++@@ -393,7 +393,7 @@
++ 
++   bool DyLibExists = false;
++   const std::string DyLibName =
++-      (SharedPrefix + "LLVM-" + SharedVersionedExt).str();
+++      (SharedPrefix + (HostTriple.isOSWindows() ? "LLVM" : "LLVM-") + SharedVersionedExt).str();
++ 
++   // If LLVM_LINK_DYLIB is ON, the single shared library will be returned
++   // for "--libs", etc, if they exist. This behaviour can be overridden with
++-- 
++2.13.3
+diff --git a/clang/0006-add-coff-exported-flag.patch b/clang/0006-add-coff-exported-flag.patch
+new file mode 100644
+index 000000000..84e226e3e
+--- /dev/null
++++ b/clang/0006-add-coff-exported-flag.patch
+@@ -0,0 +1,14 @@
++Index: lib/Object/COFFObjectFile.cpp
++===================================================================
++--- a/lib/Object/COFFObjectFile.cpp	(Revision 274558)
+++++ b/lib/Object/COFFObjectFile.cpp	(Arbeitskopie)
++@@ -217,6 +217,9 @@
++   if (Symb.isExternal() || Symb.isWeakExternal())
++     Result |= SymbolRef::SF_Global;
++ 
+++  if (Symb.isExternal())
+++    Result |= SymbolRef::SF_Exported;
+++
++   if (const coff_aux_weak_external *AWE = Symb.getWeakExternal()) {
++     Result |= SymbolRef::SF_Weak;
++     if (AWE->Characteristics != COFF::IMAGE_WEAK_EXTERN_SEARCH_ALIAS)
+diff --git a/clang/0007-getLoadAddressWithOffset-assertion.patch b/clang/0007-getLoadAddressWithOffset-assertion.patch
+new file mode 100644
+index 000000000..2d934cfa9
+--- /dev/null
++++ b/clang/0007-getLoadAddressWithOffset-assertion.patch
+@@ -0,0 +1,45 @@
++Index: lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFI386.h
++===================================================================
++--- a/lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFI386.h	(revision 283036)
+++++ b/lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFI386.h	(working copy)
++@@ -142,8 +142,7 @@
++       uint64_t Result =
++           RE.Sections.SectionA == static_cast<uint32_t>(-1)
++               ? Value
++-              : Sections[RE.Sections.SectionA].getLoadAddressWithOffset(
++-                    RE.Addend);
+++              : Sections[RE.Sections.SectionA].getLoadAddress() + RE.Addend;
++       assert(Result <= UINT32_MAX && "relocation overflow");
++       DEBUG(dbgs() << "\t\tOffset: " << RE.Offset
++                    << " RelType: IMAGE_REL_I386_DIR32"
++@@ -159,7 +158,7 @@
++       // The target's 32-bit RVA.
++       // NOTE: use Section[0].getLoadAddress() as an approximation of ImageBase
++       uint64_t Result =
++-          Sections[RE.Sections.SectionA].getLoadAddressWithOffset(RE.Addend) -
+++          Sections[RE.Sections.SectionA].getLoadAddress() + RE.Addend -
++           Sections[0].getLoadAddress();
++       assert(static_cast<int32_t>(Result) <= INT32_MAX &&
++              "relocation overflow");
++Index: lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFThumb.h
++===================================================================
++--- a/lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFThumb.h	(revision 283036)
+++++ b/lib/ExecutionEngine/RuntimeDyld/Targets/RuntimeDyldCOFFThumb.h	(working copy)
++@@ -184,7 +184,7 @@
++       uint64_t Result =
++           RE.Sections.SectionA == static_cast<uint32_t>(-1)
++               ? Value
++-              : Sections[RE.Sections.SectionA].getLoadAddressWithOffset(RE.Addend);
+++              : Sections[RE.Sections.SectionA].getLoadAddress() + RE.Addend;
++       Result |= ISASelectionBit;
++       assert(Result <= UINT32_MAX && "relocation overflow");
++       DEBUG(dbgs() << "\t\tOffset: " << RE.Offset
++@@ -229,7 +229,7 @@
++     case COFF::IMAGE_REL_ARM_MOV32T: {
++       // 32-bit VA of the target applied to a contiguous MOVW+MOVT pair.
++       uint64_t Result =
++-          Sections[RE.Sections.SectionA].getLoadAddressWithOffset(RE.Addend);
+++          Sections[RE.Sections.SectionA].getLoadAddress() + RE.Addend;
++       assert(Result <= UINT32_MAX && "relocation overflow");
++       DEBUG(dbgs() << "\t\tOffset: " << RE.Offset
++                    << " RelType: IMAGE_REL_ARM_MOV32T"
+diff --git a/clang/0009-empty-target-prefix-only-msvc.patch b/clang/0009-empty-target-prefix-only-msvc.patch
+new file mode 100644
+index 000000000..23cd500a6
+--- /dev/null
++++ b/clang/0009-empty-target-prefix-only-msvc.patch
+@@ -0,0 +1,11 @@
++--- llvm-6.0.0.src/cmake/modules/AddLLVM.cmake.orig	2018-06-01 17:52:24.905810400 +0300
+++++ llvm-6.0.0.src/cmake/modules/AddLLVM.cmake	2018-06-01 17:54:31.858071700 +0300
++@@ -473,7 +473,7 @@
++   endif()
++ 
++   if(ARG_SHARED)
++-    if(WIN32)
+++    if(MSVC)
++       set_target_properties(${name} PROPERTIES
++         PREFIX ""
++         )
+diff --git a/clang/0010-mbig-obj-for-all.patch b/clang/0010-mbig-obj-for-all.patch
+new file mode 100644
+index 000000000..e19e3bb3b
+--- /dev/null
++++ b/clang/0010-mbig-obj-for-all.patch
+@@ -0,0 +1,13 @@
++--- llvm-6.0.0.src/cmake/modules/HandleLLVMOptions.cmake.orig	2018-06-06 14:33:51.928460200 +0300
+++++ llvm-6.0.0.src/cmake/modules/HandleLLVMOptions.cmake	2018-06-06 14:33:59.840471400 +0300
++@@ -312,9 +312,7 @@
++   # Pass -mbig-obj to mingw gas on Win64. COFF has a 2**16 section limit, and
++   # on Win64, every COMDAT function creates at least 3 sections: .text, .pdata,
++   # and .xdata.
++-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
++-    append("-Wa,-mbig-obj" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
++-  endif()
+++  append("-Wa,-mbig-obj" CMAKE_C_FLAGS CMAKE_CXX_FLAGS)
++ endif()
++ 
++ if( MSVC )
+diff --git a/clang/0011-Msysize.patch b/clang/0011-Msysize.patch
+new file mode 100644
+index 000000000..77f2d3686
+--- /dev/null
++++ b/clang/0011-Msysize.patch
+@@ -0,0 +1,499 @@
++From 88e7895f08d55c69500d363fffbae3ca705356be Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 29 Oct 2020 18:31:43 +0100
++Subject: Msysize
++
++---
++ CMakeLists.txt                                |  6 +++---
++ cmake/config-ix.cmake                         |  4 ++--
++ cmake/modules/AddLLVM.cmake                   | 10 +++++-----
++ cmake/modules/CMakeLists.txt                  |  2 +-
++ cmake/modules/HandleLLVMOptions.cmake         | 14 +++++++-------
++ include/llvm/Config/abi-breaking.h.cmake      |  2 +-
++ include/llvm/Support/Compiler.h               |  6 ++++--
++ lib/Support/MemoryBuffer.cpp                  |  2 +-
++ lib/Support/Unix/DynamicLibrary.inc           |  4 ++--
++ lib/Support/Unix/Path.inc                     |  8 +++++---
++ lib/Support/raw_ostream.cpp                   |  2 +-
++ lib/Transforms/Hello/CMakeLists.txt           |  2 +-
++ test/CodeGen/MIR/AArch64/lit.local.cfg        |  2 +-
++ test/Unit/lit.cfg.py                          |  2 +-
++ test/lit.cfg.py                               |  2 +-
++ tools/CMakeLists.txt                          |  2 +-
++ tools/bugpoint-passes/CMakeLists.txt          |  2 +-
++ tools/lli/lli.cpp                             |  2 +-
++ tools/llvm-shlib/CMakeLists.txt               |  2 +-
++ .../unittests/ExecutionEngine/MCJIT/CMakeLists.txt |  2 +-
++ utils/benchmark/CMakeLists.txt                |  2 +-
++ utils/benchmark/src/internal_macros.h         |  4 ++--
++ utils/lit/lit/formats/googletest.py           |  2 +-
++ utils/lit/tests/lit.cfg                       |  2 +-
++ .../include/gtest/internal/gtest-port-arch.h       |  2 +-
++ 25 files changed, 47 insertions(+), 43 deletions(-)
++
++diff --git a/CMakeLists.txt b/CMakeLists.txt
++index 038139a2409..0f73da65365 100644
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -281,7 +281,7 @@ mark_as_advanced(LLVM_UTILS_INSTALL_DIR)
++ # They are used as destination of target generators.
++ set(LLVM_RUNTIME_OUTPUT_INTDIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/bin)
++ set(LLVM_LIBRARY_OUTPUT_INTDIR ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib${LLVM_LIBDIR_SUFFIX})
++-if(WIN32 OR CYGWIN)
+++if(WIN32 OR CYGWIN OR MSYS)
++   # DLL platform -- put DLLs into bin.
++   set(LLVM_SHLIB_OUTPUT_INTDIR ${LLVM_RUNTIME_OUTPUT_INTDIR})
++ else()
++@@ -513,7 +513,7 @@ endif()
++ set(LLVM_LIT_ARGS "${LIT_ARGS_DEFAULT}" CACHE STRING "Default options for lit")
++ 
++ # On Win32 hosts, provide an option to specify the path to the GnuWin32 tools.
++-if( WIN32 AND NOT CYGWIN )
+++if( WIN32 AND NOT (CYGWIN OR MSYS) )
++   set(LLVM_LIT_TOOLS_DIR "" CACHE PATH "Path to GnuWin32 tools")
++ endif()
++ 
++@@ -666,7 +666,7 @@ set(TARGET_TRIPLE "${LLVM_DEFAULT_TARGET_TRIPLE}")
++ message(STATUS "LLVM host triple: ${LLVM_HOST_TRIPLE}")
++ message(STATUS "LLVM default target triple: ${LLVM_DEFAULT_TARGET_TRIPLE}")
++ 
++-if(WIN32 OR CYGWIN)
+++if(WIN32 OR CYGWIN OR MSYS)
++   if(BUILD_SHARED_LIBS OR LLVM_BUILD_LLVM_DYLIB)
++     set(LLVM_ENABLE_PLUGINS_default ON)
++   else()
++diff --git a/cmake/config-ix.cmake b/cmake/config-ix.cmake
++index 90e5d327c75..69f1ed7bc14 100644
++--- a/cmake/config-ix.cmake
+++++ b/cmake/config-ix.cmake
++@@ -1,4 +1,4 @@
++-if( WIN32 AND NOT CYGWIN )
+++if( WIN32 AND NOT (CYGWIN OR MSYS) )
++   # We consider Cygwin as another Unix
++   set(PURE_WINDOWS 1)
++ endif()
++@@ -269,7 +269,7 @@ CHECK_STRUCT_HAS_MEMBER("struct stat" st_mtim.tv_nsec
++     "sys/types.h;sys/stat.h" HAVE_STRUCT_STAT_ST_MTIM_TV_NSEC)
++ 
++ check_symbol_exists(__GLIBC__ stdio.h LLVM_USING_GLIBC)
++-if( LLVM_USING_GLIBC )
+++if( LLVM_USING_GLIBC OR MSYS )
++   add_definitions( -D_GNU_SOURCE )
++   list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D_GNU_SOURCE")
++ endif()
++diff --git a/cmake/modules/AddLLVM.cmake b/cmake/modules/AddLLVM.cmake
++index 333167bfb6b..72ddfbf7aaa 100644
++--- a/cmake/modules/AddLLVM.cmake
+++++ b/cmake/modules/AddLLVM.cmake
++@@ -279,7 +279,7 @@ function(set_output_directory target)
++ 
++   # module_dir -- corresponding to LIBRARY_OUTPUT_DIRECTORY.
++   # It affects output of add_library(MODULE).
++-  if(WIN32 OR CYGWIN)
+++  if(WIN32 OR CYGWIN OR MSYS)
++     # DLL platform
++     set(module_dir ${ARG_BINARY_DIR})
++   else()
++@@ -613,7 +613,7 @@ function(llvm_add_library name)
++     endif()
++   endif()
++ 
++-  if(ARG_MODULE AND LLVM_EXPORT_SYMBOLS_FOR_PLUGINS AND ARG_PLUGIN_TOOL AND (WIN32 OR CYGWIN))
+++  if(ARG_MODULE AND LLVM_EXPORT_SYMBOLS_FOR_PLUGINS AND ARG_PLUGIN_TOOL AND (WIN32 OR CYGWIN OR MSYS))
++     # On DLL platforms symbols are imported from the tool by linking against it.
++     set(llvm_libs ${ARG_PLUGIN_TOOL})
++   elseif (NOT ARG_COMPONENT_LIB)
++@@ -1108,10 +1108,10 @@ function(export_executable_symbols target)
++     # ".dll.a", but for clang.exe that causes a collision with libclang.dll,
++     # where the import libraries of both get named libclang.dll.a. Use a suffix
++     # of ".exe.a" to avoid this.
++-    if(CYGWIN OR MINGW)
+++    if(CYGWIN OR MINGW OR MSYS)
++       set_target_properties(${target} PROPERTIES IMPORT_SUFFIX ".exe.a")
++     endif()
++-  elseif(NOT (WIN32 OR CYGWIN))
+++  elseif(NOT (WIN32 OR CYGWIN OR MSYS))
++     # On Windows auto-exporting everything doesn't work because of the limit on
++     # the size of the exported symbol table, but on other platforms we can do
++     # it without any trouble.
++@@ -1676,7 +1676,7 @@ function(get_llvm_lit_path base_dir file_name)
++   endif()
++ 
++   set(lit_file_name "llvm-lit")
++-  if (CMAKE_HOST_WIN32 AND NOT CYGWIN)
+++  if (CMAKE_HOST_WIN32 AND NOT (CYGWIN OR MSYS))
++     # llvm-lit needs suffix.py for multiprocess to find a main module.
++     set(lit_file_name "${lit_file_name}.py")
++   endif ()
++diff --git a/cmake/modules/CMakeLists.txt b/cmake/modules/CMakeLists.txt
++index 4b8879f65fe..159dd50cb8a 100644
++--- a/cmake/modules/CMakeLists.txt
+++++ b/cmake/modules/CMakeLists.txt
++@@ -59,7 +59,7 @@ set(LLVM_CONFIG_TOOLS_BINARY_DIR "${LLVM_TOOLS_BINARY_DIR}")
++ 
++ # Generate a default location for lit
++ if (LLVM_BUILD_UTILS)
++-  if (CMAKE_HOST_WIN32 AND NOT CYGWIN)
+++  if (CMAKE_HOST_WIN32 AND NOT (CYGWIN OR MSYS))
++     set(LLVM_CONFIG_DEFAULT_EXTERNAL_LIT "${LLVM_CONFIG_TOOLS_BINARY_DIR}/llvm-lit.py")
++   else()
++     set(LLVM_CONFIG_DEFAULT_EXTERNAL_LIT "${LLVM_CONFIG_TOOLS_BINARY_DIR}/llvm-lit")
++diff --git a/cmake/modules/HandleLLVMOptions.cmake b/cmake/modules/HandleLLVMOptions.cmake
++index 5ef22eb493b..ea97e1ce9f3 100644
++--- a/cmake/modules/HandleLLVMOptions.cmake
+++++ b/cmake/modules/HandleLLVMOptions.cmake
++@@ -124,13 +124,13 @@ endif()
++ 
++ if(WIN32)
++   set(LLVM_HAVE_LINK_VERSION_SCRIPT 0)
++-  if(CYGWIN)
+++  if(CYGWIN OR MSYS)
++     set(LLVM_ON_WIN32 0)
++     set(LLVM_ON_UNIX 1)
++-  else(CYGWIN)
+++  else(CYGWIN OR MSYS)
++     set(LLVM_ON_WIN32 1)
++     set(LLVM_ON_UNIX 0)
++-  endif(CYGWIN)
+++  endif(CYGWIN OR MSYS)
++ else(WIN32)
++   if(FUCHSIA OR UNIX)
++     set(LLVM_ON_WIN32 0)
++@@ -209,7 +209,7 @@ endif()
++ # Pass -Wl,-z,defs. This makes sure all symbols are defined. Otherwise a DSO
++ # build might work on ELF but fail on MachO/COFF.
++ if(NOT (${CMAKE_SYSTEM_NAME} MATCHES "Darwin|FreeBSD|OpenBSD|DragonFly|AIX|SunOS" OR
++-        WIN32 OR CYGWIN) AND
+++        WIN32 OR CYGWIN OR MSYS) AND
++    NOT LLVM_USE_SANITIZER)
++   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs")
++ endif()
++@@ -282,7 +282,7 @@ if( LLVM_ENABLE_PIC )
++     # Xcode has -mdynamic-no-pic on by default, which overrides -fPIC. I don't
++     # know how to disable this, so just force ENABLE_PIC off for now.
++     message(WARNING "-fPIC not supported with Xcode.")
++-  elseif( WIN32 OR CYGWIN)
+++  elseif( WIN32 OR CYGWIN OR MSYS)
++     # On Windows all code is PIC. MinGW warns if -fPIC is used.
++   else()
++     add_flag_or_print_warning("-fPIC" FPIC)
++@@ -303,7 +303,7 @@ if( LLVM_ENABLE_PIC )
++   endif()
++ endif()
++ 
++-if(NOT WIN32 AND NOT CYGWIN AND NOT (${CMAKE_SYSTEM_NAME} MATCHES "AIX" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+++if(NOT WIN32 AND NOT (CYGWIN OR MSYS) AND NOT (${CMAKE_SYSTEM_NAME} MATCHES "AIX" AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
++   # MinGW warns if -fvisibility-inlines-hidden is used.
++   # GCC on AIX warns if -fvisibility-inlines-hidden is used.
++   check_cxx_compiler_flag("-fvisibility-inlines-hidden" SUPPORTS_FVISIBILITY_INLINES_HIDDEN_FLAG)
++@@ -820,7 +820,7 @@ endif()
++ # FIXME: With MSVS, consider compiling with /Gy and linking with /OPT:REF?
++ # But MinSizeRel seems to add that automatically, so maybe disable these
++ # flags instead if LLVM_NO_DEAD_STRIP is set.
++-if(NOT CYGWIN AND NOT WIN32)
+++if(NOT (CYGWIN OR MSYS) AND NOT WIN32)
++   if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" AND
++      NOT uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG")
++     check_c_compiler_flag("-Werror -fno-function-sections" C_SUPPORTS_FNO_FUNCTION_SECTIONS)
++diff --git a/include/llvm/Config/abi-breaking.h.cmake b/include/llvm/Config/abi-breaking.h.cmake
++index a1ffad66077..534410b2ce6 100644
++--- a/include/llvm/Config/abi-breaking.h.cmake
+++++ b/include/llvm/Config/abi-breaking.h.cmake
++@@ -31,7 +31,7 @@
++ #pragma detect_mismatch("LLVM_ENABLE_ABI_BREAKING_CHECKS", LLVM_XSTR(LLVM_ENABLE_ABI_BREAKING_CHECKS))
++ #undef LLVM_XSTR
++ #undef LLVM_STR
++-#elif defined(_WIN32) || defined(__CYGWIN__) // Win32 w/o #pragma detect_mismatch
+++#elif defined(_WIN32) || defined(__CYGWIN__) || defined(__MSYS__) // Win32 w/o #pragma detect_mismatch
++ // FIXME: Implement checks without weak.
++ #elif defined(__cplusplus)
++ #if !(defined(_AIX) && defined(__GNUC__) && !defined(__clang__))
++diff --git a/include/llvm/Support/Compiler.h b/include/llvm/Support/Compiler.h
++index 80ea76240d6..82b3d68c02d 100644
++--- a/include/llvm/Support/Compiler.h
+++++ b/include/llvm/Support/Compiler.h
++@@ -123,7 +123,8 @@
++ /// this attribute will be made public and visible outside of any shared library
++ /// they are linked in to.
++ #if (__has_attribute(visibility) || LLVM_GNUC_PREREQ(4, 0, 0)) &&              \
++-    !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32)
+++    !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32) &&       \
+++    !defined(__MSYS__)
++ #define LLVM_LIBRARY_VISIBILITY __attribute__ ((visibility("hidden")))
++ #define LLVM_EXTERNAL_VISIBILITY __attribute__ ((visibility("default")))
++ #else
++@@ -189,7 +190,8 @@
++ 
++ // FIXME: Provide this for PE/COFF targets.
++ #if (__has_attribute(weak) || LLVM_GNUC_PREREQ(4, 0, 0)) &&                    \
++-    (!defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32))
+++    (!defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(_WIN32) &&      \
+++     !defined(__MSYS__))
++ #define LLVM_ATTRIBUTE_WEAK __attribute__((__weak__))
++ #else
++ #define LLVM_ATTRIBUTE_WEAK
++diff --git a/lib/Support/MemoryBuffer.cpp b/lib/Support/MemoryBuffer.cpp
++index 248fb72c496..3bea6ef9fe8 100644
++--- a/lib/Support/MemoryBuffer.cpp
+++++ b/lib/Support/MemoryBuffer.cpp
++@@ -363,7 +363,7 @@ static bool shouldUseMmap(sys::fs::file_t FD,
++   if ((FileSize & (PageSize -1)) == 0)
++     return false;
++ 
++-#if defined(__CYGWIN__)
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++   // Don't try to map files that are exactly a multiple of the physical page size
++   // if we need a null terminator.
++   // FIXME: We should reorganize again getPageSize() on Win32.
++diff --git a/lib/Support/Unix/DynamicLibrary.inc b/lib/Support/Unix/DynamicLibrary.inc
++index a2a379963de..d9f8abb5e67 100644
++--- a/lib/Support/Unix/DynamicLibrary.inc
+++++ b/lib/Support/Unix/DynamicLibrary.inc
++@@ -31,7 +31,7 @@ void *DynamicLibrary::HandleSet::DLOpen(const char *File, std::string *Err) {
++     return &DynamicLibrary::Invalid;
++   }
++ 
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++   // Cygwin searches symbols only in the main
++   // with the handle of dlopen(NULL, RTLD_GLOBAL).
++   if (!File)
++@@ -91,7 +91,7 @@ static void *DoSearch(const char* SymbolName) {
++   }
++ #endif
++ 
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++   {
++     EXPLICIT_SYMBOL(_alloca);
++     EXPLICIT_SYMBOL(__main);
++diff --git a/lib/Support/Unix/Path.inc b/lib/Support/Unix/Path.inc
++index d91b269cc6d..308fa8f6e7a 100644
++--- a/lib/Support/Unix/Path.inc
+++++ b/lib/Support/Unix/Path.inc
++@@ -123,7 +123,8 @@ const file_t kInvalidFile = -1;
++ 
++ #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) ||     \
++     defined(__minix) || defined(__FreeBSD_kernel__) || defined(__linux__) ||   \
++-    defined(__CYGWIN__) || defined(__DragonFly__) || defined(_AIX) || defined(__GNU__)
+++    defined(__CYGWIN__) || defined(__DragonFly__) || defined(_AIX) ||          \
+++    defined(__GNU__) || defined(__MSYS__)
++ static int
++ test_dir(char ret[PATH_MAX], const char *dir, const char *bin)
++ {
++@@ -239,7 +240,8 @@ std::string getMainExecutable(const char *argv0, void *MainAddr) {
++   // If we don't have procfs mounted, fall back to argv[0]
++   if (getprogpath(exe_path, argv0) != NULL)
++     return exe_path;
++-#elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__)
+++#elif defined(__linux__) || defined(__CYGWIN__) || defined(__gnu_hurd__) ||    \
+++    defined(__MSYS__)
++   char exe_path[PATH_MAX];
++   const char *aPath = "/proc/self/exe";
++   if (sys::fs::exists(aPath)) {
++@@ -469,7 +471,7 @@ static bool is_local_impl(struct STATVFS &Vfs) {
++   default:
++     return true;
++   }
++-#elif defined(__CYGWIN__)
+++#elif defined(__CYGWIN__) || defined(__MSYS__)
++   // Cygwin doesn't expose this information; would need to use Win32 API.
++   return false;
++ #elif defined(__Fuchsia__)
++diff --git a/lib/Support/raw_ostream.cpp b/lib/Support/raw_ostream.cpp
++index f2d78d77323..c344401eb81 100644
++--- a/lib/Support/raw_ostream.cpp
+++++ b/lib/Support/raw_ostream.cpp
++@@ -41,7 +41,7 @@
++ # include <unistd.h>
++ #endif
++ 
++-#if defined(__CYGWIN__)
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++ #include <io.h>
++ #endif
++ 
++diff --git a/lib/Transforms/Hello/CMakeLists.txt b/lib/Transforms/Hello/CMakeLists.txt
++index c4f10247c1a..249f86ec272 100644
++--- a/lib/Transforms/Hello/CMakeLists.txt
+++++ b/lib/Transforms/Hello/CMakeLists.txt
++@@ -6,7 +6,7 @@ if( NOT LLVM_REQUIRES_RTTI )
++   endif()
++ endif()
++ 
++-if(WIN32 OR CYGWIN)
+++if(WIN32 OR CYGWIN OR MSYS)
++   set(LLVM_LINK_COMPONENTS Core Support)
++ endif()
++ 
++diff --git a/test/CodeGen/MIR/AArch64/lit.local.cfg b/test/CodeGen/MIR/AArch64/lit.local.cfg
++index f4f77c5aa31..04f6c112bdd 100644
++--- a/test/CodeGen/MIR/AArch64/lit.local.cfg
+++++ b/test/CodeGen/MIR/AArch64/lit.local.cfg
++@@ -4,5 +4,5 @@ if not 'AArch64' in config.root.targets:
++     config.unsupported = True
++ 
++ # For now we don't test arm64-win32.
++-if re.search(r'cygwin|mingw32|win32|windows-gnu|windows-msvc', config.target_triple):
+++if re.search(r'cygwin|mingw32|msys|win32|windows-gnu|windows-msvc', config.target_triple):
++     config.unsupported = True
++diff --git a/test/Unit/lit.cfg.py b/test/Unit/lit.cfg.py
++index 3198ab2c953..cf99e743c84 100644
++--- a/test/Unit/lit.cfg.py
+++++ b/test/Unit/lit.cfg.py
++@@ -42,7 +42,7 @@ for symbolizer in ['ASAN_SYMBOLIZER_PATH', 'MSAN_SYMBOLIZER_PATH']:
++         config.environment[symbolizer] = os.environ[symbolizer]
++ 
++ # Win32 seeks DLLs along %PATH%.
++-if sys.platform in ['win32', 'cygwin'] and os.path.isdir(config.shlibdir):
+++if sys.platform in ['win32', 'cygwin', 'msys'] and os.path.isdir(config.shlibdir):
++     config.environment['PATH'] = os.path.pathsep.join((
++             config.shlibdir, config.environment['PATH']))
++ 
++diff --git a/test/lit.cfg.py b/test/lit.cfg.py
++index 4eaa6cb77c8..dfac0215771 100644
++--- a/test/lit.cfg.py
+++++ b/test/lit.cfg.py
++@@ -97,7 +97,7 @@ lli_args = []
++ # we don't support COFF in MCJIT well enough for the tests, force ELF format on
++ # Windows.  FIXME: the process target triple should be used here, but this is
++ # difficult to obtain on Windows.
++-if re.search(r'cygwin|windows-gnu|windows-msvc', config.host_triple):
+++if re.search(r'cygwin|msys|windows-gnu|windows-msvc', config.host_triple):
++     lli_args = ['-mtriple=' + config.host_triple + '-elf']
++ 
++ llc_args = []
++diff --git a/tools/CMakeLists.txt b/tools/CMakeLists.txt
++index b6d3b2c2fcb..296660e97d2 100644
++--- a/tools/CMakeLists.txt
+++++ b/tools/CMakeLists.txt
++@@ -17,7 +17,7 @@ if(NOT LLVM_USE_INTEL_JITEVENTS )
++   set(LLVM_TOOL_LLVM_JITLISTENER_BUILD Off)
++ endif()
++ 
++-if(CYGWIN OR NOT LLVM_ENABLE_PIC)
+++if(CYGWIN OR MSYS OR NOT LLVM_ENABLE_PIC)
++   set(LLVM_TOOL_LTO_BUILD Off)
++ endif()
++ 
++diff --git a/tools/bugpoint-passes/CMakeLists.txt b/tools/bugpoint-passes/CMakeLists.txt
++index eea3e239b80..eaa72cd8a95 100644
++--- a/tools/bugpoint-passes/CMakeLists.txt
+++++ b/tools/bugpoint-passes/CMakeLists.txt
++@@ -10,7 +10,7 @@ if( NOT LLVM_REQUIRES_RTTI )
++   endif()
++ endif()
++ 
++-if(WIN32 OR CYGWIN)
+++if(WIN32 OR CYGWIN OR MSYS)
++   set(LLVM_LINK_COMPONENTS Core)
++ endif()
++ 
++diff --git a/tools/lli/lli.cpp b/tools/lli/lli.cpp
++index 981e0812d45..5fc87aa0e4a 100644
++--- a/tools/lli/lli.cpp
+++++ b/tools/lli/lli.cpp
++@@ -61,7 +61,7 @@
++ #include "llvm/Transforms/Instrumentation.h"
++ #include <cerrno>
++ 
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++ #include <cygwin/version.h>
++ #if defined(CYGWIN_VERSION_DLL_MAJOR) && CYGWIN_VERSION_DLL_MAJOR<1007
++ #define DO_NOTHING_ATEXIT 1
++diff --git a/tools/llvm-shlib/CMakeLists.txt b/tools/llvm-shlib/CMakeLists.txt
++index f3a2056f80d..f1decd975d4 100644
++--- a/tools/llvm-shlib/CMakeLists.txt
+++++ b/tools/llvm-shlib/CMakeLists.txt
++@@ -33,7 +33,7 @@ if(LLVM_BUILD_LLVM_DYLIB)
++   add_llvm_library(LLVM SHARED DISABLE_LLVM_LINK_LLVM_DYLIB SONAME ${INSTALL_WITH_TOOLCHAIN} ${SOURCES})
++ 
++   list(REMOVE_DUPLICATES LIB_NAMES)
++-  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (MINGW) OR (HAIKU)
+++  if(("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux") OR (MINGW) OR (HAIKU) OR (MSYS)
++      OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
++      OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "GNU")
++      OR ("${CMAKE_SYSTEM_NAME}" STREQUAL "OpenBSD")
++diff --git a/unittests/ExecutionEngine/MCJIT/CMakeLists.txt b/unittests/ExecutionEngine/MCJIT/CMakeLists.txt
++index b5f8a14c41c..03da955f388 100644
++--- a/unittests/ExecutionEngine/MCJIT/CMakeLists.txt
+++++ b/unittests/ExecutionEngine/MCJIT/CMakeLists.txt
++@@ -29,6 +29,6 @@ add_llvm_unittest(MCJITTests
++   ${MCJITTestsSources}
++   )
++ 
++-if(MINGW OR CYGWIN)
+++if(MINGW OR CYGWIN OR MSYS)
++   set_property(TARGET MCJITTests PROPERTY LINK_FLAGS -Wl,--export-all-symbols)
++ endif()
++diff --git a/utils/benchmark/CMakeLists.txt b/utils/benchmark/CMakeLists.txt
++index 38bc8c6bc95..88454f8a88f 100644
++--- a/utils/benchmark/CMakeLists.txt
+++++ b/utils/benchmark/CMakeLists.txt
++@@ -173,7 +173,7 @@ else()
++   # predefined macro, which turns on all of the wonderful libc extensions.
++   # However g++ doesn't do this in Cygwin so we have to define it ourselfs
++   # since we depend on GNU/POSIX/BSD extensions.
++-  if (CYGWIN)
+++  if (CYGWIN OR MSYS)
++     add_definitions(-D_GNU_SOURCE=1)
++   endif()
++ 
++diff --git a/utils/benchmark/src/internal_macros.h b/utils/benchmark/src/internal_macros.h
++index f2d54bfcbd9..79745e78f83 100644
++--- a/utils/benchmark/src/internal_macros.h
+++++ b/utils/benchmark/src/internal_macros.h
++@@ -31,8 +31,8 @@
++   #define BENCHMARK_NORETURN
++ #endif
++ 
++-#if defined(__CYGWIN__)
++-  #define BENCHMARK_OS_CYGWIN 1
+++#if defined(__CYGWIN__) || defined(__MSYS__)
+++#define BENCHMARK_OS_CYGWIN 1
++ #elif defined(_WIN32)
++   #define BENCHMARK_OS_WINDOWS 1
++   #if defined(__MINGW32__)
++diff --git a/utils/lit/lit/formats/googletest.py b/utils/lit/lit/formats/googletest.py
++index 059eb99762e..5ef9c2fb128 100644
++--- a/utils/lit/lit/formats/googletest.py
+++++ b/utils/lit/lit/formats/googletest.py
++@@ -8,7 +8,7 @@ import lit.TestRunner
++ import lit.util
++ from .base import TestFormat
++ 
++-kIsWindows = sys.platform in ['win32', 'cygwin']
+++kIsWindows = sys.platform in ['win32', 'cygwin', 'msys']
++ 
++ class GoogleTest(TestFormat):
++     def __init__(self, test_sub_dirs, test_suffix):
++diff --git a/utils/lit/tests/lit.cfg b/utils/lit/tests/lit.cfg
++index 3c49f076a66..62fa8816e47 100644
++--- a/utils/lit/tests/lit.cfg
+++++ b/utils/lit/tests/lit.cfg
++@@ -84,7 +84,7 @@ else:
++ # that the llvm_config defines. This means that the 'system-windows' feature
++ # (and any others) need to match the names in llvm_config for consistency
++ if not llvm_config:
++-  if sys.platform.startswith('win') or sys.platform.startswith('cygwin'):
+++  if sys.platform.startswith('win') or sys.platform.startswith('cygwin') or sys.platform.startswith('msys'):
++     config.available_features.add('system-windows')
++   if platform.system() == 'AIX':
++     config.available_features.add('system-aix')
++diff --git a/utils/unittest/googletest/include/gtest/internal/gtest-port-arch.h b/utils/unittest/googletest/include/gtest/internal/gtest-port-arch.h
++index f1319c7f2e2..e19c6a04b78 100644
++--- a/utils/unittest/googletest/include/gtest/internal/gtest-port-arch.h
+++++ b/utils/unittest/googletest/include/gtest/internal/gtest-port-arch.h
++@@ -36,7 +36,7 @@
++ #define GTEST_INCLUDE_GTEST_INTERNAL_GTEST_PORT_ARCH_H_
++ 
++ // Determines the platform on which Google Test is compiled.
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++ # define GTEST_OS_CYGWIN 1
++ #elif defined __SYMBIAN32__
++ # define GTEST_OS_SYMBIAN 1
++-- 
++2.29.0.windows.1
++
+diff --git a/clang/0012-Add-minimal-msys-target.patch b/clang/0012-Add-minimal-msys-target.patch
+new file mode 100644
+index 000000000..dd408a051
+--- /dev/null
++++ b/clang/0012-Add-minimal-msys-target.patch
+@@ -0,0 +1,99 @@
++From f50d9a3f859b4361456c02273ec23c643e0ad696 Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 29 Oct 2020 18:32:27 +0100
++Subject: Add minimal msys target
++
++---
++ include/llvm/ADT/Triple.h |  8 +++++---
++ lib/Support/Triple.cpp    | 13 +++++++++++--
++ 2 files changed, 16 insertions(+), 5 deletions(-)
++
++diff --git a/include/llvm/ADT/Triple.h b/include/llvm/ADT/Triple.h
++index 6bad18f1924..7361d4211e6 100644
++--- a/include/llvm/ADT/Triple.h
+++++ b/include/llvm/ADT/Triple.h
++@@ -219,8 +219,9 @@ public:
++     Cygnus,
++     CoreCLR,
++     Simulator, // Simulator variants of other systems, e.g., Apple's iOS
++-    MacABI, // Mac Catalyst variant of Apple's iOS deployment target.
++-    LastEnvironmentType = MacABI
+++    MacABI,    // Mac Catalyst variant of Apple's iOS deployment target.
+++    Msys,
+++    LastEnvironmentType = Msys
++   };
++   enum ObjectFormatType {
++     UnknownObjectFormat,
++@@ -553,7 +554,8 @@ public:
++   }
++ 
++   bool isWindowsCygwinEnvironment() const {
++-    return isOSWindows() && getEnvironment() == Triple::Cygnus;
+++    return isOSWindows() && (getEnvironment() == Triple::Cygnus ||
+++                             getEnvironment() == Triple::Msys);
++   }
++ 
++   bool isWindowsGNUEnvironment() const {
++diff --git a/lib/Support/Triple.cpp b/lib/Support/Triple.cpp
++index fec1985ccac..3209a164008 100644
++--- a/lib/Support/Triple.cpp
+++++ b/lib/Support/Triple.cpp
++@@ -241,6 +241,7 @@ StringRef Triple::getEnvironmentTypeName(EnvironmentType Kind) {
++   case Itanium: return "itanium";
++   case MSVC: return "msvc";
++   case MacABI: return "macabi";
+++  case Msys: return "msys";
++   case Musl: return "musl";
++   case MuslEABI: return "musleabi";
++   case MuslEABIHF: return "musleabihf";
++@@ -545,6 +546,7 @@ static Triple::EnvironmentType parseEnvironment(StringRef EnvironmentName) {
++     .StartsWith("msvc", Triple::MSVC)
++     .StartsWith("itanium", Triple::Itanium)
++     .StartsWith("cygnus", Triple::Cygnus)
+++    .StartsWith("msys", Triple::Msys)
++     .StartsWith("coreclr", Triple::CoreCLR)
++     .StartsWith("simulator", Triple::Simulator)
++     .StartsWith("macabi", Triple::MacABI)
++@@ -803,6 +805,7 @@ Triple::Triple(const Twine &ArchStr, const Twine &VendorStr, const Twine &OSStr,
++ std::string Triple::normalize(StringRef Str) {
++   bool IsMinGW32 = false;
++   bool IsCygwin = false;
+++  bool IsMsys = false;
++ 
++   // Parse into components.
++   SmallVector<StringRef, 4> Components;
++@@ -824,6 +827,7 @@ std::string Triple::normalize(StringRef Str) {
++     OS = parseOS(Components[2]);
++     IsCygwin = Components[2].startswith("cygwin");
++     IsMinGW32 = Components[2].startswith("mingw");
+++    IsMsys = Components[2].startswith("msys");
++   }
++   EnvironmentType Environment = UnknownEnvironment;
++   if (Components.size() > 3)
++@@ -869,7 +873,8 @@ std::string Triple::normalize(StringRef Str) {
++         OS = parseOS(Comp);
++         IsCygwin = Comp.startswith("cygwin");
++         IsMinGW32 = Comp.startswith("mingw");
++-        Valid = OS != UnknownOS || IsCygwin || IsMinGW32;
+++        IsMsys = Comp.startswith("msys");
+++        Valid = OS != UnknownOS || IsCygwin || IsMinGW32 || IsMsys;
++         break;
++       case 3:
++         Environment = parseEnvironment(Comp);
++@@ -977,8 +982,12 @@ std::string Triple::normalize(StringRef Str) {
++     Components.resize(4);
++     Components[2] = "windows";
++     Components[3] = "cygnus";
+++  } else if (IsMsys) {
+++    Components.resize(4);
+++    Components[2] = "windows";
+++    Components[3] = "msys";
++   }
++-  if (IsMinGW32 || IsCygwin ||
+++  if (IsMinGW32 || IsCygwin || IsMsys ||
++       (OS == Triple::Win32 && Environment != UnknownEnvironment)) {
++     if (ObjectFormat != UnknownObjectFormat && ObjectFormat != Triple::COFF) {
++       Components.resize(5);
++-- 
++2.29.0.windows.1
++
+diff --git a/clang/0101-Allow-build-static-clang-library-for-mingw.patch b/clang/0101-Allow-build-static-clang-library-for-mingw.patch
+new file mode 100644
+index 000000000..5983b7fa5
+--- /dev/null
++++ b/clang/0101-Allow-build-static-clang-library-for-mingw.patch
+@@ -0,0 +1,22 @@
++From ded1b370c6ccbb427406edc6ab39656144d61818 Mon Sep 17 00:00:00 2001
++From: Alexey Pavlov <alexpux@gmail.com>
++Date: Fri, 25 Dec 2015 20:14:51 +0100
++Subject: [PATCH 1/6] Allow build static clang library for mingw
++
++---
++ tools/libclang/CMakeLists.txt | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/tools/libclang/CMakeLists.txt b/tools/libclang/CMakeLists.txt
++index 2dd6703076..477e53dd15 100644
++--- a/tools/libclang/CMakeLists.txt
+++++ b/tools/libclang/CMakeLists.txt
++@@ -94,7 +94,7 @@
++ if(NOT LLVM_ENABLE_PIC OR LIBCLANG_BUILD_STATIC)
++   set(ENABLE_STATIC STATIC)
++ endif()
++ 
++-if (WIN32 AND ENABLE_SHARED AND ENABLE_STATIC)
+++if (MSVC AND ENABLE_SHARED AND ENABLE_STATIC)
++   unset(ENABLE_STATIC)
++ endif()
+diff --git a/clang/0102-fix-libclang-name-for-mingw.patch b/clang/0102-fix-libclang-name-for-mingw.patch
+new file mode 100644
+index 000000000..60bb7a532
+--- /dev/null
++++ b/clang/0102-fix-libclang-name-for-mingw.patch
+@@ -0,0 +1,23 @@
++From 4fea4f3cc0f23cc4aacc727cff812303a63a83b5 Mon Sep 17 00:00:00 2001
++From: Mateusz Mikula <mati865@gmail.com>
++Date: Thu, 2 Feb 2017 12:21:45 +0100
++Subject: [PATCH 2/6] fix libclang name for mingw
++
++---
++ tools/libclang/CMakeLists.txt | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/tools/libclang/CMakeLists.txt b/tools/libclang/CMakeLists.txt
++index 477e53dd15..dc2e3538fa 100644
++--- a/tools/libclang/CMakeLists.txt
+++++ b/tools/libclang/CMakeLists.txt
++@@ -81,7 +81,7 @@
++ if((NOT LLVM_ENABLE_PIC OR LIBCLANG_BUILD_STATIC) AND (NOT MSVC))
++   set(ENABLE_STATIC STATIC)
++ endif()
++ 
++-if(WIN32)
+++if(MSVC)
++   set(output_name "libclang")
++ else()
++   set(output_name "clang")
+diff --git a/clang/0105-build-libclang-cpp-fix.patch b/clang/0105-build-libclang-cpp-fix.patch
+new file mode 100644
+index 000000000..12e459836
+--- /dev/null
++++ b/clang/0105-build-libclang-cpp-fix.patch
+@@ -0,0 +1,10 @@
++--- a/tools/CMakeLists.txt	2019-12-31 00:31:56.129822600 +0100
+++++ b/tools/CMakeLists.txt	2019-12-31 00:32:53.903739000 +0100
++@@ -14,7 +14,7 @@
++ 
++ add_clang_subdirectory(clang-rename)
++ add_clang_subdirectory(clang-refactor)
++-if(UNIX)
+++if(UNIX OR MINGW)
++   add_clang_subdirectory(clang-shlib)
++ endif()
+diff --git a/clang/0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch b/clang/0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch
+new file mode 100644
+index 000000000..feaf06e6c
+--- /dev/null
++++ b/clang/0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch
+@@ -0,0 +1,31 @@
++From 04ea680a8ccc4f9a4d7333cd712333960348c35b Mon Sep 17 00:00:00 2001
++From: Kristina Bessonova <kbessonova@accesssoftek.com>
++Date: Mon, 7 Sep 2020 10:03:32 +0200
++Subject: [PATCH] [cmake] Fix build of attribute plugin example on Windows
++
++Seems '${cmake_2_8_12_PRIVATE}' was removed a long time ago, so it should
++be just PRIVATE keyword here.
++
++Reviewed By: john.brawn
++
++Differential Revision: https://reviews.llvm.org/D86091
++---
++ examples/Attribute/CMakeLists.txt | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/examples/Attribute/CMakeLists.txt b/examples/Attribute/CMakeLists.txt
++index ed02f5e5992..42f04f5039b 100644
++--- a/examples/Attribute/CMakeLists.txt
+++++ b/examples/Attribute/CMakeLists.txt
++@@ -1,7 +1,7 @@
++ add_llvm_library(Attribute MODULE Attribute.cpp PLUGIN_TOOL clang)
++ 
++ if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN))
++-  target_link_libraries(Attribute ${cmake_2_8_12_PRIVATE}
+++  target_link_libraries(Attribute PRIVATE
++     clangAST
++     clangBasic
++     clangFrontend
++-- 
++2.29.0.rc1.windows.1
++
+diff --git a/clang/0107-Msysize.patch b/clang/0107-Msysize.patch
+new file mode 100644
+index 000000000..c333ad580
+--- /dev/null
++++ b/clang/0107-Msysize.patch
+@@ -0,0 +1,277 @@
++From 81c534afc411d980e8d85a6ef72b1f3b6a7a91eb Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 29 Oct 2020 18:42:31 +0100
++Subject: Msysize
++
++---
++ CMakeLists.txt                                | 4 ++--
++ examples/AnnotateFunctions/CMakeLists.txt     | 2 +-
++ examples/Attribute/CMakeLists.txt             | 2 +-
++ examples/PrintFunctionNames/CMakeLists.txt    | 2 +-
++ test/CodeGen/2003-08-21-WideString.c          | 2 +-
++ test/CodeGen/2009-07-15-pad-wchar_t-array.c   | 2 +-
++ test/CodeGen/extern-weak.c                    | 5 +++--
++ test/CodeGen/wchar-const.c                    | 2 +-
++ test/Sema/return.c                            | 2 +-
++ test/Sema/wchar.c                             | 2 +-
++ test/lit.cfg.py                               | 4 ++--
++ tools/CMakeLists.txt                          | 2 +-
++ tools/driver/CMakeLists.txt                   | 2 +-
++ tools/libclang/CIndexer.cpp                   | 4 ++--
++ tools/scan-build-py/libear/__init__.py        | 2 +-
++ tools/scan-build-py/libscanbuild/intercept.py | 2 +-
++ tools/scan-build/CMakeLists.txt               | 2 +-
++ 17 files changed, 22 insertions(+), 21 deletions(-)
++
++diff --git a/CMakeLists.txt b/CMakeLists.txt
++index 2e06c5fd902..7bc1cbdf9d5 100644
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -98,7 +98,7 @@ if( CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR )
++   # They are used as destination of target generators.
++   set(LLVM_RUNTIME_OUTPUT_INTDIR ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/bin)
++   set(LLVM_LIBRARY_OUTPUT_INTDIR ${CMAKE_BINARY_DIR}/${CMAKE_CFG_INTDIR}/lib${LLVM_LIBDIR_SUFFIX})
++-  if(WIN32 OR CYGWIN)
+++  if(WIN32 OR CYGWIN OR MSYS)
++     # DLL platform -- put DLLs into bin.
++     set(LLVM_SHLIB_OUTPUT_INTDIR ${LLVM_RUNTIME_OUTPUT_INTDIR})
++   else()
++@@ -214,7 +214,7 @@ if( CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR )
++       set(LLVM_LIT_ARGS "${LIT_ARGS_DEFAULT}" CACHE STRING "Default options for lit")
++ 
++       # On Win32 hosts, provide an option to specify the path to the GnuWin32 tools.
++-      if( WIN32 AND NOT CYGWIN )
+++      if( WIN32 AND NOT CYGWIN OR MSYS )
++         set(LLVM_LIT_TOOLS_DIR "" CACHE PATH "Path to GnuWin32 tools")
++       endif()
++     else()
++diff --git a/examples/AnnotateFunctions/CMakeLists.txt b/examples/AnnotateFunctions/CMakeLists.txt
++index e9850b64f08..c10584f747a 100644
++--- a/examples/AnnotateFunctions/CMakeLists.txt
+++++ b/examples/AnnotateFunctions/CMakeLists.txt
++@@ -1,6 +1,6 @@
++ add_llvm_library(AnnotateFunctions MODULE AnnotateFunctions.cpp PLUGIN_TOOL clang)
++ 
++-if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN))
+++if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN OR MSYS))
++   set(LLVM_LINK_COMPONENTS
++     Support
++   )
++diff --git a/examples/Attribute/CMakeLists.txt b/examples/Attribute/CMakeLists.txt
++index ed02f5e5992..0218a379a28 100644
++--- a/examples/Attribute/CMakeLists.txt
+++++ b/examples/Attribute/CMakeLists.txt
++@@ -1,6 +1,6 @@
++ add_llvm_library(Attribute MODULE Attribute.cpp PLUGIN_TOOL clang)
++ 
++-if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN))
+++if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN OR MSYS))
++   target_link_libraries(Attribute PRIVATE
++     clangAST
++     clangBasic
++diff --git a/examples/PrintFunctionNames/CMakeLists.txt b/examples/PrintFunctionNames/CMakeLists.txt
++index 63b0c015732..df5165de3de 100644
++--- a/examples/PrintFunctionNames/CMakeLists.txt
+++++ b/examples/PrintFunctionNames/CMakeLists.txt
++@@ -11,7 +11,7 @@ endif()
++ 
++ add_llvm_library(PrintFunctionNames MODULE PrintFunctionNames.cpp PLUGIN_TOOL clang)
++ 
++-if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN))
+++if(LLVM_ENABLE_PLUGINS AND (WIN32 OR CYGWIN OR MSYS))
++   set(LLVM_LINK_COMPONENTS
++     Support
++   )
++diff --git a/test/CodeGen/2003-08-21-WideString.c b/test/CodeGen/2003-08-21-WideString.c
++index 1a6e5b7c882..0b1c9933f83 100644
++--- a/test/CodeGen/2003-08-21-WideString.c
+++++ b/test/CodeGen/2003-08-21-WideString.c
++@@ -3,7 +3,7 @@
++ // This bit is taken from Sema/wchar.c so we can avoid the wchar.h include.
++ typedef __WCHAR_TYPE__ wchar_t;
++ #if defined(_WIN32) || defined(_M_IX86) || defined(__CYGWIN__) \
++-  || defined(_M_X64) || defined(SHORT_WCHAR)
+++  || defined(_M_X64) || defined(SHORT_WCHAR) || defined(__MSYS__)
++   #define WCHAR_T_TYPE unsigned short
++ #elif defined(__sun)
++   #define WCHAR_T_TYPE long
++diff --git a/test/CodeGen/2009-07-15-pad-wchar_t-array.c b/test/CodeGen/2009-07-15-pad-wchar_t-array.c
++index 4ae35158fa8..086c6de86de 100644
++--- a/test/CodeGen/2009-07-15-pad-wchar_t-array.c
+++++ b/test/CodeGen/2009-07-15-pad-wchar_t-array.c
++@@ -3,7 +3,7 @@
++ // This bit is taken from Sema/wchar.c so we can avoid the wchar.h include.
++ typedef __WCHAR_TYPE__ wchar_t;
++ #if defined(_WIN32) || defined(_M_IX86) || defined(__CYGWIN__) \
++-  || defined(_M_X64) || defined(SHORT_WCHAR)
+++  || defined(_M_X64) || defined(SHORT_WCHAR) || defined(__MSYS__)
++   #define WCHAR_T_TYPE unsigned short
++ #elif defined(__sun)
++   #define WCHAR_T_TYPE long
++diff --git a/test/CodeGen/extern-weak.c b/test/CodeGen/extern-weak.c
++index 6a78a33af65..15dc76b4c59 100644
++--- a/test/CodeGen/extern-weak.c
+++++ b/test/CodeGen/extern-weak.c
++@@ -1,8 +1,9 @@
++ // RUN: %clang_cc1 -O3 -emit-llvm -o - %s | grep extern_weak
++ // RUN: %clang_cc1 -O3 -emit-llvm -o - %s | llc
++ 
++-#if !defined(__linux__) && !defined(__FreeBSD__) && \
++-    !defined(__OpenBSD__) && !defined(__CYGWIN__) && !defined(__DragonFly__)
+++#if !defined(__linux__) && !defined(__FreeBSD__) &&                             \
+++    !defined(__OpenBSD__) && !defined(__CYGWIN__) && !defined(__DragonFly__) && \
+++    !defined(__MSYS__)
++ void foo() __attribute__((weak_import));
++ #else
++ void foo() __attribute__((weak));
++diff --git a/test/CodeGen/wchar-const.c b/test/CodeGen/wchar-const.c
++index 91b14ecc102..4a103a6ea03 100644
++--- a/test/CodeGen/wchar-const.c
+++++ b/test/CodeGen/wchar-const.c
++@@ -5,7 +5,7 @@
++ // This bit is taken from Sema/wchar.c so we can avoid the wchar.h include.
++ typedef __WCHAR_TYPE__ wchar_t;
++ #if defined(_WIN32) || defined(_M_IX86) || defined(__CYGWIN__) \
++-  || defined(_M_X64) || defined(SHORT_WCHAR)
+++  || defined(_M_X64) || defined(SHORT_WCHAR) || defined(__MSYS__)
++   #define WCHAR_T_TYPE unsigned short
++ #elif defined(__sun)
++   #define WCHAR_T_TYPE long
++diff --git a/test/Sema/return.c b/test/Sema/return.c
++index 632d3430c30..0002e7d4c11 100644
++--- a/test/Sema/return.c
+++++ b/test/Sema/return.c
++@@ -209,7 +209,7 @@ int test30() {
++   if (j)
++     longjmp(test30_j, 1);
++   else
++-#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__)
+++#if defined(_WIN32) || defined(_WIN64) || defined(__CYGWIN__) || defined(__MSYS__)
++     longjmp(test30_j, 2);
++ #else
++     _longjmp(test30_j, 1);
++diff --git a/test/Sema/wchar.c b/test/Sema/wchar.c
++index 6a4b75b39fd..a2b1a18d427 100644
++--- a/test/Sema/wchar.c
+++++ b/test/Sema/wchar.c
++@@ -4,7 +4,7 @@
++ typedef __WCHAR_TYPE__ wchar_t;
++ 
++ #if defined(_WIN32) || defined(_M_IX86) || defined(__CYGWIN__) \
++- || defined(_M_X64) || defined(__ORBIS__) || defined(SHORT_WCHAR)
+++  || defined(_M_X64) || defined(__ORBIS__) || defined(SHORT_WCHAR) || defined(__MSYS__)
++   #define WCHAR_T_TYPE unsigned short
++ #elif defined(__arm) || defined(__aarch64__)
++   #define WCHAR_T_TYPE unsigned int
++diff --git a/test/lit.cfg.py b/test/lit.cfg.py
++index dacda6894a0..dd35dc83b8c 100644
++--- a/test/lit.cfg.py
+++++ b/test/lit.cfg.py
++@@ -142,7 +142,7 @@ if is_filesystem_case_insensitive():
++     config.available_features.add('case-insensitive-filesystem')
++ 
++ # Tests that require the /dev/fd filesystem.
++-if os.path.exists('/dev/fd/0') and sys.platform not in ['cygwin']:
+++if os.path.exists('/dev/fd/0') and sys.platform not in ['cygwin', 'msys']:
++     config.available_features.add('dev-fd-fs')
++ 
++ # Set on native MS environment.
++@@ -154,7 +154,7 @@ if not re.match(r'^x86_64.*-(windows-msvc|windows-gnu)$', config.target_triple):
++     config.available_features.add('LP64')
++ 
++ # [PR12920] "clang-driver" -- set if gcc driver is not used.
++-if not re.match(r'.*-(cygwin)$', config.target_triple):
+++if not re.match(r'.*-(cygwin|msys)$', config.target_triple):
++     config.available_features.add('clang-driver')
++ 
++ # Tests that are specific to the Apple Silicon macOS.
++diff --git a/tools/CMakeLists.txt b/tools/CMakeLists.txt
++index 85a85812a8d..84d9bd60fde 100644
++--- a/tools/CMakeLists.txt
+++++ b/tools/CMakeLists.txt
++@@ -15,7 +15,7 @@ add_clang_subdirectory(c-index-test)
++ 
++ add_clang_subdirectory(clang-rename)
++ add_clang_subdirectory(clang-refactor)
++-if(UNIX OR MINGW)
+++if(UNIX OR MINGW OR MSYS)
++   add_clang_subdirectory(clang-shlib)
++ endif()
++ 
++diff --git a/tools/driver/CMakeLists.txt b/tools/driver/CMakeLists.txt
++index c53485ef195..524b03e8364 100644
++--- a/tools/driver/CMakeLists.txt
+++++ b/tools/driver/CMakeLists.txt
++@@ -49,7 +49,7 @@ clang_target_link_libraries(clang
++   clangSerialization
++   )
++ 
++-if(WIN32 AND NOT CYGWIN)
+++if(WIN32 AND NOT (CYGWIN OR MSYS))
++   # Prevent versioning if the buildhost is targeting for Win32.
++ else()
++   set_target_properties(clang PROPERTIES VERSION ${CLANG_EXECUTABLE_VERSION})
++diff --git a/tools/libclang/CIndexer.cpp b/tools/libclang/CIndexer.cpp
++index 3d8c00cf211..0f02a333dcb 100644
++--- a/tools/libclang/CIndexer.cpp
+++++ b/tools/libclang/CIndexer.cpp
++@@ -25,7 +25,7 @@
++ #include <cstdio>
++ #include <mutex>
++ 
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++ #include <cygwin/version.h>
++ #include <sys/cygwin.h>
++ #define _WIN32 1
++@@ -111,7 +111,7 @@ const std::string &CIndexer::getClangResourcesPath() {
++                sizeof(mbi));
++   GetModuleFileNameA((HINSTANCE)mbi.AllocationBase, path, MAX_PATH);
++ 
++-#ifdef __CYGWIN__
+++#if defined(__CYGWIN__) || defined(__MSYS__)
++   char w32path[MAX_PATH];
++   strcpy(w32path, path);
++ #if CYGWIN_VERSION_API_MAJOR > 0 || CYGWIN_VERSION_API_MINOR >= 181
++diff --git a/tools/scan-build-py/libear/__init__.py b/tools/scan-build-py/libear/__init__.py
++index 0dfe8c11eba..b46c202ab68 100644
++--- a/tools/scan-build-py/libear/__init__.py
+++++ b/tools/scan-build-py/libear/__init__.py
++@@ -149,7 +149,7 @@ class LinuxToolset(UnixToolset):
++ 
++ def make_toolset(src_dir):
++     platform = sys.platform
++-    if platform in {'win32', 'cygwin'}:
+++    if platform in {'win32', 'cygwin', 'msys'}:
++         raise RuntimeError('not implemented on this platform')
++     elif platform == 'darwin':
++         return DarwinToolset(src_dir)
++diff --git a/tools/scan-build-py/libscanbuild/intercept.py b/tools/scan-build-py/libscanbuild/intercept.py
++index 70f3233f5e8..c6951cf6d20 100644
++--- a/tools/scan-build-py/libscanbuild/intercept.py
+++++ b/tools/scan-build-py/libscanbuild/intercept.py
++@@ -44,7 +44,7 @@ US = chr(0x1f)
++ COMPILER_WRAPPER_CC = 'intercept-cc'
++ COMPILER_WRAPPER_CXX = 'intercept-c++'
++ TRACE_FILE_EXTENSION = '.cmd'  # same as in ear.c
++-WRAPPER_ONLY_PLATFORMS = frozenset({'win32', 'cygwin'})
+++WRAPPER_ONLY_PLATFORMS = frozenset({'win32', 'cygwin', 'msys'})
++ 
++ 
++ @command_entry_point
++diff --git a/tools/scan-build/CMakeLists.txt b/tools/scan-build/CMakeLists.txt
++index ec0702d76f1..ba68989136d 100644
++--- a/tools/scan-build/CMakeLists.txt
+++++ b/tools/scan-build/CMakeLists.txt
++@@ -2,7 +2,7 @@ option(CLANG_INSTALL_SCANBUILD "Install the scan-build tool" ON)
++ 
++ include(GNUInstallDirs)
++ 
++-if (WIN32 AND NOT CYGWIN)
+++if (WIN32 AND NOT (CYGWIN OR MSYS))
++   set(BinFiles
++         scan-build
++         scan-build.bat
++-- 
++2.29.0.windows.1
++
+diff --git a/clang/0108-Add-minimal-msys-target.patch b/clang/0108-Add-minimal-msys-target.patch
+new file mode 100644
+index 000000000..c1e6f0c79
+--- /dev/null
++++ b/clang/0108-Add-minimal-msys-target.patch
+@@ -0,0 +1,197 @@
++From a75c8105588eaad89fa651f1aa72e8aeb5b0347f Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 29 Oct 2020 18:45:19 +0100
++Subject: Add minimal msys target
++
++---
++ lib/Basic/Targets.cpp             |  6 ++++
++ lib/Basic/Targets/ARM.cpp         | 21 +++++++++++
++ lib/Basic/Targets/ARM.h           |  9 +++++
++ lib/Basic/Targets/X86.h           | 48 +++++++++++++++++++++++++
++ lib/Frontend/InitHeaderSearch.cpp |  7 ++--
++ 5 files changed, 89 insertions(+), 2 deletions(-)
++
++diff --git a/lib/Basic/Targets.cpp b/lib/Basic/Targets.cpp
++index 965f273892b..36f4e9b2001 100644
++--- a/lib/Basic/Targets.cpp
+++++ b/lib/Basic/Targets.cpp
++@@ -202,6 +202,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
++         return new MinGWARMTargetInfo(Triple, Opts);
++       case llvm::Triple::Itanium:
++         return new ItaniumWindowsARMleTargetInfo(Triple, Opts);
+++      case llvm::Triple::Msys:
+++        return new MsysARMTargetInfo(Triple, Opts);
++       case llvm::Triple::MSVC:
++       default: // Assume MSVC for unknown environments
++         return new MicrosoftARMleTargetInfo(Triple, Opts);
++@@ -497,6 +499,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
++         return new CygwinX86_32TargetInfo(Triple, Opts);
++       case llvm::Triple::GNU:
++         return new MinGWX86_32TargetInfo(Triple, Opts);
+++      case llvm::Triple::Msys:
+++        return new MsysX86_32TargetInfo(Triple, Opts);
++       case llvm::Triple::Itanium:
++       case llvm::Triple::MSVC:
++       default: // Assume MSVC for unknown environments
++@@ -554,6 +558,8 @@ TargetInfo *AllocateTarget(const llvm::Triple &Triple,
++         return new CygwinX86_64TargetInfo(Triple, Opts);
++       case llvm::Triple::GNU:
++         return new MinGWX86_64TargetInfo(Triple, Opts);
+++      case llvm::Triple::Msys:
+++        return new MsysX86_64TargetInfo(Triple, Opts);
++       case llvm::Triple::MSVC:
++       default: // Assume MSVC for unknown environments
++         return new MicrosoftX86_64TargetInfo(Triple, Opts);
++diff --git a/lib/Basic/Targets/ARM.cpp b/lib/Basic/Targets/ARM.cpp
++index 21cfe0107bb..fd71741a1b2 100644
++--- a/lib/Basic/Targets/ARM.cpp
+++++ b/lib/Basic/Targets/ARM.cpp
++@@ -1263,6 +1263,27 @@ void CygwinARMTargetInfo::getTargetDefines(const LangOptions &Opts,
++     Builder.defineMacro("_GNU_SOURCE");
++ }
++ 
+++MsysARMTargetInfo::MsysARMTargetInfo(const llvm::Triple &Triple,
+++                                     const TargetOptions &Opts)
+++    : ARMleTargetInfo(Triple, Opts) {
+++  this->WCharType = TargetInfo::UnsignedShort;
+++  TLSSupported = false;
+++  DoubleAlign = LongLongAlign = 64;
+++  resetDataLayout("e-m:e-p:32:32-Fi8-i64:64-v128:64:128-a:0:32-n32-S64");
+++}
+++
+++void MsysARMTargetInfo::getTargetDefines(const LangOptions &Opts,
+++                                         MacroBuilder &Builder) const {
+++  ARMleTargetInfo::getTargetDefines(Opts, Builder);
+++  Builder.defineMacro("_ARM_");
+++  Builder.defineMacro("__CYGWIN__");
+++  Builder.defineMacro("__CYGWIN32__");
+++  Builder.defineMacro("__MSYS__");
+++  DefineStd(Builder, "unix", Opts);
+++  if (Opts.CPlusPlus)
+++    Builder.defineMacro("_GNU_SOURCE");
+++}
+++
++ DarwinARMTargetInfo::DarwinARMTargetInfo(const llvm::Triple &Triple,
++                                          const TargetOptions &Opts)
++     : DarwinTargetInfo<ARMleTargetInfo>(Triple, Opts) {
++diff --git a/lib/Basic/Targets/ARM.h b/lib/Basic/Targets/ARM.h
++index 1e80f74d076..51250300df2 100644
++--- a/lib/Basic/Targets/ARM.h
+++++ b/lib/Basic/Targets/ARM.h
++@@ -259,6 +259,15 @@ public:
++                         MacroBuilder &Builder) const override;
++ };
++ 
+++// ARM Msys target
+++class LLVM_LIBRARY_VISIBILITY MsysARMTargetInfo : public ARMleTargetInfo {
+++public:
+++  MsysARMTargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts);
+++
+++  void getTargetDefines(const LangOptions &Opts,
+++                        MacroBuilder &Builder) const override;
+++};
+++
++ class LLVM_LIBRARY_VISIBILITY DarwinARMTargetInfo
++     : public DarwinTargetInfo<ARMleTargetInfo> {
++ protected:
++diff --git a/lib/Basic/Targets/X86.h b/lib/Basic/Targets/X86.h
++index 72a01d2514c..3860f1d32e0 100644
++--- a/lib/Basic/Targets/X86.h
+++++ b/lib/Basic/Targets/X86.h
++@@ -556,6 +556,31 @@ public:
++   }
++ };
++ 
+++// x86-32 Msys target
+++class LLVM_LIBRARY_VISIBILITY MsysX86_32TargetInfo : public X86_32TargetInfo {
+++public:
+++  MsysX86_32TargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
+++      : X86_32TargetInfo(Triple, Opts) {
+++    this->WCharType = TargetInfo::UnsignedShort;
+++    DoubleAlign = LongLongAlign = 64;
+++    resetDataLayout("e-m:x-p:32:32-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:"
+++                    "32-n8:16:32-a:0:32-S32");
+++  }
+++
+++  void getTargetDefines(const LangOptions &Opts,
+++                        MacroBuilder &Builder) const override {
+++    X86_32TargetInfo::getTargetDefines(Opts, Builder);
+++    Builder.defineMacro("_X86_");
+++    Builder.defineMacro("__CYGWIN__");
+++    Builder.defineMacro("__CYGWIN32__");
+++    Builder.defineMacro("__MSYS__");
+++    addCygMingDefines(Opts, Builder);
+++    DefineStd(Builder, "unix", Opts);
+++    if (Opts.CPlusPlus)
+++      Builder.defineMacro("_GNU_SOURCE");
+++  }
+++};
+++
++ // x86-32 Haiku target
++ class LLVM_LIBRARY_VISIBILITY HaikuX86_32TargetInfo
++     : public HaikuTargetInfo<X86_32TargetInfo> {
++@@ -824,6 +849,29 @@ public:
++   }
++ };
++ 
+++// x86-64 Msys target
+++class LLVM_LIBRARY_VISIBILITY MsysX86_64TargetInfo : public X86_64TargetInfo {
+++public:
+++  MsysX86_64TargetInfo(const llvm::Triple &Triple, const TargetOptions &Opts)
+++      : X86_64TargetInfo(Triple, Opts) {
+++    this->WCharType = TargetInfo::UnsignedShort;
+++    TLSSupported = false;
+++  }
+++
+++  void getTargetDefines(const LangOptions &Opts,
+++                        MacroBuilder &Builder) const override {
+++    X86_64TargetInfo::getTargetDefines(Opts, Builder);
+++    Builder.defineMacro("__x86_64__");
+++    Builder.defineMacro("__CYGWIN__");
+++    Builder.defineMacro("__CYGWIN64__");
+++    Builder.defineMacro("__MSYS__");
+++    addCygMingDefines(Opts, Builder);
+++    DefineStd(Builder, "unix", Opts);
+++    if (Opts.CPlusPlus)
+++      Builder.defineMacro("_GNU_SOURCE");
+++  }
+++};
+++
++ class LLVM_LIBRARY_VISIBILITY DarwinX86_64TargetInfo
++     : public DarwinTargetInfo<X86_64TargetInfo> {
++ public:
++diff --git a/lib/Frontend/InitHeaderSearch.cpp b/lib/Frontend/InitHeaderSearch.cpp
++index bc31445d6d0..86277e3a73b 100644
++--- a/lib/Frontend/InitHeaderSearch.cpp
+++++ b/lib/Frontend/InitHeaderSearch.cpp
++@@ -231,7 +231,8 @@ void InitHeaderSearch::AddDefaultCIncludePaths(const llvm::Triple &triple,
++     case llvm::Triple::Fuchsia:
++       break;
++     case llvm::Triple::Win32:
++-      if (triple.getEnvironment() != llvm::Triple::Cygnus)
+++      if (triple.getEnvironment() != llvm::Triple::Cygnus &&
+++          triple.getEnvironment() != llvm::Triple::Msys)
++         break;
++       LLVM_FALLTHROUGH;
++     default:
++@@ -322,6 +323,7 @@ void InitHeaderSearch::AddDefaultCIncludePaths(const llvm::Triple &triple,
++     switch (triple.getEnvironment()) {
++     default: llvm_unreachable("Include management is handled in the driver.");
++     case llvm::Triple::Cygnus:
+++    case llvm::Triple::Msys:
++       AddPath("/usr/include/w32api", System, false);
++       break;
++     case llvm::Triple::GNU:
++@@ -431,7 +433,8 @@ void InitHeaderSearch::AddDefaultIncludePaths(const LangOptions &Lang,
++     return;
++ 
++   case llvm::Triple::Win32:
++-    if (triple.getEnvironment() != llvm::Triple::Cygnus ||
+++    if ((triple.getEnvironment() != llvm::Triple::Cygnus &&
+++         triple.getEnvironment() != llvm::Triple::Msys) ||
++         triple.isOSBinFormatMachO())
++       return;
++     break;
++-- 
++2.29.0.windows.1
++
+diff --git a/clang/0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch b/clang/0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch
+new file mode 100644
+index 000000000..09e53c4dd
+--- /dev/null
++++ b/clang/0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch
+@@ -0,0 +1,81 @@
++From a54919e0c11542f6716043003e403f1910f32528 Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
++Date: Thu, 27 Aug 2020 14:48:22 +0300
++Subject: [PATCH] [LLD] [COFF] Error out if creating a DLL with too many
++ exported symbols
++
++The PE/DLL format has a limit on 64k exported symbols per DLL; make
++sure to check this.
++
++Differential Revision: https://reviews.llvm.org/D86701
++---
++ COFF/DriverUtils.cpp         |  8 ++++++--
++ test/COFF/Inputs/def-many.py |  5 +++++
++ test/COFF/export-limit.s     | 13 +++++++++++++
++ 3 files changed, 24 insertions(+), 2 deletions(-)
++ create mode 100644 test/COFF/Inputs/def-many.py
++ create mode 100644 test/COFF/export-limit.s
++
++diff --git a/COFF/DriverUtils.cpp b/COFF/DriverUtils.cpp
++index 6cb761abea4..de78359bb44 100644
++--- a/COFF/DriverUtils.cpp
+++++ b/COFF/DriverUtils.cpp
++@@ -32,6 +32,7 @@
++ #include "llvm/Support/Program.h"
++ #include "llvm/Support/raw_ostream.h"
++ #include "llvm/WindowsManifest/WindowsManifestMerger.h"
+++#include <limits>
++ #include <memory>
++ 
++ using namespace llvm::COFF;
++@@ -673,12 +674,15 @@ void fixupExports() {
++ 
++ void assignExportOrdinals() {
++   // Assign unique ordinals if default (= 0).
++-  uint16_t max = 0;
+++  uint32_t max = 0;
++   for (Export &e : config->exports)
++-    max = std::max(max, e.ordinal);
+++    max = std::max(max, (uint32_t)e.ordinal);
++   for (Export &e : config->exports)
++     if (e.ordinal == 0)
++       e.ordinal = ++max;
+++  if (max > std::numeric_limits<uint16_t>::max())
+++    fatal("too many exported symbols (max " +
+++          Twine(std::numeric_limits<uint16_t>::max()) + ")");
++ }
++ 
++ // Parses a string in the form of "key=value" and check
++diff --git a/test/COFF/Inputs/def-many.py b/test/COFF/Inputs/def-many.py
++new file mode 100644
++index 00000000000..ec2b811fce7
++--- /dev/null
+++++ b/test/COFF/Inputs/def-many.py
++@@ -0,0 +1,5 @@
+++import sys
+++
+++print("EXPORTS")
+++for i in range(0, int(sys.argv[1])):
+++  print("f%d=f" % (i))
++diff --git a/test/COFF/export-limit.s b/test/COFF/export-limit.s
++new file mode 100644
++index 00000000000..e65a84cb718
++--- /dev/null
+++++ b/test/COFF/export-limit.s
++@@ -0,0 +1,13 @@
+++# REQUIRES: x86
+++# RUN: %python %p/Inputs/def-many.py 65535 > %t-65535.def
+++# RUN: %python %p/Inputs/def-many.py 65536 > %t-65536.def
+++# RUN: llvm-mc -triple x86_64-win32 %s -filetype=obj -o %t.obj
+++# RUN: lld-link -dll -noentry %t.obj -out:%t.dll -def:%t-65535.def
+++# RUN: not lld-link -dll -noentry %t.obj -out:%t.dll -def:%t-65536.def 2>&1 | FileCheck %s
+++
+++# CHECK: error: too many exported symbols
+++
+++        .text
+++        .globl f
+++f:
+++        ret
++-- 
++2.29.0.rc1.windows.1
++
+diff --git a/clang/0302-LLD-Allow-configuring-default-ld.lld-backend.patch b/clang/0302-LLD-Allow-configuring-default-ld.lld-backend.patch
+new file mode 100644
+index 000000000..b22f212c6
+--- /dev/null
++++ b/clang/0302-LLD-Allow-configuring-default-ld.lld-backend.patch
+@@ -0,0 +1,59 @@
++From 61e0b2b4c5fbbea01bb40f28ea0222b87166ccdf Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Tue, 15 Sep 2020 08:39:15 +0300
++Subject: [PATCH] [LLD] Allow configuring default ld.lld backend
++
++The motivation for this is ld.lld --help targeting MinGW which
++currently prints help for the ELF backend unless -m i386pe{,p} is
++added. This confuses build systems that grep through linker help to
++find supported flags.
++
++This matches LD from Binutils which always prints help for MinGW
++when configured to target it.
++
++After this change, the backend can still be overridden to any
++supported ELF/MinGW target by using correct -m <arch>.
++
++Differential Revision: https://reviews.llvm.org/D87418
++---
++ CMakeLists.txt    | 6 ++++++
++ tools/lld.cpp | 5 +++++
++ 2 files changed, 11 insertions(+)
++
++diff --git a/CMakeLists.txt b/CMakeLists.txt
++index 34a7a68da42..8b8c7178c61 100644
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -174,6 +174,12 @@ endif()
++ option(LLD_BUILD_TOOLS
++   "Build the lld tools. If OFF, just generate build targets." ON)
++ 
+++option(LLD_DEFAULT_LD_LLD_IS_MINGW
+++    "Use MinGW as the default backend for ld.lld. If OFF, ELF will be used." OFF)
+++if (LLD_DEFAULT_LD_LLD_IS_MINGW)
+++  add_definitions("-DLLD_DEFAULT_LD_LLD_IS_MINGW=1")
+++endif()
+++
++ if (MSVC)
++   add_definitions(-wd4530) # Suppress 'warning C4530: C++ exception handler used, but unwind semantics are not enabled.'
++   add_definitions(-wd4062) # Suppress 'warning C4062: enumerator X in switch of enum Y is not handled' from system header.
++diff --git a/tools/lld/lld.cpp b/tools/lld/lld.cpp
++index 8a8f8d04bbd..d4e2fbb0309 100644
++--- a/tools/lld/lld.cpp
+++++ b/tools/lld/lld.cpp
++@@ -92,7 +92,12 @@ static bool isPETarget(std::vector<const char *> &v) {
++       continue;
++     return isPETargetName(*(it + 1));
++   }
+++
+++#ifdef LLD_DEFAULT_LD_LLD_IS_MINGW
+++  return true;
+++#else
++   return false;
+++#endif
++ }
++ 
++ static Flavor parseProgname(StringRef progname) {
++-- 
++2.29.0.rc1.windows.1
++
+diff --git a/clang/0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch b/clang/0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch
+new file mode 100644
+index 000000000..eb5d43591
+--- /dev/null
++++ b/clang/0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch
+@@ -0,0 +1,53 @@
++From 9b58b0c06e6906583a1225e5c8c51dda9cbc7cfd Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 8 Oct 2020 09:34:18 +0300
++Subject: [PATCH] [LLD] Ignore ELF tests when ld.lld defaults to MinGW
++
++Follow-up to D87418.
++
++Differential Revision: https://reviews.llvm.org/D88991
++---
++ test/CMakeLists.txt     | 1 +
++ test/lit.cfg.py         | 4 ++++
++ test/lit.site.cfg.py.in | 1 +
++ 3 files changed, 6 insertions(+)
++
++diff --git a/test/CMakeLists.txt b/test/CMakeLists.txt
++index ff957e89121..6875a54df99 100644
++--- a/test/CMakeLists.txt
+++++ b/test/CMakeLists.txt
++@@ -7,6 +7,7 @@ set(LLVM_LIBS_DIR "${LLVM_BINARY_DIR}/lib${LLVM_LIBDIR_SUFFIX}/%(build_config)s"
++ llvm_canonicalize_cmake_booleans(
++   HAVE_LIBZ
++   LLVM_LIBXML2_ENABLED
+++  LLD_DEFAULT_LD_LLD_IS_MINGW
++   )
++ 
++ configure_lit_site_cfg(
++diff --git a/test/lit.cfg.py b/test/lit.cfg.py
++index 090a7c21fa7..c031505e5c3 100644
++--- a/test/lit.cfg.py
+++++ b/test/lit.cfg.py
++@@ -110,3 +110,7 @@ if tar_executable:
++     sout, _ = tar_version.communicate()
++     if 'GNU tar' in sout.decode():
++         config.available_features.add('gnutar')
+++
+++# ELF tests expect the default target for ld.lld to be ELF.
+++if config.ld_lld_default_mingw:
+++    config.excludes.append('ELF')
++diff --git a/test/lit.site.cfg.py.in b/test/lit.site.cfg.py.in
++index bbc2c892eb7..a4e00b9dac9 100644
++--- a/test/lit.site.cfg.py.in
+++++ b/test/lit.site.cfg.py.in
++@@ -16,6 +16,7 @@ config.python_executable = "@Python3_EXECUTABLE@"
++ config.have_zlib = @LLVM_ENABLE_ZLIB@
++ config.have_libxml2 = @LLVM_ENABLE_LIBXML2@
++ config.sizeof_void_p = @CMAKE_SIZEOF_VOID_P@
+++config.ld_lld_default_mingw = @LLD_DEFAULT_LD_LLD_IS_MINGW@
++ 
++ # Support substitution of the tools and libs dirs with user parameters. This is
++ # used when we can't determine the tool dir at configuration time.
++-- 
++2.29.0.rc1.windows.1
++
+diff --git a/clang/0304-ignore-new-bfd-options.patch b/clang/0304-ignore-new-bfd-options.patch
+new file mode 100644
+index 000000000..790a8bf60
+--- /dev/null
++++ b/clang/0304-ignore-new-bfd-options.patch
+@@ -0,0 +1,13 @@
++diff --git a/MinGW/Options.td b/MinGW/Options.td
++index 0604b458193..efccf2d48ce 100644
++--- a/MinGW/Options.td
+++++ b/MinGW/Options.td
++@@ -114,6 +114,8 @@ def alias_undefined_u: JoinedOrSeparate<["-"], "u">, Alias<undefined>;
++ // Ignored options
++ def: Joined<["-"], "O">;
++ def: F<"build-id">;
+++def: F<"default-image-base-high">;
+++def: F<"default-image-base-low">;
++ def: F<"disable-auto-image-base">;
++ def: F<"enable-auto-image-base">;
++ def: F<"end-group">;
+diff --git a/clang/0305-Msysize.patch b/clang/0305-Msysize.patch
+new file mode 100644
+index 000000000..23a5c25fb
+--- /dev/null
++++ b/clang/0305-Msysize.patch
+@@ -0,0 +1,25 @@
++From 694a3db2770bf7c27455cb49b2fda65e2fb147b4 Mon Sep 17 00:00:00 2001
++From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
++Date: Thu, 29 Oct 2020 18:43:23 +0100
++Subject: Msysize
++
++---
++ CMakeLists.txt | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/CMakeLists.txt b/CMakeLists.txt
++index 040bb2c8f6d..c26abbb951f 100644
++--- a/CMakeLists.txt
+++++ b/CMakeLists.txt
++@@ -130,7 +130,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
++       set(LLVM_LIT_ARGS "${LIT_ARGS_DEFAULT}" CACHE STRING "Default options for lit")
++ 
++       # On Win32 hosts, provide an option to specify the path to the GnuWin32 tools.
++-      if(WIN32 AND NOT CYGWIN)
+++      if(WIN32 AND NOT (CYGWIN OR MSYS))
++         set(LLVM_LIT_TOOLS_DIR "" CACHE PATH "Path to GnuWin32 tools")
++       endif()
++     else()
++-- 
++2.29.0.windows.1
++
+diff --git a/clang/PKGBUILD b/clang/PKGBUILD
+new file mode 100644
+index 000000000..af7f7dd95
+--- /dev/null
++++ b/clang/PKGBUILD
+@@ -0,0 +1,217 @@
++# Maintainer: Mateusz Mikuła <mati865@gmail.com>
++
++_compiler=gcc
++# "Ninja" cant install each component seperately
++# https://github.com/martine/ninja/issues/932
++_generator="Unix Makefiles"
++#_generator="Ninja"
++if [ "${_generator}" = "Ninja" ]; then
++  _make_cmd="ninja"
++else
++  _make_cmd="make"
++fi
++
++_realname=clang
++pkgbase=mingw-w64-${_realname}
++pkgname=("${_realname}" "lld" "llvm")
++pkgver=11.0.0
++pkgrel=1
++pkgdesc="C language family frontend for LLVM"
++arch=('i686' 'x86_64')
++url="https://llvm.org/"
++license=("custom:Apache 2.0 with LLVM Exception")
++makedepends=("cmake"
++             "pkg-config"
++             "tar"
++             $([[ "$_generator" == "Ninja" ]] && echo \
++               "ninja")
++             )
++depends=("gcc")
++options=('!debug' 'strip')
++_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
++source=(${_url}/clang-${pkgver}.src.tar.xz{,.sig}
++        ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
++        ${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
++        "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
++        "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
++        "0009-empty-target-prefix-only-msvc.patch"
++        "0010-mbig-obj-for-all.patch"
++        "0011-Msysize.patch"
++        "0012-Add-minimal-msys-target.patch"
++        "0101-Allow-build-static-clang-library-for-mingw.patch"
++        "0102-fix-libclang-name-for-mingw.patch"
++        "0105-build-libclang-cpp-fix.patch"
++        "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch"
++        "0107-Msysize.patch"
++        "0108-Add-minimal-msys-target.patch"
++        "0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch"
++        "0302-LLD-Allow-configuring-default-ld.lld-backend.patch"
++        "0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch"
++        "0304-ignore-new-bfd-options.patch"
++        "0305-Msysize.patch")
++# Some patch notes :)
++#0001-0099 -> llvm
++#0101-0199 -> clang
++#0301-0399 -> lld
++sha256sums=('0f96acace1e8326b39f220ba19e055ba99b0ab21c2475042dbc6a482649c5209'
++            'SKIP'
++            'efe7be4a7b7cdc6f3bcf222827c6f837439e6e656d12d6c885d5c8a80ff4fd1c'
++            'SKIP'
++            '913f68c898dfb4a03b397c5e11c6a2f39d0f22ed7665c9cefa87a34423a72469'
++            'SKIP'
++            '9b6d3ecb0ef4a38d34aefaefff8c6257ff22d366d84630020d7f079dc8065d97'
++            '1f318c0370357fdf9c54ae6d31bad761b0caa58ac099998937b636309ecb6590'
++            '33400d16d5f6671a8fd60345c3ae44b9777a7d600061957889d14305eb2ad709'
++            '1c9efccd40a0e7834c3aa9d819aa25cfdd2cec389d1bd3e8a89bc9ff670a0129'
++            '462fb587e613c46948f7bc040e3523ae2fb0959b70ea0e18f10e4988ba36113c'
++            'fb37e32d843c817aaa57a15f2f65014c38eb80bfe2af7b84fe5c6f356eea836a'
++            'ddc43bc16f5edaf5290adabd71ce6a8a593fc3f824d7d99acd247bcce88aaf03'
++            '01b029f2a21bd998ce374a90d41d214c891dfbb611dfbd9ca147517cd2c228ea'
++            'a60f7328d84628a56a9f626e4dc26ffd0c35292c79eeba62ac3d4f25aef2fe5c'
++            '0098da33ce4cfea2a6b6943c15e769345f89b84ebea28facff4cc8b92a17bc8f'
++            '865706f9816bfa5abaa648cf7f14e2350bc384ae01109ba821bc9296f7851b39'
++            '2189f1e4bb90d11111ebf0d22a1f6f6f7cb05d69617cae9b21e9f1e195ebd8c1'
++            '0b996f438f7c7bf42c789729dfd588a65d5016386e7032e03e8cd52f1dc8bc73'
++            'c74c313e442a5b8fed7c6372ac8ff8f3598c9e33db1b520f1297949e18042e55'
++            '2e1705274dfc55466cc8977e61d569a685e18ce07895cbec2ccf3b848eafd8ee'
++            '778e0db0a5b0657ab05e2a81d83241347a4a41af2b0f9903422f651fa58e8d40'
++            'b2b5fd8b23710d172082df92c4d44dc31eb948cb34d325c106dde22d8d559d01')
++validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
++              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
++noextract=(clang-${pkgver}.src.tar.xz)
++
++apply_patch_with_msg() {
++  for _patch in "$@"
++  do
++    msg2 "Applying ${_patch}"
++    patch -Nbp1 -i "${srcdir}/${_patch}"
++  done
++}
++
++prepare() {
++  plain "Extracting clang-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
++  [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
++  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
++
++  cd "${srcdir}/llvm-${pkgver}.src"
++  apply_patch_with_msg \
++      "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
++      "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch" \
++      "0009-empty-target-prefix-only-msvc.patch" \
++      "0010-mbig-obj-for-all.patch" \
++      "0011-Msysize.patch" \
++      "0012-Add-minimal-msys-target.patch"
++
++  cd "${srcdir}/clang-${pkgver}.src"
++  apply_patch_with_msg \
++      "0101-Allow-build-static-clang-library-for-mingw.patch" \
++      "0102-fix-libclang-name-for-mingw.patch" \
++      "0105-build-libclang-cpp-fix.patch" \
++      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch" \
++      "0107-Msysize.patch" \
++      "0108-Add-minimal-msys-target.patch"
++
++  cd "${srcdir}/lld-${pkgver}.src"
++  apply_patch_with_msg \
++      "0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch" \
++      "0302-LLD-Allow-configuring-default-ld.lld-backend.patch" \
++      "0303-LLD-Ignore-ELF-tests-when-ld.lld-defaults-to-MinGW.patch" \
++      "0304-ignore-new-bfd-options.patch" \
++      "0305-Msysize.patch"
++
++  cd "${srcdir}"
++  rm -rf clang lldb | true
++  mv "${srcdir}/clang-${pkgver}.src"             clang
++  mv "${srcdir}/lld-${pkgver}.src"               lld
++}
++
++build() {
++  cd "${srcdir}"
++
++  [[ -d build-${CARCH} ]] && rm -rf build-${CARCH}
++  mkdir build-${CARCH} && cd build-${CARCH}
++
++  local -a extra_config
++
++  if check_option "debug" "y"; then
++    extra_config+=(-DCMAKE_BUILD_TYPE=Debug)
++    VERBOSE="VERBOSE=1"
++  else
++    extra_config+=(-DCMAKE_BUILD_TYPE=Release)
++  fi
++
++  cmake \
++    -G"$_generator" \
++    -DCMAKE_INSTALL_PREFIX=/usr \
++    -DLIBCLANG_BUILD_STATIC=ON \
++    -DLLD_DEFAULT_LD_LLD_IS_MINGW=ON \
++    -DLLVM_BUILD_LLVM_DYLIB=ON \
++    -DLLVM_BUILD_STATIC=OFF \
++    -DLLVM_ENABLE_ASSERTIONS=OFF \
++    -DLLVM_ENABLE_PROJECTS="clang;lld" \
++    -DLLVM_ENABLE_THREADS=ON \
++    -DLLVM_INCLUDE_EXAMPLES=OFF \
++    -DLLVM_INCLUDE_TESTS=OFF \
++    -DLLVM_LINK_LLVM_DYLIB=ON \
++    "${extra_config[@]}" \
++    ../llvm-${pkgver}.src
++
++  ${_make_cmd}
++
++  # Disable automatic installation of components that go into subpackages
++  # -i.orig to check what has been removed in-case it starts dropping more than it should
++  #
++  sed -i.orig '/\(clang\|lld\)\/cmake_install.cmake/d' tools/cmake_install.cmake
++}
++
++check() {
++ cd "${srcdir}"/build-${CARCH}
++ # Remove || true once testcase doesn't cause failures.
++#  make check || true
++#  make check-clang || true
++  make check-lld || true
++}
++
++package_clang() {
++  pkgdesc="C language family frontend for LLVM"
++  url="https://clang.llvm.org/"
++  depends=("gcc" "llvm=${pkgver}-${pkgrel}")
++
++  cd "${srcdir}/clang"
++  ${_make_cmd} -C ../build-${CARCH}/tools/clang DESTDIR="${pkgdir}" install
++
++  # Install static libraries
++  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}/usr/lib/libclang.a
++  install -Dm644 ../build-${CARCH}/lib/libclang.a ${pkgdir}/usr/lib/libclang_static.a
++}
++
++package_lld() {
++  pkgdesc="Linker tools for LLVM"
++  url="https://lld.llvm.org/"
++  depends=("gcc-libs" "llvm=${pkgver}-${pkgrel}")
++
++  cd "${srcdir}/lld"
++  ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
++}
++
++package_llvm() {
++  pkgdesc="Low Level Virtual Machine"
++  depends=("gcc-libs")
++
++  cd "${srcdir}"/llvm-${pkgver}.src
++
++  ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
++
++  install -Dm644 LICENSE.TXT "${pkgdir}/usr/share/licenses/llvm/LICENSE"
++
++  # Install CMake stuff
++  install -d "${pkgdir}"/usr/share/llvm/cmake/{modules,platforms}
++  install -Dm644 "${srcdir}"/llvm-${pkgver}.src/cmake/modules/*.cmake "${pkgdir}"/usr/share/llvm/cmake/modules/
++  install -Dm644 "${srcdir}"/llvm-${pkgver}.src/cmake/platforms/*.cmake "${pkgdir}"/usr/share/llvm/cmake/platforms/
++
++  # FileCheck is needed to build rust.
++  install -Dm755 "${srcdir}"/build-${CARCH}/bin/FileCheck.exe "${pkgdir}/usr/bin/FileCheck.exe"
++  # fix cmake files.
++  local PREFIX_WIN=$(cygpath -a ${srcdir}/build-${CARCH})
++  sed -e "s|${PREFIX_WIN}|/usr|g" -i ${pkgdir}/usr/lib/cmake/llvm/LLVMConfig.cmake
++}
+diff --git a/mingw-w64-cross-clang/PKGBUILD b/mingw-w64-cross-clang/PKGBUILD
+new file mode 100644
+index 000000000..25146678b
+--- /dev/null
++++ b/mingw-w64-cross-clang/PKGBUILD
+@@ -0,0 +1,153 @@
++# Maintainer: Mateusz Mikuła <mati865@gmail.com>
++
++_realname=clang
++_mingw_suff=mingw-w64-cross
++pkgname=("${_mingw_suff}-${_realname}")
++pkgver=11.0.0
++pkgrel=1
++pkgdesc="Cross Clang for the MinGW-w64"
++arch=('i686' 'x86_64')
++url="https://llvm.org"
++license=('custom:Apache 2.0 with LLVM Exception')
++depends=('mingw-w64-cross-crt' 'mingw-w64-cross-compiler-rt')
++makedepends=("cmake")
++options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
++_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
++source=(${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
++        ${_url}/libcxx-${pkgver}.src.tar.xz{,.sig}
++        ${_url}/libcxxabi-${pkgver}.src.tar.xz{,.sig}
++        ${_url}/libunwind-${pkgver}.src.tar.xz{,.sig})
++sha256sums=('913f68c898dfb4a03b397c5e11c6a2f39d0f22ed7665c9cefa87a34423a72469'
++            'SKIP'
++            '6c1ee6690122f2711a77bc19241834a9219dda5036e1597bfa397f341a9b8b7a'
++            'SKIP'
++            '58697d4427b7a854ec7529337477eb4fba16407222390ad81a40d125673e4c15'
++            'SKIP'
++            '8455011c33b14abfe57b2fd9803fb610316b16d4c9818bec552287e2ba68922f'
++            'SKIP')
++validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
++              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
++noextract=(libcxx-${pkgver}.src.tar.xz)
++
++_target="x86_64-w64-mingw32"
++
++prepare() {
++  plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
++  [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
++  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
++
++  cd ${srcdir}
++
++  mv "${srcdir}/libcxxabi-${pkgver}.src"         libcxxabi
++  mv "${srcdir}/libcxx-${pkgver}.src"            libcxx
++  mv "${srcdir}/libunwind-${pkgver}.src"         libunwind
++}
++
++build() {
++  cd "${srcdir}"
++
++  [[ -d build-${CARCH} ]] && rm -rf build-${CARCH}
++  mkdir build-${CARCH} && cd build-${CARCH}
++
++  export CC="clang" CXX="clang++" AS="clang" AR="llvm-ar" RANLIB="llvm-ranlib" DLLTOOL="llvm-dlltool" LD="clang"
++
++  CFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -rtlib=compiler-rt"
++  CPPFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++  CXXFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -rtlib=compiler-rt"
++  LDFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -rtlib=compiler-rt -fuse-ld=lld"
++
++  # Force win32 threads for libc++abi
++  export CXXFLAGS+=" -D_LIBCPP_HAS_THREAD_API_WIN32"
++  COMMON_CMAKE_ARGS=(-G'Unix Makefiles'
++    -DCMAKE_BUILD_TYPE=Release
++    -DCMAKE_C_COMPILER_WORKS=ON
++    -DCMAKE_CROSSCOMPILING=ON
++    -DCMAKE_CXX_COMPILER_WORKS=ON
++    -DCMAKE_INSTALL_PREFIX=/opt/${_target}
++    -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
++    -DCMAKE_SYSTEM_NAME=Windows
++    -DCXX_SUPPORTS_CUSTOM_LINKER=ON
++    -DHAVE_CXX_ATOMICS_WITHOUT_LIB=ON
++    -DHAVE_CXX_ATOMICS64_WITHOUT_LIB=ON
++    -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
++    -DLIBCXX_ENABLE_NEW_DELETE_DEFINITIONS=ON
++    -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
++    -DLIBCXX_HAS_WIN32_THREAD_API=ON
++    -DLIBCXX_INCLUDE_BENCHMARKS=OFF
++    -DLIBCXX_USE_COMPILER_RT=ON
++    -DLIBCXXABI_ENABLE_NEW_DELETE_DEFINITIONS=OFF
++    -DLIBCXXABI_ENABLE_SHARED=OFF
++    -DLIBCXXABI_ENABLE_STATIC=ON
++    -DLIBCXXABI_INSTALL_SHARED_LIBRARY=OFF
++    -DLIBCXXABI_INSTALL_STATIC_LIBRARY=OFF
++    -DLIBCXXABI_USE_COMPILER_RT=ON
++    -DLIBCXXABI_USE_LLVM_UNWINDER=ON
++    -DLIBUNWIND_ENABLE_SHARED=ON
++    -DLIBUNWIND_USE_COMPILER_RT=ON
++    -DLLVM_ENABLE_LIBCXX=ON
++    -DLLVM_ENABLE_PROJECTS="libcxx;libcxxabi;libunwind")
++
++  cd "${srcdir}"
++
++  [[ -d build-libcxx-shared-${CARCH} ]] && rm -rf build-libcxx-shared-${CARCH}
++  mkdir build-libcxx-shared-${CARCH} && cd build-libcxx-shared-${CARCH}
++
++  cmake \
++    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_LIBCPP_BUILDING_LIBRARY -U_LIBCXXABI_DISABLE_VISIBILITY_ANNOTATIONS" \
++    -DLIBCXX_ENABLE_SHARED=ON \
++    -DLIBCXX_ENABLE_STATIC=OFF \
++    -DLIBUNWIND_ENABLE_STATIC=OFF \
++    "${COMMON_CMAKE_ARGS[@]}" \
++    ${extra_config[@]} \
++    ../llvm-${pkgver}.src
++
++  make cxx
++
++  cd "${srcdir}"
++
++  [[ -d build-libcxx-static-${CARCH} ]] && rm -rf build-libcxx-static-${CARCH}
++  mkdir build-libcxx-static-${CARCH} && cd build-libcxx-static-${CARCH}
++
++  cmake \
++    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -D_LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS" \
++    -DLIBCXX_ENABLE_SHARED=OFF \
++    -DLIBCXX_ENABLE_STATIC=ON \
++    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
++    -DLIBUNWIND_ENABLE_STATIC=ON \
++    "${COMMON_CMAKE_ARGS[@]}" \
++    ${extra_config[@]} \
++    ../llvm-${pkgver}.src
++
++  make unwind cxx
++}
++
++package() {
++  cd "${srcdir}/libcxxabi"
++  make -C ../build-libcxx-static-${CARCH}/projects/libcxxabi DESTDIR="${pkgdir}/" install
++
++  cd "$srcdir/libcxx"
++  make -C ../build-libcxx-shared-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
++  make -C ../build-libcxx-static-${CARCH}/projects/libcxx DESTDIR="${pkgdir}" install
++  install -Dm644 "${srcdir}/build-libcxx-static-${CARCH}/lib/libc++experimental.a" "${pkgdir}/opt/${_target}/lib/libc++experimental.a"
++
++  cd "${srcdir}/libunwind"
++  make -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
++  install "${srcdir}/build-libcxx-static-${CARCH}/lib/libunwind.dll" "${pkgdir}/opt/${_target}/bin/libunwind.dll"
++
++  _prefix="${pkgdir}/opt/${_target}/bin"
++  for tool in addr2line ar dlltool nm objcopy objdump ranlib rc readelf readobj strings strip; do
++    printf "#!/bin/bash\n\n/usr/bin/llvm-${tool} \$@" | tee "${_prefix}/${tool}" "${_prefix}/${_target}-${tool}" > /dev/null
++  done
++  for tool in as cc clang; do
++    printf "#!/bin/bash\n\n/usr/bin/clang -target ${_target} -fuse-ld=lld -rtlib=compiler-rt -unwindlib=libunwind -Wno-error=unused-command-line-argument --sysroot=/opt/${_target} \$@" | tee "${_prefix}/${tool}" "${_prefix}/${_target}-${tool}" > /dev/null
++  done
++  for tool in c++ clang++; do
++    printf "#!/bin/bash\n\n/usr/bin/clang++ -target ${_target} -fuse-ld=lld -rtlib=compiler-rt -stdlib=libc++ -unwindlib=libunwind -Wno-error=unused-command-line-argument --sysroot=/opt/${_target} \$@" | tee "${_prefix}/${tool}" "${_prefix}/${_target}-${tool}" > /dev/null
++  done
++  for tool in ld ld.lld; do
++    printf "#!/bin/bash\n\n/usr/bin/ld.lld \$@" | tee "${_prefix}/${tool}" "${_prefix}/${_target}-${tool}" > /dev/null
++  done
++    for tool in lld; do
++    printf "#!/bin/bash\n\n/usr/bin/lld \$@" | tee "${_prefix}/${tool}" "${_prefix}/${_target}-${tool}" > /dev/null
++  done
++}
+diff --git a/mingw-w64-cross-compiler-rt/PKGBUILD b/mingw-w64-cross-compiler-rt/PKGBUILD
+new file mode 100644
+index 000000000..114d60274
+--- /dev/null
++++ b/mingw-w64-cross-compiler-rt/PKGBUILD
+@@ -0,0 +1,68 @@
++# Maintainer: Mateusz Mikuła <mati865@gmail.com>
++
++_realname=compiler-rt
++_mingw_suff=mingw-w64-cross
++pkgname=("${_mingw_suff}-${_realname}")
++pkgver=11.0.0
++pkgrel=1
++pkgdesc="Cross Clang for the MinGW-w64"
++arch=('i686' 'x86_64')
++url="https://llvm.org"
++license=('custom:Apache 2.0 with LLVM Exception')
++depends=('clang')
++makedepends=("cmake" "ninja" "${_mingw_suff}-headers")
++options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
++_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
++source=(${_url}/compiler-rt-${pkgver}.src.tar.xz{,.sig})
++sha256sums=('374aff82ff573a449f9aabbd330a5d0a441181c535a3599996127378112db234'
++            'SKIP')
++validpgpkeys=('B6C8F98282B944E3B0D5C2530FC3042E345AD05D'  # Hans Wennborg, Google.
++              '474E22316ABF4785A88C6E8EA2C794A986419D8A') # Tom Stellard
++
++_target="x86_64-w64-mingw32"
++
++prepare() {
++  cd ${srcdir}
++}
++
++build() {
++  cd "${srcdir}"
++
++  [[ -d build-${CARCH} ]] && rm -rf build-${CARCH}
++  mkdir build-${CARCH} && cd build-${CARCH}
++
++  export CC="clang" CXX="clang++" AS="clang" AR="llvm-ar" RANLIB="llvm-ranlib" DLLTOOL="llvm-dlltool" LD="clang"
++
++  CFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++  CPPFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++  CXXFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++  LDFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -fuse-ld=lld"
++
++  cmake \
++    -G'Ninja' \
++    -DCMAKE_BUILD_TYPE=Release \
++    -DCMAKE_C_COMPILER_TARGET=${CARCH}-windows-gnu \
++    -DCMAKE_C_COMPILER_WORKS=ON \
++    -DCMAKE_CXX_COMPILER_WORKS=ON \
++    -DCMAKE_INSTALL_PREFIX=/usr \
++    -DCMAKE_SIZEOF_VOID_P=8 \
++    -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
++    -DCMAKE_SYSTEM_NAME=Windows \
++    -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
++    -DCOMPILER_RT_BUILD_PROFILE=OFF \
++    -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
++    -DCOMPILER_RT_BUILD_XRAY=OFF \
++    -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
++    -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
++    ../${_realname}-${pkgver}.src
++
++  ninja
++}
++
++package() {
++  cd $srcdir/build-${CARCH}
++
++  # ninja install needs working compiler detection to find correct directory
++  mkdir -p "${pkgdir}/usr/lib/clang/${pkgver}/lib/windows"
++  cp "lib/windows/libclang_rt.builtins-${CARCH}.a" "${pkgdir}/usr/lib/clang/${pkgver}/lib/windows"
++}
+diff --git a/mingw-w64-cross-crt-git/0005-handle-ctor_list-internally.patch b/mingw-w64-cross-crt-git/0005-handle-ctor_list-internally.patch
+deleted file mode 100644
+index 5356e68cb..000000000
+--- a/mingw-w64-cross-crt-git/0005-handle-ctor_list-internally.patch
++++ /dev/null
+@@ -1,61 +0,0 @@
+-From ca451a7a45d4876065edc6755f8aab8095914b04 Mon Sep 17 00:00:00 2001
+-From: Martell Malone <martellmalone@gmail.com>
+-Date: Sat, 21 Nov 2015 18:43:46 -0800
+-Subject: [PATCH] Handle __CTOR_LIST__ internally within mingw-w64
+-
+----
+- mingw-w64-crt/crt/gccmain.c | 19 +++++++++++++------
+- 1 file changed, 13 insertions(+), 6 deletions(-)
+-
+-diff --git a/mingw-w64-crt/crt/gccmain.c b/mingw-w64-crt/crt/gccmain.c
+-index fc0e350..ba50691 100644
+---- a/mingw-w64-crt/crt/gccmain.c
+-+++ b/mingw-w64-crt/crt/gccmain.c
+-@@ -9,8 +9,15 @@
+- #include <setjmp.h>
+- 
+- typedef void (*func_ptr) (void);
+--extern func_ptr __CTOR_LIST__[];
+--extern func_ptr __DTOR_LIST__[];
+-+#define STATIC static
+-+
+-+STATIC func_ptr __MINGW_CTOR_LIST__[1]
+-+  __attribute__ ((__used__, section(".ctors"), aligned(sizeof(func_ptr))))
+-+  = { (func_ptr) (-1) };
+-+
+-+STATIC func_ptr __MINGW_DTOR_LIST__[1]
+-+  __attribute__((section(".dtors"), aligned(sizeof(func_ptr))))
+-+  = { (func_ptr) (-1) };
+- 
+- void __do_global_dtors (void);
+- void __do_global_ctors (void);
+-@@ -19,7 +26,7 @@ void __main (void);
+- void
+- __do_global_dtors (void)
+- {
+--  static func_ptr *p = __DTOR_LIST__ + 1;
+-+  static func_ptr *p = __MINGW_DTOR_LIST__ + 1;
+- 
+-   while (*p)
+-     {
+-@@ -31,17 +38,17 @@ __do_global_dtors (void)
+- void
+- __do_global_ctors (void)
+- {
+--  unsigned long nptrs = (unsigned long) (ptrdiff_t) __CTOR_LIST__[0];
+-+  unsigned long nptrs = (unsigned long) (ptrdiff_t) __MINGW_CTOR_LIST__[0];
+-   unsigned long i;
+- 
+-   if (nptrs == (unsigned long) -1)
+-     {
+--      for (nptrs = 0; __CTOR_LIST__[nptrs + 1] != 0; nptrs++);
+-+      for (nptrs = 0; __MINGW_CTOR_LIST__[nptrs + 1] != 0; nptrs++);
+-     }
+- 
+-   for (i = nptrs; i >= 1; i--)
+-     {
+--      __CTOR_LIST__[i] ();
+-+      __MINGW_CTOR_LIST__[i] ();
+-     }
+- 
+-   atexit (__do_global_dtors);
+diff --git a/mingw-w64-cross-crt-git/PKGBUILD b/mingw-w64-cross-crt-git/PKGBUILD
+index a50889910..da4732835 100644
+--- a/mingw-w64-cross-crt-git/PKGBUILD
++++ b/mingw-w64-cross-crt-git/PKGBUILD
+@@ -2,13 +2,12 @@
+ # Contributor: Martell Malone <martellmalone@gmail.com>
+ 
+ # controls the compiler that builds the crt with _variant
+-#_variant=clang
++# _variant=clang
+ _variant=gcc
+ 
+ _realname=crt
+ _mingw_suff=mingw-w64-cross
+ pkgname="${_mingw_suff}-${_realname}-git"
+-replaces=("${_mingw_suff}-${_realname}")
+ provides=("${_mingw_suff}-${_realname}")
+ conflicts=("${_mingw_suff}-${_realname}")
+ pkgver=9.0.0.6029.ecb4ff54
+@@ -18,26 +17,23 @@ arch=('i686' 'x86_64')
+ url='https://mingw-w64.sourceforge.io/'
+ license=('custom')
+ if [ "${_variant}" = "gcc" ]; then
+-groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
++  groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
++  replaces=("${_mingw_suff}-${_realname}")
+ fi
+ depends=("${_mingw_suff}-headers")
+ 
+ if [ "${_variant}" = "clang" ]; then
+   makedepends=("git" "clang" "lld")
+   pkgname="${_mingw_suff}-${_realname}-clang-git"
+-  _imptool=genlib
+ else
+   makedepends=("git" "${_mingw_suff}-gcc" "${_mingw_suff}-binutils")
+-  _imptool=dlltool
+ fi
+ 
+ options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
+ _commit='ecb4ff5498dfedd6abcbadb889b84fab19ee57b2'
+-source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#commit=$_commit"
+-        "0005-handle-ctor_list-internally.patch")
++source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#commit=$_commit")
+ 
+-sha256sums=('SKIP'
+-            '0eabe00375d4e26fd7e9afa56f6a9da02845fe2c0f900f5e1f829842bff8624a')
++sha256sums=('SKIP')
+ 
+ _targets="x86_64-w64-mingw32 i686-w64-mingw32" #armv7-w64-mingw32
+ 
+@@ -51,9 +47,6 @@ pkgver() {
+ 
+ prepare() {
+   cd "${srcdir}/mingw-w64"
+-  if [ "${_variant}" = "clang" ]; then
+-    git am "${srcdir}"/0005-handle-ctor_list-internally.patch
+-  fi
+ }
+ 
+ build() {
+@@ -72,16 +65,13 @@ build() {
+   esac
+     mkdir -p ${srcdir}/crt-${_target} && cd ${srcdir}/crt-${_target}
+ 
+-    #--with-host-libstdcxx="-lstdc++ -lsupc++"
+-    # we must stitch to this once i get it built / working :)
+-    # AS = as
+-
+     if [ "${_variant}" = "clang" ]; then
+-      export CC="${_target}-clang" CXX="${_target}-clang++" AR="llvm-ar" RANLIB="llvm-ranlib" DLLTOOL="${_target}-dlltool" LD="lld"
+-    fi
+-
+-    if [ "${_imptool}" = "genlib" ]; then
+-      _crt_configure_args+=" --with-genlib"
++      export CC="clang" CXX="clang++" AS="clang" AR="llvm-ar" RANLIB="llvm-ranlib" DLLTOOL="llvm-dlltool" LD="clang"
++      _crt_configure_args+=" --with-default-msvcrt=ucrt"
++      CFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++      CPPFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++      CXXFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
++      LDFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -fuse-ld=lld"
+     fi
+ 
+     ${srcdir}/mingw-w64/mingw-w64-crt/configure \
+diff --git a/mingw-w64-cross-headers-git/PKGBUILD b/mingw-w64-cross-headers-git/PKGBUILD
+index 9d6a89d17..8ebe2ed5f 100644
+--- a/mingw-w64-cross-headers-git/PKGBUILD
++++ b/mingw-w64-cross-headers-git/PKGBUILD
+@@ -1,10 +1,19 @@
+ # Maintainer: Alexey Pavlov <alexpux@gmail.com>
+ # Contributor: Martell Malone <martellmalone@gmail.com>
+ 
++# controls the compiler that builds the crt with _variant
++# _variant=clang
++_variant=gcc
++
+ _realname=headers
+ _mingw_suff=mingw-w64-cross
+-pkgname=("${_mingw_suff}-${_realname}-git")
+-replaces=("${_mingw_suff}-${_realname}")
++if [ "${_variant}" = "clang" ]; then
++  pkgname=("${_mingw_suff}-${_realname}-clang-git")
++else
++  pkgname=("${_mingw_suff}-${_realname}-git")
++  replaces=("${_mingw_suff}-${_realname}")
++  groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
++fi
+ provides=("${_mingw_suff}-${_realname}")
+ conflicts=("${_mingw_suff}-${_realname}")
+ pkgdesc="MinGW-w64 headers for cross-compiler"
+@@ -13,7 +22,6 @@ pkgrel=2
+ arch=('i686' 'x86_64')
+ url="https://mingw-w64.sourceforge.io/"
+ license=('custom')
+-groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
+ makedepends=('git')
+ options=('!strip' '!libtool' '!emptydirs' '!buildflags')
+ _commit='ecb4ff5498dfedd6abcbadb889b84fab19ee57b2'
+@@ -38,13 +46,21 @@ build() {
+   for _target in ${_targets}; do
+     msg "Configuring ${_target} headers"
+     mkdir -p ${srcdir}/headers-${_target} && cd ${srcdir}/headers-${_target}
++
++    if [ "${_variant}" = "clang" ]; then
++      _crt="ucrt"
++    else
++      _crt="msvcrt"
++    fi
++
+     ${srcdir}/mingw-w64/mingw-w64-headers/configure \
+     --build=${CHOST} \
+     --host=${_target} \
+     --prefix=/opt/${_target} \
+     --enable-sdk=all \
+     --enable-secure-api \
+-    --with-default-win32-winnt=0x601
++    --with-default-win32-winnt=0x601 \
++    --with-default-msvcrt=${_crt}
+   done
+ }
+ 
+@@ -54,8 +70,10 @@ package() {
+     cd ${srcdir}/headers-${_target}
+     make DESTDIR=${pkgdir} install
+ 
+-    rm ${pkgdir}/opt/${_target}/include/pthread_signal.h
+-    rm ${pkgdir}/opt/${_target}/include/pthread_time.h
+-    rm ${pkgdir}/opt/${_target}/include/pthread_unistd.h
++    if [ "${_variant}" != "clang" ]; then
++      rm ${pkgdir}/opt/${_target}/include/pthread_signal.h
++      rm ${pkgdir}/opt/${_target}/include/pthread_time.h
++      rm ${pkgdir}/opt/${_target}/include/pthread_unistd.h
++    fi
+   done
+ }
+
+From dc477a9de19ad34f147399cf83537042673c9719 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mateusz=20Miku=C5=82a?= <mati865@gmail.com>
+Date: Sat, 7 Nov 2020 01:33:56 +0100
+Subject: [PATCH 2/2] Use Clang variant of mingw-64 cross packages to test CI
+
+---
+ mingw-w64-cross-crt-git/PKGBUILD     | 4 ++--
+ mingw-w64-cross-headers-git/PKGBUILD | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/mingw-w64-cross-crt-git/PKGBUILD b/mingw-w64-cross-crt-git/PKGBUILD
+index da4732835..a65979fd3 100644
+--- a/mingw-w64-cross-crt-git/PKGBUILD
++++ b/mingw-w64-cross-crt-git/PKGBUILD
+@@ -2,8 +2,8 @@
+ # Contributor: Martell Malone <martellmalone@gmail.com>
+ 
+ # controls the compiler that builds the crt with _variant
+-# _variant=clang
+-_variant=gcc
++_variant=clang
++# _variant=gcc
+ 
+ _realname=crt
+ _mingw_suff=mingw-w64-cross
+diff --git a/mingw-w64-cross-headers-git/PKGBUILD b/mingw-w64-cross-headers-git/PKGBUILD
+index 8ebe2ed5f..e0a399355 100644
+--- a/mingw-w64-cross-headers-git/PKGBUILD
++++ b/mingw-w64-cross-headers-git/PKGBUILD
+@@ -2,8 +2,8 @@
+ # Contributor: Martell Malone <martellmalone@gmail.com>
+ 
+ # controls the compiler that builds the crt with _variant
+-# _variant=clang
+-_variant=gcc
++_variant=clang
++# _variant=gcc
+ 
+ _realname=headers
+ _mingw_suff=mingw-w64-cross

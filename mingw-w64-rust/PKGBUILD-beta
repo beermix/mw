@@ -31,7 +31,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/2020-10-21/rustc-beta-src.tar.xz"
+source=("https://static.rust-lang.org/dist/2020-11-18/rustc-beta-src.tar.xz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
