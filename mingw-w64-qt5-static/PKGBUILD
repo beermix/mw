@@ -9,7 +9,7 @@ _variant=-static
 # Tune the following to decide how and what to build
 if [ "${_variant}" = "-static" ]; then
   _namesuff="-static"
-  _build_mode=("-release")
+  _build_mode=("-debug-and-release")
   _with_icu=no
   _with_fontconfig=no
   _with_openssl=no
@@ -32,7 +32,7 @@ if [ "${_variant}" = "-static" ]; then
   _ltcg="no"
 else
   _namesuff=
-  _build_mode=("-release")
+  _build_mode=("-release" "-force-debug-info" "-separate-debug-info")
   _with_icu=yes
   _with_fontconfig=yes
   _with_openssl=yes
@@ -109,7 +109,7 @@ pkgbase="mingw-w64-${_realname}"
 if [ "${_variant}" = "-static" ]; then
   pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 else
-  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+  pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}" "${MINGW_PACKAGE_PREFIX}-${_realname}-debug")
 fi
 _ver_base=5.15.1
 # use 5.6.1-1 hot fix : only the archive name was changed from *-5.6.1.tar.xz to *-5.6.1-1.tar.xz
@@ -156,7 +156,8 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
             "${MINGW_PACKAGE_PREFIX}-xpm-nox" \
             $([[ "$_system_zlib" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-zlib"))
             $([[ "$_with_icu" == "yes" ]] && echo \
-              "${MINGW_PACKAGE_PREFIX}-icu")
+              "${MINGW_PACKAGE_PREFIX}-icu" \
+              "${MINGW_PACKAGE_PREFIX}-icu-debug-libs")
         )
 optdepends=($([[ "$_variant" == "-shared" ]] && echo \
               "${MINGW_PACKAGE_PREFIX}-clang" \
@@ -339,13 +340,13 @@ prepare() {
   local _HARD_FLAGS=
   case ${MINGW_CHOST} in
     i686*)
-      _ARCH_TUNE="-march=i686 -mtune=haswell"
+      _ARCH_TUNE="-march=i686 -mtune=core2"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--nxcompat,--no-seh"
       fi
     ;;
     x86_64*)
-      _ARCH_TUNE="-march=nocona -mtune=haswell"
+      _ARCH_TUNE="-march=nocona -mtune=core2"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--high-entropy-va,--nxcompat,--default-image-base-high"
       fi
@@ -646,8 +647,8 @@ package_it() {
   install -D -m644 LICENSE.LGPLv3  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.LGPLv3
   install -D -m644 LICENSE.QT-LICENSE-AGREEMENT  "${pkgdir}${_qt5_prefix}"/share/licenses/qt5/LICENSE.QT-LICENSE-AGREEMENT
 
-#  mv -f "${pkgdir}${_qt5_prefix}/lib"/*.debug "${pkgdir}${_qt5_prefix}/bin"/ || true
-#  rsync -armR --remove-source-files --include="*/" --include="*.debug" --exclude="*" --prune-empty-dirs ${pkgdir}/.${MINGW_PREFIX} ${srcdir}/${CARCH}-debug/
+  mv -f "${pkgdir}${_qt5_prefix}/lib"/*.debug "${pkgdir}${_qt5_prefix}/bin"/ || true
+  rsync -armR --remove-source-files --include="*/" --include="*.debug" --exclude="*" --prune-empty-dirs ${pkgdir}/.${MINGW_PREFIX} ${srcdir}/${CARCH}-debug/
 
   # Remove dlls from lib/
   rm -f "${pkgdir}${_qt5_prefix}/lib"/*.dll
@@ -715,8 +716,16 @@ package_mingw-w64-i686-qt5() {
   package_it
 }
 
+package_mingw-w64-i686-qt5-debug() {
+  cp -rf ${srcdir}/${CARCH}-debug${MINGW_PREFIX} "${pkgdir}"/
+}
+
 package_mingw-w64-x86_64-qt5() {
   package_it
+}
+
+package_mingw-w64-x86_64-qt5-debug() {
+  cp -rf ${srcdir}/${CARCH}-debug${MINGW_PREFIX} "${pkgdir}"/
 }
 
 fi
