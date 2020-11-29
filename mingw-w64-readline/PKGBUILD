@@ -17,7 +17,7 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('staticlibs' 'strip')
 license=('GPL')
 url="https://cnswww.cns.cwru.edu/php/chet/readline/rltop.html"
-source=("https://ftp.gnu.org/gnu/${_realname}/${_realname}-${_basever}.tar.gz"{,.sig}
+source=("https://ftp.gnu.org/gnu/${_realname}/${_realname}-${_basever}.tar.gz"
         0001-Add-private-history_rename-function-and-in-WIN32-use.patch)
 if [ ${_patchlevel} -gt 00 ]; then
     for (( p=1; p<=$((10#${_patchlevel})); p++ )); do

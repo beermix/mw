@@ -35,7 +35,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-capstone"
          "${MINGW_PACKAGE_PREFIX}-libslirp"
          "${MINGW_PACKAGE_PREFIX}-usbredir"
          "${MINGW_PACKAGE_PREFIX}-zstd")
-source=(https://download.qemu.org/${_realname}-${pkgver}.tar.xz{,.sig})
+source=(https://download.qemu.org/${_realname}-${pkgver}.tar.xz)
 sha256sums=('c9174eb5933d9eb5e61f541cd6d1184cd3118dfe4c5c4955bc1bdc4d390fa4e5'
             'SKIP')
 validpgpkeys=('CEACC9E15534EBABB82D3FA03353C9CEF108B584') # Michael Roth <flukshun@gmail.com>

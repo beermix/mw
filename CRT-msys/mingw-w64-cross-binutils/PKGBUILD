@@ -16,7 +16,7 @@ checkdepends=('dejagnu' 'bc')
 makedepends=("libiconv" "zlib")
 options=('staticlibs' '!distcc' '!ccache' '!buildflags')
 #install=binutils.install
-source=(https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2{,.sig}
+source=(https://ftp.gnu.org/gnu/binutils/binutils-${pkgver}.tar.bz2
         0001-enable-gold-on.mingw32.patch
         0002-check-for-unusual-file-harder.patch
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch

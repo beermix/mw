@@ -21,7 +21,7 @@ options=('strip' 'staticlibs')
 license=(GPL3 partial:'LGPL2.1')
 
 url="https://www.gnu.org/software/gettext/"
-source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"{,.sig}
+source=("https://ftp.gnu.org/pub/gnu/${_realname}/${_realname}-${pkgver}.tar.gz"
         00-relocatex-libintl-0.18.3.1.patch
         120-Fix-Woe32-link-errors-when-compiling-with-O0.patch
         04-mingw-script-slash-fix.mingw.patch

@@ -11,7 +11,7 @@ groups=('base-devel')
 depends=('libiconv' 'libintl' 'libpcre' 'sh')
 makedepends=('texinfo' 'gettext-devel' 'libiconv-devel' 'pcre-devel')
 install=${pkgname}.install
-source=(https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz{,.sig})
+source=(https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.xz)
 sha256sums=('b82ac77707c2ab945520c8404c9fa9f890f7791a62cf2103cf6238acad87a44a'
             'SKIP')
 validpgpkeys=('155D3FC500C834486D1EEA677FD9FCCB000BEEEE')  # Jim Meyering

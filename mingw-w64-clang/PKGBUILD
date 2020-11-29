@@ -262,8 +262,8 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
-  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
+  # export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
+  # export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
