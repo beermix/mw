@@ -3,7 +3,7 @@
 _realname=qemu
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-_base_ver=5.1.0
+_base_ver=5.2.0
 _rc=
 pkgver=${_base_ver}${_rc//-/.}
 pkgrel=1
@@ -59,7 +59,7 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
-  ../${_realname}-${pkgver}/configure \
+  ../${_realname}-${pkgver}${_rc}/configure \
       --disable-werror \
       --disable-kvm \
       --disable-spice \
