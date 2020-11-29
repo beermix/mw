@@ -31,7 +31,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
 #install=rust.install
-source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.xz"
+source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "force-curl-rust.patch"
         "0001-add-missing-libs.patch"
         "0002-fix-install-msys2.patch"
@@ -48,11 +48,11 @@ sha256sums=('0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b'
             '061f1cf5374c926bc130a4afbde005dcd09fdbaee079469ad045fd23a7a88a2c'
             '3c21cc518439f17944d368fcaf00648f048af4bcabc134f63acf47f32d8cc27b')
 #validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
-noextract=(${_realname}c-${pkgver}-src.tar.xz)
+noextract=(${_realname}c-${pkgver}-src.tar.gz)
 
 prepare() {
   [[ -d ${srcdir}/${_realname}c-${pkgver}-src ]] && rm -rf ${srcdir}/${_realname}c-${pkgver}-src
-  tar -xJf ${srcdir}/${_realname}c-${pkgver}-src.tar.gz -C ${srcdir} || true
+  tar -xzf ${srcdir}/${_realname}c-${pkgver}-src.tar.gz -C ${srcdir} || true
 
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
@@ -123,6 +123,9 @@ package() {
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libwinpthread*.dll
+
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-APACHE "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-APACHE"
+  install -Dm644 ${srcdir}/${_realname}c-${pkgver}-src/LICENSE-MIT "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE-MIT"
 
   mkdir -p "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
