@@ -1,7 +1,7 @@
-diff --git a/src/librustc_llvm/build.rs b/src/librustc_llvm/build.rs
+diff --git a/compiler/rustc_llvm/build.rs b/compiler/rustc_llvm/build.rs
 index caa2740408..52738a47f7 100644
---- a/src/librustc_llvm/build.rs
-+++ b/src/librustc_llvm/build.rs
+--- a/compiler/rustc_llvm/build.rs
++++ b/compiler/rustc_llvm/build.rs
 @@ -269,6 +269,7 @@
      // LLVM requires symbols from this library, but apparently they're not printed
      // during llvm-config?
