@@ -29,9 +29,9 @@ makedepends=("cmake"
 depends=("gcc")
 options=('!debug' 'strip')
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
-source=(${_url}/clang-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/lld-${pkgver}.src.tar.xz{,.sig}
-        ${_url}/llvm-${pkgver}.src.tar.xz{,.sig}
+source=(${_url}/clang-${pkgver}.src.tar.xz
+        ${_url}/lld-${pkgver}.src.tar.xz
+        ${_url}/llvm-${pkgver}.src.tar.xz
         "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch"
         "0004-llvm-config-look-for-unversioned-shared-lib-on-win32.patch"
         "0009-empty-target-prefix-only-msvc.patch"
@@ -143,6 +143,8 @@ build() {
   cmake \
     -G"$_generator" \
     -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLLVM_INCLUDE_DOCS=OFF \
+    -DLLVM_CCACHE_BUILD=OFF \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLIBCLANG_BUILD_STATIC=ON \
     -DLLD_DEFAULT_LD_LLD_IS_MINGW=ON \
@@ -157,7 +159,7 @@ build() {
     "${extra_config[@]}" \
     ../llvm-${pkgver}.src
 
-  ${_make_cmd}
+  noti --time nice -n19 ${_make_cmd} -j7
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should

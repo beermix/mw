@@ -42,6 +42,7 @@ build() {
     -G'Ninja' \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER_TARGET=${CARCH}-windows-gnu \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_C_COMPILER_WORKS=ON \
     -DCMAKE_CXX_COMPILER_WORKS=ON \
     -DCMAKE_INSTALL_PREFIX=/usr \
