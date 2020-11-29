@@ -27,7 +27,7 @@ prepare() {
 build() {
   declare -a _btype
   if check_option "debug" "y"; then
-    _btype="--disable-debug --disable-log"
+    _btype="--enable-debug --enable-log"
   else
     _btype=
   fi
