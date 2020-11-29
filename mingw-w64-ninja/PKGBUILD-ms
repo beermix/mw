@@ -1,0 +1,37 @@
+# Maintainer: Martell Malone <Martell Malone at g mail dot com>
+
+_realname=ninja
+pkgname=("${_realname}")
+pkgver=1.10.2
+pkgrel=1
+_descr="Ninja is a small build system with a focus on speed"
+pkgdesc="${_descr}"
+arch=('i686' 'x86_64')
+url="https://ninja-build.org"
+license=('Apache')
+depends=()
+options=('strip' 'staticlibs')
+makedepends=("re2c" "python3")
+source=("${pkgname}-${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/v${pkgver}.tar.gz")
+sha256sums=('a6b6f7ac360d4aabd54e299cc1d8fa7b234cd81b9401693da21221c62569a23e')
+
+prepare () {
+  cd ${srcdir}/ninja-${pkgver}
+}
+
+build() {
+  cd ${srcdir}/ninja-${pkgver}
+  /usr/bin/python3 configure.py --bootstrap
+}
+
+package_ninja() {
+  mkdir -p "${pkgdir}"/usr/bin
+  mv "${srcdir}/ninja-${pkgver}/ninja.exe" "${pkgdir}"/usr/bin/
+  mkdir -p "${pkgdir}"/usr/lib
+  mv "${srcdir}/ninja-${pkgver}/build/libninja.a" "${pkgdir}"/usr/lib/
+  mkdir -p "${pkgdir}"/etc/bash-completion.d
+  cp  "${srcdir}/ninja-${pkgver}/misc/bash-completion" "${pkgdir}"/etc/bash-completion.d/ninja
+  mkdir -p "${pkgdir}"/usr/share/zsh/site-functions
+  cp  "${srcdir}/ninja-${pkgver}/misc/zsh-completion" "${pkgdir}"/usr/share/zsh/site-functions/_ninja
+
+}
