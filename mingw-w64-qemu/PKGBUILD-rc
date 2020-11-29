@@ -8,7 +8,7 @@ _base_ver=5.2.0
 _rc=-rc3
 #pkgver=${_base_ver}${_rc//-/.}
 pkgver=${_base_ver}
-pkgrel=1
+pkgrel=2
 pkgdesc="A generic and open source processor emulator (mingw-w64)"
 arch=('any')
 license=('GPL2' 'LGPL2')
@@ -61,6 +61,9 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
+  #export CC='ccache gcc'
+  #export CXX='ccache g++'
+
   ../${_realname}-${pkgver}${_rc}/configure \
       --disable-werror \
       --disable-kvm \
@@ -77,6 +80,7 @@ build() {
       --enable-gtk \
       --enable-sdl \
       --enable-zstd \
+      --ninja=${MINGW_PREFIX}/bin/ninja \
       "${_extra_config[@]}" \
       --prefix=${MINGW_PREFIX} \
       --bindir=${MINGW_PREFIX}/bin \
@@ -91,5 +95,5 @@ build() {
 
 package() {
   cd "${srcdir}"/build-${CARCH}
-  make DESTDIR="${pkgdir}/" install
+  DESTDIR="${pkgdir}/" ninja install
 }
