@@ -340,13 +340,13 @@ prepare() {
   local _HARD_FLAGS=
   case ${MINGW_CHOST} in
     i686*)
-      _ARCH_TUNE="-march=i686 -mtune=haswell"
+      _ARCH_TUNE="-march=i686 -mtune=core2"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--nxcompat,--no-seh"
       fi
     ;;
     x86_64*)
-      _ARCH_TUNE="-march=nocona -mtune=haswell"
+      _ARCH_TUNE="-march=nocona -mtune=core2"
       if [ "${_enable_hardening}" = "yes" ]; then
         _HARD_FLAGS="-Wl,--dynamicbase,--high-entropy-va,--nxcompat,--default-image-base-high"
       fi
