@@ -86,7 +86,7 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  noti --time nice -n19 make -j7
+  /home/User/.bin/noti.exe --time nice -n19 make -j8
 }
 
 package() {
