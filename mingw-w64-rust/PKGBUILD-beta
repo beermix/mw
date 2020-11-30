@@ -97,11 +97,8 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
-    --enable-full-tools \
-    --enable-cargo-native-static \
     --enable-locked-deps \
     --enable-parallel-compiler \
     --enable-optimize-tests \
@@ -114,7 +111,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j6
 }
 
 check() {
@@ -124,7 +121,7 @@ check() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || tru6
 }
 
 package() {
@@ -133,7 +130,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j6
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
