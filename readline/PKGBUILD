@@ -1,0 +1,75 @@
+# Maintainer: Alexey Pavlov <Alexpux@gmail.com>
+
+pkgbase=readline
+pkgname=('libreadline' 'libreadline-devel')
+_basever=8.0
+_patchlevel=004 #prepare for some patches
+pkgver=${_basever}.${_patchlevel}
+pkgrel=1
+pkgdesc="GNU readline library"
+arch=('i686' 'x86_64')
+url="https://tiswww.case.edu/php/chet/readline/rltop.html"
+license=('GPL')
+makedepends=('ncurses-devel')
+#backup=('etc/inputrc')
+options=('!emptydirs')
+source=(https://ftp.gnu.org/gnu/readline/readline-${_basever}.tar.gz{,.sig}
+        readline-7.0.3-3.clipboard.patch
+        readline-7.0.3-3.src.patch
+        readline-6.3-msys2.patch
+        readline-6.3-paste-utf8.patch)
+if [ $_patchlevel -gt 00 ]; then
+    for (( p=1; p<=$((10#${_patchlevel})); p++ )); do
+        source=(${source[@]} https://ftp.gnu.org/gnu/readline/readline-${_basever}-patches/readline${_basever//./}-$(printf "%03d" $p){,.sig})
+    done
+fi
+
+prepare() {
+  cd ${srcdir}/${pkgbase}-${_basever}
+  for (( p=1; p<=$((10#${_patchlevel})); p++ )); do
+    msg "applying patch readline${_basever//./}-$(printf "%03d" $p)"
+    patch -p0 -i $srcdir/readline${_basever//./}-$(printf "%03d" $p)
+  done
+  patch -p2 -i ${srcdir}/readline-7.0.3-3.src.patch
+  patch -p1 -i ${srcdir}/readline-6.3-msys2.patch
+  patch -p1 -i ${srcdir}/readline-6.3-paste-utf8.patch
+  patch -p1 -i ${srcdir}/readline-7.0.3-3.clipboard.patch
+}
+
+build() {
+  cd ${srcdir}/${pkgbase}-${_basever}
+
+  # Remove RPATH from shared objects (FS#14366)
+  sed -i 's|-Wl,-rpath,$(libdir) ||g' support/shobj-conf
+
+  ./configure \
+    --prefix=/usr \
+    --build=${CHOST} \
+    --host=${CHOST} \
+    --with-curses \
+    bash_cv_termcap_lib=libncurses
+  make VERBOSE=1
+
+  make DESTDIR=${srcdir}/dest install
+}
+
+package_libreadline() {
+  depends=('ncurses')
+  groups=('libraries')
+  install=readline.install
+
+  mkdir -p ${pkgdir}/usr
+  cp -rf ${srcdir}/dest/usr/bin ${pkgdir}/usr/
+  cp -rf ${srcdir}/dest/usr/share ${pkgdir}/usr/
+}
+
+package_libreadline-devel() {
+  groups=('development')
+  options=('staticlibs')
+  depends=("libreadline=${pkgver}" 'ncurses-devel')
+  pkgdesc="readline headers and libraries"
+
+  mkdir -p ${pkgdir}/usr
+  cp -rf ${srcdir}/dest/usr/include ${pkgdir}/usr/
+  cp -rf ${srcdir}/dest/usr/lib ${pkgdir}/usr/
+}

@@ -7,7 +7,6 @@ _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=beta
-pkgrel=1007
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -84,16 +83,22 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel="beta" \
+    --release-channel=stable \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
+    --enable-full-bootstrap \
+    --enable-manage-submodules \
+    --enable-optimize-llvm \
+    --enable-optimize \
+    --enable-use-libcxx \
+    --enable-full-tools \
+    --enable-cargo-native-static \
     --enable-locked-deps \
     --enable-parallel-compiler \
-    --enable-ccache \
-    --disable-sanitizers \
+    --enable-optimize-tests \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
@@ -132,4 +137,6 @@ package() {
   install -d "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions"
   mv "${pkgdir}${MINGW_PREFIX}/etc/bash_completion.d/cargo" \
      "${pkgdir}${MINGW_PREFIX}/share/bash-completion/completions/cargo"
+
+  rm -i ../../rustc-beta-src.tar.xz
 }
