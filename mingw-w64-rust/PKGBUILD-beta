@@ -1,12 +1,13 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
 # Contributor: Mateusz Mikuła <mati865@gmail.com
+# https://raw.githubusercontent.com/rust-lang/rust/master/src/stage0.txt
 
 _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.49.0
+pkgver=beta
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
@@ -90,17 +91,15 @@ build() {
     --build=$OSTYPE \
     --host=$OSTYPE \
     --target=$OSTYPE \
-    --release-channel=stable \
+    --release-channel=beta \
     --enable-ninja \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-full-bootstrap \
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
-    --enable-use-libcxx \
     --enable-full-tools \
     --enable-cargo-native-static \
     --enable-locked-deps \
