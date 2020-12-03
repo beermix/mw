@@ -6,7 +6,7 @@
 _realname=go
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.15.5
+pkgver=1.15.6
 pkgrel=1
 pkgdesc="Go Lang (mingw-w64)"
 arch=('any')
@@ -16,7 +16,7 @@ url="https://www.golang.org/"
 depends=()
 makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 options=('!strip')
-source=("https://fossies.org/linux/misc/go${pkgver}.src.tar.gz"
+source=("https://github.com/golang/go/archive/go${pkgver}.tar.gz"
         0010-go1.7-proper-go-binary-path.patch
         0011-add-GO_BUILD_VERBOSE.patch)
 sha256sums=('7011af3bbc2ac108d1b82ea8abb87b2e63f78844f0259be20cde4d42c5c40584'
