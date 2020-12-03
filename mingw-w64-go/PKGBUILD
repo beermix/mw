@@ -16,7 +16,7 @@ url="https://www.golang.org/"
 depends=()
 makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 options=('!strip')
-source=("https://github.com/golang/go/archive/go${pkgver}.tar.gz"
+source=("https://storage.googleapis.com/golang/go${pkgver}.src.tar.gz"
         0010-go1.7-proper-go-binary-path.patch
         0011-add-GO_BUILD_VERBOSE.patch)
 sha256sums=('7011af3bbc2ac108d1b82ea8abb87b2e63f78844f0259be20cde4d42c5c40584'
@@ -80,7 +80,7 @@ package() {
 
   cp -rf bin "${pkgdir}${MINGW_PREFIX}"
   cp -rf bin pkg src lib misc api test "${pkgdir}${MINGW_PREFIX}/lib/go"
- 
+
   install -Dm644 VERSION "${pkgdir}${MINGW_PREFIX}/lib/go/VERSION"
 
   rm -rf "${pkgdir}${MINGW_PREFIX}/lib/go/pkg/bootstrap" "${pkgdir}${MINGW_PREFIX}/lib/go/pkg/tool/*/api"
