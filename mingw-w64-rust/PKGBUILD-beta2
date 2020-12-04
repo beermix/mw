@@ -92,17 +92,14 @@ build() {
     --target=$OSTYPE \
     --release-channel=beta \
     --enable-ninja \
+    --enable-ccache \
+    --enable-optimize-llvm \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-missing-tools \
-    --enable-full-tools \
     --disable-codegen-tests \
     --enable-manage-submodules \
-    --enable-optimize-llvm \
     --enable-optimize \
-    --enable-lld \
-    --enable-parallel-compiler \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \

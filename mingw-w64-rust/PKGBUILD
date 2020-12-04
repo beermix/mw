@@ -94,8 +94,6 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-missing-tools \
-    --enable-full-tools \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-optimize-llvm \
