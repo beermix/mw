@@ -34,7 +34,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.1
 rc_ver=rc1
-pkgrel=1
+pkgrel=2
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -271,6 +271,7 @@ build() {
     -G"$_generator" \
     -DLLVM_ENABLE_WERROR=OFF \
     -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD="host;NVPTX" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -320,6 +321,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD="host;NVPTX"
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON
@@ -382,7 +384,7 @@ check() {
 package_clang() {
   pkgdesc="C language family frontend for LLVM (mingw-w64)"
   url="https://clang.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}${rc_ver}-${pkgrel}"
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-gcc"
            "${MINGW_PACKAGE_PREFIX}-z3")
 
@@ -397,7 +399,7 @@ package_clang() {
 package_clang-analyzer() {
   pkgdesc="A source code analysis framework (mingw-w64)"
   url="https://clang-analyzer.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}${rc_ver}-${pkgrel}"
+  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-python")
 
   cd "${srcdir}/clang"
@@ -413,12 +415,13 @@ package_clang-analyzer() {
   # Compile Python scripts
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}"${MINGW_PREFIX}/bin/clang-analyzer
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}"${MINGW_PREFIX}/lib/clang-analyzer
+  install -Dm644 LICENSE.TXT "${pkgdir}"${MINGW_PREFIX}/share/licenses/clang-analyzer/LICENSE
 }
 
 package_clang-tools-extra() {
   pkgdesc="Extra tools built using Clang's tooling APIs (mingw-w64)"
   url="https://clang.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}${rc_ver}-${pkgrel}")
+  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}-${pkgrel}")
 
   cd "${srcdir}/clang-tools-extra"
   ${_make_cmd} -C ../build-${CARCH}/tools/clang/tools/extra DESTDIR="${pkgdir}" install
@@ -475,7 +478,7 @@ package_libunwind() {
 package_lld() {
   pkgdesc="Linker tools for LLVM (mingw-w64)"
   url="https://lld.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}${rc_ver}-${pkgrel}")
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}/lld"
   ${_make_cmd} -C ../build-${CARCH}/tools/lld DESTDIR="${pkgdir}" install
@@ -484,7 +487,7 @@ package_lld() {
 package_lldb() {
   pkgdesc="Next generation, high-performance debugger (mingw-w64)"
   url="https://lldb.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}${rc_ver}-${pkgrel}"
+  depends=("${MINGW_PACKAGE_PREFIX}-clang=${pkgver}-${pkgrel}"
            "${MINGW_PACKAGE_PREFIX}-libxml2"
            "${MINGW_PACKAGE_PREFIX}-lua"
            "${MINGW_PACKAGE_PREFIX}-python"
@@ -499,6 +502,8 @@ package_lldb() {
    local _pyver=$(${MINGW_PREFIX}/bin/python -c "import sys;sys.stdout.write('.'.join(map(str, sys.version_info[:2])))")
   ${MINGW_PREFIX}/bin/python -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
   ${MINGW_PREFIX}/bin/python -O -m compileall "${pkgdir}${MINGW_PREFIX}/lib/python${_pyver}/site-packages/lldb"
+
+  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/lldb/LICENSE"
 }
 
 package_llvm() {
@@ -510,6 +515,8 @@ package_llvm() {
   cd "${srcdir}"/llvm-${pkgver}${rc_ver}.src
 
   ${_make_cmd} -C ../build-${CARCH} DESTDIR="${pkgdir}" install
+
+  install -Dm644 LICENSE.TXT "${pkgdir}${MINGW_PREFIX}/share/licenses/llvm/LICENSE"
 
   # Install CMake stuff
   install -d "${pkgdir}"${MINGW_PREFIX}/share/llvm/cmake/{modules,platforms}
@@ -526,7 +533,7 @@ package_llvm() {
 package_polly() {
   pkgdesc="Polly - Polyhedral optimizations for LLVM (mingw-w64)"
   url="https://polly.llvm.org/"
-  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}${rc_ver}-${pkgrel}")
+  depends=("${MINGW_PACKAGE_PREFIX}-llvm=${pkgver}-${pkgrel}")
 
   cd "${srcdir}"/polly
   ${_make_cmd} -C ../build-${CARCH}/tools/polly DESTDIR="${pkgdir}" install
