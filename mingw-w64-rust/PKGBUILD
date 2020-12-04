@@ -31,8 +31,7 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-python-ruamel.yaml.clib"
              "${MINGW_PACKAGE_PREFIX}-python-yaml"
              "${MINGW_PACKAGE_PREFIX}-libunwind"
-             "${MINGW_PACKAGE_PREFIX}-rust"
-             
+
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
@@ -99,9 +98,6 @@ build() {
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
-    --enable-use-libcxx \
-    --enable-full-tools \
-    --enable-cargo-native-static \
     --enable-locked-deps \
     --enable-parallel-compiler \
     --enable-optimize-tests \
@@ -114,7 +110,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
 }
 
 check() {
@@ -133,7 +129,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j8
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
