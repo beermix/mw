@@ -60,6 +60,7 @@ options=('!debug' 'strip')
 #_url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}-${rc_ver}
 source=(${_url}/llvm-${pkgver}${rc_ver}.src.tar.xz
+        ${_url}/openmp-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/clang-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/compiler-rt-${pkgver}${rc_ver}.src.tar.xz
         ${_url}/test-suite-${pkgver}${rc_ver}.src.tar.xz
