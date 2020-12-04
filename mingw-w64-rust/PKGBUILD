@@ -96,7 +96,6 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-full-bootstrap \
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
