@@ -1,0 +1,3052 @@
+diff --git a/Makefile.am b/Makefile.am
+index 8cc39c9..2b5765e 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -59,7 +59,15 @@ loadavg_SRCS =	lib/getloadavg.c
+ make_SOURCES =	$(make_SRCS)
+ EXTRA_make_SOURCES = $(amiga_SRCS) $(vms_SRCS)
+ 
+-make_LDADD =	$(LIBOBJS) $(GUILE_LIBS) lib/libgnu.a $(GETLOADAVG_LIBS) \
++if HAVE_GUILE
++  _GUILE_CFLAGS = $(GUILE_CFLAGS)
++  _GUILE_LIBS = $(GUILE_LIBS)
++else
++  _GUILE_CFLAGS =
++  _GUILE_LIBS =
++endif
++
++make_LDADD =	$(LIBOBJS) $(_GUILE_LIBS) lib/libgnu.a $(GETLOADAVG_LIBS) \
+ 		@LIBINTL@
+ 
+ localedir =	$(datadir)/locale
+@@ -68,7 +76,7 @@ AM_CPPFLAGS =	-Isrc -I$(top_srcdir)/src -Ilib -I$(top_srcdir)/lib \
+ 		-DLIBDIR=\"$(libdir)\" -DINCLUDEDIR=\"$(includedir)\" \
+ 		-DLOCALEDIR=\"$(localedir)\"
+ 
+-AM_CFLAGS =	$(GUILE_CFLAGS)
++AM_CFLAGS =	$(_GUILE_CFLAGS)
+ 
+ if WINDOWSENV
+   make_SOURCES += $(w32_SRCS)
+diff --git a/build.sh b/build.sh
+index 4c88b53..cc1c790 100755
+--- a/build.sh
++++ b/build.sh
+@@ -103,7 +103,7 @@ convert ()
+     esac
+ 
+     fn="$top_srcdir/lib/${fn##*/}"
+-    [ -f "$fn" ] || { echo "Missing file: $fn"; exit 1; }
++    test -f "$fn" || { echo "Missing file: $fn"; exit 1; }
+ 
+     sed "/definitions* of $inc/r $fn" "$int" > "${int}_"
+     int=${int}_
+diff --git a/configure.ac b/configure.ac
+index cd49a2c..960991c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,7 +16,7 @@
+ # You should have received a copy of the GNU General Public License along with
+ # this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+-AC_INIT([GNU make],[4.3],[bug-make@gnu.org])
++AC_INIT([GNU make],[4.3.90],[bug-make@gnu.org])
+ 
+ AC_PREREQ([2.69])
+ 
+@@ -38,6 +38,9 @@ AM_INIT_AUTOMAKE([1.16.1 foreign -Werror -Wall])
+ AC_USE_SYSTEM_EXTENSIONS
+ AC_PROG_CC
+ 
++# GNU Gnulib requires C99, so I guess we might as well too...
++AC_PROG_CC_C99
++
+ # Configure gnulib
+ gl_EARLY
+ gl_INIT
+diff --git a/src/arscan.c b/src/arscan.c
+index 3ce21db..2565fbb 100644
+--- a/src/arscan.c
++++ b/src/arscan.c
+@@ -378,6 +378,31 @@ struct ar_hdr
+ 
+ #include "output.h"
+ 
++
++static unsigned long int
++parse_int (const char *ptr, const size_t len, const int base,
++           const char *type, const char *archive, const char *name)
++{
++  const char *const ep = ptr + len;
++  const char max = '0' + base - 1;
++  long int val = 0;
++
++  /* In all the versions I know of the spaces come last, but be safe.  */
++  while (ptr < ep && *ptr == ' ')
++    ++ptr;
++
++  while (ptr < ep && *ptr != ' ')
++    {
++      if (*ptr < '0' || *ptr > max)
++        OSSS (fatal, NILF, _("Invalid %s for archive %s member %s"),
++                           type, archive, name);
++      val = (val * base) + (*ptr - '0');
++      ++ptr;
++    }
++
++  return val;
++}
++
+ /* Takes three arguments ARCHIVE, FUNCTION and ARG.
+ 
+    Open the archive named ARCHIVE, find its members one by one,
+@@ -540,6 +565,8 @@ ar_scan (const char *archive, ar_member_func_t function, const void *arg)
+         long int fnval;
+         off_t o;
+ 
++        memset(&member_header, '\0', sizeof (member_header));
++
+         EINTRLOOP (o, lseek (desc, member_offset, 0));
+         if (o < 0)
+           goto invalid;
+@@ -703,8 +730,8 @@ ar_scan (const char *archive, ar_member_func_t function, const void *arg)
+         }
+ 
+ #ifndef M_XENIX
+-        sscanf (TOCHAR (member_header.ar_mode), "%8o", &eltmode);
+-        eltsize = atol (TOCHAR (member_header.ar_size));
++        eltmode = parse_int (TOCHAR (member_header.ar_mode), sizeof (member_header.ar_mode), 8, "mode", archive, name);
++        eltsize = parse_int (TOCHAR (member_header.ar_size), sizeof (member_header.ar_size), 10, "size", archive, name);
+ #else   /* Xenix.  */
+         eltmode = (unsigned short int) member_header.ar_mode;
+         eltsize = member_header.ar_size;
+@@ -714,9 +741,9 @@ ar_scan (const char *archive, ar_member_func_t function, const void *arg)
+           (*function) (desc, name, ! long_name, member_offset,
+                        member_offset + AR_HDR_SIZE, eltsize,
+ #ifndef M_XENIX
+-                       atol (TOCHAR (member_header.ar_date)),
+-                       atoi (TOCHAR (member_header.ar_uid)),
+-                       atoi (TOCHAR (member_header.ar_gid)),
++                       parse_int (TOCHAR (member_header.ar_date), sizeof (member_header.ar_date), 10, "date", archive, name),
++                       parse_int (TOCHAR (member_header.ar_uid), sizeof (member_header.ar_uid), 10, "uid", archive, name),
++                       parse_int (TOCHAR (member_header.ar_gid), sizeof (member_header.ar_gid), 10, "gid", archive, name),
+ #else   /* Xenix.  */
+                        member_header.ar_date,
+                        member_header.ar_uid,
+diff --git a/src/commands.c b/src/commands.c
+index 88c33a3..dd17999 100644
+--- a/src/commands.c
++++ b/src/commands.c
+@@ -508,7 +508,7 @@ fatal_error_signal (int sig)
+ #ifdef WINDOWS32
+   extern HANDLE main_thread;
+ 
+-  /* Windows creates a sperate thread for handling Ctrl+C, so we need
++  /* Windows creates a separate thread for handling Ctrl+C, so we need
+      to suspend the main thread, or else we will have race conditions
+      when both threads call reap_children.  */
+   if (main_thread)
+diff --git a/src/default.c b/src/default.c
+index 751ea15..fffff8b 100644
+--- a/src/default.c
++++ b/src/default.c
+@@ -518,7 +518,12 @@ static const char *default_variables[] =
+ #else /* !VMS */
+ 
+     "AR", "ar",
+-    "ARFLAGS", "rv",
++#ifdef _AIX
++    /* AIX requires object file format specification: choose -Xany.  */
++    "ARFLAGS", "-Xany -rv",
++#else
++    "ARFLAGS", "-rv",
++#endif
+     "AS", "as",
+ #ifdef GCC_IS_NATIVE
+     "CC", "gcc",
+diff --git a/src/dir.c b/src/dir.c
+index 862a18e..d237d4b 100644
+--- a/src/dir.c
++++ b/src/dir.c
+@@ -18,6 +18,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #include "hash.h"
+ #include "filedef.h"
+ #include "dep.h"
++#include "debug.h"
+ 
+ #ifdef  HAVE_DIRENT_H
+ # include <dirent.h>
+@@ -175,7 +176,7 @@ vms_hash (const char *name)
+ 
+   while (*name)
+     {
+-      unsigned char uc = *name;
++      unsigned char uc = (unsigned char) *name;
+       int g;
+ #ifdef HAVE_CASE_INSENSITIVE_FS
+       h = (h << 4) + (isupper (uc) ? tolower (uc) : uc);
+@@ -232,6 +233,12 @@ vmsstat_dir (const char *name, struct stat *st)
+ #endif /* _USE_STD_STAT */
+ #endif /* VMS */
+ 
++/* Never have more than this many directories open at once.  */
++
++#define MAX_OPEN_DIRECTORIES 10
++
++static unsigned int open_directories = 0;
++
+ /* Hash table of directories.  */
+ 
+ #ifndef DIRECTORY_BUCKETS
+@@ -262,9 +269,25 @@ struct directory_contents
+ # endif
+ #endif /* WINDOWS32 */
+     struct hash_table dirfiles; /* Files in this directory.  */
++    unsigned long counter;      /* command_count value when last read. */
+     DIR *dirstream;             /* Stream reading this directory.  */
+   };
+ 
++static struct directory_contents *
++clear_directory_contents (struct directory_contents *dc)
++{
++  dc->counter = 0;
++  if (dc->dirstream)
++    {
++      --open_directories;
++      closedir (dc->dirstream);
++      dc->dirstream = 0;
++    }
++  hash_free (&dc->dirfiles, 1);
++
++  return NULL;
++}
++
+ static unsigned long
+ directory_contents_hash_1 (const void *key_0)
+ {
+@@ -363,7 +386,9 @@ static struct hash_table directory_contents;
+ 
+ struct directory
+   {
+-    const char *name;                   /* Name of the directory.  */
++    const char *name;           /* Name of the directory.  */
++    unsigned long counter;      /* command_count value when last read.
++                                   Used for non-existent directories.  */
+ 
+     /* The directory's contents.  This data may be shared by several
+        entries in the hash table, which refer to the same directory
+@@ -393,12 +418,6 @@ directory_hash_cmp (const void *x, const void *y)
+ /* Table of directories hashed by name.  */
+ static struct hash_table directories;
+ 
+-/* Never have more than this many directories open at once.  */
+-
+-#define MAX_OPEN_DIRECTORIES 10
+-
+-static unsigned int open_directories = 0;
+-
+ 
+ /* Hash table of files in each directory.  */
+ 
+@@ -449,150 +468,163 @@ find_directory (const char *name)
+   struct directory *dir;
+   struct directory **dir_slot;
+   struct directory dir_key;
++  struct directory_contents *dc;
++  struct directory_contents **dc_slot;
++  struct directory_contents dc_key;
++
++  struct stat st;
++  int r;
++#ifdef WINDOWS32
++  char *w32_path;
++#endif
+ 
+   dir_key.name = name;
+   dir_slot = (struct directory **) hash_find_slot (&directories, &dir_key);
+   dir = *dir_slot;
+ 
+-  if (HASH_VACANT (dir))
++  if (!HASH_VACANT (dir))
++    {
++      unsigned long ctr = dir->contents ? dir->contents->counter : dir->counter;
++
++      /* No commands have run since we parsed this directory so it's good.  */
++      if (ctr == command_count)
++        return dir;
++
++      DB (DB_VERBOSE, ("Directory %s cache invalidated (count %lu != command %lu)\n",
++                       name, ctr, command_count));
++
++      if (dir->contents)
++        clear_directory_contents (dir->contents);
++    }
++  else
+     {
+       /* The directory was not found.  Create a new entry for it.  */
+-      const char *p = name + strlen (name);
+-      struct stat st;
+-      int r;
++      size_t len = strlen (name);
+ 
+       dir = xmalloc (sizeof (struct directory));
+ #if defined(HAVE_CASE_INSENSITIVE_FS) && defined(VMS)
+       /* Todo: Why is this only needed on VMS? */
+       {
+         char *lname = downcase_inplace (xstrdup (name));
+-        dir->name = strcache_add_len (lname, p - name);
++        dir->name = strcache_add_len (lname, len);
+         free (lname);
+       }
+ #else
+-      dir->name = strcache_add_len (name, p - name);
++      dir->name = strcache_add_len (name, len);
+ #endif
+       hash_insert_at (&directories, dir, dir_slot);
+-      /* The directory is not in the name hash table.
+-         Find its device and inode numbers, and look it up by them.  */
++    }
++
++  dir->contents = NULL;
++  dir->counter = command_count;
+ 
++  /* See if the directory exists.  */
+ #if defined(WINDOWS32)
+-      {
+-        char tem[MAXPATHLEN], *tstart, *tend;
+-
+-        /* Remove any trailing slashes.  Windows32 stat fails even on
+-           valid directories if they end in a slash. */
+-        memcpy (tem, name, p - name + 1);
+-        tstart = tem;
+-        if (tstart[1] == ':')
+-          tstart += 2;
+-        for (tend = tem + (p - name - 1);
+-             tend > tstart && (*tend == '/' || *tend == '\\');
+-             tend--)
+-          *tend = '\0';
+-
+-        r = stat (tem, &st);
+-      }
++  {
++    char tem[MAXPATHLEN], *tstart, *tend;
++
++    /* Remove any trailing slashes.  Windows32 stat fails even on
++       valid directories if they end in a slash. */
++    memcpy (tem, name, p - name + 1);
++    tstart = tem;
++    if (tstart[1] == ':')
++      tstart += 2;
++    for (tend = tem + (p - name - 1);
++         tend > tstart && (*tend == '/' || *tend == '\\');
++         tend--)
++      *tend = '\0';
++
++    r = stat (tem, &st);
++  }
+ #else
+-      EINTRLOOP (r, stat (name, &st));
++  EINTRLOOP (r, stat (name, &st));
+ #endif
+ 
+-      if (r < 0)
+-        {
+-        /* Couldn't stat the directory.  Mark this by
+-           setting the 'contents' member to a nil pointer.  */
+-          dir->contents = 0;
+-        }
+-      else
+-        {
+-          /* Search the contents hash table; device and inode are the key.  */
++  if (r < 0)
++    /* Couldn't stat the directory; nothing else to do.  */
++    return dir;
+ 
+-#ifdef WINDOWS32
+-          char *w32_path;
+-#endif
+-          struct directory_contents *dc;
+-          struct directory_contents **dc_slot;
+-          struct directory_contents dc_key;
++  /* Search the contents hash table; device and inode are the key.  */
+ 
+-          dc_key.dev = st.st_dev;
++  memset (&dc_key, '\0', sizeof (dc_key));
++  dc_key.dev = st.st_dev;
+ #ifdef WINDOWS32
+-          dc_key.path_key = w32_path = w32ify (name, 1);
+-          dc_key.ctime = st.st_ctime;
++  dc_key.path_key = w32_path = w32ify (name, 1);
++  dc_key.ctime = st.st_ctime;
+ #else
+ # ifdef VMS_INO_T
+-          dc_key.ino[0] = st.st_ino[0];
+-          dc_key.ino[1] = st.st_ino[1];
+-          dc_key.ino[2] = st.st_ino[2];
++  dc_key.ino[0] = st.st_ino[0];
++  dc_key.ino[1] = st.st_ino[1];
++  dc_key.ino[2] = st.st_ino[2];
+ # else
+-          dc_key.ino = st.st_ino;
++  dc_key.ino = st.st_ino;
+ # endif
+ #endif
+-          dc_slot = (struct directory_contents **) hash_find_slot (&directory_contents, &dc_key);
+-          dc = *dc_slot;
++  dc_slot = (struct directory_contents **) hash_find_slot (&directory_contents, &dc_key);
++  dc = *dc_slot;
+ 
+-          if (HASH_VACANT (dc))
+-            {
+-              /* Nope; this really is a directory we haven't seen before.  */
++  if (HASH_VACANT (dc))
++    {
++      /* Nope; this really is a directory we haven't seen before.  */
+ #ifdef WINDOWS32
+-              char  fs_label[BUFSIZ];
+-              char  fs_type[BUFSIZ];
+-              unsigned long  fs_serno;
+-              unsigned long  fs_flags;
+-              unsigned long  fs_len;
++      char  fs_label[BUFSIZ];
++      char  fs_type[BUFSIZ];
++      unsigned long  fs_serno;
++      unsigned long  fs_flags;
++      unsigned long  fs_len;
+ #endif
+-              dc = (struct directory_contents *)
+-                xmalloc (sizeof (struct directory_contents));
++      /* Enter it in the contents hash table.  */
++      dc = xcalloc (sizeof (struct directory_contents));
++      *dc = dc_key;
+ 
+-              /* Enter it in the contents hash table.  */
+-              dc->dev = st.st_dev;
+ #ifdef WINDOWS32
+-              dc->path_key = xstrdup (w32_path);
+-              dc->ctime = st.st_ctime;
+-              dc->mtime = st.st_mtime;
+-
+-              /* NTFS is the only WINDOWS32 filesystem that bumps mtime on a
+-                 directory when files are added/deleted from a directory.  */
+-              w32_path[3] = '\0';
+-              if (GetVolumeInformation (w32_path, fs_label, sizeof (fs_label),
+-                                        &fs_serno, &fs_len, &fs_flags, fs_type,
+-                                        sizeof (fs_type)) == FALSE)
+-                dc->fs_flags = FS_UNKNOWN;
+-              else if (!strcmp (fs_type, "FAT"))
+-                dc->fs_flags = FS_FAT;
+-              else if (!strcmp (fs_type, "NTFS"))
+-                dc->fs_flags = FS_NTFS;
+-              else
+-                dc->fs_flags = FS_UNKNOWN;
+-#else
+-# ifdef VMS_INO_T
+-              dc->ino[0] = st.st_ino[0];
+-              dc->ino[1] = st.st_ino[1];
+-              dc->ino[2] = st.st_ino[2];
+-# else
+-              dc->ino = st.st_ino;
+-# endif
++      dc->path_key = xstrdup (w32_path);
++      dc->mtime = st.st_mtime;
++
++      /* NTFS is the only WINDOWS32 filesystem that bumps mtime on a
++         directory when files are added/deleted from a directory.  */
++      w32_path[3] = '\0';
++      if (GetVolumeInformation (w32_path, fs_label, sizeof (fs_label),
++                                &fs_serno, &fs_len, &fs_flags, fs_type,
++                                sizeof (fs_type)) == FALSE)
++        dc->fs_flags = FS_UNKNOWN;
++      else if (!strcmp (fs_type, "FAT"))
++        dc->fs_flags = FS_FAT;
++      else if (!strcmp (fs_type, "NTFS"))
++        dc->fs_flags = FS_NTFS;
++      else
++        dc->fs_flags = FS_UNKNOWN;
+ #endif /* WINDOWS32 */
+-              hash_insert_at (&directory_contents, dc, dc_slot);
+-              ENULLLOOP (dc->dirstream, opendir (name));
+-              if (dc->dirstream == 0)
+-                /* Couldn't open the directory.  Mark this by setting the
+-                   'files' member to a nil pointer.  */
+-                dc->dirfiles.ht_vec = 0;
+-              else
+-                {
+-                  hash_init (&dc->dirfiles, DIRFILE_BUCKETS,
+-                             dirfile_hash_1, dirfile_hash_2, dirfile_hash_cmp);
+-                  /* Keep track of how many directories are open.  */
+-                  ++open_directories;
+-                  if (open_directories == MAX_OPEN_DIRECTORIES)
+-                    /* We have too many directories open already.
+-                       Read the entire directory and then close it.  */
+-                    dir_contents_file_exists_p (dc, 0);
+-                }
+-            }
+ 
+-          /* Point the name-hashed entry for DIR at its contents data.  */
+-          dir->contents = dc;
++      hash_insert_at (&directory_contents, dc, dc_slot);
++    }
++
++  /* Point the name-hashed entry for DIR at its contents data.  */
++  dir->contents = dc;
++
++  /* If the contents have changed, we need to reseet.  */
++  if (dc->counter != command_count)
++    {
++      if (dc->counter)
++        clear_directory_contents (dc);
++
++      dc->counter = command_count;
++
++      ENULLLOOP (dc->dirstream, opendir (name));
++      if (dc->dirstream == 0)
++        /* Couldn't open the directory.  Mark this by setting the
++           'files' member to a nil pointer.  */
++        dc->dirfiles.ht_vec = 0;
++      else
++        {
++          hash_init (&dc->dirfiles, DIRFILE_BUCKETS,
++                     dirfile_hash_1, dirfile_hash_2, dirfile_hash_cmp);
++          /* Keep track of how many directories are open.  */
++          ++open_directories;
++          if (open_directories == MAX_OPEN_DIRECTORIES)
++            /* We have too many directories open already.
++               Read the entire directory and then close it.  */
++            dir_contents_file_exists_p (dc, 0);
+         }
+     }
+ 
+@@ -1286,13 +1318,13 @@ local_stat (const char *path, struct stat *buf)
+   /* Make sure the parent of "." exists and is a directory, not a
+      file.  This is because 'stat' on Windows normalizes the argument
+      foo/. => foo without checking first that foo is a directory.  */
+-  if (plen > 1 && path[plen - 1] == '.'
++  if (plen > 2 && path[plen - 1] == '.'
+       && (path[plen - 2] == '/' || path[plen - 2] == '\\'))
+     {
+-      char parent[MAXPATHLEN];
++      char parent[MAXPATHLEN+1];
+ 
+-      strncpy (parent, path, plen - 2);
+-      parent[plen - 2] = '\0';
++      strncpy (parent, path, MAXPATHLEN);
++      parent[MIN(plen - 2, MAXPATHLEN)] = '\0';
+       if (stat (parent, buf) < 0 || !_S_ISDIR (buf->st_mode))
+         return -1;
+     }
+diff --git a/src/function.c b/src/function.c
+index 0917e0c..87f2a8b 100644
+--- a/src/function.c
++++ b/src/function.c
+@@ -910,7 +910,6 @@ func_foreach (char *o, char **argv, const char *funcname UNUSED)
+ 
+ struct a_word
+ {
+-  struct a_word *next;
+   struct a_word *chain;
+   char *str;
+   size_t length;
+@@ -941,7 +940,6 @@ a_word_hash_cmp (const void *x, const void *y)
+ 
+ struct a_pattern
+ {
+-  struct a_pattern *next;
+   char *str;
+   char *percent;
+   size_t length;
+@@ -950,78 +948,84 @@ struct a_pattern
+ static char *
+ func_filter_filterout (char *o, char **argv, const char *funcname)
+ {
+-  struct a_word *wordhead;
+-  struct a_word **wordtail;
++  struct a_word *words;
++  struct a_word *word_end;
+   struct a_word *wp;
+-  struct a_pattern *pathead;
+-  struct a_pattern **pattail;
++  struct a_pattern *patterns;
++  struct a_pattern *pat_end;
+   struct a_pattern *pp;
++  size_t pat_count = 0, word_count = 0;
+ 
+   struct hash_table a_word_table;
+   int is_filter = funcname[CSTRLEN ("filter")] == '\0';
+-  const char *pat_iterator = argv[0];
+-  const char *word_iterator = argv[1];
++  const char *cp;
+   int literals = 0;
+-  int words = 0;
+   int hashing = 0;
+   char *p;
+   size_t len;
++  int doneany = 0;
+ 
+-  /* Chop ARGV[0] up into patterns to match against the words.
+-     We don't need to preserve it because our caller frees all the
+-     argument memory anyway.  */
++  /* Find the number of words and get memory for them.  */
++  cp = argv[1];
++  while ((p = find_next_token (&cp, NULL)) != 0)
++    ++word_count;
+ 
+-  pattail = &pathead;
+-  while ((p = find_next_token (&pat_iterator, &len)) != 0)
+-    {
+-      struct a_pattern *pat = alloca (sizeof (struct a_pattern));
++  if (!word_count)
++    return o;
++
++  words = xcalloc (word_count * sizeof (struct a_word));
++  word_end = words + word_count;
+ 
+-      *pattail = pat;
+-      pattail = &pat->next;
++  /* Find the number of patterns and get memory for them.  */
++  cp = argv[0];
++  while ((p = find_next_token (&cp, NULL)) != 0)
++    ++pat_count;
+ 
+-      if (*pat_iterator != '\0')
+-        ++pat_iterator;
++  patterns = xcalloc (pat_count * sizeof (struct a_pattern));
++  pat_end = patterns + pat_count;
++
++  /* Chop argv[0] up into patterns to match against the words.  */
++
++  cp = argv[0];
++  pp = patterns;
++  while ((p = find_next_token (&cp, &len)) != 0)
++    {
++      if (*cp != '\0')
++        ++cp;
+ 
+-      pat->str = p;
+       p[len] = '\0';
+-      pat->percent = find_percent (p);
+-      if (pat->percent == 0)
++      pp->str = p;
++      pp->percent = find_percent (p);
++      if (pp->percent == 0)
+         literals++;
+-
+       /* find_percent() might shorten the string so LEN is wrong.  */
+-      pat->length = strlen (pat->str);
++      pp->length = strlen (pp->str);
++
++      ++pp;
+     }
+-  *pattail = 0;
+ 
+   /* Chop ARGV[1] up into words to match against the patterns.  */
+ 
+-  wordtail = &wordhead;
+-  while ((p = find_next_token (&word_iterator, &len)) != 0)
++  cp = argv[1];
++  wp = words;
++  while ((p = find_next_token (&cp, &len)) != 0)
+     {
+-      struct a_word *word = alloca (sizeof (struct a_word));
+-
+-      *wordtail = word;
+-      wordtail = &word->next;
+-
+-      if (*word_iterator != '\0')
+-        ++word_iterator;
++      if (*cp != '\0')
++        ++cp;
+ 
+       p[len] = '\0';
+-      word->str = p;
+-      word->length = len;
+-      word->matched = 0;
+-      word->chain = 0;
+-      words++;
++      wp->str = p;
++      wp->length = len;
++      ++wp;
+     }
+-  *wordtail = 0;
+ 
+   /* Only use a hash table if arg list lengths justifies the cost.  */
+-  hashing = (literals >= 2 && (literals * words) >= 10);
++  hashing = (literals > 1 && (literals * word_count) >= 10);
+   if (hashing)
+     {
+-      hash_init (&a_word_table, words, a_word_hash_1, a_word_hash_2,
++      hash_init (&a_word_table, word_count, a_word_hash_1, a_word_hash_2,
+                  a_word_hash_cmp);
+-      for (wp = wordhead; wp != 0; wp = wp->next)
++      for (wp = words; wp < word_end; ++wp)
+         {
+           struct a_word *owp = hash_insert (&a_word_table, wp);
+           if (owp)
+@@ -1029,51 +1033,49 @@ func_filter_filterout (char *o, char **argv, const char *funcname)
+         }
+     }
+ 
+-  if (words)
++  /* Run each pattern through the words, killing words.  */
++  for (pp = patterns; pp < pat_end; ++pp)
+     {
+-      int doneany = 0;
+-
+-      /* Run each pattern through the words, killing words.  */
+-      for (pp = pathead; pp != 0; pp = pp->next)
++      if (pp->percent)
++        for (wp = words; wp < word_end; ++wp)
++          wp->matched |= pattern_matches (pp->str, pp->percent, wp->str);
++      else if (hashing)
+         {
+-          if (pp->percent)
+-            for (wp = wordhead; wp != 0; wp = wp->next)
+-              wp->matched |= pattern_matches (pp->str, pp->percent, wp->str);
+-          else if (hashing)
++          struct a_word a_word_key;
++          a_word_key.str = pp->str;
++          a_word_key.length = pp->length;
++          wp = hash_find_item (&a_word_table, &a_word_key);
++          while (wp)
+             {
+-              struct a_word a_word_key;
+-              a_word_key.str = pp->str;
+-              a_word_key.length = pp->length;
+-              wp = hash_find_item (&a_word_table, &a_word_key);
+-              while (wp)
+-                {
+-                  wp->matched |= 1;
+-                  wp = wp->chain;
+-                }
++              wp->matched |= 1;
++              wp = wp->chain;
+             }
+-          else
+-            for (wp = wordhead; wp != 0; wp = wp->next)
+-              wp->matched |= (wp->length == pp->length
+-                              && strneq (pp->str, wp->str, wp->length));
+         }
++      else
++        for (wp = words; wp < word_end; ++wp)
++          wp->matched |= (wp->length == pp->length
++                          && strneq (pp->str, wp->str, wp->length));
++    }
+ 
+-      /* Output the words that matched (or didn't, for filter-out).  */
+-      for (wp = wordhead; wp != 0; wp = wp->next)
+-        if (is_filter ? wp->matched : !wp->matched)
+-          {
+-            o = variable_buffer_output (o, wp->str, strlen (wp->str));
+-            o = variable_buffer_output (o, " ", 1);
+-            doneany = 1;
+-          }
++  /* Output the words that matched (or didn't, for filter-out).  */
++  for (wp = words; wp < word_end; ++wp)
++    if (is_filter ? wp->matched : !wp->matched)
++      {
++        o = variable_buffer_output (o, wp->str, strlen (wp->str));
++        o = variable_buffer_output (o, " ", 1);
++        doneany = 1;
++      }
+ 
+-      if (doneany)
+-        /* Kill the last space.  */
+-        --o;
+-    }
++  if (doneany)
++    /* Kill the last space.  */
++    --o;
+ 
+   if (hashing)
+     hash_free (&a_word_table, 0);
+ 
++  free (patterns);
++  free (words);
++
+   return o;
+ }
+ 
+@@ -2233,6 +2235,11 @@ func_file (char *o, char **argv, const char *funcname UNUSED)
+       if (fp == NULL)
+         OSS (fatal, reading_file, _("open: %s: %s"), fn, strerror (errno));
+ 
++      /* We've changed the contents of a directory, possibly.
++         Another option would be to look up the directory we changed and reset
++         its counter to 0.  */
++      ++command_count;
++
+       if (argv[1])
+         {
+           size_t l = strlen (argv[1]);
+diff --git a/src/job.c b/src/job.c
+index ae1f18b..28ddacf 100644
+--- a/src/job.c
++++ b/src/job.c
+@@ -504,7 +504,7 @@ block_sigs ()
+ static void
+ unblock_sigs ()
+ {
+-  sigsetmask (siggetmask (0) & ~fatal_signal_mask)
++  sigsetmask (siggetmask () & ~fatal_signal_mask);
+ }
+ 
+ void
+@@ -721,9 +721,6 @@ reap_children (int block, int err)
+       else if (pid < 0)
+         {
+           /* A remote status command failed miserably.  Punt.  */
+-#if !defined(__MSDOS__) && !defined(_AMIGA) && !defined(WINDOWS32)
+-        remote_status_lose:
+-#endif
+           pfatal_with_name ("remote_status");
+         }
+       else
+@@ -779,8 +776,9 @@ reap_children (int block, int err)
+               /* Now try a blocking wait for a remote child.  */
+               pid = remote_status (&exit_code, &exit_sig, &coredump, 1);
+               if (pid < 0)
+-                goto remote_status_lose;
+-              else if (pid == 0)
++                pfatal_with_name ("remote_status");
++
++              if (pid == 0)
+                 /* No remote children either.  Finally give up.  */
+                 break;
+ 
+@@ -876,6 +874,9 @@ reap_children (int block, int err)
+ #endif /* WINDOWS32 */
+         }
+ 
++      /* Some child finished: increment the command count.  */
++      ++command_count;
++
+       /* Check if this is the child of the 'shell' function.  */
+       if (!remote && pid == shell_function_pid)
+         {
+@@ -2381,6 +2382,18 @@ child_execute_job (struct childbase *child, int good_stdin, char **argv)
+           break;
+         }
+ 
++    /* execvp() will use a default PATH if none is set; emulate that.  */
++    if (p == NULL)
++      {
++        size_t l = confstr (_CS_PATH, NULL, 0);
++        if (l)
++          {
++            char *dp = alloca (l);
++            confstr (_CS_PATH, dp, l);
++            p = dp;
++          }
++      }
++
+     cmd = (char *)find_in_given_path (argv[0], p, 0);
+   }
+ 
+@@ -2754,7 +2767,7 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
+   /* We used to have a double quote (") in sh_chars_dos[] below, but
+      that caused any command line with quoted file names be run
+      through a temporary batch file, which introduces command-line
+-     limit of 4K charcaters imposed by cmd.exe.  Since CreateProcess
++     limit of 4K characters imposed by cmd.exe.  Since CreateProcess
+      can handle quoted file names just fine, removing the quote lifts
+      the limit from a very frequent use case, because using quoted
+      file names is commonplace on MS-Windows.  */
+diff --git a/src/job.h b/src/job.h
+index ee290fb..fc92bcf 100644
+--- a/src/job.h
++++ b/src/job.h
+@@ -29,7 +29,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #endif
+ 
+ #define CHILDBASE                                               \
+-    char *cmd_name;       /* Alloced copy of command run.  */   \
++    char *cmd_name;       /* Allocated copy of command run.  */ \
+     char **environment;   /* Environment for commands. */       \
+     VMSCHILD                                                    \
+     struct output output  /* Output for this child.  */
+diff --git a/src/load.c b/src/load.c
+index 27f5899..5d57b68 100644
+--- a/src/load.c
++++ b/src/load.c
+@@ -195,7 +195,7 @@ load_file (const floc *flocp, const char **ldname, int noerror)
+         fp = *ldname;
+       else
+         ++fp;
+-      while (isalnum (*fp) || *fp == '_')
++      while (isalnum ((unsigned char) *fp) || *fp == '_')
+         *(p++) = *(fp++);
+       strcpy (p, SYMBOL_EXTENSION);
+       symname = new;
+diff --git a/src/main.c b/src/main.c
+index 78a27d7..9066513 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -227,12 +227,9 @@ int check_symlink_flag = 0;
+ 
+ /* Nonzero means print directory before starting and when done (-w).  */
+ 
+-int print_directory_flag = 0;
+-
+-/* Nonzero means ignore print_directory_flag and never print the directory.
+-   This is necessary because print_directory_flag is set implicitly.  */
+-
+-int inhibit_print_directory_flag = 0;
++int print_directory;
++static int print_directory_flag = -1;
++static const int default_print_directory_flag = -1;
+ 
+ /* Nonzero means print version information.  */
+ 
+@@ -325,6 +322,12 @@ struct variable shell_var;
+ 
+ char cmd_prefix = '\t';
+ 
++/* Count the number of commands we've invoked, that might change something in
++   the filesystem.  Start with 1 so calloc'd memory never matches.  */
++
++unsigned long command_count = 1;
++
++
+ 
+ /* The usage output.  We write it this way to make life easier for the
+    translators, especially those trying to translate to right-to-left
+@@ -438,7 +441,8 @@ static const struct command_switch switches[] =
+       "no-keep-going" },
+     { 't', flag, &touch_flag, 1, 1, 1, 0, 0, "touch" },
+     { 'v', flag, &print_version_flag, 1, 1, 0, 0, 0, "version" },
+-    { 'w', flag, &print_directory_flag, 1, 1, 0, 0, 0, "print-directory" },
++    { 'w', flag, &print_directory_flag, 1, 1, 0, 0,
++      &default_print_directory_flag, "print-directory" },
+ 
+     /* These options take arguments.  */
+     { 'C', filename, &directories, 0, 0, 0, 0, 0, "directory" },
+@@ -457,12 +461,13 @@ static const struct command_switch switches[] =
+     { CHAR_MAX+1, strlist, &db_flags, 1, 1, 0, "basic", 0, "debug" },
+     { CHAR_MAX+2, string, &jobserver_auth, 1, 1, 0, 0, 0, "jobserver-auth" },
+     { CHAR_MAX+3, flag, &trace_flag, 1, 1, 0, 0, 0, "trace" },
+-    { CHAR_MAX+4, flag, &inhibit_print_directory_flag, 1, 1, 0, 0, 0,
+-      "no-print-directory" },
++    { CHAR_MAX+4, flag_off, &print_directory_flag, 1, 1, 0, 0,
++      &default_print_directory_flag, "no-print-directory" },
+     { CHAR_MAX+5, flag, &warn_undefined_variables_flag, 1, 1, 0, 0, 0,
+       "warn-undefined-variables" },
+     { CHAR_MAX+7, string, &sync_mutex, 1, 1, 0, 0, 0, "sync-mutex" },
+-    { CHAR_MAX+8, flag_off, &silent_flag, 1, 1, 0, 0, &default_silent_flag, "no-silent" },
++    { CHAR_MAX+8, flag_off, &silent_flag, 1, 1, 0, 0, &default_silent_flag,
++      "no-silent" },
+     { CHAR_MAX+9, string, &jobserver_auth, 1, 0, 0, 0, 0, "jobserver-fds" },
+     { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+   };
+@@ -1523,6 +1528,18 @@ main (int argc, char **argv, char **envp)
+   /* Set always_make_flag if -B was given and we've not restarted already.  */
+   always_make_flag = always_make_set && (restarts == 0);
+ 
++  /* If the user didn't specify any print-directory options, compute the
++     default setting: disable under -s / print in sub-makes and under -C.  */
++
++  if (print_directory_flag == -1)
++    print_directory = !silent_flag && (directories != 0 || makelevel > 0);
++  else
++    print_directory = print_directory_flag;
++
++  /* If -R was given, set -r too (doesn't make sense otherwise!)  */
++  if (no_builtin_variables_flag)
++    no_builtin_rules_flag = 1;
++
+   /* Print version information, and exit.  */
+   if (print_version_flag)
+     {
+@@ -1588,6 +1605,68 @@ main (int argc, char **argv, char **envp)
+   /* We may move, but until we do, here we are.  */
+   starting_directory = current_directory;
+ 
++  /* If there were -C flags, move ourselves about.  */
++  if (directories != 0)
++    {
++      unsigned int i;
++      for (i = 0; directories->list[i] != 0; ++i)
++        {
++          const char *dir = directories->list[i];
++#ifdef WINDOWS32
++          /* WINDOWS32 chdir() doesn't work if the directory has a trailing '/'
++             But allow -C/ just in case someone wants that.  */
++          {
++            char *p = (char *)dir + strlen (dir) - 1;
++            while (p > dir && (p[0] == '/' || p[0] == '\\'))
++              --p;
++            p[1] = '\0';
++          }
++#endif
++          if (chdir (dir) < 0)
++            pfatal_with_name (dir);
++        }
++    }
++
++#ifdef WINDOWS32
++  /*
++   * THIS BLOCK OF CODE MUST COME AFTER chdir() CALL ABOVE IN ORDER
++   * TO NOT CONFUSE THE DEPENDENCY CHECKING CODE IN implicit.c.
++   *
++   * The functions in dir.c can incorrectly cache information for "."
++   * before we have changed directory and this can cause file
++   * lookups to fail because the current directory (.) was pointing
++   * at the wrong place when it was first evaluated.
++   */
++   no_default_sh_exe = !find_and_set_default_shell (NULL);
++#endif /* WINDOWS32 */
++
++  /* Construct the list of include directories to search.  */
++
++  construct_include_path (include_directories == 0
++                          ? 0 : include_directories->list);
++
++  /* If we chdir'ed, figure out where we are now.  */
++  if (directories)
++    {
++#ifdef WINDOWS32
++      if (getcwd_fs (current_directory, GET_PATH_MAX) == 0)
++#else
++      if (getcwd (current_directory, GET_PATH_MAX) == 0)
++#endif
++        {
++#ifdef  HAVE_GETCWD
++          perror_with_name ("getcwd", "");
++#else
++          OS (error, NILF, "getwd: %s", current_directory);
++#endif
++          starting_directory = 0;
++        }
++      else
++        starting_directory = current_directory;
++    }
++
++  define_variable_cname ("CURDIR", current_directory, o_file, 0);
++
+   /* Validate the arg_job_slots configuration before we define MAKEFLAGS so
+      users get an accurate value in their makefiles.
+      At this point arg_job_slots is the argv setting, if there is one, else
+@@ -1687,80 +1766,6 @@ main (int argc, char **argv, char **envp)
+ #endif
+     }
+ 
+-  /* If there were -C flags, move ourselves about.  */
+-  if (directories != 0)
+-    {
+-      unsigned int i;
+-      for (i = 0; directories->list[i] != 0; ++i)
+-        {
+-          const char *dir = directories->list[i];
+-#ifdef WINDOWS32
+-          /* WINDOWS32 chdir() doesn't work if the directory has a trailing '/'
+-             But allow -C/ just in case someone wants that.  */
+-          {
+-            char *p = (char *)dir + strlen (dir) - 1;
+-            while (p > dir && (p[0] == '/' || p[0] == '\\'))
+-              --p;
+-            p[1] = '\0';
+-          }
+-#endif
+-          if (chdir (dir) < 0)
+-            pfatal_with_name (dir);
+-        }
+-    }
+-
+-#ifdef WINDOWS32
+-  /*
+-   * THIS BLOCK OF CODE MUST COME AFTER chdir() CALL ABOVE IN ORDER
+-   * TO NOT CONFUSE THE DEPENDENCY CHECKING CODE IN implicit.c.
+-   *
+-   * The functions in dir.c can incorrectly cache information for "."
+-   * before we have changed directory and this can cause file
+-   * lookups to fail because the current directory (.) was pointing
+-   * at the wrong place when it was first evaluated.
+-   */
+-   no_default_sh_exe = !find_and_set_default_shell (NULL);
+-#endif /* WINDOWS32 */
+-
+-  /* Except under -s, always do -w in sub-makes and under -C.  */
+-  if (!silent_flag && (directories != 0 || makelevel > 0))
+-    print_directory_flag = 1;
+-
+-  /* Let the user disable that with --no-print-directory.  */
+-  if (inhibit_print_directory_flag)
+-    print_directory_flag = 0;
+-
+-  /* If -R was given, set -r too (doesn't make sense otherwise!)  */
+-  if (no_builtin_variables_flag)
+-    no_builtin_rules_flag = 1;
+-
+-  /* Construct the list of include directories to search.  */
+-
+-  construct_include_path (include_directories == 0
+-                          ? 0 : include_directories->list);
+-
+-  /* If we chdir'ed, figure out where we are now.  */
+-  if (directories)
+-    {
+-#ifdef WINDOWS32
+-      if (getcwd_fs (current_directory, GET_PATH_MAX) == 0)
+-#else
+-      if (getcwd (current_directory, GET_PATH_MAX) == 0)
+-#endif
+-        {
+-#ifdef  HAVE_GETCWD
+-          perror_with_name ("getcwd", "");
+-#else
+-          OS (error, NILF, "getwd: %s", current_directory);
+-#endif
+-          starting_directory = 0;
+-        }
+-      else
+-        starting_directory = current_directory;
+-    }
+-
+-  define_variable_cname ("CURDIR", current_directory, o_file, 0);
+-
+   /* Read any stdin makefiles into temporary files.  */
+ 
+   if (makefiles != 0)
+@@ -2189,11 +2194,20 @@ main (int argc, char **argv, char **envp)
+ 
+       DB (DB_BASIC, (_("Updating makefiles....\n")));
+ 
++      /* Count the makefiles, and reverse the order so that we attempt to
++         rebuild them in the order they were read.  */
+       {
+-        struct goaldep *d;
+         unsigned int num_mkfiles = 0;
+-        for (d = read_files; d != NULL; d = d->next)
+-          ++num_mkfiles;
++        struct goaldep *d = read_files;
++        read_files = NULL;
++        while (d != NULL)
++          {
++            struct goaldep *t = d;
++            d = d->next;
++            t->next = read_files;
++            read_files = t;
++            ++num_mkfiles;
++          }
+ 
+         makefile_mtimes = alloca (num_mkfiles * sizeof (FILE_TIMESTAMP));
+       }
+diff --git a/src/makeint.h b/src/makeint.h
+index c428a36..c4cc4df 100644
+--- a/src/makeint.h
++++ b/src/makeint.h
+@@ -41,6 +41,13 @@ char *alloca ();
+ # endif
+ #endif
+ 
++/* Some versions of GCC (e.g., 10.x) set the warn_unused_result attribute on
++   __builtin_alloca.  This causes alloca(0) to fail and is not easily worked
++   around so make a helper.
++   See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98055  */
++
++#define free_alloca() do{ void *__p = alloca (0); (void)__p; }while(0)
++
+ /* Disable assert() unless we're a maintainer.
+    Some asserts are compute-intensive.  */
+ #ifndef MAKE_MAINTAINER_MODE
+@@ -115,7 +122,7 @@ extern int errno;
+ #endif
+ 
+ /* Some systems define _POSIX_VERSION but are not really POSIX.1.  */
+-#if (defined (butterfly) || defined (__arm) || (defined (__mips) && defined (_SYSTYPE_SVR3)) || (defined (sequent) && defined (i386)))
++#if (defined (butterfly) || (defined (__mips) && defined (_SYSTYPE_SVR3)) || (defined (sequent) && defined (i386)))
+ # undef POSIX
+ #endif
+ 
+@@ -670,10 +677,11 @@ extern unsigned short stopchar_map[];
+ extern int just_print_flag, run_silent, ignore_errors_flag, keep_going_flag;
+ extern int print_data_base_flag, question_flag, touch_flag, always_make_flag;
+ extern int env_overrides, no_builtin_rules_flag, no_builtin_variables_flag;
+-extern int print_version_flag, print_directory_flag, check_symlink_flag;
++extern int print_version_flag, print_directory, check_symlink_flag;
+ extern int warn_undefined_variables_flag, trace_flag, posix_pedantic;
+ extern int not_parallel, second_expansion, clock_skew_detected;
+ extern int rebuilding_makefiles, one_shell, output_sync, verify_flag;
++extern unsigned long command_count;
+ 
+ extern const char *default_shell;
+ 
+diff --git a/src/misc.c b/src/misc.c
+index de19e37..bc5060a 100644
+--- a/src/misc.c
++++ b/src/misc.c
+@@ -535,8 +535,8 @@ strcasecmp (const char *s1, const char *s2)
+ {
+   while (1)
+     {
+-      int c1 = (int) *(s1++);
+-      int c2 = (int) *(s2++);
++      int c1 = (unsigned char) *(s1++);
++      int c2 = (unsigned char) *(s2++);
+ 
+       if (isalpha (c1))
+         c1 = tolower (c1);
+@@ -560,8 +560,8 @@ strncasecmp (const char *s1, const char *s2, int n)
+ {
+   while (n-- > 0)
+     {
+-      int c1 = (int) *(s1++);
+-      int c2 = (int) *(s2++);
++      int c1 = (unsigned char) *(s1++);
++      int c2 = (unsigned char) *(s2++);
+ 
+       if (isalpha (c1))
+         c1 = tolower (c1);
+diff --git a/src/output.c b/src/output.c
+index 2211749..e222e0a 100644
+--- a/src/output.c
++++ b/src/output.c
+@@ -144,14 +144,18 @@ log_working_directory (int entering)
+   return 1;
+ }
+ 
+-/* Set a file descriptor to be in O_APPEND mode.
+-   If it fails, just ignore it.  */
++/* Set a file descriptor referring to a regular file
++   to be in O_APPEND mode.  If it fails, just ignore it.  */
+ 
+ static void
+ set_append_mode (int fd)
+ {
+ #if defined(F_GETFL) && defined(F_SETFL) && defined(O_APPEND)
+-  int flags = fcntl (fd, F_GETFL, 0);
++  struct stat stbuf;
++  int flags;
++  if (fstat (fd, &stbuf) != 0 || !S_ISREG (stbuf.st_mode))
++    return;
++  flags = fcntl (fd, F_GETFL, 0);
+   if (flags >= 0)
+     {
+       int r;
+@@ -367,7 +371,7 @@ output_dump (struct output *out)
+       void *sem = acquire_semaphore ();
+ 
+       /* Log the working directory for this dump.  */
+-      if (print_directory_flag && output_sync != OUTPUT_SYNC_RECURSE)
++      if (print_directory && output_sync != OUTPUT_SYNC_RECURSE)
+         traced = log_working_directory (1);
+ 
+       if (outfd_not_empty)
+@@ -517,7 +521,7 @@ output_start (void)
+   /* If we're not syncing this output per-line or per-target, make sure we emit
+      the "Entering..." message where appropriate.  */
+   if (output_sync == OUTPUT_SYNC_NONE || output_sync == OUTPUT_SYNC_RECURSE)
+-    if (! stdio_traced && print_directory_flag)
++    if (! stdio_traced && print_directory)
+       stdio_traced = log_working_directory (1);
+ }
+ 
+diff --git a/src/output.h b/src/output.h
+index a506505..ece1c70 100644
+--- a/src/output.h
++++ b/src/output.h
+@@ -67,14 +67,21 @@ void output_dump (struct output *out);
+ 
+ # ifdef WINDOWS32
+ /* For emulations in w32/compat/posixfcn.c.  */
+-#  define F_GETFD 1
+-#  define F_SETLKW 2
++#  ifndef F_GETFD
++#   define F_GETFD 1
++#  endif
++#  ifndef F_SETLKW
++#   define F_SETLKW 2
++#  endif
+ /* Implementation note: None of the values of l_type below can be zero
+    -- they are compared with a static instance of the struct, so zero
+    means unknown/invalid, see w32/compat/posixfcn.c. */
+-#  define F_WRLCK 1
+-#  define F_UNLCK 2
+-
++#  ifndef F_WRLCK
++#   define F_WRLCK 1
++#  endif
++#  ifndef F_UNLCK
++#   define F_UNLCK 2
++#  endif
+ struct flock
+   {
+     short l_type;
+@@ -89,7 +96,9 @@ struct flock
+ typedef intptr_t sync_handle_t;
+ 
+ /* Public functions emulated/provided in posixfcn.c.  */
++#  if !defined(GNULIB_defined_rpl_fcntl) && !defined(GNULIB_defined_fcntl)
+ int fcntl (intptr_t fd, int cmd, ...);
++#  endif
+ intptr_t create_mutex (void);
+ int same_stream (FILE *f1, FILE *f2);
+ 
+diff --git a/src/posixos.c b/src/posixos.c
+index 525f292..eab175a 100644
+--- a/src/posixos.c
++++ b/src/posixos.c
+@@ -145,6 +145,11 @@ jobserver_parse_auth (const char *auth)
+   /* When using pselect() we want the read to be non-blocking.  */
+   set_blocking (job_fds[0], 0);
+ 
++  /* By default we don't send the job pipe FDs to our children.
++     See jobserver_pre_child() and jobserver_post_child().  */
++  fd_noinherit (job_fds[0]);
++  fd_noinherit (job_fds[1]);
++
+   return 1;
+ }
+ 
+diff --git a/src/read.c b/src/read.c
+index fa197fb..b66f3d4 100644
+--- a/src/read.c
++++ b/src/read.c
+@@ -63,9 +63,9 @@ struct vmodifiers
+     unsigned int assign_v:1;
+     unsigned int define_v:1;
+     unsigned int undefine_v:1;
+-    unsigned int export_v:1;
+     unsigned int override_v:1;
+     unsigned int private_v:1;
++    enum variable_export export_v ENUM_BITFIELD (2);
+   };
+ 
+ /* Types of "words" that can be read in a makefile.  */
+@@ -142,6 +142,7 @@ static void do_undefine (char *name, enum variable_origin origin,
+ static struct variable *do_define (char *name, enum variable_origin origin,
+                                    struct ebuffer *ebuf);
+ static int conditional_line (char *line, size_t len, const floc *flocp);
++static void check_specials (const struct nameseq *file, int set_default);
+ static void record_files (struct nameseq *filenames, int are_also_makes,
+                           const char *pattern,
+                           const char *pattern_percent, char *depstr,
+@@ -263,10 +264,6 @@ read_all_makefiles (const char **makefiles)
+         {
+           /* No default makefile was found.  Add the default makefiles to the
+              'read_files' chain so they will be updated if possible.  */
+-          struct goaldep *tail = read_files;
+-          /* Add them to the tail, after any MAKEFILES variable makefiles.  */
+-          while (tail != 0 && tail->next != 0)
+-            tail = tail->next;
+           for (p = default_makefiles; *p != 0; ++p)
+             {
+               struct goaldep *d = alloc_goaldep ();
+@@ -274,14 +271,9 @@ read_all_makefiles (const char **makefiles)
+               /* Tell update_goal_chain to bail out as soon as this file is
+                  made, and main not to die if we can't make this file.  */
+               d->flags = RM_DONTCARE;
+-              if (tail == 0)
+-                read_files = d;
+-              else
+-                tail->next = d;
+-              tail = d;
++              d->next = read_files;
++              read_files = d;
+             }
+-          if (tail != 0)
+-            tail->next = 0;
+         }
+     }
+ 
+@@ -440,7 +432,7 @@ eval_makefile (const char *filename, unsigned short flags)
+   fclose (ebuf.fp);
+ 
+   free (ebuf.bufstart);
+-  alloca (0);
++  free_alloca ();
+ 
+   errno = 0;
+   return deps;
+@@ -482,7 +474,7 @@ eval_buffer (char *buffer, const floc *flocp)
+ 
+   reading_file = curfile;
+ 
+-  alloca (0);
++  free_alloca ();
+ }
+ 
+ /* Check LINE to see if it's a variable assignment or undefine.
+@@ -525,7 +517,9 @@ parse_var_assignment (const char *line, struct vmodifiers *vmod)
+       wlen = p2 - p;
+ 
+       if (word1eq ("export"))
+-        vmod->export_v = 1;
++        vmod->export_v = v_export;
++      else if (word1eq ("unexport"))
++        vmod->export_v = v_noexport;
+       else if (word1eq ("override"))
+         vmod->override_v = 1;
+       else if (word1eq ("private"))
+@@ -751,8 +745,8 @@ eval (struct ebuffer *ebuf, int set_default)
+ 
+           assert (v != NULL);
+ 
+-          if (vmod.export_v)
+-            v->export = v_export;
++          if (vmod.export_v != v_default)
++            v->export = vmod.export_v;
+           if (vmod.private_v)
+             v->private_var = 1;
+ 
+@@ -1322,79 +1316,7 @@ eval (struct ebuffer *ebuf, int set_default)
+             commands[commands_idx++] = '\n';
+           }
+ 
+-        /* Determine if this target should be made default. We used to do
+-           this in record_files() but because of the delayed target recording
+-           and because preprocessor directives are legal in target's commands
+-           it is too late. Consider this fragment for example:
+-
+-           foo:
+-
+-           ifeq ($(.DEFAULT_GOAL),foo)
+-              ...
+-           endif
+-
+-           Because the target is not recorded until after ifeq directive is
+-           evaluated the .DEFAULT_GOAL does not contain foo yet as one
+-           would expect. Because of this we have to move the logic here.  */
+-
+-        if (set_default && default_goal_var->value[0] == '\0')
+-          {
+-            struct dep *d;
+-            struct nameseq *t = filenames;
+-
+-            for (; t != 0; t = t->next)
+-              {
+-                int reject = 0;
+-                const char *name = t->name;
+-
+-                /* We have nothing to do if this is an implicit rule. */
+-                if (strchr (name, '%') != 0)
+-                  break;
+-
+-                /* See if this target's name does not start with a '.',
+-                   unless it contains a slash.  */
+-                if (*name == '.' && strchr (name, '/') == 0
+-#ifdef HAVE_DOS_PATHS
+-                    && strchr (name, '\\') == 0
+-#endif
+-                    )
+-                  continue;
+-
+-
+-                /* If this file is a suffix, don't let it be
+-                   the default goal file.  */
+-                for (d = suffix_file->deps; d != 0; d = d->next)
+-                  {
+-                    struct dep *d2;
+-                    if (*dep_name (d) != '.' && streq (name, dep_name (d)))
+-                      {
+-                        reject = 1;
+-                        break;
+-                      }
+-                    for (d2 = suffix_file->deps; d2 != 0; d2 = d2->next)
+-                      {
+-                        size_t l = strlen (dep_name (d2));
+-                        if (!strneq (name, dep_name (d2), l))
+-                          continue;
+-                        if (streq (name + l, dep_name (d)))
+-                          {
+-                            reject = 1;
+-                            break;
+-                          }
+-                      }
+-
+-                    if (reject)
+-                      break;
+-                  }
+-
+-                if (!reject)
+-                  {
+-                    define_variable_global (".DEFAULT_GOAL", 13, t->name,
+-                                            o_file, 0, NILF);
+-                    break;
+-                  }
+-              }
+-          }
++        check_specials (filenames, set_default);
+       }
+     }
+ 
+@@ -1912,7 +1834,8 @@ record_target_var (struct nameseq *filenames, char *defn,
+       /* Set up the variable to be *-specific.  */
+       v->per_target = 1;
+       v->private_var = vmod->private_v;
+-      v->export = vmod->export_v ? v_export : v_default;
++      if (vmod->export_v != v_default)
++        v->export = vmod->export_v;
+ 
+       /* If it's not an override, check to see if there was a command-line
+          setting.  If so, reset the value.  */
+@@ -1935,6 +1858,106 @@ record_target_var (struct nameseq *filenames, char *defn,
+     }
+ }
+ 
++
++/* Check for special targets.  We used to do this in record_files() but that's
++   too late: by the time we get there we'll have already parsed the next line
++   and it have been mis-parsed because these special targets haven't been
++   considered yet.  */
++
++static void check_specials (const struct nameseq* files, int set_default)
++{
++  const struct nameseq *t = files;
++
++  /* Unlikely but ...  */
++  if (posix_pedantic && second_expansion && one_shell
++      && (!set_default || default_goal_var->value[0] == '\0'))
++    return;
++
++  for (; t != 0; t = t->next)
++    {
++      const char* nm = t->name;
++
++      if (!posix_pedantic && streq (nm, ".POSIX"))
++        {
++          posix_pedantic = 1;
++          define_variable_cname (".SHELLFLAGS", "-ec", o_default, 0);
++          /* These default values are based on IEEE Std 1003.1-2008.
++             It requires '-O 1' for [CF]FLAGS, but GCC doesn't allow
++             space between -O and the number so omit it here.  */
++          define_variable_cname ("CC", "c99", o_default, 0);
++          define_variable_cname ("CFLAGS", "-O1", o_default, 0);
++          define_variable_cname ("FC", "fort77", o_default, 0);
++          define_variable_cname ("FFLAGS", "-O1", o_default, 0);
++          define_variable_cname ("SCCSGETFLAGS", "-s", o_default, 0);
++          continue;
++        }
++
++      if (!second_expansion && streq (nm, ".SECONDEXPANSION"))
++        {
++          second_expansion = 1;
++          continue;
++        }
++
++#if !defined (__MSDOS__) && !defined (__EMX__)
++      if (!one_shell && streq (nm, ".ONESHELL"))
++        {
++          one_shell = 1;
++          continue;
++        }
++#endif
++
++      /* Determine if this target should be made default.  */
++
++      if (set_default && default_goal_var->value[0] == '\0')
++        {
++          struct dep *d;
++          int reject = 0;
++
++          /* We have nothing to do if this is an implicit rule. */
++          if (strchr (nm, '%') != 0)
++            break;
++
++          /* See if this target's name does not start with a '.',
++             unless it contains a slash.  */
++          if (*nm == '.' && strchr (nm, '/') == 0
++#ifdef HAVE_DOS_PATHS
++              && strchr (nm, '\\') == 0
++#endif
++              )
++            continue;
++
++          /* If this file is a suffix, it can't be the default goal file.  */
++          for (d = suffix_file->deps; d != 0; d = d->next)
++            {
++              struct dep *d2;
++              if (*dep_name (d) != '.' && streq (nm, dep_name (d)))
++                {
++                  reject = 1;
++                  break;
++                }
++              for (d2 = suffix_file->deps; d2 != 0; d2 = d2->next)
++                {
++                  size_t l = strlen (dep_name (d2));
++                  if (!strneq (nm, dep_name (d2), l))
++                    continue;
++                  if (streq (nm + l, dep_name (d)))
++                    {
++                      reject = 1;
++                      break;
++                    }
++                }
++
++              if (reject)
++                break;
++            }
++
++          if (!reject)
++            define_variable_global (".DEFAULT_GOAL", 13, t->name,
++                                    o_file, 0, NILF);
++        }
++    }
++}
++
+ /* Record a description line for files FILENAMES,
+    with dependencies DEPS, commands to execute described
+    by COMMANDS and COMMANDS_IDX, coming from FILENAME:COMMANDS_STARTED.
+@@ -2076,29 +2099,6 @@ record_files (struct nameseq *filenames, int are_also_makes,
+ 
+       free_ns (filenames);
+ 
+-      /* Check for special targets.  Do it here instead of, say, snap_deps()
+-         so that we can immediately use the value.  */
+-      if (!posix_pedantic && streq (name, ".POSIX"))
+-        {
+-          posix_pedantic = 1;
+-          define_variable_cname (".SHELLFLAGS", "-ec", o_default, 0);
+-          /* These default values are based on IEEE Std 1003.1-2008.
+-             It requires '-O 1' for [CF]FLAGS, but GCC doesn't allow space
+-             between -O and the number so omit it here.  */
+-          define_variable_cname ("ARFLAGS", "-rv", o_default, 0);
+-          define_variable_cname ("CC", "c99", o_default, 0);
+-          define_variable_cname ("CFLAGS", "-O1", o_default, 0);
+-          define_variable_cname ("FC", "fort77", o_default, 0);
+-          define_variable_cname ("FFLAGS", "-O1", o_default, 0);
+-          define_variable_cname ("SCCSGETFLAGS", "-s", o_default, 0);
+-        }
+-      else if (!second_expansion && streq (name, ".SECONDEXPANSION"))
+-        second_expansion = 1;
+-#if !defined (__MSDOS__) && !defined (__EMX__)
+-      else if (!one_shell && streq (name, ".ONESHELL"))
+-        one_shell = 1;
+-#endif
+-
+       /* If this is a static pattern rule:
+          'targets: target%pattern: prereq%pattern; recipe',
+          make sure the pattern matches this target name.  */
+@@ -3215,10 +3215,10 @@ parse_file_seq (char **stringp, size_t size, int stopmap,
+       /* Strip leading "this directory" references.  */
+       if (NONE_SET (flags, PARSEFS_NOSTRIP))
+ #ifdef VMS
+-        /* Skip leading '[]'s. should only be one set or bug somwhere else */
++        /* Skip leading '[]'s. should only be one set or bug somewhere else */
+         if (p - s > 2 && s[0] == '[' && s[1] == ']')
+             s += 2;
+-        /* Skip leading '<>'s. should only be one set or bug somwhere else */
++        /* Skip leading '<>'s. should only be one set or bug somewhere else */
+         if (p - s > 2 && s[0] == '<' && s[1] == '>')
+             s += 2;
+ #endif
+diff --git a/src/remake.c b/src/remake.c
+index fb237c5..beaf7e0 100644
+--- a/src/remake.c
++++ b/src/remake.c
+@@ -337,7 +337,7 @@ update_file (struct file *file, unsigned int depth)
+       check_renamed (f);
+ 
+       /* Clean up any alloca() used during the update.  */
+-      alloca (0);
++      free_alloca ();
+ 
+       /* If we got an error, don't bother with double_colon etc.  */
+       if (new && !keep_going_flag)
+diff --git a/src/variable.c b/src/variable.c
+index e379622..9258262 100644
+--- a/src/variable.c
++++ b/src/variable.c
+@@ -212,9 +212,9 @@ define_variable_in_set (const char *name, size_t length,
+ 
+ #ifdef VMS
+   /* VMS does not populate envp[] with DCL symbols and logical names which
+-     historically are mapped to environent variables.
++     historically are mapped to environment variables.
+      If the variable is not yet defined, then we need to check if getenv()
+-     can find it.  Do not do this for origin == o_env to avoid infinte
++     can find it.  Do not do this for origin == o_env to avoid infinite
+      recursion */
+   if (HASH_VACANT (v) && (origin != o_env))
+     {
+@@ -282,6 +282,8 @@ define_variable_in_set (const char *name, size_t length,
+ 
+   v->export = v_default;
+   v->exportable = 1;
++  /* Check the nul-terminated variable name.  */
++  name = v->name;
+   if (*name != '_' && (*name < 'A' || *name > 'Z')
+       && (*name < 'a' || *name > 'z'))
+     v->exportable = 0;
+@@ -475,8 +477,9 @@ lookup_variable (const char *name, size_t length)
+     }
+ 
+ #ifdef VMS
+-  /* VMS does not populate envp[] with DCL symbols and logical names which
+-     historically are mapped to enviroment varables and returned by getenv() */
++  /* VMS doesn't populate envp[] with DCL symbols and logical names, which
++     historically are mapped to environment variables and returned by
++     getenv().  */
+   {
+     char *vname = alloca (length + 1);
+     char *value;
+@@ -977,6 +980,41 @@ define_automatic_variables (void)
+ 
+ int export_all_variables;
+ 
++static int
++should_export (const struct variable *v)
++{
++  switch (v->export)
++    {
++    case v_export:
++      break;
++
++    case v_noexport:
++      return 0;
++
++    case v_ifset:
++      if (v->origin == o_default)
++        return 0;
++      break;
++
++    case v_default:
++      if (v->origin == o_default || v->origin == o_automatic)
++        /* Only export default variables by explicit request.  */
++        return 0;
++
++      /* The variable doesn't have a name that can be exported.  */
++      if (! v->exportable)
++        return 0;
++
++      if (! export_all_variables
++          && v->origin != o_command
++          && v->origin != o_env && v->origin != o_env_override)
++        return 0;
++      break;
++    }
++
++  return 1;
++}
++
+ /* Create a new environment for FILE's commands.
+    If FILE is nil, this is for the 'shell' function.
+    The child's MAKELEVEL variable is incremented.  */
+@@ -992,6 +1030,8 @@ target_environment (struct file *file)
+   struct variable makelevel_key;
+   char **result_0;
+   char **result;
++  /* If we got no value from the environment then never add the default.  */
++  int added_SHELL = shell_var.value == 0;
+ 
+   if (file == 0)
+     set_list = current_variable_set_list;
+@@ -1001,74 +1041,35 @@ target_environment (struct file *file)
+   hash_init (&table, VARIABLE_BUCKETS,
+              variable_hash_1, variable_hash_2, variable_hash_cmp);
+ 
+-  /* Run through all the variable sets in the list,
+-     accumulating variables in TABLE.  */
++  /* Run through all the variable sets in the list, accumulating variables
++     in TABLE.  We go from most specific to least, so the first variable we
++     encounter is the keeper.  */
+   for (s = set_list; s != 0; s = s->next)
+     {
+       struct variable_set *set = s->set;
++      int isglobal = set == &global_variable_set;
++
+       v_slot = (struct variable **) set->table.ht_vec;
+       v_end = v_slot + set->table.ht_size;
+       for ( ; v_slot < v_end; v_slot++)
+         if (! HASH_VACANT (*v_slot))
+           {
+-            struct variable **new_slot;
++            struct variable **evslot;
+             struct variable *v = *v_slot;
+ 
+-            /* If this is a per-target variable and it hasn't been touched
+-               already then look up the global version and take its export
+-               value.  */
+-            if (v->per_target && v->export == v_default)
+-              {
+-                struct variable *gv;
++            evslot = (struct variable **) hash_find_slot (&table, v);
+ 
+-                gv = lookup_variable_in_set (v->name, strlen (v->name),
+-                                             &global_variable_set);
+-                if (gv)
+-                  v->export = gv->export;
++            if (HASH_VACANT (*evslot))
++              {
++                /* If we're not global, or we are and should export, add it.  */
++                if (!isglobal || should_export (v))
++                  hash_insert_at (&table, v, evslot);
+               }
+-
+-            switch (v->export)
++            else if ((*evslot)->export == v_default)
+               {
+-              case v_default:
+-                if (v->origin == o_default || v->origin == o_automatic)
+-                  /* Only export default variables by explicit request.  */
+-                  continue;
+-
+-                /* The variable doesn't have a name that can be exported.  */
+-                if (! v->exportable)
+-                  continue;
+-
+-                if (! export_all_variables
+-                    && v->origin != o_command
+-                    && v->origin != o_env && v->origin != o_env_override)
+-                  continue;
+-                break;
+-
+-              case v_export:
+-                break;
+-
+-              case v_noexport:
+-                {
+-                  /* If this is the SHELL variable and it's not exported,
+-                     then add the value from our original environment, if
+-                     the original environment defined a value for SHELL.  */
+-                  if (streq (v->name, "SHELL") && shell_var.value)
+-                    {
+-                      v = &shell_var;
+-                      break;
+-                    }
+-                  continue;
+-                }
+-
+-              case v_ifset:
+-                if (v->origin == o_default)
+-                  continue;
+-                break;
++                /* We already have a variable but we don't know its status.  */
++                (*evslot)->export = v->export;
+               }
+-
+-            new_slot = (struct variable **) hash_find_slot (&table, v);
+-            if (HASH_VACANT (*new_slot))
+-              hash_insert_at (&table, v, new_slot);
+           }
+     }
+ 
+@@ -1076,7 +1077,7 @@ target_environment (struct file *file)
+   makelevel_key.length = MAKELEVEL_LENGTH;
+   hash_delete (&table, &makelevel_key);
+ 
+-  result = result_0 = xmalloc ((table.ht_fill + 2) * sizeof (char *));
++  result = result_0 = xmalloc ((table.ht_fill + 3) * sizeof (char *));
+ 
+   v_slot = (struct variable **) table.ht_vec;
+   v_end = v_slot + table.ht_size;
+@@ -1085,6 +1086,15 @@ target_environment (struct file *file)
+       {
+         struct variable *v = *v_slot;
+ 
++        /* This might be here because it was a target-specific variable that
++           we didn't know the status of when we added it.  */
++        if (! should_export (v))
++          continue;
++
++        /* If this is the SHELL variable remember we already added it.  */
++        if (!added_SHELL && streq (v->name, "SHELL"))
++          added_SHELL = 1;
++
+         /* If V is recursively expanded and didn't come from the environment,
+            expand its value.  If it came from the environment, it should
+            go back into the environment unchanged.  */
+@@ -1111,6 +1121,9 @@ target_environment (struct file *file)
+           }
+       }
+ 
++  if (!added_SHELL)
++    *result++ = xstrdup (concat (3, shell_var.name, "=", shell_var.value));
++
+   *result = xmalloc (100);
+   sprintf (*result, "%s=%u", MAKELEVEL_NAME, makelevel + 1);
+   *++result = 0;
+diff --git a/src/variable.h b/src/variable.h
+index e8cba4f..23f3282 100644
+--- a/src/variable.h
++++ b/src/variable.h
+@@ -41,6 +41,14 @@ enum variable_flavor
+     f_append_value      /* Append unexpanded value */
+   };
+ 
++enum variable_export
++{
++    v_default = 0,      /* Decide in target_environment.  */
++    v_export,           /* Export this variable.  */
++    v_noexport,         /* Don't export this variable.  */
++    v_ifset             /* Export it if it has a non-default value.  */
++};
++
+ /* Structure that represents one variable definition.
+    Each bucket of the hash table is a chain of these,
+    chained through 'next'.  */
+@@ -73,12 +81,7 @@ struct variable
+     enum variable_origin
+       origin ENUM_BITFIELD (3); /* Variable origin.  */
+     enum variable_export
+-      {
+-        v_export,               /* Export this variable.  */
+-        v_noexport,             /* Don't export this variable.  */
+-        v_ifset,                /* Export it if it has a non-default value.  */
+-        v_default               /* Decide in target_environment.  */
+-      } export ENUM_BITFIELD (2);
++      export ENUM_BITFIELD (2); /* Export control. */
+   };
+ 
+ /* Structure that represents a variable set.  */
+diff --git a/src/vms_exit.c b/src/vms_exit.c
+index b54bba1..9b5c129 100644
+--- a/src/vms_exit.c
++++ b/src/vms_exit.c
+@@ -1,6 +1,6 @@
+ /* vms_exit.c
+  *
+- * Wrapper for the VMS exit() command to tranlate UNIX codes to be
++ * Wrapper for the VMS exit() command to translate UNIX codes to be
+  * encoded for POSIX, but also have VMS severity levels.
+  * The posix_exit() variant only sets a severity level for status code 1.
+  *
+diff --git a/src/vms_export_symbol.c b/src/vms_export_symbol.c
+index 9b4ed78..418c45c 100644
+--- a/src/vms_export_symbol.c
++++ b/src/vms_export_symbol.c
+@@ -77,7 +77,7 @@ struct dcl_symbol
+   struct dsc$descriptor_s value_desc;
+   char name[MAX_DCL_SYMBOL_LEN + 1];    /* + 1 byte for null terminator */
+   char value[MAX_DCL_SYMBOL_VALUE +1];  /* + 1 byte for null terminator */
+-  char pad[3]; /* Pad structure to longword allignment */
++  char pad[3]; /* Pad structure to longword alignment */
+ };
+ 
+ static struct dcl_symbol * vms_dcl_symbol_head = NULL;
+@@ -108,7 +108,7 @@ clear_exported_symbols (void)
+ 
+   symbol = vms_dcl_symbol_head;
+ 
+-  /* Walk the list of symbols.  This is done durring exit,
++  /* Walk the list of symbols.  This is done during exit,
+    * so no need to free memory.
+    */
+   while (symbol != NULL)
+diff --git a/src/vms_progname.c b/src/vms_progname.c
+index 95d0521..fb5d5f2 100644
+--- a/src/vms_progname.c
++++ b/src/vms_progname.c
+@@ -409,7 +409,7 @@ set_program_name (const char *argv0)
+                 int i;
+ 
+                 i = 1;
+-                while (isdigit (lastdot[i])) {
++                while (isdigit ((unsigned char) lastdot[i])) {
+                     i++;
+                 }
+                 if (lastdot[i] == 0) {
+@@ -417,7 +417,7 @@ set_program_name (const char *argv0)
+                 }
+             }
+ 
+-            /* Find the .exe on the name (case insenstive) and toss it */
++            /* Find the .exe on the name (case insensitive) and toss it */
+             dotexe = strrchr (vms_new_nam, '.');
+             if (dotexe != NULL) {
+                 if ((dotexe[1] == 'e' || dotexe[1] == 'E') &&
+diff --git a/src/vmsfunctions.c b/src/vmsfunctions.c
+index 51310da..9ef6302 100644
+--- a/src/vmsfunctions.c
++++ b/src/vmsfunctions.c
+@@ -149,7 +149,7 @@ vms_command(const char* argv0)
+    If something goes wrong in sys$parse (unlikely, this is a VMS/CRTL supplied
+    file specification) or if there is an empty name part (not easy to produce,
+    but it is possible) just return "make".
+-   Somes notes ...
++   Some notes ...
+    NAM[L]$M_SYNCHK requests a syntax check, only.
+    NAM is for ODS2 names (shorter parts, output usually converted to UPPERCASE).
+    NAML is for ODS2/ODS5 names (longer parts, output unchanged).
+diff --git a/src/vmsjobs.c b/src/vmsjobs.c
+index 979a209..3588f4a 100644
+--- a/src/vmsjobs.c
++++ b/src/vmsjobs.c
+@@ -331,7 +331,7 @@ posix_parse_sq (struct token_info *token)
+ static char *
+ posix_parse_dq (struct token_info *token)
+ {
+-  /* Unix mode:  Any imbedded \" becomes doubled.
++  /* Unix mode:  Any embedded \" becomes doubled.
+                  \t is tab, \\, \$ leading character stripped.
+                  $ character replaced with \' unless escaped.
+   */
+@@ -367,7 +367,7 @@ posix_parse_dq (struct token_info *token)
+             }
+           INC_TOKEN_LEN_OR_BREAK;
+         }
+-      else if (*p == '$' && isalpha (p[1]))
++      else if (*p == '$' && isalpha ((unsigned char) p[1]))
+         {
+           /* A symbol we should be able to substitute */
+           *q++ = '\'';
+@@ -463,7 +463,7 @@ vms_parse_quotes (struct token_info *token)
+                 }
+               break;
+             case '\'':
+-              /* Symbol substitution ony in double quotes */
++              /* Symbol substitution only in double quotes */
+               if ((p[1] == '\'') && (parse_level[nest] == '"'))
+                 {
+                   nest++;
+@@ -506,7 +506,7 @@ posix_parse_dollar (struct token_info *token)
+   *q++ = '\'';
+   INC_TOKEN_LEN_OR_RETURN (p);
+ 
+-  while ((isalnum (*p)) || (*p == '_'))
++  while ((isalnum ((unsigned char) *p)) || (*p == '_'))
+     {
+       *q++ = *p++;
+       INC_TOKEN_LEN_OR_BREAK;
+@@ -707,7 +707,7 @@ build_vms_cmd (char **cmd_tokens,
+             }
+ 
+           /* Optional whitespace */
+-          if (isspace (cmd_tokens[cmd_tkn_index][0]))
++          if (isspace ((unsigned char) cmd_tokens[cmd_tkn_index][0]))
+             {
+               strcpy (&cmd[cmd_len], cmd_tokens[cmd_tkn_index]);
+               cmd_len += strlen (cmd_tokens[cmd_tkn_index]);
+@@ -789,7 +789,7 @@ build_vms_cmd (char **cmd_tokens,
+       if (cmd_tkn_index == append_token)
+         {
+           free (cmd_tokens[cmd_tkn_index++]);
+-          if (isspace (cmd_tokens[cmd_tkn_index][0]))
++          if (isspace ((unsigned char) cmd_tokens[cmd_tkn_index][0]))
+             free (cmd_tokens[cmd_tkn_index++]);
+           free (cmd_tokens[cmd_tkn_index++]);
+         }
+@@ -987,7 +987,7 @@ child_execute_job (struct childbase *child, int good_stdin UNUSED, char *argv)
+           /* TODO: Should we diagnose if paren_level goes negative? */
+           break;
+         case '&':
+-          if (isalpha (p[1]) && !vms_unix_simulation)
++          if (isalpha ((unsigned char) p[1]) && !vms_unix_simulation)
+             {
+               /* VMS symbol substitution */
+               p = parse_text (&token, 0);
+@@ -1061,7 +1061,7 @@ child_execute_job (struct childbase *child, int good_stdin UNUSED, char *argv)
+           UPDATE_TOKEN;
+           break;
+         case ':':
+-          if ((p[1] == 0) || isspace (p[1]))
++          if ((p[1] == 0) || isspace ((unsigned char) p[1]))
+             {
+               /* Unix Null command - treat as comment until next command */
+               unix_echo_cmd = 0;
+@@ -1115,7 +1115,7 @@ child_execute_job (struct childbase *child, int good_stdin UNUSED, char *argv)
+           break;
+         default:
+           /* Skip repetitive whitespace */
+-          if (isspace (*p))
++          if (isspace ((unsigned char) *p))
+             {
+               p = parse_char (&token, 1);
+ 
+@@ -1125,7 +1125,7 @@ child_execute_job (struct childbase *child, int good_stdin UNUSED, char *argv)
+                 token_str[0] = ' ';
+               UPDATE_TOKEN;
+ 
+-              while (isspace (*p))
++              while (isspace ((unsigned char) *p))
+                 p++;
+               if (assignment_hack != 0)
+                 assignment_hack++;
+@@ -1176,7 +1176,7 @@ child_execute_job (struct childbase *child, int good_stdin UNUSED, char *argv)
+       char * raw_append_file;
+       file_token = append_token;
+       file_token++;
+-      if (isspace (cmd_tokens[file_token][0]))
++      if (isspace ((unsigned char) cmd_tokens[file_token][0]))
+         file_token++;
+       raw_append_file = vmsify (cmd_tokens[file_token], 0);
+       /* VMS DCL needs a trailing dot if null file extension */
+diff --git a/src/w32/compat/dirent.c b/src/w32/compat/dirent.c
+index b8ec615..de80f72 100644
+--- a/src/w32/compat/dirent.c
++++ b/src/w32/compat/dirent.c
+@@ -23,7 +23,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #include <stdlib.h>
+ #include "dirent.h"
+ 
+-
++#ifndef __MINGW32__
+ DIR*
+ opendir(const char* pDirName)
+ {
+@@ -193,3 +193,4 @@ seekdir(DIR* pDir, long nPosition)
+ 
+         return;
+ }
++#endif  /* !__MINGW32__ */
+diff --git a/src/w32/compat/posixfcn.c b/src/w32/compat/posixfcn.c
+index 975dfb7..00d87e0 100644
+--- a/src/w32/compat/posixfcn.c
++++ b/src/w32/compat/posixfcn.c
+@@ -29,6 +29,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
+ #ifndef NO_OUTPUT_SYNC
+ /* Support for OUTPUT_SYNC and related functionality.  */
+ 
++#if !defined(GNULIB_defined_rpl_fcntl) && !defined(GNULIB_defined_fcntl)
+ /* Emulation of fcntl that supports only F_GETFD and F_SETLKW.  */
+ int
+ fcntl (intptr_t fd, int cmd, ...)
+@@ -142,6 +143,7 @@ fcntl (intptr_t fd, int cmd, ...)
+         return -1;
+     }
+ }
++#endif /* GNULIB_defined_fcntl */
+ 
+ static intptr_t mutex_handle = -1;
+ 
+diff --git a/src/w32/pathstuff.c b/src/w32/pathstuff.c
+index 99b6a3f..b825631 100644
+--- a/src/w32/pathstuff.c
++++ b/src/w32/pathstuff.c
+@@ -177,7 +177,7 @@ convert_path_to_nutc(char *path)
+         *pathp = '\0';
+ 
+         /*
+-         * Loop through PATH and convert one elemnt of the path at at
++         * Loop through PATH and convert one element of the path at at
+          * a time. Single file pathnames will fail this and fall
+          * to the logic below loop.
+          */
+diff --git a/tests/scripts/features/export b/tests/scripts/features/export
+index 81bff0c..ad58177 100644
+--- a/tests/scripts/features/export
++++ b/tests/scripts/features/export
+@@ -32,16 +32,17 @@ ifdef EXPORT_ALL_PSEUDO
+ .EXPORT_ALL_VARIABLES:
+ endif
+ 
++.RECIPEPREFIX := >
+ all:
+-	@echo "FOO=$(FOO) BAR=$(BAR) BAZ=$(BAZ) BOZ=$(BOZ) BITZ=$(BITZ) BOTZ=$(BOTZ)"
+-	@echo "FOO=$$FOO BAR=$$BAR BAZ=$$BAZ BOZ=$$BOZ BITZ=$$BITZ BOTZ=$$BOTZ"
++> @echo "FOO=$(FOO) BAR=$(BAR) BAZ=$(BAZ) BOZ=$(BOZ) BITZ=$(BITZ) BOTZ=$(BOTZ)"
++> @echo "FOO=$$FOO BAR=$$BAR BAZ=$$BAZ BOZ=$$BOZ BITZ=$$BITZ BOTZ=$$BOTZ"
+ ',
+            '', "FOO=foo BAR=bar BAZ=baz BOZ=boz BITZ=bitz BOTZ=botz
+ FOO= BAR= BAZ=baz BOZ=boz BITZ=bitz BOTZ=\n");
+ 
+ # TEST 1: make sure vars inherited from the parent are exported
+ 
+-$extraENV{FOO} = 1;
++$ENV{FOO} = 1;
+ 
+ &run_make_test(undef, '', "FOO=foo BAR=bar BAZ=baz BOZ=boz BITZ=bitz BOTZ=botz
+ FOO=foo BAR= BAZ=baz BOZ=boz BITZ=bitz BOTZ=\n");
+@@ -85,9 +86,10 @@ B = b
+ export $(FOO)
+ export $(B)ar
+ 
++.RECIPEPREFIX := >
+ all:
+-	@echo foo=$(foo) bar=$(bar)
+-	@echo foo=$$foo bar=$$bar
++> @echo foo=$(foo) bar=$(bar)
++> @echo foo=$$foo bar=$$bar
+ ',
+              "", "foo=f-ok bar=b-ok\nfoo=f-ok bar=b-ok\n");
+ 
+@@ -108,9 +110,10 @@ export foo bar
+ unexport $(FOO)
+ unexport $(B)ar
+ 
++.RECIPEPREFIX := >
+ all:
+-	@echo foo=$(foo) bar=$(bar)
+-	@echo foo=$$foo bar=$$bar
++> @echo foo=$(foo) bar=$(bar)
++> @echo foo=$$foo bar=$$bar
+ ',
+               '', "foo=f-ok bar=b-ok\nfoo= bar=\n");
+ 
+@@ -140,7 +143,8 @@ all: ; @echo A=$$A B=$$B C=$$C D=$$D E=$$E F=$$F G=$$G H=$$H I=$$I J=$$J
+ 
+ # TEST 8: Test unexporting multiple variables on the same line
+ 
+-@extraENV{qw(A B C D E F G H I J)} = qw(1 2 3 4 5 6 7 8 9 10);
++@args{qw(A B C D E F G H I J)} = qw(1 2 3 4 5 6 7 8 9 10);
++%ENV = (%ENV, %args);
+ 
+ &run_make_test('
+ A = a
+@@ -174,7 +178,7 @@ a: ; @echo "\$$(export)=$(export) / \$$export=$$export"
+ ',
+                '', "\$(export)=456 / \$export=456\n");
+ 
+-# TEST 9: Check "export" as a target
++# TEST 10: Check "export" as a target
+ 
+ &run_make_test('
+ a: export
+@@ -182,5 +186,25 @@ export: ; @echo "$@"
+ ',
+                '', "export\n");
+ 
++# Check export and assignment of a variable on the same line
++
++$ENV{hello} = 'moon';
++
++run_make_test(q!
++all: ; @echo hello=$(hello) hello=$$hello
++export hello=sun
++!,
++              '', "hello=sun hello=sun\n");
++
++# Check unexport and assignment of a variable on the same line
++
++$ENV{hello} = 'moon';
++
++run_make_test(q!
++all: ; @echo hello=$(hello) hello=$$hello
++unexport hello=sun
++!,
++              '', "hello=sun hello=\n");
++
+ # This tells the test driver that the perl test script executed properly.
+ 1;
+diff --git a/tests/scripts/features/include b/tests/scripts/features/include
+index 0c63c06..7dd17b5 100644
+--- a/tests/scripts/features/include
++++ b/tests/scripts/features/include
+@@ -157,7 +157,7 @@ include inc1
+ include inc2
+ inc2:; echo > $@
+ !,
+-              '', "echo > inc2\necho > inc1\nDONE\n");
++              '', "echo > inc1\necho > inc2\nDONE\n");
+ 
+ rmfiles('inc1', 'inc2');
+ 
+@@ -209,7 +209,7 @@ inc1:; echo > $@
+ include inc1
+ include inc2
+ !,
+-                  '', "#MAKEFILE#:7: inc2: $ERR_no_such_file\n#MAKE#: *** No rule to make target 'inc2'.  Stop.\n", 512);
++                  '', "echo > inc1\n#MAKEFILE#:7: inc2: $ERR_no_such_file\n#MAKE#: *** No rule to make target 'inc2'.  Stop.\n", 512);
+ 
+     rmfiles('inc1');
+ 
+@@ -260,4 +260,25 @@ inc1:; @%s $@ && echo FOO := bar > $@
+     rmfiles('inc1');
+ }
+ 
++# Check that the order of remaking include files is correct: should remake
++# them in the same order they were encountered in the makefile.  SV 58735
++
++run_make_test(q!
++-include i1 i2
++-include i3
++-include i4
++%:;@echo $@
++all:;
++!,
++              '', "i1\ni2\ni3\ni4\n#MAKE#: 'all' is up to date.\n");
++rmfiles('foo');
++
++# Check the default makefiles... this requires us to invoke make with no
++# arguments.  Also check MAKEFILES
++
++$ENV{MAKEFILES} = 'foobar barfoo';
++run_make_with_options(undef, q!-E '%:;@echo $@' -E 'all:;' -E '-include bizbaz' -E '-include bazbiz'!, get_logfile(0));
++$answer = "bizbaz\nbazbiz\nfoobar\nbarfoo\nGNUmakefile\nmakefile\nMakefile\n#MAKE#: 'all' is up to date.\n";
++&compare_output(subst_make_string($answer), &get_logfile(1));
++
+ 1;
+diff --git a/tests/scripts/features/jobserver b/tests/scripts/features/jobserver
+index 73d10d9..35b5696 100644
+--- a/tests/scripts/features/jobserver
++++ b/tests/scripts/features/jobserver
+@@ -25,17 +25,16 @@ all:;@echo $@: "/$(SHOW)/"
+ 
+ # Setting parallelism with the environment
+ # Command line should take precedence over the environment
+-$extraENV{MAKEFLAGS} = "-j2 $np";
++$ENV{MAKEFLAGS} = "-j2 $np";
+ run_make_test(q!
+ SHOW = $(patsubst --jobserver-auth=%,--jobserver-auth=<auth>,$(MAKEFLAGS))
+ recurse: ; @echo $@: "/$(SHOW)/"; $(MAKE) -f #MAKEFILE# all
+ all:;@echo $@: "/$(SHOW)/"
+ !,
+               '', "recurse: /-j2 --jobserver-auth=<auth> $np/\nall: /-j2 --jobserver-auth=<auth> $np/\n");
+-delete $extraENV{MAKEFLAGS};
+ 
+ # Test override of -jN
+-$extraENV{MAKEFLAGS} = "-j9 $np";
++$ENV{MAKEFLAGS} = "-j9 $np";
+ run_make_test(q!
+ SHOW = $(patsubst --jobserver-auth=%,--jobserver-auth=<auth>,$(MAKEFLAGS))
+ recurse: ; @echo $@: "/$(SHOW)/"; $(MAKE) -j3 -f #MAKEFILE# recurse2
+@@ -43,7 +42,6 @@ recurse2: ; @echo $@: "/$(SHOW)/"; $(MAKE) -f #MAKEFILE# all
+ all:;@echo $@: "/$(SHOW)/"
+ !,
+               "-j2 $np", "recurse: /-j2 --jobserver-auth=<auth> $np/\n#MAKE#[1]: warning: -j3 forced in submake: resetting jobserver mode.\nrecurse2: /-j3 --jobserver-auth=<auth> $np/\nall: /-j3 --jobserver-auth=<auth> $np/\n");
+-delete $extraENV{MAKEFLAGS};
+ 
+ # Test override of -jN with -j
+ run_make_test(q!
+@@ -64,17 +62,18 @@ all:;@echo $@: "/$(SHOW)/"
+ unlink('inc.mk');
+ 
+ run_make_test(q!
++.RECIPEPREFIX = >
+ -include inc.mk
+ recur:
+-#	@echo 'MAKEFLAGS = $(MAKEFLAGS)'
+-	@rm -f inc.mk
+-	@$(MAKE) -j2 -f #MAKEFILE# all
++#> @echo 'MAKEFLAGS = $(MAKEFLAGS)'
++> @rm -f inc.mk
++> @$(MAKE) -j2 -f #MAKEFILE# all
+ all:
+-#	@echo 'MAKEFLAGS = $(MAKEFLAGS)'
+-	@echo $@
++#> @echo 'MAKEFLAGS = $(MAKEFLAGS)'
++> @echo $@
+ inc.mk:
+-#	@echo 'MAKEFLAGS = $(MAKEFLAGS)'
+-	@echo 'FOO = bar' > $@
++#> @echo 'MAKEFLAGS = $(MAKEFLAGS)'
++> @echo 'FOO = bar' > $@
+ !,
+               "$np -j2", "#MAKE#[1]: warning: -j2 forced in submake: resetting jobserver mode.\nall\n");
+ 
+@@ -102,8 +101,17 @@ default: ; @ #MAKEPATH# -f Makefile2
+     rmfiles('Makefile2');
+ }
+ 
+-1;
++# Ensure enter/leave directory messages appear before jobserver warnings
+ 
+-### Local Variables:
+-### eval: (setq whitespace-action (delq 'auto-cleanup whitespace-action))
+-### End:
++run_make_test(q!
++all: ; @$(MAKE) -C . -f #MAKEFILE# recurse -j1
++recurse: ; @echo hi
++!,
++              '-w -j2', "#MAKE#: Entering directory '#PWD#'
++#MAKE#[1]: Entering directory '#PWD#'
++#MAKE#[1]: warning: -j1 forced in submake: resetting jobserver mode.
++hi
++#MAKE#[1]: Leaving directory '#PWD#'
++#MAKE#: Leaving directory '#PWD#'\n");
++
++1;
+diff --git a/tests/scripts/features/parallelism b/tests/scripts/features/parallelism
+index 08f94a6..e9935b4 100644
+--- a/tests/scripts/features/parallelism
++++ b/tests/scripts/features/parallelism
+@@ -148,7 +148,7 @@ rmfiles('target');
+ # TEST #11: Make sure -jN from MAKEFLAGS is processed even when we re-exec
+ # See Savannah bug #33873
+ 
+-$extraENV{MAKEFLAGS} = '-j4';
++$ENV{MAKEFLAGS} = '-j4';
+ 
+ run_make_test(q!
+ things = thing1 thing2
+@@ -160,7 +160,6 @@ inc.mk: ; @touch $@
+ !,
+               '', "file thing2start\nwait thing2start\nfile thing1start\nwait thing1start\nfile thing2end\nwait thing2end\nthing1end\n");
+ 
+-delete $extraENV{MAKEFLAGS};
+ rmfiles(qw(inc.mk thing1start thing1end thing2start thing2end));
+ 
+ # Ensure intermediate/secondary files are not pruned incorrectly.
+diff --git a/tests/scripts/features/reinvoke b/tests/scripts/features/reinvoke
+index d2a1f50..657f6c9 100644
+--- a/tests/scripts/features/reinvoke
++++ b/tests/scripts/features/reinvoke
+@@ -45,17 +45,17 @@ all: ; @echo hello
+ 
+ a : b ; echo >> $@
+ 
+-b : c ; [ -f $@ ] || echo >> $@
++b : c ; test -f $@ || echo >> $@
+ 
+ c: ; echo >> $@
+ 
+ include $(F)',
+-              'F=a', "[ -f b ] || echo >> b\nhello\n");
++              'F=a', "test -f b || echo >> b\nhello\n");
+ 
+ # Now try with the file we're not updating being the actual file we're
+ # including: this and the previous one test different parts of the code.
+ 
+-run_make_test(undef, 'F=b', "[ -f b ] || echo >> b\nhello\n");
++run_make_test(undef, 'F=b', "test -f b || echo >> b\nhello\n");
+ 
+ &rmfiles('a','b','c');
+ 
+diff --git a/tests/scripts/features/targetvars b/tests/scripts/features/targetvars
+index 2929b2c..cf0424b 100644
+--- a/tests/scripts/features/targetvars
++++ b/tests/scripts/features/targetvars
+@@ -12,8 +12,9 @@ export BAR = bar
+ one: override FOO = one
+ one two: ; @echo $(FOO) $(BAR)
+ two: BAR = two
++.RECIPEPREFIX = >
+ three: ; BAR=1000
+-	@echo $(FOO) $(BAR)
++> @echo $(FOO) $(BAR)
+ # Some things that shouldn not be target vars
+ funk : override
+ funk : override adelic
+@@ -86,7 +87,6 @@ run_make_test(undef, "foo.q bar.q", "qvar = rvar\nqvar =\n");
+ 
+ run_make_test(undef, "foo.t bar.s", "qvar = qvar\nqvar =\n");
+ 
+-
+ # TEST #8
+ # For PR/1378: Target-specific vars don't inherit correctly
+ 
+@@ -183,7 +183,7 @@ run_make_test(undef, 'foo PATTERN=yes', "ok ok foo pat\nok ok foo pat\n");
+ # (> make default buffer length)
+ 
+ run_make_test('
+-base_metals_fmd_reports.sun5 base_metals_fmd_reports CreateRealPositions        CreateMarginFunds deals_changed_since : BUILD_OBJ=$(shell if [ -f               "build_information.generate" ]; then echo "$(OBJ_DIR)/build_information.o"; else echo "no build information"; fi  )
++base_metals_fmd_reports.sun5 base_metals_fmd_reports CreateRealPositions        CreateMarginFunds deals_changed_since : BUILD_OBJ=$(shell if test -f               "build_information.generate"   ; then echo "$(OBJ_DIR)/build_information.o"; else echo "no build information"; fi  )
+ 
+ deals_changed_since: ; @echo $(BUILD_OBJ)
+ ',
+@@ -270,7 +270,7 @@ all: ; $sname >/dev/null
+ 
+ # Don't use the general PATH if not found on the target path
+ 
+-$extraENV{PATH} = "$ENV{PATH}:sd";
++$ENV{PATH} = "$ENV{PATH}:sd";
+ 
+ run_make_test(qq!
+ all: PATH := ..
+@@ -281,6 +281,138 @@ all: ; $sname
+ unlink("sd/$sname");
+ rmdir ('sd');
+ 
++# SV 59230: Conditional (non-)assignment of target-specific variables should
++# preserve export settings.
++
++$ENV{hello} = 'moon';
++run_make_test(q!
++all:; @echo hello=$$hello
++dummy: hello?=world
++!,
++              '', 'hello=moon');
++
++# SV 59230: Assignment of a global variable should not affect export of a
++# target specific variable.
++
++$ENV{hello} = "moon";
++run_make_test(q!
++all:; @echo hello=$$hello
++hello=sun
++dummy: hello?=world
++!,
++              '', 'hello=sun');
++
++# Support target-specific unexport
++
++$ENV{hello} = "moon";
++run_make_test(q!
++unexport hello=sun
++all: base exp
++base exp: ; @echo hello=$$hello
++exp: export hello=world
++!,
++              '', "hello=\nhello=world\n");
++
++$ENV{hello} = "moon";
++run_make_test(q!
++hello=sun
++all: base exp
++base exp: ; @echo hello=$$hello
++exp: unexport hello=world
++!,
++              '', "hello=sun\nhello=\n");
++
++run_make_test(q!
++all:; @echo hello=$$hello
++unexport hello=sun
++dummy: hello?=world
++!,
++              '', 'hello=');
++
++$ENV{hello} = "moon";
++run_make_test(q!
++all:; @echo hello=$$hello
++hello=sun
++dummy: unexport hello=world
++!,
++              '', 'hello=sun');
++
++run_make_test(q!
++all: mid
++mid: base
++
++ifeq ($(midexport),export)
++mid: export hello=mid
++else ifeq ($(midexport),unexport)
++mid: unexport hello=mid
++else
++mid: hello=mid
++endif
++
++ifeq ($(baseexport),export)
++base: export hello=base
++else ifeq ($(baseexport),unexport)
++base: unexport hello=base
++else
++base: hello=base
++endif
++
++all mid base:; @echo $@ make=$(hello) shell=$$hello
++!,
++              '', "base make=base shell=\nmid make=mid shell=\nall make= shell=\n");
++
++# Test base settings with env var
++$ENV{hello} = "environ";
++run_make_test(undef,
++              '', "base make=base shell=base\nmid make=mid shell=mid\nall make=environ shell=environ\n");
++
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'baseexport=export', "base make=base shell=base\nmid make=mid shell=mid\nall make=environ shell=environ\n");
++
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'baseexport=unexport', "base make=base shell=\nmid make=mid shell=mid\nall make=environ shell=environ\n");
++
++# Test mid settings with env var
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'midexport=export', "base make=base shell=base\nmid make=mid shell=mid\nall make=environ shell=environ\n");
++
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'midexport=export baseexport=unexport', "base make=base shell=\nmid make=mid shell=mid\nall make=environ shell=environ\n");
++
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'midexport=unexport', "base make=base shell=\nmid make=mid shell=\nall make=environ shell=environ\n");
++
++$ENV{hello} = "environ";
++run_make_test(undef,
++              'midexport=unexport baseexport=export', "base make=base shell=base\nmid make=mid shell=\nall make=environ shell=environ\n");
++
++# Test base settings without env var
++run_make_test(undef,
++              'baseexport=export', "base make=base shell=base\nmid make=mid shell=\nall make= shell=\n");
++
++run_make_test(undef,
++              'baseexport=unexport', "base make=base shell=\nmid make=mid shell=\nall make= shell=\n");
++
++# Test mid settings with env var
++run_make_test(undef,
++              'midexport=export', "base make=base shell=base\nmid make=mid shell=mid\nall make= shell=\n");
++
++run_make_test(undef,
++              'midexport=export baseexport=unexport', "base make=base shell=\nmid make=mid shell=mid\nall make= shell=\n");
++
++run_make_test(undef,
++              'midexport=unexport', "base make=base shell=\nmid make=mid shell=\nall make= shell=\n");
++
++run_make_test(undef,
++              'midexport=unexport baseexport=export', "base make=base shell=base\nmid make=mid shell=\nall make= shell=\n");
++
++
++
+ # TEST #19: Test define/endef variables as target-specific vars
+ 
+ # run_make_test('
+@@ -296,7 +428,3 @@ rmdir ('sd');
+ #               '', "local\n");
+ 
+ 1;
+-
+-### Local Variables:
+-### eval: (setq whitespace-action (delq 'auto-cleanup whitespace-action))
+-### End:
+diff --git a/tests/scripts/features/vpathgpath b/tests/scripts/features/vpathgpath
+index 5e6217b..5c5996c 100644
+--- a/tests/scripts/features/vpathgpath
++++ b/tests/scripts/features/vpathgpath
+@@ -40,7 +40,7 @@ close(MAKEFILE);
+ 
+ $off = -500;
+ 
+-sub touchfiles {
++sub gtouchfiles {
+   foreach (@_) {
+     ($f = $_) =~ s,VP/,$VP,g;
+     &utouch($off, $f);
+@@ -51,7 +51,7 @@ sub touchfiles {
+ 
+ # Run the general-case test
+ 
+-&touchfiles("VP/foo.d", "VP/bar.d", "VP/foo.c", "VP/bar.c", "foo.b", "bar.d");
++&gtouchfiles("VP/foo.d", "VP/bar.d", "VP/foo.c", "VP/bar.c", "foo.b", "bar.d");
+ 
+ &run_make_with_options($makefile,"general",&get_logfile());
+ 
+diff --git a/tests/scripts/functions/eval b/tests/scripts/functions/eval
+index 90513bd..a3fba87 100644
+--- a/tests/scripts/functions/eval
++++ b/tests/scripts/functions/eval
+@@ -127,7 +127,7 @@ EOF
+ 
+ close(MAKEFILE);
+ 
+-$extraENV{EVAR} = '1';
++$ENV{EVAR} = '1';
+ &run_make_with_options($makefile4, "", &get_logfile);
+ $answer = "OK\n";
+ &compare_output($answer,&get_logfile(1));
+diff --git a/tests/scripts/functions/filter-out b/tests/scripts/functions/filter-out
+index 1fe4819..dec5343 100644
+--- a/tests/scripts/functions/filter-out
++++ b/tests/scripts/functions/filter-out
+@@ -27,6 +27,22 @@ all: ; @echo '$(files1) $(files2)'
+ !,
+               '', "foo.elc foo.elc\n");
+ 
++# Force use of hash (see function.c:func_filter_filterout for params)
++
++my $base = 'foo.1 foo.2 foo.3 foo.4 foo.5 foo.6 foo.7 foo.8 foo.9 foo.10';
++
++my $base10 = join(' ', ($base) x 10);
++my $out3 = join(' ', ('foo.3') x 10);
++my $out456 = join(' ', ('foo.4 foo.5 foo.6') x 10);
++
++run_make_test("words := $base10" . q!
++files1 := $(filter %.3, $(words))
++files2 := $(filter %.4 foo.5 foo.6, $(words))
++all: ; @echo '$(files1) $(files2)'
++!,
++              '', "$out3 $out456\n");
++
++
+ # Escaped patterns
+ run_make_test(q!all:;@echo '$(filter foo\%bar,foo%bar fooXbar)'!,
+               '', "foo%bar\n");
+diff --git a/tests/scripts/functions/foreach b/tests/scripts/functions/foreach
+index 9badc52..6a06109 100644
+--- a/tests/scripts/functions/foreach
++++ b/tests/scripts/functions/foreach
+@@ -14,7 +14,7 @@ types of foreach loops are tested\n";
+ # TEST 0
+ 
+ # Set an environment variable that we can test in the makefile.
+-$extraENV{FOOFOO} = 'foo foo';
++$ENV{FOOFOO} = 'foo foo';
+ 
+ run_make_test("space = ' '".'
+ null :=
+@@ -31,8 +31,6 @@ for2: ; @echo $(fe)',
+               "undefined file default file environment default file command line override automatic automatic
+ foo.o bletch.o null.o @.o garf.o .o    .o undefined.o file.o default.o file.o environment.o default.o file.o command.o line.o override.o automatic.o automatic.o");
+ 
+-delete $extraENV{FOOFOO};
+-
+ # TEST 1: Test that foreach variables take precedence over global
+ # variables in a global scope (like inside an eval).  Tests bug #11913
+ 
+diff --git a/tests/scripts/functions/origin b/tests/scripts/functions/origin
+index f7b7eb8..9b9fd56 100644
+--- a/tests/scripts/functions/origin
++++ b/tests/scripts/functions/origin
+@@ -16,26 +16,27 @@ defined per the following list:
+ 'automatic'            Automatic variable\n";
+ 
+ # Set an environment variable
+-$extraENV{MAKETEST} = 1;
++$ENV{MAKETEST} = 1;
+ 
+ run_make_test('
+ foo := bletch garf
+ auto_var = undefined CC MAKETEST MAKE foo CFLAGS WHITE @
+ av = $(foreach var, $(auto_var), $(origin $(var)) )
+ override WHITE := BLACK
++.RECIPEPREFIX = >
+ all: auto
+-	@echo $(origin undefined)
+-	@echo $(origin CC)
+-	@echo $(origin MAKETEST)
+-	@echo $(origin MAKE)
+-	@echo $(origin foo)
+-	@echo $(origin CFLAGS)
+-	@echo $(origin WHITE)
+-	@echo $(origin @)
++> @echo $(origin undefined)
++> @echo $(origin CC)
++> @echo $(origin MAKETEST)
++> @echo $(origin MAKE)
++> @echo $(origin foo)
++> @echo $(origin CFLAGS)
++> @echo $(origin WHITE)
++> @echo $(origin @)
+ auto :
+-	@echo $(av)',
+-	      '-e WHITE=WHITE CFLAGS=',
+-	      'undefined default environment default file command line override automatic
++> @echo $(av)',
++    '-e WHITE=WHITE CFLAGS=',
++    'undefined default environment default file command line override automatic
+ undefined
+ default
+ environment
+@@ -45,7 +46,4 @@ command line
+ override
+ automatic');
+ 
+-# Reset an environment variable
+-delete $extraENV{MAKETEST};
+-
+ 1;
+diff --git a/tests/scripts/misc/bs-nl b/tests/scripts/misc/bs-nl
+index fdf4aab..e8ba046 100644
+--- a/tests/scripts/misc/bs-nl
++++ b/tests/scripts/misc/bs-nl
+@@ -88,7 +88,6 @@ var:;@echo '|$(var)|'!,
+ # POSIX: Preserve trailing space
+ run_make_test(q!
+ .POSIX:
+-x = y
+ var = he  \
+ llo
+ var:;@echo '|$(var)|'!,
+@@ -97,7 +96,6 @@ var:;@echo '|$(var)|'!,
+ # POSIX: One space per bs-nl
+ run_make_test(q!
+ .POSIX:
+-x = y
+ var = he\
+ \
+ \
+diff --git a/tests/scripts/misc/general4 b/tests/scripts/misc/general4
+index eeb8d10..0077c89 100644
+--- a/tests/scripts/misc/general4
++++ b/tests/scripts/misc/general4
+@@ -94,7 +94,7 @@ all: ; $sname >/dev/null
+ 
+ # Don't use the general PATH if not found on the target path
+ 
+-$extraENV{PATH} = "$ENV{PATH}:sd";
++$ENV{PATH} = "$ENV{PATH}:sd";
+ 
+ run_make_test(qq!
+ PATH := ..
+@@ -118,4 +118,11 @@ all: ; $sname
+ 
+ unlink($sname);
+ 
++# SV 57674: ensure we use a system default PATH if one is not set
++delete $ENV{PATH};
++run_make_test(q!
++a: ; @echo hi
++!,
++              '', "hi\n");
++
+ 1;
+diff --git a/tests/scripts/options/dash-e b/tests/scripts/options/dash-e
+index 17c3fc8..944c39d 100644
+--- a/tests/scripts/options/dash-e
++++ b/tests/scripts/options/dash-e
+@@ -4,21 +4,12 @@ $description = "The following test creates a makefile to ...";
+ 
+ $details = "";
+ 
+-$extraENV{GOOGLE} = 'boggle';
++$ENV{GOOGLE} = 'boggle';
+ 
+-open(MAKEFILE,"> $makefile");
+-
+-print MAKEFILE <<'EOF';
++run_make_test(q!
+ GOOGLE = bazzle
+ all:; @echo "$(GOOGLE)"
+-EOF
+-
+-close(MAKEFILE);
+-
+-&run_make_with_options($makefile, '-e' ,&get_logfile);
+-
+-$answer = "boggle\n";
+-
+-&compare_output($answer,&get_logfile(1));
++!,
++              '-e', "boggle\n");
+ 
+ 1;
+diff --git a/tests/scripts/options/print-directory b/tests/scripts/options/print-directory
+index db762b2..7ba9a2e 100644
+--- a/tests/scripts/options/print-directory
++++ b/tests/scripts/options/print-directory
+@@ -2,15 +2,25 @@
+ 
+ $description = "Test the -w option to GNU make.";
+ 
++my $enter = "#MAKE#: Entering directory '#PWD#'";
++my $leave = "#MAKE#: Leaving directory '#PWD#'";
++
+ # Simple test without -w
+ run_make_test(q!
+ all: ; @echo hi
+ !,
+         "", "hi\n");
+ 
++my $ans = "$enter\nhi\n$leave\n";
++
+ # Simple test with -w
+-run_make_test(undef, "-w",
+-              "#MAKE#: Entering directory '#PWD#'\nhi\n#MAKE#: Leaving directory '#PWD#'\n");
++run_make_test(undef, "-w", $ans);
++
++# Simple test with overriding -w
++run_make_test(undef, "-w --no-print-directory", "hi\n");
++
++# Simple test with overriding --no-print-directory
++run_make_test(undef, "--no-print-directory --print-directory", $ans);
+ 
+ # Test makefile rebuild to ensure no enter/leave
+ run_make_test(q!
+@@ -21,13 +31,40 @@ foo: ; touch foo
+         "", "touch foo\n");
+ unlink('foo');
+ 
++$ans = "$enter\ntouch foo\n$leave\n";
++
+ # Test makefile rebuild with -w
++run_make_test(undef, "-w", $ans);
++unlink('foo');
++
++# Test makefile rebuild with -w overridden
++run_make_test(undef, "-w --no-print-directory", "touch foo\n");
++unlink('foo');
++
++# Test makefile rebuild with --no-print-directory overridden
++run_make_test(undef, "--no-print-directory --print-directory", $ans);
++unlink('foo');
++
++my $enter1 = "#MAKE#[1]: Entering directory '#PWD#'";
++my $leave1 = "#MAKE#[1]: Leaving directory '#PWD#'";
++
++$ans = "$enter1\nhi\n$leave1\n";
++
++# Test makefile recursion with default enter/leave
+ run_make_test(q!
+-include foo
+-all: ;@:
+-foo: ; touch foo
++all: ;@$(MAKE) -f #MAKEFILE# recurse
++recurse: ; @echo hi
+ !,
+-        "-w", "#MAKE#: Entering directory '#PWD#'\ntouch foo\n#MAKE#: Leaving directory '#PWD#'\n");
+-unlink('foo');
++        "", $ans);
++
++# Disable enter/leave
++run_make_test(undef, "--no-print-directory", "hi\n");
++
++# Re-enable enter/leave
++$ans = "$enter\n$ans$leave\n";
++run_make_test(undef, "--no-print-directory -w", $ans);
++
++# Override enter/leave
++run_make_test(undef, "-w --no-print-directory", "hi\n");
+ 
+ 1;
+diff --git a/tests/scripts/targets/POSIX b/tests/scripts/targets/POSIX
+index c44cc50..c40b8db 100644
+--- a/tests/scripts/targets/POSIX
++++ b/tests/scripts/targets/POSIX
+@@ -20,6 +20,8 @@ all: ; \@$script
+               '', "#MAKE#: *** [#MAKEFILE#:3: all] Error $err\n", 512);
+ 
+ # User settings must override .POSIX
++# In the standard .POSIX must be the first thing in the makefile
++# but we relax that rule in GNU make.
+ $flags = '-xc';
+ $out = `$sh_name $flags '$script' 2>&1`;
+ run_make_test(qq!
+@@ -47,7 +49,7 @@ $make
+               '', $r);
+ 
+ # Make sure that local settings take precedence
+-%extraENV = map { $_ => "xx-$_" } keys %POSIX;
++%ENV = (%ENV, map { $_ => "xx-$_" } keys %POSIX);
+ $r = join('', map { "$_=xx-$_\n"} sort keys %POSIX);
+ run_make_test(undef, '', $r);
+ 
+diff --git a/tests/scripts/variables/GNUMAKEFLAGS b/tests/scripts/variables/GNUMAKEFLAGS
+index 6e50794..063c256 100644
+--- a/tests/scripts/variables/GNUMAKEFLAGS
++++ b/tests/scripts/variables/GNUMAKEFLAGS
+@@ -5,7 +5,7 @@ $description = "Test proper behavior of GNUMAKEFLAGS";
+ # Accept flags from GNUMAKEFLAGS as well as MAKEFLAGS
+ # Results always go in MAKEFLAGS
+ 
+-$extraENV{'GNUMAKEFLAGS'} = '-e -r -R';
++$ENV{'GNUMAKEFLAGS'} = '-e -r -R';
+ 
+ run_make_test(q!
+ all: ; @echo $(MAKEFLAGS)
+@@ -14,7 +14,7 @@ all: ; @echo $(MAKEFLAGS)
+ 
+ # Long arguments mean everything is prefixed with "-"
+ 
+-$extraENV{'GNUMAKEFLAGS'} = '--no-print-directory -e -r -R --trace';
++$ENV{'GNUMAKEFLAGS'} = '--no-print-directory -e -r -R --trace';
+ 
+ run_make_test(q!
+ all: ; @echo $(MAKEFLAGS)
+@@ -27,7 +27,7 @@ erR --trace --no-print-directory");
+ 
+ unlink('x.mk');
+ 
+-$extraENV{GNUMAKEFLAGS} = '-Itst/bad';
++$ENV{GNUMAKEFLAGS} = '-Itst/bad';
+ 
+ run_make_test(q!
+ recurse: ; @echo $@; echo MAKEFLAGS = $$MAKEFLAGS; echo GNUMAKEFLAGS = $$GNUMAKEFLAGS; #MAKEPATH# -f #MAKEFILE# all
+@@ -35,7 +35,7 @@ all: ; @echo $@; echo MAKEFLAGS = $$MAKEFLAGS; echo GNUMAKEFLAGS = $$GNUMAKEFLAG
+ -include x.mk
+ x.mk: ; @echo $@; echo MAKEFLAGS = $$MAKEFLAGS; echo GNUMAKEFLAGS = $$GNUMAKEFLAGS; echo > $@
+ !,
+-              "", "x.mk\nMAKEFLAGS = -Itst/bad\nGNUMAKEFLAGS =\nrecurse\nMAKEFLAGS = -Itst/bad\nGNUMAKEFLAGS =\n#MAKE#[1]: Entering directory '#PWD#'\nall\nMAKEFLAGS = w -Itst/bad\nGNUMAKEFLAGS =\n#MAKE#[1]: Leaving directory '#PWD#'\n");
++              "", "x.mk\nMAKEFLAGS = -Itst/bad\nGNUMAKEFLAGS =\nrecurse\nMAKEFLAGS = -Itst/bad\nGNUMAKEFLAGS =\n#MAKE#[1]: Entering directory '#PWD#'\nall\nMAKEFLAGS = -Itst/bad\nGNUMAKEFLAGS =\n#MAKE#[1]: Leaving directory '#PWD#'\n");
+ 
+ unlink('x.mk');
+ 
+diff --git a/tests/scripts/variables/SHELL b/tests/scripts/variables/SHELL
+index 4ff1ac2..78d887c 100644
+--- a/tests/scripts/variables/SHELL
++++ b/tests/scripts/variables/SHELL
+@@ -14,21 +14,19 @@ $mshell = $sh_name;
+ 
+ # According to POSIX, the value of SHELL in the environment has no impact on
+ # the value in the makefile.
+-# Note %extraENV takes precedence over the default value for the shell.
+ 
+-$extraENV{SHELL} = '/dev/null';
++$ENV{SHELL} = '/dev/null';
+ run_make_test('all:;@echo "$(SHELL)"', '', $mshell);
+ 
+-# According to POSIX, any value of SHELL set in the makefile should _NOT_ be
+-# exported to the subshell!  I wanted to set SHELL to be $^X (perl) in the
+-# makefile, but make runs $(SHELL) -c 'commandline' and that doesn't work at
+-# all when $(SHELL) is perl :-/.  So, we just add an extra initial /./ which
+-# works well on UNIX and seems to work OK on at least some non-UNIX systems.
++# According to POSIX, any value of SHELL set in the makefile should not be
++# exported to the subshell.  A more portable option might be to set SHELL to
++# be $^X (perl) in the makefile, and set .SHELLFLAGS to -e.
+ 
+-$extraENV{SHELL} = $mshell;
++$ENV{SHELL} = $mshell;
+ 
+ my $altshell = "/./$mshell";
+ my $altshell2 = "/././$mshell";
++
+ if ($mshell =~ m,^([a-zA-Z]:)([\\/])(.*),) {
+     $altshell = "$1$2.$2$3";
+     $altshell2 = "$1$2.$2.$2$3";
+@@ -41,7 +39,7 @@ all:;@echo "$(SHELL) $$SHELL"
+ # As a GNU make extension, if make's SHELL variable is explicitly exported,
+ # then we really _DO_ export it.
+ 
+-$extraENV{SHELL} = $mshell;
++$ENV{SHELL} = $mshell;
+ 
+ run_make_test("export SHELL := $altshell\n".'
+ all:;@echo "$(SHELL) $$SHELL"
+@@ -51,13 +49,13 @@ all:;@echo "$(SHELL) $$SHELL"
+ # Test out setting of SHELL, both exported and not, as a target-specific
+ # variable.
+ 
+-$extraENV{SHELL} = $mshell;
++$ENV{SHELL} = $mshell;
+ 
+ run_make_test("all: SHELL := $altshell\n".'
+ all:;@echo "$(SHELL) $$SHELL"
+ ', '', "$altshell $mshell");
+ 
+-$extraENV{SHELL} = $mshell;
++$ENV{SHELL} = $mshell;
+ 
+ run_make_test("
+ SHELL := $altshell2
+diff --git a/tests/scripts/variables/automatic b/tests/scripts/variables/automatic
+index 0b2e451..efd039c 100644
+--- a/tests/scripts/variables/automatic
++++ b/tests/scripts/variables/automatic
+@@ -107,7 +107,7 @@ bar: ;',
+ 
+ unlink('foo');
+ 
+-# TEST #4: ensure prereq ordering is correct when the commmand target has none
++# TEST #4: ensure prereq ordering is correct when the command target has none
+ # See Savannah bug #21198
+ 
+ run_make_test('
+diff --git a/tests/test_driver.pl b/tests/test_driver.pl
+index f18e785..ec17be1 100644
+--- a/tests/test_driver.pl
++++ b/tests/test_driver.pl
+@@ -83,13 +83,9 @@ if ($^O ne 'VMS') {
+ # in recipes
+ $perl_name =~ tr,\\,/,;
+ 
+-# %makeENV is the cleaned-out environment.
++# %makeENV is the cleaned-out environment.  Tests must not modify it.
+ %makeENV = ();
+ 
+-# %extraENV are any extra environment variables the tests might want to set.
+-# These are RESET AFTER EVERY TEST!
+-%extraENV = ();
+-
+ sub vms_get_process_logicals {
+   # Sorry for the long note here, but to keep this test running on
+   # VMS, it is needed to be understood.
+@@ -150,11 +146,6 @@ sub resetENV
+       }
+     }
+   }
+-
+-  foreach $v (keys %extraENV) {
+-    $ENV{$v} = $extraENV{$v};
+-    delete $extraENV{$v};
+-  }
+ }
+ 
+ sub toplevel
+@@ -266,7 +257,7 @@ sub toplevel
+     foreach my $dir (@dirs) {
+       next if ($dir =~ /^(\..*|CVS|RCS)$/ || ! -d "$scriptpath/$dir");
+       push (@rmdirs, $dir);
+-      # VMS can have overlayed file systems, so directories may repeat.
++      # VMS can have overlaid file systems, so directories may repeat.
+       next if -d "$workpath/$dir";
+       mkdir ("$workpath/$dir", 0777)
+           or &error ("Couldn't mkdir $workpath/$dir: $!\n");
+@@ -1059,15 +1050,13 @@ sub _run_with_timeout
+ # This runs a command without any debugging info.
+ sub _run_command
+ {
+-  # We reset this before every invocation.  On Windows I think there is only
+-  # one environment, not one per process, so I think that variables set in
+-  # test scripts might leak into subsequent tests if this isn't reset--???
+-  resetENV();
+-
+   my $orig = $SIG{ALRM};
+   my $code = eval { _run_with_timeout(@_); };
+   $SIG{ALRM} = $orig;
+ 
++  # Reset then environment so that it's clean for the next test.
++  resetENV();
++
+   if ($@) {
+     # The eval failed.  If it wasn't SIGALRM then die.
+     $@ eq "timeout\n" or die "Command failed: $@";

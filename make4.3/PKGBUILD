@@ -3,7 +3,7 @@
 
 pkgname=make
 pkgver=4.3
-pkgrel=4
+pkgrel=5
 pkgdesc="GNU make utility to maintain groups of programs"
 arch=('i686' 'x86_64')
 url="https://www.gnu.org/software/make"
@@ -14,13 +14,15 @@ makedepends=('gettext' 'procps')
 install=${pkgname}.install
 options=() # 'debug' '!strip')
 source=("https://ftp.gnu.org/gnu/${pkgname}/${pkgname}-${pkgver}.tar.lz"
-		make-git.patch)
+		make-git.patch
+		000-git.patch)
 
 prepare() {
 	cd "${pkgname}-${pkgver}"
-	patch -p1 -i "${srcdir}"/make-git.patch
+	#patch -p1 -i "${srcdir}"/make-git.patch
+	patch -p1 -i "${srcdir}"/000-git.patch
 
-	#autoreconf -vfi
+  #autoreconf -fi
 }
 
 build() {
