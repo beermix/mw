@@ -197,10 +197,9 @@ prepare() {
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
-      "0105-build-libclang-cpp-fix.patch" \
-      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch"
+      "0105-build-libclang-cpp-fix.patch"
 
-  cd "${srcdir}/lldb-${pkgver}${rc_ver}.src"
+  cd "${srcdir}/lld-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0301-LLD-COFF-Error-out-if-creating-a-DLL-with-too-many-e.patch" \
       "0302-LLD-Allow-configuring-default-ld.lld-backend.patch" \
