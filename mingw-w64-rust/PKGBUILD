@@ -7,7 +7,7 @@ _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.48.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -94,13 +94,13 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
+    --enable-missing-tools \
+    --enable-full-tools \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
-    --enable-locked-deps \
     --enable-parallel-compiler \
-    --enable-optimize-tests \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \

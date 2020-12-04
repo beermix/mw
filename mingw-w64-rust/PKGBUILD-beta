@@ -95,13 +95,14 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
+    --enable-missing-tools \
+    --enable-full-tools \
+    --enable-option-check \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
-    --enable-locked-deps \
     --enable-parallel-compiler \
-    --enable-optimize-tests \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
