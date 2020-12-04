@@ -84,7 +84,7 @@ build() {
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-qt-gui                                      \
-    --parallel=${NUMBER_OF_PROCESSORS}
+    --parallel=7
   plain "Start building..."
   make
 }
