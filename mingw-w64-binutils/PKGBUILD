@@ -22,8 +22,6 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch
         0110-binutils-mingw-gnu-print.patch
         0120-windres-handle-spaces.patch
-        0320-aslr-compat-base-addr.patch
-        version-fix.patch
         000-binutils35-stable-branch.patch
         nodocs.patch
         1000-Change-the-default-characteristics-of-DLLs-built-by-.patch
