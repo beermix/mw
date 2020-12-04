@@ -131,7 +131,7 @@ prepare() {
   del_file_exists intl/canonicalize.c intl/canonicalize.h \
     intl/relocatex.c intl/relocatex.h
 
-  # Enable clear linux patches     000-gcc10-stable-branch.patch \
+  # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
     000-gcc10-stable-branch.patch
@@ -308,12 +308,12 @@ build() {
   fi
 
   # libbacktrace is not installed by default
-  strip -d -o ${srcdir}${MINGW_PREFIX}/lib/libbacktrace.a libbacktrace/.libs/libbacktrace.a
-  mkdir -p ${srcdir}${MINGW_PREFIX}/include/backtrace
-  cp libbacktrace/backtrace-supported.h \
-    libbacktrace/gstdint.h \
-    ../${_sourcedir}/libbacktrace/backtrace.h \
-    ${srcdir}${MINGW_PREFIX}/include/backtrace/
+#  strip -d -o ${srcdir}${MINGW_PREFIX}/lib/libbacktrace.a libbacktrace/.libs/libbacktrace.a
+#  mkdir -p ${srcdir}${MINGW_PREFIX}/include/backtrace
+#  cp libbacktrace/backtrace-supported.h \
+#    libbacktrace/gstdint.h \
+#    ../${_sourcedir}/libbacktrace/backtrace.h \
+#    ${srcdir}${MINGW_PREFIX}/include/backtrace/
 }
 
 package_mingw-w64-gcc-libs() {

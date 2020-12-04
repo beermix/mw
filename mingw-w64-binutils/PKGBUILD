@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.35.1
-pkgrel=4
+pkgrel=5
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -58,7 +58,7 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93'
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  #patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
+  patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
 
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
