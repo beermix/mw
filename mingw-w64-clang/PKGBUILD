@@ -34,7 +34,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-polly")
 pkgver=11.0.1
 rc_ver=rc1
-pkgrel=2
+pkgrel=3
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
 url="https://llvm.org/"
@@ -263,8 +263,8 @@ build() {
     export ASM_COMPILER_FLAGS=-win64
   fi
 
-  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
-  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
+#  export CFLAGS="${CFLAGS} -Wno-unused-variable -Wno-unknown-pragmas -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
+#  export CXXFLAGS="${CXXFLAGS} -Wno-unused-variable -Wno-format-extra-args -Wno-format -Wno-attributes -Wno-unused-function -Wno-unused-command-line-argument"
 
   MSYS2_ARG_CONV_EXCL="-DCMAKE_INSTALL_PREFIX=" \
   ${MINGW_PREFIX}/bin/cmake.exe \
@@ -296,6 +296,7 @@ build() {
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
     "${extra_config[@]}" \
+    -Wno-dev \
     ../llvm-${pkgver}${rc_ver}.src
 
   # sed away the bad windows style command line parameters (they are translated by msys from /bad to c:\msys\bad
