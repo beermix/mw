@@ -93,13 +93,14 @@ build() {
     --release-channel=beta \
     --enable-ninja \
     --enable-ccache \
-    --enable-optimize-llvm \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --disable-codegen-tests \
-    --enable-manage-submodules \
     --enable-optimize \
+    --enable-sccache \
+    --enable-control-flow-guard \
+    --enable-full-bootstrap \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
