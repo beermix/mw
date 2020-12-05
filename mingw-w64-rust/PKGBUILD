@@ -1,13 +1,14 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
 # Contributor: Mateusz Mikuła <mati865@gmail.com
+# https://raw.githubusercontent.com/rust-lang/rust/master/src/stage0.txt
 
 _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=1.48.0
-pkgrel=2
+pkgrel=3
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -43,7 +44,8 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch"
-        "0006-Update-cc.patch")
+        "0006-Update-cc.patch"
+        "00-config.patch")
 sha256sums=('0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b'
             '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
             '20aae51f8fe525d677d81f4075011db4f413420393ccd212ba21d503880ddb61'
@@ -67,6 +69,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
+  patch -p1 -i "${srcdir}/00-config.patch"
 }
 
 build() {
@@ -91,9 +94,19 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-ninja \
+    --enable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
+    --enable-optimize-llvm \
+    --disable-codegen-tests \
+    --enable-optimize \
+    --enable-manage-submodules \
+    --enable-missing-tools \
+    --enable-full-tools \
+    --enable-option-checking \
+    --disable-control-flow-guard \
+    --enable-full-bootstrap \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
@@ -103,7 +116,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
 }
 
 check() {
@@ -112,8 +125,7 @@ check() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 || true
 }
 
 package() {

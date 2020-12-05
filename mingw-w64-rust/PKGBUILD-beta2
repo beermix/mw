@@ -98,8 +98,7 @@ build() {
     --enable-extended \
     --disable-codegen-tests \
     --enable-optimize \
-    --enable-sccache \
-    --enable-control-flow-guard \
+    --disable-control-flow-guard \
     --enable-full-bootstrap \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
@@ -110,7 +109,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}-${pkgver}/x.py build --verbose --stage 2 -j8
+  ${MINGW_PREFIX}/bin/python ../${_realname}-${pkgver}/x.py  build --verbose --stage 2 -j8
 }
 
 check() {
