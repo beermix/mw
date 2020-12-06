@@ -65,11 +65,9 @@ source=(#"https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${
         0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch
         0015-makedeps-properly-handle-win-paths.patch
         0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
-        0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
         0130-libstdc++-in-out.patch
         0140-gcc-8.2.0-diagnostic-color.patch
         0150-gcc-10.2.0-libgcc-ldflags.patch
-        0160-libbacktrace-seh.patch
         010-documentation.patch
         optimize.patch
         ipa-cp.patch
@@ -159,8 +157,7 @@ prepare() {
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
     0015-makedeps-properly-handle-win-paths.patch \
-    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
-    0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch
+    0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch
 
 #  apply_patch_with_msg \
 #    0130-libstdc++-in-out.patch
@@ -173,11 +170,6 @@ prepare() {
   apply_patch_with_msg \
     0150-gcc-10.2.0-libgcc-ldflags.patch
 
-  # ensure libbacktrace works with SEH
-  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96948
-  apply_patch_with_msg \
-    0160-libbacktrace-seh.patch
-
   # do not expect ${prefix}/mingw symlink - this should be superceded by
   # 0005-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
   sed -i 's/${prefix}\/mingw\//${prefix}\//g' configure
@@ -187,10 +179,10 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  echo ${pkgver} > gcc/BASE-VER
+  # echo ${pkgver} > gcc/BASE-VER
 
   # mmapio.c:69:14: error: implicit declaration of function ‘getpagesize’
-  # sed -i 's|\-Werror||g' libbacktrace/configure
+  sed -i 's|\-Werror||g' libbacktrace/configure
 }
 
 build() {
