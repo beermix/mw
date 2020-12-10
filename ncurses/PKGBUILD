@@ -4,7 +4,7 @@
 pkgbase=ncurses
 pkgname=('ncurses' 'ncurses-devel')
 _basever=6.2
-_date=20201128
+_date=20201205
 pkgver=${_basever}.${_date}
 #pkgver=6.2
 pkgrel=1
