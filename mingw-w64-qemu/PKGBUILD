@@ -59,7 +59,7 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
-  ../${_realname}-${pkgver}${_rc}/configure \
+  ../${_realname}-${pkgver}/configure \
       --disable-werror \
       --disable-kvm \
       --disable-spice \
@@ -84,7 +84,7 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  make
+  /home/User/.bin/noti.exe --time nice -n19 make -j7
 }
 
 package() {
