@@ -292,6 +292,7 @@ build() {
     -DLLVM_POLLY_LINK_INTO_TOOLS=OFF \
     -DPython3_FIND_REGISTRY=NEVER \
     -DPython3_ROOT_DIR=${MINGW_PREFIX} \
+    -DLLDB_EMBED_PYTHON_HOME=OFF \
     "${extra_config[@]}" \
     ../llvm-${pkgver}${rc_ver}.src
 
