@@ -139,10 +139,10 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    000-gcc10-stable-branch.patch
 
+#    optimize.patch \
+#    optimize-at-least-some.patch
 #    ipa-cp.patch \
 #    openmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
@@ -170,8 +170,8 @@ prepare() {
     0022-jit-port-libgccjit-to-Windows.patch \
     0023-gcc-jit-Rename-libgccjit.dll-to-libgccjit-0.dll.patch
 
-#  apply_patch_with_msg \
-#    0130-libstdc++-in-out.patch
+  apply_patch_with_msg \
+    0130-libstdc++-in-out.patch
 
   # Enable diagnostic color under mintty
   # Вячеслав Петрищев <vyachemail@gmail.com>
@@ -256,6 +256,9 @@ build() {
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
+
+  export CC='ccache gcc'
+  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \

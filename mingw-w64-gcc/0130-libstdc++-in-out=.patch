@@ -1,7 +1,7 @@
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/dragonfly/c_locale.h gcc-10.1.0/libstdc++-v3/config/locale/dragonfly/c_locale.h
 --- gcc-10.1.0-orig/libstdc++-v3/config/locale/dragonfly/c_locale.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/config/locale/dragonfly/c_locale.h	2020-05-08 15:27:14.917453700 +0300
-@@ -55,7 +55,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -55,7 +55,7 @@
    // fall back to the unsafe vsprintf which, in general, can be dangerous
    // and should be avoided.
    inline int
@@ -10,7 +10,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/dragonfly/c_locale.h gcc-1
  		   const int __size __attribute__ ((__unused__)),
  		   const char* __fmt, ...)
    {
-@@ -65,9 +65,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -65,9 +65,9 @@
      __builtin_va_start(__args, __fmt);
  
  #if _GLIBCXX_USE_C99_STDIO
@@ -25,7 +25,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/dragonfly/c_locale.h gcc-1
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/generic/c_locale.h gcc-10.1.0/libstdc++-v3/config/locale/generic/c_locale.h
 --- gcc-10.1.0-orig/libstdc++-v3/config/locale/generic/c_locale.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/config/locale/generic/c_locale.h	2020-05-08 15:27:14.920470300 +0300
-@@ -53,7 +53,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -53,7 +53,7 @@
    // fall back to the unsafe vsprintf which, in general, can be dangerous
    // and should be avoided.
    inline int
@@ -34,7 +34,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/generic/c_locale.h gcc-10.
  		   const int __size __attribute__((__unused__)),
  		   const char* __fmt, ...)
    {
-@@ -71,9 +71,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -71,9 +71,9 @@
      __builtin_va_start(__args, __fmt);
  
  #if _GLIBCXX_USE_C99_STDIO && !_GLIBCXX_HAVE_BROKEN_VSNPRINTF
@@ -49,7 +49,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/generic/c_locale.h gcc-10.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/gnu/c_locale.h gcc-10.1.0/libstdc++-v3/config/locale/gnu/c_locale.h
 --- gcc-10.1.0-orig/libstdc++-v3/config/locale/gnu/c_locale.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/config/locale/gnu/c_locale.h	2020-05-08 15:27:14.923461200 +0300
-@@ -67,7 +67,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -67,7 +67,7 @@
    // and should be avoided.
    inline int
    __convert_from_v(const __c_locale& __cloc __attribute__ ((__unused__)),
@@ -58,7 +58,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/gnu/c_locale.h gcc-10.1.0/
  		   const int __size __attribute__ ((__unused__)),
  		   const char* __fmt, ...)
    {
-@@ -89,9 +89,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -89,9 +89,9 @@
      __builtin_va_start(__args, __fmt);
  
  #if _GLIBCXX_USE_C99_STDIO
@@ -73,7 +73,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/config/locale/gnu/c_locale.h gcc-10.1.0/
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.h gcc-10.1.0/libstdc++-v3/include/bits/basic_string.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/basic_string.h	2020-05-08 15:27:14.939505400 +0300
-@@ -6527,13 +6527,13 @@ _GLIBCXX_END_NAMESPACE_CXX11
+@@ -6517,13 +6517,13 @@
  
    template<>
      basic_istream<char>&
@@ -92,7 +92,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.h gcc-10.1.0/l
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0/libstdc++-v3/include/bits/basic_string.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/basic_string.tcc	2020-05-08 15:27:14.947409100 +0300
-@@ -1465,7 +1465,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1473,7 +1473,7 @@
    // 21.3.7.9 basic_string::getline and operators
    template<typename _CharT, typename _Traits, typename _Alloc>
      basic_istream<_CharT, _Traits>&
@@ -101,7 +101,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  	       basic_string<_CharT, _Traits, _Alloc>& __str)
      {
        typedef basic_istream<_CharT, _Traits>		__istream_type;
-@@ -1478,7 +1478,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1486,7 +1486,7 @@
  
        __size_type __extracted = 0;
        typename __ios_base::iostate __err = __ios_base::goodbit;
@@ -110,7 +110,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
        if (__cerb)
  	{
  	  __try
-@@ -1487,12 +1487,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1495,12 +1495,12 @@
  	      __str.erase();
  	      _CharT __buf[128];
  	      __size_type __len = 0;	      
@@ -126,7 +126,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  
  	      while (__extracted < __n
  		     && !_Traits::eq_int_type(__c, __eof)
-@@ -1506,17 +1506,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1514,17 +1514,17 @@
  		    }
  		  __buf[__len++] = _Traits::to_char_type(__c);
  		  ++__extracted;
@@ -147,7 +147,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -1524,20 +1524,20 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1532,20 +1532,20 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -172,7 +172,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  	    basic_string<_CharT, _Traits, _Alloc>& __str, _CharT __delim)
      {
        typedef basic_istream<_CharT, _Traits>		__istream_type;
-@@ -1549,7 +1549,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1557,7 +1557,7 @@
        __size_type __extracted = 0;
        const __size_type __n = __str.max_size();
        typename __ios_base::iostate __err = __ios_base::goodbit;
@@ -181,7 +181,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
        if (__cerb)
  	{
  	  __try
-@@ -1557,7 +1557,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1565,7 +1565,7 @@
  	      __str.erase();
  	      const __int_type __idelim = _Traits::to_int_type(__delim);
  	      const __int_type __eof = _Traits::eof();
@@ -190,7 +190,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  
  	      while (__extracted < __n
  		     && !_Traits::eq_int_type(__c, __eof)
-@@ -1565,7 +1565,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1573,7 +1573,7 @@
  		{
  		  __str += _Traits::to_char_type(__c);
  		  ++__extracted;
@@ -199,7 +199,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  		}
  
  	      if (_Traits::eq_int_type(__c, __eof))
-@@ -1573,14 +1573,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1581,14 +1581,14 @@
  	      else if (_Traits::eq_int_type(__c, __idelim))
  		{
  		  ++__extracted;		  
@@ -216,7 +216,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -1588,14 +1588,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1596,14 +1596,14 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -237,7 +237,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/basic_string.tcc gcc-10.1.0
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libstdc++-v3/include/bits/istream.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/istream.tcc	2020-05-08 15:27:14.962363600 +0300
-@@ -44,21 +44,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -44,21 +44,21 @@
  
    template<typename _CharT, typename _Traits>
      basic_istream<_CharT, _Traits>::sentry::
@@ -266,7 +266,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
  		while (!traits_type::eq_int_type(__c, __eof)
  		       && __ct.is(ctype_base::space,
  				  traits_type::to_char_type(__c)))
-@@ -73,18 +73,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -73,18 +73,18 @@
  	  }
  	__catch(__cxxabiv1::__forced_unwind&)
  	  {
@@ -289,7 +289,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
  	}
      }
  
-@@ -928,18 +928,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -928,18 +928,18 @@
    // 27.6.1.2.3 Character extraction templates
    template<typename _CharT, typename _Traits>
      basic_istream<_CharT, _Traits>&
@@ -311,7 +311,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
  	      if (!_Traits::eq_int_type(__cb, _Traits::eof()))
  		__c = _Traits::to_char_type(__cb);
  	      else
-@@ -947,20 +947,20 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -947,20 +947,20 @@
  	    }
  	  __catch(__cxxabiv1::__forced_unwind&)
  	    {
@@ -337,7 +337,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
      {
        typedef basic_istream<_CharT, _Traits>		__istream_type;
        typedef basic_streambuf<_CharT, _Traits>          __streambuf_type;
-@@ -970,20 +970,20 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -970,20 +970,20 @@
  
        streamsize __extracted = 0;
        ios_base::iostate __err = ios_base::goodbit;
@@ -362,7 +362,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
  	      int_type __c = __sb->sgetc();
  
  	      while (__extracted < __num - 1
-@@ -1001,36 +1001,36 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1001,36 +1001,36 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 68.  Extractors for char* should store null at end
  	      *__s = char_type();
@@ -407,7 +407,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
        __int_type __c = __sb->sgetc();
  
        while (!_Traits::eq_int_type(__c, __eof)
-@@ -1038,8 +1038,8 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1038,8 +1038,8 @@
  	__c = __sb->snextc();
  
         if (_Traits::eq_int_type(__c, __eof))
@@ -421,7 +421,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/istream.tcc gcc-10.1.0/libs
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/iterator_concepts.h gcc-10.1.0/libstdc++-v3/include/bits/iterator_concepts.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/iterator_concepts.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/iterator_concepts.h	2020-05-08 17:14:06.085050500 +0300
-@@ -486,13 +486,13 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -443,13 +443,13 @@
        using __iter_concept = typename __iter_concept_impl<_Iter>::type;
  
    template<typename _In>
@@ -441,7 +441,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/iterator_concepts.h gcc-10.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_conv.h gcc-10.1.0/libstdc++-v3/include/bits/locale_conv.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_conv.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/locale_conv.h	2020-05-08 15:27:14.966323000 +0300
-@@ -315,10 +315,10 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -315,10 +315,10 @@
        {
  	if (!_M_with_cvtstate)
  	  _M_state = state_type();
@@ -455,7 +455,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_conv.h gcc-10.1.0/li
  	if (_M_with_strings)
  	  return _M_wide_err_string;
  	__throw_range_error("wstring_convert::from_bytes");
-@@ -351,10 +351,10 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -351,10 +351,10 @@
        {
  	if (!_M_with_cvtstate)
  	  _M_state = state_type();
@@ -469,7 +469,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_conv.h gcc-10.1.0/li
  	if (_M_with_strings)
  	  return _M_byte_err_string;
  	__throw_range_error("wstring_convert::to_bytes");
-@@ -447,13 +447,13 @@ _GLIBCXX_END_NAMESPACE_CXX11
+@@ -447,13 +447,13 @@
        { return _M_buf && _M_conv_put() && !_M_buf->pubsync() ? 0 : -1; }
  
        typename _Wide_streambuf::int_type
@@ -490,7 +490,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_conv.h gcc-10.1.0/li
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/libstdc++-v3/include/bits/locale_facets.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/locale_facets.h	2020-05-08 15:27:14.978314200 +0300
-@@ -1988,7 +1988,7 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -1988,7 +1988,7 @@
         *  except if the value is 1, sets @a v to true, if the value is 0, sets
         *  @a v to false, and otherwise set err to ios_base::failbit.
         *
@@ -499,7 +499,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
         *  @param  __end  End of input stream.
         *  @param  __io  Source of locale and flags.
         *  @param  __err  Error flags to set.
-@@ -1996,9 +1996,9 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -1996,9 +1996,9 @@
         *  @return  Iterator after reading.
        */
        iter_type
@@ -511,7 +511,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
  
        //@{
        /**
-@@ -2025,7 +2025,7 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2025,7 +2025,7 @@
         *  Otherwise, sets err to ios_base::failbit and leaves @a v unaltered.
         *  Sets err to ios_base::eofbit if the stream is emptied.
         *
@@ -520,7 +520,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
         *  @param  __end  End of input stream.
         *  @param  __io  Source of locale and flags.
         *  @param  __err  Error flags to set.
-@@ -2033,35 +2033,35 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2033,35 +2033,35 @@
         *  @return  Iterator after reading.
        */
        iter_type
@@ -568,7 +568,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
  #endif
        //@}
  
-@@ -2085,7 +2085,7 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2085,7 +2085,7 @@
         *  Otherwise, sets err to ios_base::failbit and leaves @a v unaltered.
         *  Sets err to ios_base::eofbit if the stream is emptied.
         *
@@ -577,7 +577,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
         *  @param  __end  End of input stream.
         *  @param  __io  Source of locale and flags.
         *  @param  __err  Error flags to set.
-@@ -2093,19 +2093,19 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2093,19 +2093,19 @@
         *  @return  Iterator after reading.
        */
        iter_type
@@ -603,7 +603,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
        //@}
  
        /**
-@@ -2128,7 +2128,7 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2128,7 +2128,7 @@
         *  Otherwise, sets err to ios_base::failbit and leaves @a v unaltered.
         *  Sets err to ios_base::eofbit if the stream is emptied.
         *
@@ -612,7 +612,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
         *  @param  __end  End of input stream.
         *  @param  __io  Source of locale and flags.
         *  @param  __err  Error flags to set.
-@@ -2136,9 +2136,9 @@ _GLIBCXX_BEGIN_NAMESPACE_LDBL
+@@ -2136,9 +2136,9 @@
         *  @return  Iterator after reading.
        */
        iter_type
@@ -627,7 +627,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/locale_facets.h gcc-10.1.0/
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream.tcc gcc-10.1.0/libstdc++-v3/include/bits/ostream.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/ostream.tcc	2020-05-08 15:27:14.983277300 +0300
-@@ -318,10 +318,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -318,10 +318,10 @@
  
    template<typename _CharT, typename _Traits>
      basic_ostream<_CharT, _Traits>&
@@ -640,7 +640,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream.tcc gcc-10.1.0/libs
        else
  	{
  	  // _GLIBCXX_RESOLVE_LIB_DEFECTS
-@@ -339,18 +339,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -339,18 +339,18 @@
  
  	      _CharT *__ws = __pg.__get();
  	      for (size_t  __i = 0; __i < __clen; ++__i)
@@ -667,7 +667,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream.tcc gcc-10.1.0/libs
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream_insert.h gcc-10.1.0/libstdc++-v3/include/bits/ostream_insert.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream_insert.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/ostream_insert.h	2020-05-08 15:27:14.987293800 +0300
-@@ -41,31 +41,31 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -41,31 +41,31 @@
  
    template<typename _CharT, typename _Traits>
      inline void
@@ -706,7 +706,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream_insert.h gcc-10.1.0
  	      break;
  	    }
  	}
-@@ -73,43 +73,43 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -73,43 +73,43 @@
  
    template<typename _CharT, typename _Traits>
      basic_ostream<_CharT, _Traits>&
@@ -767,7 +767,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ostream_insert.h gcc-10.1.0
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/libstdc++-v3/include/bits/ranges_algo.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/ranges_algo.h	2020-05-08 17:28:57.317446100 +0300
-@@ -1752,7 +1752,7 @@ namespace ranges
+@@ -1750,7 +1750,7 @@
  	&& indirectly_copyable<_Iter, _Out>
  	&& uniform_random_bit_generator<remove_reference_t<_Gen>>
        _Out
@@ -776,7 +776,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
  		 iter_difference_t<_Iter> __n, _Gen&& __g) const
        {
  	if constexpr (forward_iterator<_Iter>)
-@@ -1761,7 +1761,7 @@ namespace ranges
+@@ -1759,7 +1759,7 @@
  	    // which may take linear time.
  	    auto __lasti = ranges::next(__first, __last);
  	    return std::sample(std::move(__first), std::move(__lasti),
@@ -785,7 +785,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
  	  }
  	else
  	  {
-@@ -1772,7 +1772,7 @@ namespace ranges
+@@ -1770,7 +1770,7 @@
  	    iter_difference_t<_Iter> __sample_sz = 0;
  	    while (__first != __last && __sample_sz != __n)
  	      {
@@ -794,7 +794,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
  		++__first;
  	      }
  	    for (auto __pop_sz = __sample_sz; __first != __last;
-@@ -1780,9 +1780,9 @@ namespace ranges
+@@ -1778,9 +1778,9 @@
  	      {
  		const auto __k = __d(__g, __param_type{0, __pop_sz});
  		if (__k < __n)
@@ -806,7 +806,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
  	  }
        }
  
-@@ -1791,11 +1791,11 @@ namespace ranges
+@@ -1789,11 +1789,11 @@
  	&& indirectly_copyable<iterator_t<_Range>, _Out>
  	&& uniform_random_bit_generator<remove_reference_t<_Gen>>
        _Out
@@ -820,7 +820,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
  		       std::forward<_Gen>(__g));
        }
    };
-@@ -2172,11 +2172,11 @@ namespace ranges
+@@ -2170,11 +2170,11 @@
  				      projected<iterator_t<_Range2>, _Proj2>>
        constexpr partial_sort_copy_result<borrowed_iterator_t<_Range1>,
  					 borrowed_iterator_t<_Range2>>
@@ -837,7 +837,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algo.h gcc-10.1.0/li
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algobase.h gcc-10.1.0/libstdc++-v3/include/bits/ranges_algobase.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algobase.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/ranges_algobase.h	2020-05-08 17:16:30.310826200 +0300
-@@ -220,34 +220,34 @@ namespace ranges
+@@ -220,34 +220,34 @@
        using __detail::__is_normal_iterator;
        if constexpr (__is_move_iterator<_Iter> && same_as<_Iter, _Sent>)
  	{
@@ -881,7 +881,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algobase.h gcc-10.1.
  	}
        else if constexpr (sized_sentinel_for<_Sent, _Iter>)
  	{
-@@ -363,28 +363,28 @@ namespace ranges
+@@ -363,28 +363,28 @@
        if constexpr (__is_reverse_iterator<_Iter> && same_as<_Iter, _Sent>
  		    && __is_reverse_iterator<_Out>)
  	{
@@ -920,7 +920,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_algobase.h gcc-10.1.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_uninitialized.h gcc-10.1.0/libstdc++-v3/include/bits/ranges_uninitialized.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_uninitialized.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/ranges_uninitialized.h	2020-05-08 17:17:52.556144400 +0300
-@@ -361,10 +361,10 @@ namespace ranges
+@@ -361,10 +361,10 @@
  	  {
  	    auto __d1 = __ilast - __ifirst;
  	    auto __d2 = __olast - __ofirst;
@@ -933,7 +933,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_uninitialized.h gcc-
  	  }
  	else
  	  {
-@@ -412,10 +412,10 @@ namespace ranges
+@@ -412,10 +412,10 @@
  						 iter_rvalue_reference_t<_Iter>>)
  	  {
  	    auto __d = __olast - __ofirst;
@@ -949,7 +949,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/ranges_uninitialized.h gcc-
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.h gcc-10.1.0/libstdc++-v3/include/bits/regex.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/regex.h	2020-05-08 15:27:14.996242100 +0300
-@@ -1946,7 +1946,7 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -1946,7 +1946,7 @@
         */
        template<typename _Out_iter>
  	_Out_iter
@@ -958,7 +958,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.h gcc-10.1.0/libstdc+
  	       const char_type* __fmt_last,
  	       match_flag_type __flags = regex_constants::format_default) const;
  
-@@ -1955,10 +1955,10 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -1955,10 +1955,10 @@
         */
        template<typename _Out_iter, typename _St, typename _Sa>
  	_Out_iter
@@ -971,7 +971,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.h gcc-10.1.0/libstdc+
  			__flags);
  	}
  
-@@ -2460,46 +2460,46 @@ _GLIBCXX_END_NAMESPACE_CXX11
+@@ -2460,46 +2460,46 @@
    /**
     * @brief Search for a regular expression within a range for multiple times,
     and replace the matched parts through filling a format string.
@@ -1028,7 +1028,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.h gcc-10.1.0/libstdc+
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstdc++-v3/include/bits/regex.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/bits/regex.tcc	2020-05-08 16:11:37.031430400 +0300
-@@ -352,7 +352,7 @@ namespace __detail
+@@ -352,7 +352,7 @@
    template<typename _Out_iter>
      _Out_iter
      match_results<_Bi_iter, _Alloc>::
@@ -1037,7 +1037,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  	   const match_results<_Bi_iter, _Alloc>::char_type* __fmt_first,
  	   const match_results<_Bi_iter, _Alloc>::char_type* __fmt_last,
  	   match_flag_type __flags) const
-@@ -367,7 +367,7 @@ namespace __detail
+@@ -367,7 +367,7 @@
  	{
  	  auto& __sub = (*this)[__idx];
  	  if (__sub.matched)
@@ -1046,7 +1046,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  	};
  
        if (__flags & regex_constants::format_sed)
-@@ -381,7 +381,7 @@ namespace __detail
+@@ -381,7 +381,7 @@
  		  if (__fctyp.is(__ctype_type::digit, *__fmt_first))
  		    __output(__traits.value(*__fmt_first, 10));
  		  else
@@ -1055,7 +1055,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  		  continue;
  		}
  	      if (*__fmt_first == '\\')
-@@ -394,10 +394,10 @@ namespace __detail
+@@ -394,10 +394,10 @@
  		  __output(0);
  		  continue;
  		}
@@ -1068,7 +1068,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  	}
        else
  	{
-@@ -407,7 +407,7 @@ namespace __detail
+@@ -407,7 +407,7 @@
  	      if (__next == __fmt_last)
  		break;
  
@@ -1077,7 +1077,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  
  	      auto __eat = [&](char __ch) -> bool
  		{
-@@ -420,22 +420,22 @@ namespace __detail
+@@ -420,22 +420,22 @@
  		};
  
  	      if (++__next == __fmt_last)
@@ -1104,7 +1104,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  		}
  	      else if (__fctyp.is(__ctype_type::digit, *__next))
  		{
-@@ -450,18 +450,18 @@ namespace __detail
+@@ -450,18 +450,18 @@
  		    __output(__num);
  		}
  	      else
@@ -1127,7 +1127,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  		  const basic_regex<_Ch_type, _Rx_traits>& __e,
  		  const _Ch_type* __fmt,
  		  regex_constants::match_flag_type __flags)
-@@ -472,7 +472,7 @@ namespace __detail
+@@ -472,7 +472,7 @@
        if (__i == __end)
  	{
  	  if (!(__flags & regex_constants::format_no_copy))
@@ -1136,7 +1136,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
  	}
        else
  	{
-@@ -481,17 +481,17 @@ namespace __detail
+@@ -481,17 +481,17 @@
  	  for (; __i != __end; ++__i)
  	    {
  	      if (!(__flags & regex_constants::format_no_copy))
@@ -1159,38 +1159,10 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/regex.tcc gcc-10.1.0/libstd
      }
  
    template<typename _Bi_iter,
-diff --git a/libstdc++-v3/include/bits/stl_algo.h b/libstdc++-v3/include/bits/stl_algo.h
-index bbb4313fd..e8f5dcbd7 100644
---- a/libstdc++-v3/include/bits/stl_algo.h
-+++ b/libstdc++-v3/include/bits/stl_algo.h
-@@ -784,21 +784,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
-    *  @ingroup mutating_algorithms
-    *  @param  __first   An input iterator.
-    *  @param  __last    An input iterator.
--   *  @param  __out_true   An output iterator.
--   *  @param  __out_false  An output iterator.
-+   *  @param  ___out_true   An output iterator.
-+   *  @param  ___out_false  An output iterator.
-    *  @param  __pred    A predicate.
-    *  @return   A pair designating the ends of the resulting sequences.
-    *
-    *  Copies each element in the range @p [__first,__last) for which
-    *  @p __pred returns true to the range beginning at @p out_true
--   *  and each element for which @p __pred returns false to @p __out_false.
-+   *  and each element for which @p __pred returns false to @p ___out_false.
-   */
-   template<typename _InputIterator, typename _OutputIterator1,
- 	   typename _OutputIterator2, typename _Predicate>
-     _GLIBCXX20_CONSTEXPR
-     pair<_OutputIterator1, _OutputIterator2>
-     partition_copy(_InputIterator __first, _InputIterator __last,
--		   _OutputIterator1 __out_true, _OutputIterator2 __out_false,
-+		   _OutputIterator1 ___out_true, _OutputIterator2 ___out_false,
- 		   _Predicate __pred)
-     {
-       // concept requirements
-				    _DistanceType(__buf.size()), __comp);
-@@ -5760,7 +5760,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/bits/stl_algo.h gcc-10.1.0/libstdc++-v3/include/bits/stl_algo.h
+--- gcc-10.1.0-orig/libstdc++-v3/include/bits/stl_algo.h	2020-05-07 13:50:02.000000000 +0300
++++ gcc-10.1.0/libstdc++-v3/include/bits/stl_algo.h	2020-05-08 15:27:15.013196800 +0300
+@@ -5758,7 +5758,7 @@
             typename _Size, typename _UniformRandomBitGenerator>
      _RandomAccessIterator
      __sample(_InputIterator __first, _InputIterator __last, input_iterator_tag,
@@ -1199,7 +1171,7 @@ index bbb4313fd..e8f5dcbd7 100644
  	     _Size __n, _UniformRandomBitGenerator&& __g)
      {
        using __distrib_type = uniform_int_distribution<_Size>;
-@@ -5769,7 +5769,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5767,7 +5767,7 @@
        _Size __sample_sz = 0;
        while (__first != __last && __sample_sz != __n)
  	{
@@ -1208,7 +1180,7 @@ index bbb4313fd..e8f5dcbd7 100644
  	  ++__first;
  	}
        for (auto __pop_sz = __sample_sz; __first != __last;
-@@ -5777,9 +5777,9 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5775,9 +5775,9 @@
  	{
  	  const auto __k = __d(__g, __param_type{0, __pop_sz});
  	  if (__k < __n)
@@ -1220,7 +1192,7 @@ index bbb4313fd..e8f5dcbd7 100644
      }
  
    /// Selection sampling algorithm.
-@@ -5788,7 +5788,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5786,7 +5786,7 @@
      _OutputIterator
      __sample(_ForwardIterator __first, _ForwardIterator __last,
  	     forward_iterator_tag,
@@ -1229,16 +1201,7 @@ index bbb4313fd..e8f5dcbd7 100644
  	     _Size __n, _UniformRandomBitGenerator&& __g)
      {
        using __distrib_type = uniform_int_distribution<_Size>;
-@@ -5798,7 +5798,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
-       using __uc_type = common_type_t<typename _Gen::result_type, _USize>;
- 
-       if (__first == __last)
--	return __out;
-+	return ___out;
- 
-       __distrib_type __d{};
-       _Size __unsampled_sz = std::distance(__first, __last);
-@@ -5820,7 +5820,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5815,7 +5815,7 @@
  	      --__unsampled_sz;
  	      if (__p.first < __n)
  		{
@@ -1247,7 +1210,7 @@ index bbb4313fd..e8f5dcbd7 100644
  		  --__n;
  		}
  
-@@ -5831,7 +5831,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5826,7 +5826,7 @@
  	      --__unsampled_sz;
  	      if (__p.second < __n)
  		{
@@ -1256,7 +1219,7 @@ index bbb4313fd..e8f5dcbd7 100644
  		  --__n;
  		}
  
-@@ -5844,10 +5844,10 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5839,10 +5839,10 @@
        for (; __n != 0; ++__first)
  	if (__d(__g, __param_type{0, --__unsampled_sz}) < __n)
  	  {
@@ -1269,7 +1232,7 @@ index bbb4313fd..e8f5dcbd7 100644
      }
  
  #if __cplusplus > 201402L
-@@ -5857,7 +5857,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5852,7 +5852,7 @@
             typename _Distance, typename _UniformRandomBitGenerator>
      _SampleIterator
      sample(_PopulationIterator __first, _PopulationIterator __last,
@@ -1278,7 +1241,7 @@ index bbb4313fd..e8f5dcbd7 100644
  	   _UniformRandomBitGenerator&& __g)
      {
        using __pop_cat = typename
-@@ -5876,7 +5876,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
+@@ -5871,7 +5871,7 @@
  
        typename iterator_traits<_PopulationIterator>::difference_type __d = __n;
        return _GLIBCXX_STD_A::
@@ -1290,7 +1253,7 @@ index bbb4313fd..e8f5dcbd7 100644
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/algorithm gcc-10.1.0/libstdc++-v3/include/experimental/algorithm
 --- gcc-10.1.0-orig/libstdc++-v3/include/experimental/algorithm	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/experimental/algorithm	2020-05-08 16:12:28.617088800 +0300
-@@ -59,7 +59,7 @@ inline namespace fundamentals_v2
+@@ -59,7 +59,7 @@
             typename _Distance, typename _UniformRandomNumberGenerator>
      _SampleIterator
      sample(_PopulationIterator __first, _PopulationIterator __last,
@@ -1299,7 +1262,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/algorithm gcc-10.1.
  	   _UniformRandomNumberGenerator&& __g)
      {
        using __pop_cat = typename
-@@ -78,7 +78,7 @@ inline namespace fundamentals_v2
+@@ -78,7 +78,7 @@
  
        typename iterator_traits<_PopulationIterator>::difference_type __d = __n;
        return _GLIBCXX_STD_A::
@@ -1308,7 +1271,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/algorithm gcc-10.1.
  		 std::forward<_UniformRandomNumberGenerator>(__g));
      }
  
-@@ -86,9 +86,9 @@ inline namespace fundamentals_v2
+@@ -86,9 +86,9 @@
             typename _Distance>
      inline _SampleIterator
      sample(_PopulationIterator __first, _PopulationIterator __last,
@@ -1323,7 +1286,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/algorithm gcc-10.1.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0/libstdc++-v3/include/experimental/internet
 --- gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/experimental/internet	2020-05-08 17:30:25.005879100 +0300
-@@ -740,9 +740,9 @@ namespace ip
+@@ -740,9 +740,9 @@
      if (__p == nullptr)
        return __make_address_v6(__str, nullptr, __ec);
      char __buf[64];
@@ -1335,7 +1298,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
        {
  	if (!__skip_leading_zero || *__str != '0')
  	  {
-@@ -750,15 +750,15 @@ namespace ip
+@@ -750,15 +750,15 @@
  	      __skip_leading_zero = true;
  	    else
  	      __skip_leading_zero = false;
@@ -1354,7 +1317,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
  	return __make_address_v6(__buf, __p + 1, __ec);
        }
    }
-@@ -774,10 +774,10 @@ namespace ip
+@@ -774,10 +774,10 @@
      if (__pos == string::npos)
        return __make_address_v6(__str.c_str(), nullptr, __ec);
      char __buf[64];
@@ -1367,7 +1330,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
        {
  	if (!__skip_leading_zero || __str[__n] != '0')
  	  {
-@@ -785,15 +785,15 @@ namespace ip
+@@ -785,15 +785,15 @@
  	      __skip_leading_zero = true;
  	    else
  	      __skip_leading_zero = false;
@@ -1386,7 +1349,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
  	return __make_address_v6(__buf, __str.c_str() + __pos + 1, __ec);
        }
    }
-@@ -806,20 +806,20 @@ namespace ip
+@@ -806,20 +806,20 @@
    make_address_v6(string_view __str, error_code& __ec) noexcept
    {
      char __buf[64];
@@ -1412,7 +1375,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
  		__skip_leading_zero = true;
  	      }
  	  }
-@@ -829,16 +829,16 @@ namespace ip
+@@ -829,16 +829,16 @@
  	      __skip_leading_zero = true;
  	    else
  	      __skip_leading_zero = false;
@@ -1436,7 +1399,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/experimental/internet gcc-10.1.0
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc++-v3/include/ext/algorithm
 --- gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/ext/algorithm	2020-05-08 15:27:15.031175400 +0300
-@@ -258,7 +258,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -258,7 +258,7 @@
  	   typename _Distance>
      _OutputIterator
      random_sample_n(_ForwardIterator __first, _ForwardIterator __last,
@@ -1445,7 +1408,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc
      {
        // concept requirements
        __glibcxx_function_requires(_ForwardIteratorConcept<_ForwardIterator>)
-@@ -273,14 +273,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -273,14 +273,14 @@
  	{
  	  if ((std::rand() % __remaining) < __m)
  	    {
@@ -1463,7 +1426,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc
      }
  
    /**
-@@ -292,7 +292,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -292,7 +292,7 @@
  	   typename _Distance, typename _RandomNumberGenerator>
      _OutputIterator
      random_sample_n(_ForwardIterator __first, _ForwardIterator __last,
@@ -1472,7 +1435,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc
  		   _RandomNumberGenerator& __rand)
      {
        // concept requirements
-@@ -310,44 +310,44 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -310,44 +310,44 @@
  	{
  	  if (__rand(__remaining) < __m)
  	    {
@@ -1525,7 +1488,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc
  		    _RandomNumberGenerator& __rand,
  		    const _Distance __n)
      {
-@@ -358,17 +358,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -358,17 +358,17 @@
        _Distance __m = 0;
        _Distance __t = __n;
        for ( ; __first != __last && __m < __n; ++__m, ++__first)
@@ -1549,7 +1512,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/algorithm gcc-10.1.0/libstdc
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/pb_ds/detail/debug_map_base.hpp gcc-10.1.0/libstdc++-v3/include/ext/pb_ds/detail/debug_map_base.hpp
 --- gcc-10.1.0-orig/libstdc++-v3/include/ext/pb_ds/detail/debug_map_base.hpp	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/ext/pb_ds/detail/debug_map_base.hpp	2020-05-08 15:27:15.041151800 +0300
-@@ -57,9 +57,9 @@ namespace __gnu_pbds
+@@ -57,9 +57,9 @@
      // Need std::pair ostream extractor.
      template<typename _CharT, typename _Traits, typename _Tp1, typename _Tp2>
      inline std::basic_ostream<_CharT, _Traits>&
@@ -1564,7 +1527,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/pb_ds/detail/debug_map_base.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/random.tcc gcc-10.1.0/libstdc++-v3/include/ext/random.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/ext/random.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/ext/random.tcc	2020-05-08 15:27:15.056090400 +0300
-@@ -208,38 +208,38 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -208,38 +208,38 @@
    namespace {
  
      template<size_t __shift>
@@ -1624,7 +1587,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/random.tcc gcc-10.1.0/libstd
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libstdc++-v3/include/ext/vstring.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/ext/vstring.tcc	2020-05-08 15:27:15.065086300 +0300
-@@ -549,7 +549,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -549,7 +549,7 @@
    template<typename _CharT, typename _Traits, typename _Alloc,
             template <typename, typename, typename> class _Base>
      basic_istream<_CharT, _Traits>&
@@ -1633,7 +1596,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  	       __gnu_cxx::__versa_string<_CharT, _Traits,
  	                                 _Alloc, _Base>& __str)
      {
-@@ -564,7 +564,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -564,7 +564,7 @@
  
        __size_type __extracted = 0;
        typename __ios_base::iostate __err = __ios_base::goodbit;
@@ -1642,7 +1605,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
        if (__cerb)
  	{
  	  __try
-@@ -573,12 +573,12 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -573,12 +573,12 @@
  	      __str.erase();
  	      _CharT __buf[128];
  	      __size_type __len = 0;
@@ -1658,7 +1621,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  
  	      while (__extracted < __n
  		     && !_Traits::eq_int_type(__c, __eof)
-@@ -592,17 +592,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -592,17 +592,17 @@
  		    }
  		  __buf[__len++] = _Traits::to_char_type(__c);
  		  ++__extracted;
@@ -1679,7 +1642,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -610,21 +610,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -610,21 +610,21 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -1705,7 +1668,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  	    __gnu_cxx::__versa_string<_CharT, _Traits, _Alloc, _Base>& __str,
  	    _CharT __delim)
      {
-@@ -638,7 +638,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -638,7 +638,7 @@
        __size_type __extracted = 0;
        const __size_type __n = __str.max_size();
        typename __ios_base::iostate __err = __ios_base::goodbit;
@@ -1714,7 +1677,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
        if (__cerb)
  	{
  	  __try
-@@ -649,7 +649,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -649,7 +649,7 @@
  	      __size_type __len = 0;
  	      const __int_type __idelim = _Traits::to_int_type(__delim);
  	      const __int_type __eof = _Traits::eof();
@@ -1723,7 +1686,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  
  	      while (__extracted < __n
  		     && !_Traits::eq_int_type(__c, __eof)
-@@ -662,7 +662,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -662,7 +662,7 @@
  		    }
  		  __buf[__len++] = _Traits::to_char_type(__c);
  		  ++__extracted;
@@ -1732,7 +1695,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  		}
  	      __str.append(__buf, __len);
  
-@@ -671,14 +671,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -671,14 +671,14 @@
  	      else if (_Traits::eq_int_type(__c, __idelim))
  		{
  		  ++__extracted;		  
@@ -1749,7 +1712,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -686,14 +686,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -686,14 +686,14 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -1770,7 +1733,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/ext/vstring.tcc gcc-10.1.0/libst
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libstdc++-v3/include/parallel/algo.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/parallel/algo.h	2020-05-08 16:14:08.758653700 +0300
-@@ -289,67 +289,67 @@ namespace __parallel
+@@ -289,67 +289,67 @@
    // Sequential fallback
    template<typename _IIter, typename _OutputIterator>
      inline _OutputIterator
@@ -1853,7 +1816,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Sequential fallback
-@@ -358,9 +358,9 @@ namespace __parallel
+@@ -358,9 +358,9 @@
      inline _OutputIterator
      set_union(_IIter1 __begin1, _IIter1 __end1,
  	      _IIter2 __begin2, _IIter2 __end2,
@@ -1865,7 +1828,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback
    template<typename _IIter1, typename _IIter2,
-@@ -368,10 +368,10 @@ namespace __parallel
+@@ -368,10 +368,10 @@
      inline _OutputIterator
      set_union(_IIter1 __begin1, _IIter1 __end1,
  	      _IIter2 __begin2, _IIter2 __end2,
@@ -1878,7 +1841,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback for input iterator case
    template<typename _IIter1, typename _IIter2, typename _Predicate,
-@@ -412,17 +412,17 @@ namespace __parallel
+@@ -412,17 +412,17 @@
  	   typename _OutputIterator>
      inline _OutputIterator
      set_union(_IIter1 __begin1, _IIter1 __end1,
@@ -1899,7 +1862,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Public interface
-@@ -431,13 +431,13 @@ namespace __parallel
+@@ -431,13 +431,13 @@
      inline _OutputIterator
      set_union(_IIter1 __begin1, _IIter1 __end1,
  	      _IIter2 __begin2, _IIter2 __end2,
@@ -1916,7 +1879,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Sequential fallback.
-@@ -446,9 +446,9 @@ namespace __parallel
+@@ -446,9 +446,9 @@
      inline _OutputIterator
      set_intersection(_IIter1 __begin1, _IIter1 __end1,
  		     _IIter2 __begin2, _IIter2 __end2,
@@ -1928,7 +1891,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback.
    template<typename _IIter1, typename _IIter2,
-@@ -456,10 +456,10 @@ namespace __parallel
+@@ -456,10 +456,10 @@
      inline _OutputIterator
      set_intersection(_IIter1 __begin1, _IIter1 __end1,
  		     _IIter2 __begin2, _IIter2 __end2,
@@ -1941,7 +1904,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback for input iterator case
    template<typename _IIter1, typename _IIter2,
-@@ -506,17 +506,17 @@ namespace __parallel
+@@ -506,17 +506,17 @@
      inline _OutputIterator
      set_intersection(_IIter1 __begin1, _IIter1 __end1,
  		     _IIter2 __begin2, _IIter2 __end2,
@@ -1962,7 +1925,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    template<typename _IIter1, typename _IIter2,
-@@ -524,13 +524,13 @@ namespace __parallel
+@@ -524,13 +524,13 @@
      inline _OutputIterator
      set_intersection(_IIter1 __begin1, _IIter1 __end1,
  		     _IIter2 __begin2, _IIter2 __end2,
@@ -1979,7 +1942,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Sequential fallback
-@@ -539,10 +539,10 @@ namespace __parallel
+@@ -539,10 +539,10 @@
      inline _OutputIterator
      set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
  			     _IIter2 __begin2, _IIter2 __end2,
@@ -1992,7 +1955,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback
    template<typename _IIter1, typename _IIter2,
-@@ -550,10 +550,10 @@ namespace __parallel
+@@ -550,10 +550,10 @@
      inline _OutputIterator
      set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
  			     _IIter2 __begin2, _IIter2 __end2,
@@ -2005,7 +1968,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback for input iterator case
    template<typename _IIter1, typename _IIter2,
-@@ -600,17 +600,17 @@ namespace __parallel
+@@ -600,17 +600,17 @@
      inline _OutputIterator
      set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
  			     _IIter2 __begin2, _IIter2 __end2,
@@ -2026,7 +1989,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Public interface.
-@@ -619,13 +619,13 @@ namespace __parallel
+@@ -619,13 +619,13 @@
      inline _OutputIterator
      set_symmetric_difference(_IIter1 __begin1, _IIter1 __end1,
  			     _IIter2 __begin2, _IIter2 __end2,
@@ -2043,7 +2006,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Sequential fallback.
-@@ -634,9 +634,9 @@ namespace __parallel
+@@ -634,9 +634,9 @@
      inline _OutputIterator
      set_difference(_IIter1 __begin1, _IIter1 __end1,
  		   _IIter2 __begin2, _IIter2 __end2,
@@ -2055,7 +2018,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback.
    template<typename _IIter1, typename _IIter2,
-@@ -644,10 +644,10 @@ namespace __parallel
+@@ -644,10 +644,10 @@
      inline _OutputIterator
      set_difference(_IIter1 __begin1, _IIter1 __end1,
  		   _IIter2 __begin2, _IIter2 __end2,
@@ -2068,7 +2031,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
  
    // Sequential fallback for input iterator case.
    template<typename _IIter1, typename _IIter2, typename _Predicate,
-@@ -692,17 +692,17 @@ namespace __parallel
+@@ -692,17 +692,17 @@
      inline _OutputIterator
      set_difference(_IIter1 __begin1, _IIter1 __end1,
  		   _IIter2 __begin2, _IIter2 __end2,
@@ -2089,7 +2052,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
      }
  
    // Public interface
-@@ -711,13 +711,13 @@ namespace __parallel
+@@ -711,13 +711,13 @@
      inline _OutputIterator
      set_difference(_IIter1 __begin1, _IIter1 __end1,
  		   _IIter2 __begin2, _IIter2 __end2,
@@ -2109,7 +2072,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/algo.h gcc-10.1.0/libst
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/multiway_merge.h gcc-10.1.0/libstdc++-v3/include/parallel/multiway_merge.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/parallel/multiway_merge.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/parallel/multiway_merge.h	2020-05-08 15:27:15.079047100 +0300
-@@ -1372,7 +1372,7 @@ namespace __gnu_parallel
+@@ -1372,7 +1372,7 @@
     *     for (int __j = 0; __i < 10; ++__j)
     *       sequences[__i][__j] = __j;
     *
@@ -2118,7 +2081,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/multiway_merge.h gcc-10
     *   std::vector<std::pair<int*> > seqs;
     *   for (int __i = 0; __i < 10; ++__i)
     *     { seqs.push(std::make_pair<int*>(sequences[__i],
-@@ -1733,7 +1733,7 @@ namespace __gnu_parallel
+@@ -1733,7 +1733,7 @@
     *     for (int __j = 0; __i < 11; ++__j)
     *       sequences[__i][__j] = __j; // __last one is sentinel!
     *
@@ -2130,7 +2093,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/multiway_merge.h gcc-10
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h gcc-10.1.0/libstdc++-v3/include/parallel/set_operations.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/parallel/set_operations.h	2020-05-08 15:27:15.083009600 +0300
-@@ -130,12 +130,12 @@ namespace __gnu_parallel
+@@ -130,12 +130,12 @@
        }
  
        _OutputIterator
@@ -2147,7 +2110,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h gcc-10
      };
  
  
-@@ -198,12 +198,12 @@ namespace __gnu_parallel
+@@ -198,12 +198,12 @@
        }
  
        _OutputIterator
@@ -2164,7 +2127,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h gcc-10
      };
  
  
-@@ -265,12 +265,12 @@ namespace __gnu_parallel
+@@ -265,12 +265,12 @@
        }
  
        _OutputIterator
@@ -2181,7 +2144,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h gcc-10
      };
  
    template<class _IIter, class _OutputIterator, class _Compare>
-@@ -335,12 +335,12 @@ namespace __gnu_parallel
+@@ -335,12 +335,12 @@
        }
  
        _OutputIterator
@@ -2201,7 +2164,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/set_operations.h gcc-10
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/unique_copy.h gcc-10.1.0/libstdc++-v3/include/parallel/unique_copy.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/parallel/unique_copy.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/parallel/unique_copy.h	2020-05-08 15:27:15.087025400 +0300
-@@ -85,7 +85,7 @@ namespace __gnu_parallel
+@@ -85,7 +85,7 @@
  	// Check for length without duplicates
  	// Needed for position in output
  	_DifferenceType __i = 0;
@@ -2210,7 +2173,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/unique_copy.h gcc-10.1.
  
  	if (__iam == 0)
            {
-@@ -93,7 +93,7 @@ namespace __gnu_parallel
+@@ -93,7 +93,7 @@
              __end = __borders[__iam + 1];
  
              ++__i;
@@ -2219,7 +2182,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/unique_copy.h gcc-10.1.
  
              for (_IIter __iter = __first + __begin; __iter < __first + __end;
  		 ++__iter)
-@@ -101,7 +101,7 @@ namespace __gnu_parallel
+@@ -101,7 +101,7 @@
          	if (!__binary_pred(*__iter, *(__iter - 1)))
                    {
                      ++__i;
@@ -2231,7 +2194,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/parallel/unique_copy.h gcc-10.1.
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/pstl/parallel_backend_serial.h gcc-10.1.0/libstdc++-v3/include/pstl/parallel_backend_serial.h
 --- gcc-10.1.0-orig/libstdc++-v3/include/pstl/parallel_backend_serial.h	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/pstl/parallel_backend_serial.h	2020-05-08 17:31:03.377433600 +0300
-@@ -110,10 +110,10 @@ template <class _ExecutionPolicy, typename _RandomAccessIterator1, typename _Ran
+@@ -110,10 +110,10 @@
            typename _RandomAccessIterator3, typename _Compare, typename _LeafMerge>
  void
  __parallel_merge(_ExecutionPolicy&&, _RandomAccessIterator1 __first1, _RandomAccessIterator1 __last1,
@@ -2247,7 +2210,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/pstl/parallel_backend_serial.h g
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/istream gcc-10.1.0/libstdc++-v3/include/std/istream
 --- gcc-10.1.0-orig/libstdc++-v3/include/std/istream	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/std/istream	2020-05-08 15:27:15.096048100 +0300
-@@ -738,7 +738,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -738,7 +738,7 @@
    //@{
    /**
     *  @brief  Character extractors
@@ -2256,7 +2219,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/istream gcc-10.1.0/libstdc++
     *  @param  __c  A character reference.
     *  @return  in
     *
-@@ -749,25 +749,25 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -749,25 +749,25 @@
    */
    template<typename _CharT, typename _Traits>
      basic_istream<_CharT, _Traits>&
@@ -2289,7 +2252,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/istream gcc-10.1.0/libstdc++
     *
     *  Behaves like one of the formatted arithmetic extractors described in
     *  std::basic_istream.  After constructing a sentry object with good
-@@ -791,22 +791,22 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -791,22 +791,22 @@
    */
    template<typename _CharT, typename _Traits>
      basic_istream<_CharT, _Traits>&
@@ -2321,7 +2284,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/istream gcc-10.1.0/libstdc++
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/ostream gcc-10.1.0/libstdc++-v3/include/std/ostream
 --- gcc-10.1.0-orig/libstdc++-v3/include/std/ostream	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/std/ostream	2020-05-08 16:22:41.690280200 +0300
-@@ -488,14 +488,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -488,14 +488,14 @@
    //@{
    /**
     *  @brief  Character inserters
@@ -2338,7 +2301,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/ostream gcc-10.1.0/libstdc++
     *  called.
     *
     *  If @p __c is of type @c char and the character type of the stream is not
-@@ -503,30 +503,30 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -503,30 +503,30 @@
    */
    template<typename _CharT, typename _Traits>
      inline basic_ostream<_CharT, _Traits>&
@@ -2379,7 +2342,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/ostream gcc-10.1.0/libstdc++
  
  #if __cplusplus > 201703L
    // The following deleted overloads prevent formatting character values as
-@@ -573,7 +573,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -573,7 +573,7 @@
    //@{
    /**
     *  @brief  String inserters
@@ -2388,7 +2351,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/ostream gcc-10.1.0/libstdc++
     *  @param  __s  A character string.
     *  @return  out
     *  @pre  @p __s must be a non-NULL pointer
-@@ -582,47 +582,47 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -582,47 +582,47 @@
     *  std::basic_ostream.  After constructing a sentry object with good
     *  status, this function inserts @c traits::length(__s) characters starting
     *  at @p __s, widened if necessary, followed by any required padding (as
@@ -2450,9 +2413,10 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/ostream gcc-10.1.0/libstdc++
  
  #if __cplusplus > 201703L
     // The following deleted overloads prevent formatting strings as
-diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/thread gcc-10.1.0/libstdc++-v3/include/std/thread
---- gcc-10.1.0-orig/libstdc++-v3/include/std/thread	2020-05-07 13:50:02.000000000 +0300
-+++ gcc-10.1.0/libstdc++-v3/include/std/thread	2020-05-08 16:26:35.600707900 +0300
+diff --git a/libstdc++-v3/include/std/thread b/libstdc++-v3/include/std/thread
+index b1ed458ba..b13e1d6a6 100644
+--- a/libstdc++-v3/include/std/thread
++++ b/libstdc++-v3/include/std/thread
 @@ -112,7 +112,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
  
        template<class _CharT, class _Traits>
@@ -2481,7 +2445,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/thread gcc-10.1.0/libstdc++-
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v3/include/std/tuple
 --- gcc-10.1.0-orig/libstdc++-v3/include/std/tuple	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/std/tuple	2020-05-08 16:34:58.013623400 +0300
-@@ -230,23 +230,23 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -230,23 +230,23 @@
        _Tuple_impl& operator=(const _Tuple_impl&) = delete;
  
        constexpr
@@ -2514,7 +2478,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  
        template<typename _Alloc>
  	_GLIBCXX20_CONSTEXPR
-@@ -273,66 +273,66 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -273,66 +273,66 @@
        template<typename _Alloc>
  	_GLIBCXX20_CONSTEXPR
          _Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
@@ -2602,7 +2566,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
        }
      };
  
-@@ -370,17 +370,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -370,17 +370,17 @@
        _Tuple_impl& operator=(const _Tuple_impl&) = delete;
  
        constexpr
@@ -2626,7 +2590,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename _Alloc>
-@@ -403,55 +403,55 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -403,55 +403,55 @@
        template<typename _Alloc>
  	_GLIBCXX20_CONSTEXPR
          _Tuple_impl(allocator_arg_t __tag, const _Alloc& __a,
@@ -2696,7 +2660,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
        }
      };
  
-@@ -667,9 +667,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -667,9 +667,9 @@
  			   && !__use_other_ctor<const tuple<_UElements...>&>(),
  	       _ImplicitCtor<_Valid, const _UElements&...> = true>
  	constexpr
@@ -2708,7 +2672,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename... _UElements,
-@@ -677,9 +677,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -677,9 +677,9 @@
  			   && !__use_other_ctor<const tuple<_UElements...>&>(),
  	       _ExplicitCtor<_Valid, const _UElements&...> = false>
  	explicit constexpr
@@ -2720,7 +2684,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename... _UElements,
-@@ -687,18 +687,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -687,18 +687,18 @@
  			     && !__use_other_ctor<tuple<_UElements...>&&>(),
  	       _ImplicitCtor<_Valid, _UElements...> = true>
  	constexpr
@@ -2743,7 +2707,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  
        // Allocator-extended constructors.
  
-@@ -744,13 +744,13 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -744,13 +744,13 @@
  
        template<typename _Alloc>
  	_GLIBCXX20_CONSTEXPR
@@ -2761,7 +2725,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  
        template<typename _Alloc, typename... _UElements,
  	       bool _Valid = (sizeof...(_Elements) == sizeof...(_UElements))
-@@ -758,9 +758,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -758,9 +758,9 @@
  	       _ImplicitCtor<_Valid, const _UElements&...> = true>
  	_GLIBCXX20_CONSTEXPR
  	tuple(allocator_arg_t __tag, const _Alloc& __a,
@@ -2773,7 +2737,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename _Alloc, typename... _UElements,
-@@ -770,9 +770,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -770,9 +770,9 @@
  	_GLIBCXX20_CONSTEXPR
  	explicit
  	tuple(allocator_arg_t __tag, const _Alloc& __a,
@@ -2785,7 +2749,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename _Alloc, typename... _UElements,
-@@ -781,9 +781,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -781,9 +781,9 @@
  	       _ImplicitCtor<_Valid, _UElements...> = true>
  	_GLIBCXX20_CONSTEXPR
  	tuple(allocator_arg_t __tag, const _Alloc& __a,
@@ -2797,7 +2761,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename _Alloc, typename... _UElements,
-@@ -793,9 +793,9 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -793,9 +793,9 @@
  	_GLIBCXX20_CONSTEXPR
  	explicit
  	tuple(allocator_arg_t __tag, const _Alloc& __a,
@@ -2809,7 +2773,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        // tuple assignment
-@@ -804,10 +804,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -804,10 +804,10 @@
        tuple&
        operator=(typename conditional<__assignable<const _Elements&...>(),
  				     const tuple&,
@@ -2822,7 +2786,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	return *this;
        }
  
-@@ -815,39 +815,39 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -815,39 +815,39 @@
        tuple&
        operator=(typename conditional<__assignable<_Elements...>(),
  				     tuple&&,
@@ -2870,7 +2834,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
      };
  
  #if __cpp_deduction_guides >= 201606
-@@ -998,60 +998,60 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -998,60 +998,60 @@
        template<typename _U1, typename _U2,
  	       _ImplicitCtor<true, const _U1&, const _U2&> = true>
  	constexpr
@@ -2949,7 +2913,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  
        // Allocator-extended constructors.
  
-@@ -1094,21 +1094,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1094,21 +1094,21 @@
  
        template<typename _Alloc>
  	_GLIBCXX20_CONSTEXPR
@@ -2977,7 +2941,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	{ }
  
        template<typename _Alloc, typename _U1, typename _U2,
-@@ -1116,55 +1116,55 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1116,55 +1116,55 @@
  	explicit
  	_GLIBCXX20_CONSTEXPR
  	tuple(allocator_arg_t __tag, const _Alloc& __a,
@@ -3049,7 +3013,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  
        // Tuple assignment.
  
-@@ -1172,10 +1172,10 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1172,10 +1172,10 @@
        tuple&
        operator=(typename conditional<__assignable<const _T1&, const _T2&>(),
  				     const tuple&,
@@ -3062,7 +3026,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
  	return *this;
        }
  
-@@ -1183,61 +1183,61 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -1183,61 +1183,61 @@
        tuple&
        operator=(typename conditional<__assignable<_T1, _T2>(),
  				     tuple&&,
@@ -3141,7 +3105,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/tuple gcc-10.1.0/libstdc++-v
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/utility gcc-10.1.0/libstdc++-v3/include/std/utility
 --- gcc-10.1.0-orig/libstdc++-v3/include/std/utility	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/std/utility	2020-05-08 17:18:30.711365300 +0300
-@@ -220,23 +220,23 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -220,23 +220,23 @@
  
    template<std::size_t _Int, class _Tp1, class _Tp2>
      constexpr typename tuple_element<_Int, std::pair<_Tp1, _Tp2>>::type&
@@ -3176,7 +3140,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/std/utility gcc-10.1.0/libstdc++
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/regex gcc-10.1.0/libstdc++-v3/include/tr1/regex
 --- gcc-10.1.0-orig/libstdc++-v3/include/tr1/regex	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/tr1/regex	2020-05-08 15:27:15.152848800 +0300
-@@ -2005,7 +2005,7 @@ namespace regex_constants
+@@ -2005,7 +2005,7 @@
         */
        template<typename _Out_iter>
          _Out_iter
@@ -3185,7 +3149,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/regex gcc-10.1.0/libstdc++-v
  	       regex_constants::match_flag_type __flags
  	       = regex_constants::format_default) const;
  
-@@ -2401,7 +2401,7 @@ namespace regex_constants
+@@ -2401,7 +2401,7 @@
    template<typename _Out_iter, typename _Bi_iter,
  	   typename _Rx_traits, typename _Ch_type>
      inline _Out_iter
@@ -3197,7 +3161,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/regex gcc-10.1.0/libstdc++-v
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/tuple gcc-10.1.0/libstdc++-v3/include/tr1/tuple
 --- gcc-10.1.0-orig/libstdc++-v3/include/tr1/tuple	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/tr1/tuple	2020-05-08 15:27:15.170772900 +0300
-@@ -102,26 +102,26 @@ namespace tr1
+@@ -102,26 +102,26 @@
        : _Inherited(__tail...), _M_head(__head) { }
  
        template<typename... _UElements>
@@ -3234,7 +3198,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/tuple gcc-10.1.0/libstdc++-v
  	return *this;
        }
      };
-@@ -139,24 +139,24 @@ namespace tr1
+@@ -139,24 +139,24 @@
        : _Inherited(__elements...) { }
  
        template<typename... _UElements>
@@ -3267,7 +3231,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/tuple gcc-10.1.0/libstdc++-v
  	return *this;
        }
      };
-@@ -178,41 +178,41 @@ namespace tr1
+@@ -178,41 +178,41 @@
        : _Inherited(__a1, __a2) { }
  
        template<typename _U1, typename _U2>
@@ -3326,7 +3290,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/tuple gcc-10.1.0/libstdc++-v
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/utility gcc-10.1.0/libstdc++-v3/include/tr1/utility
 --- gcc-10.1.0-orig/libstdc++-v3/include/tr1/utility	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/tr1/utility	2020-05-08 15:27:15.172801000 +0300
-@@ -93,13 +93,13 @@ namespace tr1
+@@ -93,13 +93,13 @@
  
    template<int _Int, class _Tp1, class _Tp2>
      inline typename tuple_element<_Int, std::pair<_Tp1, _Tp2> >::type&
@@ -3347,7 +3311,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr1/utility gcc-10.1.0/libstdc++
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set gcc-10.1.0/libstdc++-v3/include/tr2/bool_set
 --- gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/tr2/bool_set	2020-05-08 15:27:15.176798500 +0300
-@@ -131,18 +131,18 @@ namespace tr2
+@@ -131,18 +131,18 @@
  
      template<typename CharT, typename Traits>
        friend std::basic_ostream<CharT, Traits>&
@@ -3373,7 +3337,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set gcc-10.1.0/libstdc+
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set.tcc gcc-10.1.0/libstdc++-v3/include/tr2/bool_set.tcc
 --- gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set.tcc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/include/tr2/bool_set.tcc	2020-05-08 15:27:15.180745900 +0300
-@@ -100,9 +100,9 @@ _GLIBCXX_END_NAMESPACE_VERSION
+@@ -100,9 +100,9 @@
         *  @param  v  Value to format and insert.
         *  @return  Iterator after reading.
        iter_type
@@ -3388,7 +3352,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/include/tr2/bool_set.tcc gcc-10.1.0/libs
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/scripts/gen_includers.pl gcc-10.1.0/libstdc++-v3/scripts/gen_includers.pl
 --- gcc-10.1.0-orig/libstdc++-v3/scripts/gen_includers.pl	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/scripts/gen_includers.pl	2020-05-08 17:20:01.806557600 +0300
-@@ -15,8 +15,8 @@ $mu_get_tuple_args = "::std::tr1::get<0>(__tuple)";
+@@ -15,8 +15,8 @@
  $bind_v_template_args = "typename result_of<_Mu<_T1> _CV(_T1, tuple<_GLIBCXX_BIND_TEMPLATE_ARGS>)>::type";
  $bind_v_args = "_Mu<_T1>()(_M_arg1, ::std::tr1::tie(_GLIBCXX_BIND_ARGS))";
  $tuple_add_cref = "typename __add_c_ref<_T1>::type __a1";
@@ -3399,7 +3363,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/scripts/gen_includers.pl gcc-10.1.0/libs
  $template_params_null_class = "typename _T1 = _NullClass";
  $template_args_stripped = "typename __strip_reference_wrapper<_T1>::__type";
  $template_params_u = "typename _U1";
-@@ -42,8 +42,8 @@ for ($num_args = 2; $num_args <= $max; ++$num_args) {
+@@ -42,8 +42,8 @@
    $bind_v_template_args .= ", typename result_of<_Mu<_T$num_args> _CV(_T$num_args, tuple<_GLIBCXX_BIND_TEMPLATE_ARGS>)>::type";
    $bind_v_args .= ", _Mu<_T$num_args>()(_M_arg$num_args, ::std::tr1::tie(_GLIBCXX_BIND_ARGS))";
    $tuple_add_cref .= ", typename __add_c_ref<_T$num_args>::type __a$num_args";
@@ -3413,7 +3377,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/scripts/gen_includers.pl gcc-10.1.0/libs
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++11/snprintf_lite.cc gcc-10.1.0/libstdc++-v3/src/c++11/snprintf_lite.cc
 --- gcc-10.1.0-orig/libstdc++-v3/src/c++11/snprintf_lite.cc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/src/c++11/snprintf_lite.cc	2020-05-08 17:31:40.727583100 +0300
-@@ -74,14 +74,14 @@ namespace __gnu_cxx {
+@@ -74,14 +74,14 @@
      // Long enough for decimal representation.
      int __ilen = 3 * sizeof(__val);
      char *__cs = static_cast<char*>(__builtin_alloca(__ilen));
@@ -3498,7 +3462,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream.cc gcc-10.1.0/libstdc+
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/libstdc++-v3/src/c++98/istream-string.cc
 --- gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc	2020-05-07 13:50:02.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/src/c++98/istream-string.cc	2020-05-08 17:22:00.781026800 +0300
-@@ -40,7 +40,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -40,7 +40,7 @@
  
    template<>
      basic_istream<char>&
@@ -3507,7 +3471,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
      {
        typedef basic_istream<char>       	__istream_type;
        typedef __istream_type::int_type		__int_type;
-@@ -52,18 +52,18 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -52,18 +52,18 @@
  
        __size_type __extracted = 0;
        ios_base::iostate __err = ios_base::goodbit;
@@ -3530,7 +3494,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __int_type __c = __sb->sgetc();
  
  	      while (__extracted < __n
-@@ -95,11 +95,11 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -95,11 +95,11 @@
  
  	      if (__traits_type::eq_int_type(__c, __eof))
  		__err |= ios_base::eofbit;
@@ -3544,7 +3508,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -107,19 +107,19 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -107,19 +107,19 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -3568,7 +3532,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	    char __delim)
      {
        typedef basic_istream<char>       	__istream_type;
-@@ -133,7 +133,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -133,7 +133,7 @@
        __size_type __extracted = 0;
        const __size_type __n = __str.max_size();
        ios_base::iostate __err = ios_base::goodbit;
@@ -3577,7 +3541,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
        if (__cerb)
  	{
  	  __try
-@@ -141,7 +141,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -141,7 +141,7 @@
  	      __str.erase();
  	      const __int_type __idelim = __traits_type::to_int_type(__delim);
  	      const __int_type __eof = __traits_type::eof();
@@ -3586,7 +3550,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __int_type __c = __sb->sgetc();
  
  	      while (__extracted < __n
-@@ -183,7 +183,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -183,7 +183,7 @@
  	    }
  	  __catch(__cxxabiv1::__forced_unwind&)
  	    {
@@ -3595,7 +3559,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -191,20 +191,20 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -191,20 +191,20 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -3620,7 +3584,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	    wchar_t __delim)
      {
        typedef basic_istream<wchar_t>       	__istream_type;
-@@ -218,7 +218,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -218,7 +218,7 @@
        __size_type __extracted = 0;
        const __size_type __n = __str.max_size();
        ios_base::iostate __err = ios_base::goodbit;
@@ -3629,7 +3593,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
        if (__cerb)
  	{
  	  __try
-@@ -226,7 +226,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -226,7 +226,7 @@
  	      __str.erase();
  	      const __int_type __idelim = __traits_type::to_int_type(__delim);
  	      const __int_type __eof = __traits_type::eof();
@@ -3638,7 +3602,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __int_type __c = __sb->sgetc();
  
  	      while (__extracted < __n
-@@ -268,7 +268,7 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -268,7 +268,7 @@
  	    }
  	  __catch(__cxxabiv1::__forced_unwind&)
  	    {
@@ -3647,7 +3611,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
  	      __throw_exception_again;
  	    }
  	  __catch(...)
-@@ -276,14 +276,14 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+@@ -276,14 +276,14 @@
  	      // _GLIBCXX_RESOLVE_LIB_DEFECTS
  	      // 91. Description of operator>> and getline() for string<>
  	      // might cause endless loop
@@ -3668,7 +3632,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/src/c++98/istream-string.cc gcc-10.1.0/l
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_extract_chars.cc gcc-10.1.0/libstdc++-v3/testsuite/performance/27_io/ifstream_extract_chars.cc
 --- gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_extract_chars.cc	2020-05-07 13:50:03.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/testsuite/performance/27_io/ifstream_extract_chars.cc	2020-05-08 17:24:18.822634600 +0300
-@@ -47,7 +47,7 @@ int main()
+@@ -47,7 +47,7 @@
        out << line;
    }
    
@@ -3677,7 +3641,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_ext
    {
      start_counters(time, resource);
      for (int iter = 0; iter < 25; ++iter)
-@@ -62,7 +62,7 @@ int main()
+@@ -62,7 +62,7 @@
      clear_counters(time, resource);
    }
    
@@ -3689,7 +3653,7 @@ diff -Naur gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_ext
 diff -Naur gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_getline-2.cc gcc-10.1.0/libstdc++-v3/testsuite/performance/27_io/ifstream_getline-2.cc
 --- gcc-10.1.0-orig/libstdc++-v3/testsuite/performance/27_io/ifstream_getline-2.cc	2020-05-07 13:50:03.000000000 +0300
 +++ gcc-10.1.0/libstdc++-v3/testsuite/performance/27_io/ifstream_getline-2.cc	2020-05-08 17:24:27.481493000 +0300
-@@ -63,7 +63,7 @@ int main()
+@@ -63,7 +63,7 @@
      clear_counters(time, resource);
    }
  
