@@ -7,8 +7,8 @@ _realname=rust
 _bootstrapping=yes
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=1.48.0
-pkgrel=3
+pkgver=1.49.0
+pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
 url="https://www.rust-lang.org/ru/"
@@ -94,19 +94,17 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --enable-ninja \
-    --enable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-optimize-llvm \
-    --disable-codegen-tests \
     --enable-optimize \
-    --enable-manage-submodules \
     --enable-missing-tools \
     --enable-full-tools \
-    --enable-option-checking \
-    --disable-control-flow-guard \
-    --enable-full-bootstrap \
+    --enable-option-check \
+    --disable-codegen-tests \
+    --enable-manage-submodules \
+    --enable-optimize-llvm \
+    --enable-optimize \
     --enable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
@@ -125,7 +123,8 @@ check() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 || true
+  nice -n19 \
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 -j7 || true
 }
 
 package() {
@@ -134,7 +133,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j8
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
