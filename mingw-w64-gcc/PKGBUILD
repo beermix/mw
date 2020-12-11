@@ -500,8 +500,6 @@ package_mingw-w64-libgccjit() {
   cp include/libgccjit.h                                      ${pkgdir}${MINGW_PREFIX}/include/
   cp include/libgccjit++.h                                    ${pkgdir}${MINGW_PREFIX}/include/
   cp lib/libgccjit.dll.a                                      ${pkgdir}${MINGW_PREFIX}/lib/
-  mkdir -p ${pkgdir}${MINGW_PREFIX}/share/info
-  cp share/info/libgccjit.info                                ${pkgdir}${MINGW_PREFIX}/share/info/
 }
 
 # Wrappers for package functions
