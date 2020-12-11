@@ -1163,33 +1163,6 @@ diff --git a/libstdc++-v3/include/bits/stl_algo.h b/libstdc++-v3/include/bits/st
 index bbb4313fd..e8f5dcbd7 100644
 --- a/libstdc++-v3/include/bits/stl_algo.h
 +++ b/libstdc++-v3/include/bits/stl_algo.h
-@@ -784,21 +784,21 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
-    *  @ingroup mutating_algorithms
-    *  @param  __first   An input iterator.
-    *  @param  __last    An input iterator.
--   *  @param  __out_true   An output iterator.
--   *  @param  __out_false  An output iterator.
-+   *  @param  ___out_true   An output iterator.
-+   *  @param  ___out_false  An output iterator.
-    *  @param  __pred    A predicate.
-    *  @return   A pair designating the ends of the resulting sequences.
-    *
-    *  Copies each element in the range @p [__first,__last) for which
-    *  @p __pred returns true to the range beginning at @p out_true
--   *  and each element for which @p __pred returns false to @p __out_false.
-+   *  and each element for which @p __pred returns false to @p ___out_false.
-   */
-   template<typename _InputIterator, typename _OutputIterator1,
- 	   typename _OutputIterator2, typename _Predicate>
-     _GLIBCXX20_CONSTEXPR
-     pair<_OutputIterator1, _OutputIterator2>
-     partition_copy(_InputIterator __first, _InputIterator __last,
--		   _OutputIterator1 __out_true, _OutputIterator2 __out_false,
-+		   _OutputIterator1 ___out_true, _OutputIterator2 ___out_false,
- 		   _Predicate __pred)
-     {
-       // concept requirements
-				    _DistanceType(__buf.size()), __comp);
 @@ -5760,7 +5760,7 @@ _GLIBCXX_BEGIN_NAMESPACE_ALGO
             typename _Size, typename _UniformRandomBitGenerator>
      _RandomAccessIterator
