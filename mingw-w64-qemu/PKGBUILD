@@ -1,9 +1,10 @@
 # Maintainer: Martell Malone <martellmalone@gmail.com>
+# https://download.qemu.org/?C=M;O=D
 
 _realname=qemu
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-_base_ver=5.2.0
+_base_ver=5.1.0
 _rc=
 pkgver=${_base_ver}${_rc//-/.}
 pkgrel=1
@@ -75,6 +76,7 @@ build() {
       --enable-gtk \
       --enable-sdl \
       --enable-zstd \
+      --target-list="i386-softmmu x86_64-softmmu" \
       "${_extra_config[@]}" \
       --prefix=${MINGW_PREFIX} \
       --bindir=${MINGW_PREFIX}/bin \
@@ -84,7 +86,7 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  /home/User/.bin/noti.exe --time nice -n19 make -j7
+  make -j8
 }
 
 package() {

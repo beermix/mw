@@ -49,7 +49,7 @@ prepare() {
   patch -Np1 -i "${srcdir}"/0001-disable-some-tests-when-static.patch
   patch -Np1 -i "${srcdir}"/0002-disable_glib_compile_schemas_warning.patch
   patch -Np1 -i "${srcdir}"/002-no-tests.patch
-  patch -Np1 -i "${srcdir}"/004-no-distutils.patch
+  #patch -Np1 -i "${srcdir}"/004-no-distutils.patch
 }
 
 build() {
@@ -57,11 +57,19 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH}-static ]] && rm -rf "${srcdir}"/build-${CARCH}-static
   mkdir "${srcdir}"/build-${CARCH}-static && cd "${srcdir}"/build-${CARCH}-static
 
+  declare -a extra_config
+  if check_option "debug" "n"; then
+    extra_config+=("--buildtype=release")
+  else
+    extra_config+=("--buildtype=debug")
+  fi
+
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
   meson \
-    --buildtype=plain \
+    --prefix="${MINGW_PREFIX}" \
+    "${extra_config[@]}" \
     --default-library=static \
     -Dforce_posix_threads=true \
-    -Db_lto=false \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
     nice -n19 ninja -j7
@@ -70,14 +78,16 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
 
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
   meson \
-    --buildtype=plain \
-    -Db_lto=false \
+    --prefix="${MINGW_PREFIX}" \
+    "${extra_config[@]}" \
     -Ddefault_library=shared \
     -Dman=false \
     -Dforce_posix_threads=true \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
+
     nice -n19 ninja -j7
 }
 
@@ -105,10 +115,4 @@ package() {
     sed -e "s|${_PRE_WIN}|${MINGW_PREFIX}|g" \
      -i ${pkgdir}${MINGW_PREFIX}/bin/${name}-script.py
   done
-
-  for pcfile in  "${pkgdir}${MINGW_PREFIX}"/lib/pkgconfig/*.pc; do
-    sed -s "s|${_PRE_WIN}|${MINGW_PREFIX}|g" -i "${pcfile}"
-  done
-
-  sed -s "s|${_PRE_WIN}|${MINGW_PREFIX}|g" -i "${pkgdir}${MINGW_PREFIX}/bin/glib-gettextize"
 }
