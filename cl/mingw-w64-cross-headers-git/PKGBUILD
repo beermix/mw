@@ -1,27 +1,19 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Martell Malone <martellmalone@gmail.com>
 
-# controls the compiler that builds the crt with _variant
-_variant=clang
-# _variant=gcc
-
 _realname=headers
 _mingw_suff=mingw-w64-cross
-if [ "${_variant}" = "clang" ]; then
-  pkgname=("${_mingw_suff}-${_realname}-clang-git")
-else
-  pkgname=("${_mingw_suff}-${_realname}-git")
-  replaces=("${_mingw_suff}-${_realname}")
-  groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
-fi
+pkgname=("${_mingw_suff}-${_realname}-git")
+replaces=("${_mingw_suff}-${_realname}")
 provides=("${_mingw_suff}-${_realname}")
 conflicts=("${_mingw_suff}-${_realname}")
-pkgdesc="MinGW-w64 headers for cross-compiler"
 pkgver=9.0.0.6029.ecb4ff54
 pkgrel=2
+pkgdesc="MinGW-w64 headers for cross-compiler"
 arch=('i686' 'x86_64')
 url="https://mingw-w64.sourceforge.io/"
 license=('custom')
+groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
 makedepends=('git')
 options=('!strip' '!libtool' '!emptydirs' '!buildflags')
 _commit='ecb4ff5498dfedd6abcbadb889b84fab19ee57b2'
@@ -46,13 +38,6 @@ build() {
   for _target in ${_targets}; do
     msg "Configuring ${_target} headers"
     mkdir -p ${srcdir}/headers-${_target} && cd ${srcdir}/headers-${_target}
-
-    if [ "${_variant}" = "clang" ]; then
-      _crt="ucrt"
-    else
-      _crt="msvcrt"
-    fi
-
     ${srcdir}/mingw-w64/mingw-w64-headers/configure \
     --build=${CHOST} \
     --host=${_target} \
@@ -60,7 +45,7 @@ build() {
     --enable-sdk=all \
     --enable-secure-api \
     --with-default-win32-winnt=0x601 \
-    --with-default-msvcrt=${_crt}
+    --with-default-msvcrt=msvcrt
   done
 }
 
@@ -70,10 +55,8 @@ package() {
     cd ${srcdir}/headers-${_target}
     make DESTDIR=${pkgdir} install
 
-    if [ "${_variant}" != "clang" ]; then
-      rm ${pkgdir}/opt/${_target}/include/pthread_signal.h
-      rm ${pkgdir}/opt/${_target}/include/pthread_time.h
-      rm ${pkgdir}/opt/${_target}/include/pthread_unistd.h
-    fi
+    rm ${pkgdir}/opt/${_target}/include/pthread_signal.h
+    rm ${pkgdir}/opt/${_target}/include/pthread_time.h
+    rm ${pkgdir}/opt/${_target}/include/pthread_unistd.h
   done
 }

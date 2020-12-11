@@ -1,7 +1,7 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
 pkgname="msys2-w32api-runtime"
-pkgver=8.0.0.5679.78276d42
+pkgver=9.0.0.6054.829a2e2a
 pkgrel=1
 pkgdesc="Win32 API import libs for MSYS2 toolchain"
 arch=('i686' 'x86_64')
