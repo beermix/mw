@@ -100,7 +100,6 @@ build() {
     --enable-optimize \
     --enable-missing-tools \
     --enable-full-tools \
-    --enable-option-check \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-optimize-llvm \
