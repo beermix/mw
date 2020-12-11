@@ -87,6 +87,7 @@ build() {
     --enable-extended \
     --enable-missing-tools \
     --enable-full-tools \
+    --enable-optimize \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-llvm-link-shared \
