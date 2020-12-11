@@ -85,9 +85,10 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-missing-tools \
-    --enable-full-tools \
     --enable-optimize \
+    --enable-optimize-llvm \
+    --enable-ninja \
+    --enable-ccache \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-llvm-link-shared \
@@ -99,7 +100,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --stage 2 --verbose -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
 }
 
 check() {
