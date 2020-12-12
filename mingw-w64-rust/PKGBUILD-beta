@@ -77,7 +77,7 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=beta \
-    --enable-ninja \
+    --disable-ninja \
     --enable-ccache \
     --disable-docs \
     --enable-missing-tools \
@@ -91,7 +91,7 @@ build() {
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
  
-  export RUST_BACKTRACE=0
+  export RUST_BACKTRACE=full
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
