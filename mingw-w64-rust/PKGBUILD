@@ -64,7 +64,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
-  #patch -p1 -i "${srcdir}/00-config.patch"
+  patch -p1 -i "${srcdir}/00-config.patch"
 }
 
 build() {
@@ -90,27 +90,18 @@ build() {
     --release-channel=stable \
     --enable-ninja \
     --enable-ccache \
-    --enable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-missing-tools \
-    --enable-full-tools \
     --disable-codegen-tests \
-    --enable-manage-submodules \
     --enable-optimize-llvm \
-    --enable-optimize \
-    --disable-control-flow-guard \
-    --disable-llvm-link-shared \
-    --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2
 }
 
 check() {
@@ -128,7 +119,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
