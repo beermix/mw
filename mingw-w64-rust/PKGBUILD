@@ -101,7 +101,8 @@ build() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2
+  nice -n19 \
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
 }
 
 check() {
@@ -119,7 +120,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j8
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll

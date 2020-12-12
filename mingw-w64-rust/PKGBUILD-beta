@@ -22,17 +22,10 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-curl"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-libssh2"
-             "${MINGW_PACKAGE_PREFIX}-lldb"
-             "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-libgit2"
              "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-python"
-             "${MINGW_PACKAGE_PREFIX}-libyaml"
-             "${MINGW_PACKAGE_PREFIX}-python-ruamel.yaml.clib"
-             "${MINGW_PACKAGE_PREFIX}-python-yaml"
-             "${MINGW_PACKAGE_PREFIX}-libunwind"
-
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
              "${MINGW_PACKAGE_PREFIX}-zlib")
 options=('staticlibs')
@@ -44,7 +37,8 @@ source=("https://static.rust-lang.org/dist/2020-12-10/rustc-beta-src.tar.xz"
         "0003-link-with-system-curl.patch"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch"
-        "0006-Update-cc.patch")
+        "0006-Update-cc.patch"
+        "00-config.patch")
 noextract=("rustc-beta-src.tar.xz")
 
 prepare() {
@@ -59,6 +53,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
+  patch -p1 -i "${srcdir}/00-config.patch"
 }
 
 build() {
@@ -82,25 +77,27 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=beta \
+    --enable-ninja \
+    --enable-ccache \
     --disable-docs \
+    --enable-missing-tools \
+    --enable-full-tools \
     --disable-compiler-docs \
     --enable-extended \
     --enable-optimize \
     --enable-optimize-llvm \
-    --enable-ninja \
-    --enable-ccache \
+    --enable-lld \
     --disable-codegen-tests \
-    --enable-manage-submodules \
-    --enable-llvm-link-shared \
-    --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
+ 
+  export RUST_BACKTRACE=0
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j8
 }
 
 check() {
@@ -109,17 +106,18 @@ check() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --verbose --stage 2 -j7 || true
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py test --stage 2 || true
 }
 
 package() {
   cd "${srcdir}/${CARCH}"
 
+  export RUST_BACKTRACE=0
+
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j8
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
