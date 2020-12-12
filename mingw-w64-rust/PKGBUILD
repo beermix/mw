@@ -90,15 +90,18 @@ build() {
     --release-channel=stable \
     --enable-ninja \
     --enable-ccache \
+    --enable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
+    --enable-missing-tools \
+    --enable-full-tools \
     --disable-codegen-tests \
     --enable-manage-submodules \
     --enable-optimize-llvm \
     --enable-optimize \
     --disable-control-flow-guard \
-    --enable-llvm-link-shared \
+    --disable-llvm-link-shared \
     --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
