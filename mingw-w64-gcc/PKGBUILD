@@ -6,7 +6,7 @@
 # Contributor: Kirill Müller <krlmlr@mailbox.org>
 
 _enable_ada=no
-_enable_objc=no
+_enable_objc=yes
 _enable_jit=yes
 _threads="posix"
 _realname=gcc
@@ -24,7 +24,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=10
+pkgrel=11
 #_islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -143,7 +143,8 @@ prepare() {
     ipa-cp.patch \
     openmp-vectorize-v2.patch \
     fortran-vector-v2.patch \
-    gomp-relax.patch
+    gomp-relax.patch \
+    tune-inline.patch
 
 #    optimize.patch \
 #    optimize-at-least-some.patch
@@ -152,8 +153,6 @@ prepare() {
 #    fortran-vector-v2.patch \
 #    gomp-relax.patch \
 #    tune-inline.patch
-#    optimize.patch \
-#    optimize-at-least-some.patch \
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
@@ -253,10 +252,10 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
