@@ -2,7 +2,7 @@
 
 pkgname=mc
 pkgver=4.8.25
-pkgrel=3
+pkgrel=4
 pkgdesc="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
 arch=('i686' 'x86_64')
 url="https://www.midnight-commander.org/"

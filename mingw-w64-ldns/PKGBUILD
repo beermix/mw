@@ -52,11 +52,10 @@ build() {
     --localstatedir=${MINGW_PREFIX}/var \
     --with-trust-anchor=${MINGW_PREFIX}/etc/trusted-key.key \
     --with-drill \
-    --with-examples \
+    --without-examples \
     --with-ssl=${MINGW_PREFIX} \
     --without-pyldns \
-    --without-pyldnsx \
-    --disable-dane-verify
+    --without-pyldnsx
 
   make
 }
