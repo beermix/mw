@@ -82,6 +82,9 @@ prepare() {
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
   sed -i '/^development=/s/true/false/' bfd/development.sh
+
+  # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
+  sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
 }
 
 build() {
@@ -114,7 +117,7 @@ build() {
     --enable-silent-rules \
     --enable-install-libiberty \
     --enable-plugins \
-    --enable-targets=x86_64-w64-mingw32,i686-w64-mingw32 \
+    --enable-targets=x86_64-w64-mingw32 \
     --disable-shared
 
   make MAKEINFO=true
