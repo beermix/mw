@@ -1,12 +1,9 @@
-# Maintainer: Alexey Pavlov <alexpux@gmail.com>
-# Contributor: Martell Malone <martellmalone@gmail.com>
+# Maintainer: Mateusz Mikula <mati865@gmail.com>
 
 _realname=crt
-_mingw_suff=mingw-w64-cross
-pkgname=("${_mingw_suff}-${_realname}-git")
-replaces=("${_mingw_suff}-${_realname}")
-provides=("${_mingw_suff}-${_realname}")
-conflicts=("${_mingw_suff}-${_realname}")
+_mingw_suff=mingw-w64-cross-clang
+pkgname=("${_mingw_suff}-${_realname}")
+conflicts=("${_mingw_suff%-*}-${_realname}")
 pkgver=9.0.0.6029.ecb4ff54
 pkgrel=2
 pkgdesc='MinGW-w64 CRT for cross-compiler'
@@ -15,11 +12,10 @@ url='https://mingw-w64.sourceforge.io/'
 license=('custom')
 groups=("${_mingw_suff}-toolchain" "${_mingw_suff}")
 depends=("${_mingw_suff}-headers")
-makedepends=("git" "${_mingw_suff}-gcc" "${_mingw_suff}-binutils")
+makedepends=("git" "clang" "lld")
 options=('!strip' 'staticlibs' '!emptydirs' '!buildflags')
 _commit='ecb4ff5498dfedd6abcbadb889b84fab19ee57b2'
 source=("mingw-w64"::"git+https://git.code.sf.net/p/mingw-w64/mingw-w64#commit=$_commit")
-
 sha256sums=('SKIP')
 
 _targets="x86_64-w64-mingw32 i686-w64-mingw32" #armv7-w64-mingw32
@@ -52,11 +48,18 @@ build() {
   esac
     mkdir -p ${srcdir}/crt-${_target} && cd ${srcdir}/crt-${_target}
 
+    export CC="clang" CXX="clang++" AS="clang" AR="llvm-ar" RANLIB="llvm-ranlib" DLLTOOL="llvm-dlltool" LD="clang"
+    CFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
+    CPPFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
+    CXXFLAGS+=" -target ${_target} --sysroot=/opt/${_target}"
+    LDFLAGS+=" -target ${_target} --sysroot=/opt/${_target} -fuse-ld=lld"
+
     ${srcdir}/mingw-w64/mingw-w64-crt/configure \
     --build=${CHOST} \
     --prefix=/opt/${_target} \
     --host=${_target} \
     --enable-wildcard \
+    --with-default-msvcrt=ucrt \
     ${_crt_configure_args}
 
     make
