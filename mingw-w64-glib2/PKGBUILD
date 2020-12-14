@@ -6,11 +6,11 @@
 _realname=glib2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.67.0
+pkgver=2.66.3
 pkgrel=1
 url="https://www.gtk.org/"
 arch=('any')
-pkgdesc="Common C routines used by GTK+ 2.4 and other libs (mingw-w64)"
+pkgdesc="Common C routines used by GTK+ 3 and other libs (mingw-w64)"
 license=(LGPL2)
 install=glib2-${CARCH}.install
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
@@ -93,10 +93,10 @@ build() {
 
 package() {
   cd "${srcdir}/build-${CARCH}-static"
-  DESTDIR="${pkgdir}${MINGW_PREFIX}" ninja install
+  DESTDIR="${pkgdir}" ninja install
 
   cd "${srcdir}/build-${CARCH}-shared"
-  DESTDIR="${pkgdir}${MINGW_PREFIX}" ninja install
+  DESTDIR="${pkgdir}" ninja install
 
   for hook in glib-compile-schemas gio-querymodules; do
     local hook_path="${srcdir}/${MINGW_PACKAGE_PREFIX}-${hook}.hook";
