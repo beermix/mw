@@ -1,0 +1,13 @@
+diff --git a/configure.py b/configure.py
+index cded265..d7049a3 100755
+--- a/configure.py
++++ b/configure.py
+@@ -371,7 +371,7 @@ libs = []
+ 
+ if platform.is_mingw():
+     cflags.remove('-fvisibility=hidden');
+-    ldflags.append('-static')
++    ldflags.append('-s')
+ elif platform.is_solaris():
+     cflags.remove('-fvisibility=hidden')
+ elif platform.is_aix():
