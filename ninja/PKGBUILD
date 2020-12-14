@@ -1,0 +1,30 @@
+# Maintainer: Martell Malone <Martell Malone at g mail dot com>
+
+_realname=ninja
+pkgname=("${_realname}")
+pkgver=68f971460bb21abd59dfe6253e35a55c3e1cfc64
+pkgrel=1
+_descr="Ninja is a small build system with a focus on speed"
+pkgdesc="${_descr}"
+arch=('i686' 'x86_64')
+url="https://ninja-build.org"
+license=('Apache')
+depends=()
+options=('strip' 'staticlibs')
+makedepends=("re2c" "python3" "cmake")
+source=("${pkgname}-${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz")
+sha256sums=('a6b6f7ac360d4aabd54e299cc1d8fa7b234cd81b9401693da21221c62569a23e')
+
+package_ninja() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+
+  cmake \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    ../${_realname}-${pkgver}
+
+  make install DESTDIR="${srcdir}/dest"
+
+  mkdir -p "${pkgdir}"/usr/bin
+  mv "${srcdir}/ninja-${pkgver}/ninja.exe" "${pkgdir}"/usr/bin/
+}
