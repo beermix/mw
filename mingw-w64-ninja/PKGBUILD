@@ -15,10 +15,10 @@ makedepends=("re2c" "${MINGW_PACKAGE_PREFIX}-python")
 source=("${_realname}-${pkgver}.tar.gz"::"https://github.com/ninja-build/ninja/archive/${pkgver}.tar.gz"
 	"no-static.patch")
 
-#prepare () {
-#  cd ${srcdir}/ninja-${pkgver}
-#  patch -p1 -i "${srcdir}"/no-static.patch
-#}
+prepare () {
+  cd ${srcdir}/ninja-${pkgver}
+  patch -p1 -i "${srcdir}"/no-static.patch
+}
 
 build() {
   mkdir -p "${pkgdir}${MINGW_PREFIX}"/bin
