@@ -24,7 +24,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=12
+pkgrel=6
 #_islver=0.21
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -276,8 +276,8 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
+    --with-arch=${_arch} \
     --with-tune=haswell \
-    --with-arch=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
     --enable-libatomic \
