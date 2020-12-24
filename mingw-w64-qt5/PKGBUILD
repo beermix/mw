@@ -111,11 +111,11 @@ if [ "${_variant}" = "-static" ]; then
 else
   pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}" "${MINGW_PACKAGE_PREFIX}-${_realname}-debug")
 fi
-_ver_base=5.15.1
+_ver_base=5.15.2
 # use 5.6.1-1 hot fix : only the archive name was changed from *-5.6.1.tar.xz to *-5.6.1-1.tar.xz
 _hotfix=
 pkgver=${_ver_base//-/}
-pkgrel=1
+pkgrel=2
 arch=('any')
 pkgdesc="A cross-platform application and UI framework (mingw-w64${_namesuff})"
 url='https://www.qt.io/'
@@ -606,7 +606,7 @@ build() {
   # There is a race condition / dependency problem with libqtiff and dumpdoc.exe which
   # can happen at -j9 so make twice (dumpdoc.exe depends on libqtiff but can get built
   # first).
-  /home/User/.bin/noti.exe --time nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
+  /home/User/.bin/noti --time nice -n19 ${_make} ${MAKEFLAGS} || ${_make} ${MAKEFLAGS}
 
   # For quicker turn-around testing qtwebengine.
   # ${_make} module-qtbase
