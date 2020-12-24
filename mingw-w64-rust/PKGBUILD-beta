@@ -92,7 +92,7 @@ build() {
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
  
-  export RUST_BACKTRACE=0
+  export RUST_BACKTRACE=full
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
@@ -113,7 +113,7 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}"
 
-  export RUST_BACKTRACE=0
+  export RUST_BACKTRACE=full
 
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
