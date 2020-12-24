@@ -22,6 +22,8 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-curl"
              "${MINGW_PACKAGE_PREFIX}-libffi"
              "${MINGW_PACKAGE_PREFIX}-libssh2"
+             "${MINGW_PACKAGE_PREFIX}-lldb"
+             "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
              "${MINGW_PACKAGE_PREFIX}-libgit2"
              "${MINGW_PACKAGE_PREFIX}-openssl"
@@ -77,17 +79,16 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=beta \
-    --disable-ninja \
+    --enable-ninja \
     --enable-ccache \
     --disable-docs \
-    --enable-missing-tools \
-    --enable-full-tools \
     --disable-compiler-docs \
     --enable-extended \
     --enable-optimize \
+    --enable-full-bootstrap \
     --enable-optimize-llvm \
-    --enable-lld \
     --disable-codegen-tests \
+    --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
  
