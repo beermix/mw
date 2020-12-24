@@ -86,7 +86,7 @@ build() {
     -D__MINGW_USE_VC2005_COMPAT \
     -DOPENSSLBIN=\"\\\"${MINGW_PREFIX}/bin\\\"\"
 
-  make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all -j1
+  make ZLIB_INCLUDE=-I"${MINGW_PREFIX}"/include depend all
 }
 
 check() {
