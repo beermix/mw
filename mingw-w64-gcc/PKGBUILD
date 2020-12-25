@@ -138,14 +138,15 @@ prepare() {
   # Enable clear linux patches
   apply_patch_with_msg \
     010-documentation.patch \
-    000-gcc10-stable-branch.patch \
-    ipa-cp.patch \
-    openmp-vectorize-v2.patch \
-    fortran-vector-v2.patch \
-    gomp-relax.patch \
-    tune-inline.patch \
-    optimize.patch \
-    optimize-at-least-some.patch
+    000-gcc10-stable-branch.patch
+    
+#    ipa-cp.patch \
+#    openmp-vectorize-v2.patch \
+#    fortran-vector-v2.patch \
+#    gomp-relax.patch \
+#    tune-inline.patch \
+#    optimize.patch \
+#    optimize-at-least-some.patch
 
   apply_patch_with_msg \
     0002-Relocate-libintl.patch \
