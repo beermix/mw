@@ -2,7 +2,7 @@
 # Maintainer: Ray Donnelly <mingw.android@gmail.com>
 
 pkgname=git
-pkgver=2.30
+pkgver=2.30.0
 pkgrel=1
 pkgdesc="The fast distributed version control system"
 arch=('i686' 'x86_64')
@@ -71,7 +71,7 @@ prepare() {
   patch -p2 -i "${srcdir}"/git-2.3.5-mingw-pwd.patch
   patch -p1 -i "${srcdir}"/git-2.8.2-Cygwin-Allow-DOS-paths.patch
   patch -p1 -i "${srcdir}"/git-tcsh-completion-fixes.patch
-  patch -p1 -i "${srcdir}"/git-zsh-completion-fixes.patch
+  #patch -p1 -i "${srcdir}"/git-zsh-completion-fixes.patch
 
   local _arch=
   if [ "${CARCH}" == 'x86_64' ]; then
@@ -99,7 +99,7 @@ build() {
     --mandir=/usr/share/man
 
   make INSTALLDIRS=vendor all
-  make -j1 man
+  #make -j1 man
   #make -j1 info
   make -C contrib/subtree prefix=/usr all
 }
@@ -125,7 +125,7 @@ package() {
   export PYTHON_PATH='/usr/bin/python'
   cd "${srcdir}/${pkgname}-${pkgver}"
   make INSTALLDIRS=vendor DESTDIR="$pkgdir" install
-  make INSTALLDIRS=vendor DESTDIR="${pkgdir}" install-man
+  #make INSTALLDIRS=vendor DESTDIR="${pkgdir}" install-man
   #make INSTALLDIRS=vendor DESTDIR="${pkgdir}" install-info
 
   # bash completion
