@@ -6,8 +6,8 @@
 # Contributor: Kirill Müller <krlmlr@mailbox.org>
 
 _enable_ada=no
-_enable_objc=yes
-_enable_jit=yes
+_enable_objc=no
+_enable_jit=no
 _threads="posix"
 _realname=gcc
 pkgbase=mingw-w64-${_realname}
@@ -137,10 +137,9 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch
-    
-#    000-gcc10-stable-branch.patch
-    
+    010-documentation.patch \
+    000-gcc10-stable-branch.patch
+
 #    ipa-cp.patch \
 #    openmp-vectorize-v2.patch \
 #    fortran-vector-v2.patch \
