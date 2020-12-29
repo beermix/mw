@@ -3,7 +3,7 @@
 _realname=aria2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=15cad965eb75c8b7f11bc2fc94354d1873bf6261
+pkgver=faa6955c8d7bb7b6541e0b7fbb84f7d213f761ab
 pkgrel=1
 pkgdesc="A multi-protocol & multi-source, cross platform download utility (mingw-w64)"
 arch=('any')
