@@ -48,7 +48,6 @@ build() {
       "${extra_config[@]}" \
       -DZSTD_BUILD_CONTRIB=ON \
       -DZSTD_MULTITHREAD_SUPPORT=ON \
-      -DZSTD_PROGRAMS_LINK_SHARED=OFF \
       ../${_realname}-${pkgver}/build/cmake
 
   make
