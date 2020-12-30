@@ -24,7 +24,7 @@ pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
 _sourcedir=${_realname}-${pkgver}
-pkgrel=6
+pkgrel=7
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -196,7 +196,7 @@ prepare() {
 
   # mmapio.c:69:14: error: implicit declaration of function ‘getpagesize’
   # sed -i 's|\-Werror||g' libbacktrace/configure
-  
+
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 
@@ -310,7 +310,7 @@ build() {
     sed -i 's,^STRIP_FOR_TARGET=.*$,STRIP_FOR_TARGET=true,g' Makefile
   fi
 
-  noti --time nice -n19 make all
+  /home/User/.bin/noti.exe --time nice -n19 make all
 
   rm -rf ${srcdir}${MINGW_PREFIX}
 
