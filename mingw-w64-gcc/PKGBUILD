@@ -243,22 +243,22 @@ build() {
   CXXFLAGS=${CXXFLAGS/-pipe/}
   LDFLAGS=${LDFLAGS/-pipe/}
 
-#  --with-arch=${_arch} 
+#  --with-arch=${_arch}
 #  --with-system-libunwind \
 #  --disable-vtable-verify --disable-libunwind-exceptions \
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g0 -O2"
-  export CXXFLAGS="-march=haswell -g0 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+  export CFLAGS="-march=haswell -g1 -O2"
+  export CXXFLAGS="-march=haswell -g1 -O2"
+  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
+  export CC='/home/User/.bin/sccache.exe gcc'
+  export CXX='/home/User/.bin/sccache.exe g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
