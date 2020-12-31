@@ -39,7 +39,7 @@ build() {
     --disable-debug-mode \
     --disable-samples 
 
-  make
+  make -j1
 }
 
 package() {

@@ -249,16 +249,16 @@ build() {
 
   unset CFLAGS
   unset CXXFLAGS
-  export CFLAGS="-march=haswell -g1 -O2"
-  export CXXFLAGS="-march=haswell -g1 -O2"
-  export CFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
-  export CXXFLAGS_FOR_TARGET="-march=haswell -g1 -O2"
+  export CFLAGS="-march=haswell -g0 -O2"
+  export CXXFLAGS="-march=haswell -g0 -O2"
+  export CFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
+  export CXXFLAGS_FOR_TARGET="-march=haswell -g0 -O2"
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
 
-  export CC='/home/User/.bin/sccache.exe gcc'
-  export CXX='/home/User/.bin/sccache.exe g++'
+  #export CC="/home/User/ccache/ccache.exe gcc"
+  #export CXX="/home/User/ccache/ccache.exe g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
@@ -269,7 +269,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=westmere \
+    --with-arch=${_arch} \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
