@@ -239,13 +239,9 @@ build() {
     _languages+=",jit"
   fi
 
-  CFLAGS=${CFLAGS/-pipe/}
-  CXXFLAGS=${CXXFLAGS/-pipe/}
-  LDFLAGS=${LDFLAGS/-pipe/}
-
-#  --with-arch=${_arch}
-#  --with-system-libunwind \
-#  --disable-vtable-verify --disable-libunwind-exceptions \
+#  CFLAGS=${CFLAGS/-pipe/}
+#  CXXFLAGS=${CXXFLAGS/-pipe/}
+#  LDFLAGS=${LDFLAGS/-pipe/}
 
   unset CFLAGS
   unset CXXFLAGS
@@ -256,9 +252,6 @@ build() {
 
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
-
-  #export CC="/home/User/ccache/ccache.exe gcc"
-  #export CXX="/home/User/ccache/ccache.exe g++"
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \

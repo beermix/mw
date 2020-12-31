@@ -1,6 +1,5 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 
-PKGEXT='.pkg.tar.xz'
 pkgname=mintty
 pkgver=master
 pkgrel=1
@@ -11,11 +10,8 @@ license=('GPL3')
 depends=('sh')
 url="https://mintty.github.io"
 source=(${pkgname}-${pkgver}.tar.gz::https://github.com/mintty/mintty/archive/${pkgver}.tar.gz
-        0001-add-msys2-launcher.patch
+        0002-add-msys2-launcher.patch
         0002-fix-current-dir-inheritance-for-alt-f2-on-msys2.patch)
-sha256sums=('5423320eea63aff00e3a10924848323466075381ac1e7ea925356af3fe771528'
-            '7f7475e8a8e3b15319b95cabed856e941ddfdbc31ca09b47ce0f25ffb22aeb03'
-            'de398d6ca166ebeb44ab1c23e3759ec5d2d13e2241360d6a06c918c611e62830')
 
 del_file_exists() {
   for _fname in "$@"
@@ -29,8 +25,8 @@ del_file_exists() {
 prepare() {
   cd "${srcdir}/${pkgname}-${pkgver}"
   del_file_exists src/launcher.c src/launcher.h
-  patch -p1 -i ${srcdir}/0001-add-msys2-launcher.patch
-  patch -p1 -i ${srcdir}/0002-fix-current-dir-inheritance-for-alt-f2-on-msys2.patch
+  patch -p1 -i ${srcdir}/0002-add-msys2-launcher.patch
+  #patch -p1 -i ${srcdir}/0002-fix-current-dir-inheritance-for-alt-f2-on-msys2.patch
 }
 
 build() {

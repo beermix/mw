@@ -56,7 +56,7 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93'
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
+#  patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
 
   patch -p1 -i "${srcdir}"/0002-check-for-unusual-file-harder.patch
@@ -70,18 +70,18 @@ prepare() {
   patch -p1 -i "${srcdir}"/1003-Pass-disable-reloc-section-on-PE-targets-for-PR-2566.patch
   patch -p1 -i "${srcdir}"/1004-Fix-a-segfault-when-creating-an-import-library-with-.patch
   patch -p1 -i "${srcdir}"/1005-After-preventing-creating-an-import-library-for-an-e.patch
-  #patch -p1 -i "${srcdir}"/1006-Import-patch-from-mainline-to-fix-decoding-DWARF-inf.patch
+  patch -p1 -i "${srcdir}"/1006-Import-patch-from-mainline-to-fix-decoding-DWARF-inf.patch
 
   # Temporarily revert defaults change while testing.
   patch -p1 -i "${srcdir}"/2000-Temporarily-revert-default-dll-characteristics.patch
   # Add an option to change default bases back below 4GB to ease transition
-  #patch -p1 -i "${srcdir}"/2001-ld-option-to-move-default-bases-under-4GB.patch
+  patch -p1 -i "${srcdir}"/2001-ld-option-to-move-default-bases-under-4GB.patch
   # https://github.com/msys2/MINGW-packages/issues/7027
   # https://github.com/msys2/MINGW-packages/issues/7023
-  #patch -p1 -i "${srcdir}"/2002-default-to-4GB-image-base-for-now.patch
+  patch -p1 -i "${srcdir}"/2002-default-to-4GB-image-base-for-now.patch
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
-  sed -i '/^development=/s/true/false/' bfd/development.sh
+  #sed -i '/^development=/s/true/false/' bfd/development.sh
 
   # hack! - libiberty configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" libiberty/configure
@@ -146,9 +146,4 @@ package() {
   #install -m644 ${srcdir}/${_realname}-${pkgver}/include/demangle.h ${pkgdir}${MINGW_PREFIX}/include
 
   find ${pkgdir}${MINGW_PREFIX}/share -type f -iname "opcodes.mo" -o -iname "bfd.mo" | xargs -rtl1 rm
-
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING      ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.LIB  ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING.LIB
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3     ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3
-  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING3.LIB ${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING3.LIB
 }
