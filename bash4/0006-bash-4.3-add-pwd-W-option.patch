@@ -1,0 +1,82 @@
+diff -Naur a/builtins/cd.def b/builtins/cd.def
+--- a/builtins/cd.def	2013-11-07 03:04:24.000000000 +0400
++++ b/builtins/cd.def	2014-03-13 16:36:10.757000000 +0400
+@@ -28,6 +28,8 @@
+ #  include <unistd.h>
+ #endif
+ 
++# include <sys/cygwin.h>
++
+ #include "../bashtypes.h"
+ #include "posixdir.h"
+ #include "posixstat.h"
+@@ -442,13 +444,14 @@
+ 
+ $BUILTIN pwd
+ $FUNCTION pwd_builtin
+-$SHORT_DOC pwd [-LP]
++$SHORT_DOC pwd [-LPW]
+ Print the name of the current working directory.
+ 
+ Options:
+   -L	print the value of $PWD if it names the current working
+ 		directory
+   -P	print the physical directory, without any symbolic links
++  -W	print the Win32 value of the physical directory
+ 
+ By default, `pwd' behaves as if `-L' were specified.
+ 
+@@ -466,13 +469,13 @@
+ pwd_builtin (list)
+      WORD_LIST *list;
+ {
+-  char *directory;
++  char *directory, *buffer, *wbuffer;
+   int opt, pflag;
+ 
+   verbatim_pwd = no_symbolic_links;
+   pflag = 0;
+   reset_internal_getopt ();
+-  while ((opt = internal_getopt (list, "LP")) != -1)
++  while ((opt = internal_getopt (list, "LPW")) != -1)
+     {
+       switch (opt)
+ 	{
+@@ -482,6 +485,9 @@
+ 	case 'L':
+ 	  verbatim_pwd = 0;
+ 	  break;
++	case 'W':
++	  verbatim_pwd = 2;
++	  break;
+ 	CASE_HELPOPT;
+ 	default:
+ 	  builtin_usage ();
+@@ -489,6 +495,19 @@
+     }
+   list = loptend;
+ 
++  if (verbatim_pwd == 2) {
++    buffer = xmalloc (PATH_MAX);
++    wbuffer = xmalloc (PATH_MAX);
++    directory = getcwd (buffer, PATH_MAX);
++    cygwin_conv_path (CCP_POSIX_TO_WIN_A|CCP_ABSOLUTE, buffer, wbuffer, PATH_MAX+1);
++    {
++      char *c = wbuffer;
++      while (c = strchr (c, '\\'))
++	*c = '/';
++    }
++    free (buffer);
++    directory = wbuffer;
++  } else {
+ #define tcwd the_current_working_directory
+ 
+   directory = tcwd ? (verbatim_pwd ? sh_physpath (tcwd, 0) : tcwd)
+@@ -505,6 +524,7 @@
+     }
+ 
+ #undef tcwd
++  }
+ 
+   if (directory)
+     {
