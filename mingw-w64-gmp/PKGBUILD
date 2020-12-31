@@ -9,8 +9,7 @@ pkgdesc="A free library for arbitrary precision arithmetic (mingw-w64)"
 arch=('any')
 url="https://gmplib.org/"
 license=('LGPL3' 'GPL')
-source=(https://gmplib.org/download/gmp-${pkgver}/${_realname}-${pkgver}.tar.xz
-        gmp_x86_64_coff_type.patch)
+source=(https://gmplib.org/download/gmp-${pkgver}/${_realname}-${pkgver}.tar.xz{,.sig})
 options=('staticlibs')
 validpgpkeys=('343C2FF0FBEE5EC2EDBEF399F3599FF828C67298') # Niels Möller <nisse@lysator.liu.se>"
 sha256sums=('fd4829912cddd12f84181c3451cc752be224643e87fac497b69edddadc49b4f2'
