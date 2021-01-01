@@ -1,422 +1,3 @@
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -59,7 +59,15 @@ loadavg_SRCS =	lib/getloadavg.c
- make_SOURCES =	$(make_SRCS)
- EXTRA_make_SOURCES = $(amiga_SRCS) $(vms_SRCS)
- 
--make_LDADD =	$(LIBOBJS) $(GUILE_LIBS) lib/libgnu.a $(GETLOADAVG_LIBS) \
-+if HAVE_GUILE
-+  _GUILE_CFLAGS = $(GUILE_CFLAGS)
-+  _GUILE_LIBS = $(GUILE_LIBS)
-+else
-+  _GUILE_CFLAGS =
-+  _GUILE_LIBS =
-+endif
-+
-+make_LDADD =	$(LIBOBJS) $(_GUILE_LIBS) lib/libgnu.a $(GETLOADAVG_LIBS) \
- 		@LIBINTL@
- 
- localedir =	$(datadir)/locale
-@@ -68,7 +76,7 @@ AM_CPPFLAGS =	-Isrc -I$(top_srcdir)/src -Ilib -I$(top_srcdir)/lib \
- 		-DLIBDIR=\"$(libdir)\" -DINCLUDEDIR=\"$(includedir)\" \
- 		-DLOCALEDIR=\"$(localedir)\"
- 
--AM_CFLAGS =	$(GUILE_CFLAGS)
-+AM_CFLAGS =	$(_GUILE_CFLAGS)
- 
- if WINDOWSENV
-   make_SOURCES += $(w32_SRCS)
-diff --git a/build.sh b/build.sh
-index 4c88b53..cc1c790 100755
---- a/build.sh
-+++ b/build.sh
-@@ -103,7 +103,7 @@ convert ()
-     esac
- 
-     fn="$top_srcdir/lib/${fn##*/}"
--    [ -f "$fn" ] || { echo "Missing file: $fn"; exit 1; }
-+    test -f "$fn" || { echo "Missing file: $fn"; exit 1; }
- 
-     sed "/definitions* of $inc/r $fn" "$int" > "${int}_"
-     int=${int}_
-diff --git a/build_w32.bat b/build_w32.bat
-index 553e9d9..da77022 100755
-diff --git a/configure.ac b/configure.ac
-index cd49a2c..7d8f9ef 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -16,7 +16,7 @@
- # You should have received a copy of the GNU General Public License along with
- # this program.  If not, see <http://www.gnu.org/licenses/>.
- 
--AC_INIT([GNU make],[4.3],[bug-make@gnu.org])
-+AC_INIT([GNU make],[4.3.90],[bug-make@gnu.org])
- 
- AC_PREREQ([2.69])
- 
-@@ -38,6 +38,9 @@ AM_INIT_AUTOMAKE([1.16.1 foreign -Werror -Wall])
- AC_USE_SYSTEM_EXTENSIONS
- AC_PROG_CC
- 
-+# GNU Gnulib requires C99, so I guess we might as well too...
-+AC_PROG_CC_C99
-+
- # Configure gnulib
- gl_EARLY
- gl_INIT
-@@ -526,6 +529,9 @@ AC_CONFIG_FILES([Makefile build.cfg lib/Makefile po/Makefile.in doc/Makefile \
- # We don't need this: the standard automake output suffices for POSIX systems.
- #mk/Posix.mk
- 
-+# Put build.sh in the build directory so it's easy to find
-+AC_CONFIG_LINKS([build.sh:build.sh])
-+
- # OK, do it!
- 
- AC_OUTPUT
-diff --git a/doc/make.1 b/doc/make.1
-index dbd023f..1ec661e 100644
---- a/doc/make.1
-+++ b/doc/make.1
-@@ -130,21 +130,28 @@ are omitted, then the behavior is the same as if
- .B \-d
- was specified.
- .I FLAGS
--may be
--.I a
-+may be any or all of the following names, comma- or space-separated.  Only the
-+first character is significant: the rest may be omitted:
-+.I all
- for all debugging output (same as using
- .BR \-d ),
--.I b
-+.I basic
- for basic debugging,
--.I v
-+.I verbose
- for more verbose basic debugging,
--.I i
--for showing implicit rules,
--.I j
--for details on invocation of commands, and
--.I m
--for debugging while remaking makefiles.  Use
--.I n
-+.I implicit
-+for showing implicit rule search operations,
-+.I jobs
-+for details on invocation of commands,
-+.I makefile
-+for debugging while remaking makefiles,
-+.I print
-+shows all recipes that are run even if they are silent, and
-+.I why
-+shows the reason
-+.BR make
-+decided to rebuild each target.  Use
-+.I none
- to disable all previous debugging flags.
- .TP 0.5i
- \fB\-e\fR, \fB\-\-environment\-overrides\fR
-diff --git a/doc/make.texi b/doc/make.texi
-index 733c0b9..fe64ec2 100644
---- a/doc/make.texi
-+++ b/doc/make.texi
-@@ -276,6 +276,7 @@ Functions for Transforming Text
- * Text Functions::              General-purpose text manipulation functions.
- * File Name Functions::         Functions for manipulating file names.
- * Conditional Functions::       Functions that implement conditions.
-+* Let Function::                Lexically scoped variables.
- * Foreach Function::            Repeat some text with controlled variation.
- * File Function::               Write text to a file.
- * Call Function::               Expand a user-defined function.
-@@ -1280,12 +1281,11 @@ hierarchy.})
- @file{/usr/gnu/include},
- @file{/usr/local/include}, @file{/usr/include}.
- 
--If an included makefile cannot be found in any of these directories, a
--warning message is generated, but it is not an immediately fatal error;
--processing of the makefile containing the @code{include} continues.
--Once it has finished reading makefiles, @code{make} will try to remake
--any that are out of date or don't exist.
--@xref{Remaking Makefiles, ,How Makefiles Are Remade}.
-+If an included makefile cannot be found in any of these directories it
-+is not an immediately fatal error; processing of the makefile
-+containing the @code{include} continues.  Once it has finished reading
-+makefiles, @code{make} will try to remake any that are out of date or
-+don't exist.  @xref{Remaking Makefiles, ,How Makefiles Are Remade}.
- Only after it has tried to find a way to remake a makefile and failed,
- will @code{make} diagnose the missing makefile as a fatal error.
- 
-@@ -1346,16 +1346,21 @@ files.  If a makefile can be remade from other files, you probably want
- @code{make} to get an up-to-date version of the makefile to read in.
- 
- To this end, after reading in all makefiles @code{make} will consider
--each as a goal target and attempt to update it.  If a makefile has a
--rule which says how to update it (found either in that very makefile or
--in another one) or if an implicit rule applies to it (@pxref{Implicit
--Rules, ,Using Implicit Rules}), it will be updated if necessary.  After
--all makefiles have been checked, if any have actually been changed,
--@code{make} starts with a clean slate and reads all the makefiles over
--again.  (It will also attempt to update each of them over again, but
--normally this will not change them again, since they are already up to
--date.)  Each restart will cause the special variable
--@code{MAKE_RESTARTS} to be updated (@pxref{Special Variables}).@refill
-+each as a goal target, in the order in which they were processed, and
-+attempt to update it.  If parallel builds (@pxref{Parallel, ,Parallel
-+Execution}) are enabled then makefiles will be rebuilt in parallel as
-+well.
-+
-+If a makefile has a rule which says how to update it (found either in
-+that very makefile or in another one) or if an implicit rule applies
-+to it (@pxref{Implicit Rules, ,Using Implicit Rules}), it will be
-+updated if necessary.  After all makefiles have been checked, if any
-+have actually been changed, @code{make} starts with a clean slate and
-+reads all the makefiles over again.  (It will also attempt to update
-+each of them over again, but normally this will not change them again,
-+since they are already up to date.)  Each restart will cause the
-+special variable @code{MAKE_RESTARTS} to be updated (@pxref{Special
-+Variables}).@refill
- 
- If you know that one or more of your makefiles cannot be remade and
- you want to keep @code{make} from performing an implicit rule search
-@@ -1384,12 +1389,11 @@ if a default makefile does not exist but can be created by running
- @code{make} rules, you probably want the rules to be run so that the
- makefile can be used.
- 
--Therefore, if none of the default makefiles exists, @code{make} will try
--to make each of them in the same order in which they are searched for
--(@pxref{Makefile Names, ,What Name to Give Your Makefile})
--until it succeeds in making one, or it runs out of names to try.  Note
--that it is not an error if @code{make} cannot find or make any makefile;
--a makefile is not always necessary.@refill
-+Therefore, if none of the default makefiles exists, @code{make} will
-+try to make each of them until it succeeds in making one, or it runs
-+out of names to try.  Note that it is not an error if @code{make}
-+cannot find or make any makefile; a makefile is not always
-+necessary.@refill
- 
- When you use the @samp{-t} or @samp{--touch} option
- (@pxref{Instead of Execution, ,Instead of Executing Recipes}),
-@@ -2717,6 +2721,12 @@ clean:
- Once this is done, @samp{make clean} will run the recipe regardless of
- whether there is a file named @file{clean}.
- 
-+Prerequisites of @code{.PHONY} are always interpreted as literal
-+target names, never as patterns (even if they contain @samp{%}
-+characters).  To always rebuild a pattern rule consider using a
-+``force target'' (@pxref{Force Targets, ,Rules without Recipes or
-+Prerequisites}).
-+
- Phony targets are also useful in conjunction with recursive
- invocations of @code{make} (@pxref{Recursion, ,Recursive Use of @code{make}}).
- In this situation the makefile will often contain a variable which
-@@ -6280,8 +6290,9 @@ Set a target-specific variable value like this:
- @end example
- 
- Target-specific variable assignments can be prefixed with any or all of the
--special keywords @code{export}, @code{override}, or @code{private};
--these apply their normal behavior to this instance of the variable only.
-+special keywords @code{export}, @code{unexport}, @code{override}, or
-+@code{private}; these apply their normal behavior to this instance of the
-+variable only.
- 
- Multiple @var{target} values create a target-specific variable value for
- each member of the target list individually.
-@@ -7028,6 +7039,7 @@ be substituted.
- * Text Functions::              General-purpose text manipulation functions.
- * File Name Functions::         Functions for manipulating file names.
- * Conditional Functions::       Functions that implement conditions.
-+* Let Function::                Lexically scoped variables.
- * Foreach Function::            Repeat some text with controlled variation.
- * File Function::               Write text to a file.
- * Call Function::               Expand a user-defined function.
-@@ -7628,7 +7640,7 @@ the file names to refer to an existing file or directory.  Use the
- @code{wildcard} function to test for existence.
- @end table
- 
--@node Conditional Functions, Foreach Function, File Name Functions, Functions
-+@node Conditional Functions, Let Function, File Name Functions, Functions
- @section Functions for Conditionals
- @findex if
- @cindex conditional expansion
-@@ -7681,14 +7693,84 @@ the result of the expansion is the expansion of the last argument.
- 
- @end table
- 
--@node Foreach Function, File Function, Conditional Functions, Functions
-+@node Let Function, Foreach Function, Conditional Functions, Functions
-+@section The @code{let} Function
-+@findex let
-+@cindex variables, lexically scoped
-+
-+The @code{let} function provides a means to limit the scope of a
-+variable.  The assignment of the named variables in a @code{let}
-+expression is in effect only within the text provided by the
-+@code{let} expression, and this assignment doesn't impact that named
-+variable in any outer scope.
-+
-+Additionally, the @code{let} function enables list unpacking by
-+assigning all unassigned values to the last named variable.
-+
-+The syntax of the @code{let} function is:
-+
-+@example
-+$(let @var{var} [@var{var} ...],[@var{list}],@var{text})
-+@end example
-+
-+@noindent
-+The first two arguments, @var{var} and @var{list}, are expanded before
-+anything else is done; note that the last argument, @var{text}, is
-+@strong{not} expanded at the same time.  Next, each word of the
-+expanded value of @var{list} is bound to each of the variable names,
-+@var{var}, in turn, with the final variable name being bound to the
-+remainder of the expanded @var{list}.  In other words, the first word
-+of @var{list} is bound to the first variable @var{var}, the second
-+word to the second variable @var{var}, and so on.
-+
-+If there are more variable names in @var{var} than there are words in
-+@var{list}, the remaining @var{var} variable names are set to the
-+empty string.  If there are fewer @var{var}s than words in @var{list}
-+then the last @var{var} is set to all remaining words in @var{list}.
-+
-+The variables in @var{var} are assigned as simply-expanded variables
-+during the execution of @code{let}.  @xref{Flavors, ,The Two Flavors
-+of Variables}.@refill
-+
-+After all variables are thus bound, @var{text} is expanded to provide
-+the result of the @code{let} function.
-+
-+For example, this macro reverses the order of the words in the list
-+that it is given as its first argument:
-+
-+@example
-+reverse = $(let first rest,$1,$(if $(rest),$(call reverse,$(rest)) )$(first))
-+
-+all: ; @@echo $(call reverse,d c b a)
-+@end example
-+
-+@noindent
-+will print @code{a b c d}.  When first called, @code{let} will expand
-+@var{$1} to @code{d c b a}.  It will then assign @var{first} to
-+@code{d} and assign @var{rest} to @code{c b a}.  It will then expand
-+the if-statement, where @code{$(rest)} is not empty so we recursively
-+invoke the @var{reverse} function with the value of @var{rest} which
-+is now @code{c b a}.  The recursive invocation of @code{let} assigns
-+@var{first} to @code{c} and @var{rest} to @code{b a}.  The recursion
-+continues until @code{let} is called with just a single value,
-+@code{a}.  Here @var{first} is @code{a} and @var{rest} is empty, so we
-+do not recurse but simply expand @code{$(first)} to @code{a} and
-+return, which adds @code{ b}, etc.
-+
-+After the @var{reverse} call is complete, the @var{first} and
-+@var{rest} variables are no longer set.  If variables by those names
-+existed beforehand, they are not affected by the expansion of the
-+@code{reverse} macro.
-+
-+@node Foreach Function, File Function, Let Function, Functions
- @section The @code{foreach} Function
- @findex foreach
- @cindex words, iterating over
- 
--The @code{foreach} function is very different from other functions.  It
--causes one piece of text to be used repeatedly, each time with a different
--substitution performed on it.  It resembles the @code{for} command in the
-+The @code{foreach} function is similar to the @code{let} function, but very
-+different from other functions.  It causes one piece of text to be used
-+repeatedly, each time with a different substitution performed on it.  The
-+@code{foreach} function resembles the @code{for} command in the
- shell @code{sh} and the @code{foreach} command in the C-shell @code{csh}.
- 
- The syntax of the @code{foreach} function is:
-@@ -7747,13 +7829,14 @@ actual function call to be re-expanded under the control of @code{foreach};
- a simply-expanded variable would not do, since @code{wildcard} would be
- called only once at the time of defining @code{find_files}.
- 
--The @code{foreach} function has no permanent effect on the variable
--@var{var}; its value and flavor after the @code{foreach} function call are
--the same as they were beforehand.  The other values which are taken from
--@var{list} are in effect only temporarily, during the execution of
--@code{foreach}.  The variable @var{var} is a simply-expanded variable
--during the execution of @code{foreach}.  If @var{var} was undefined
--before the @code{foreach} function call, it is undefined after the call.
-+Like the @code{let} function, the @code{foreach} function has no permanent
-+effect on the variable @var{var}; its value and flavor after the
-+@code{foreach} function call are the same as they were beforehand.  The
-+other values which are taken from @var{list} are in effect only
-+temporarily, during the execution of @code{foreach}.  The variable
-+@var{var} is a simply-expanded variable during the execution of
-+@code{foreach}.  If @var{var} was undefined before the @code{foreach}
-+function call, it is undefined after the call.
- @xref{Flavors, ,The Two Flavors of Variables}.@refill
- 
- You must take care when using complex variable expressions that result in
-@@ -8888,6 +8971,15 @@ the makefiles.  This option enables messages while rebuilding makefiles,
- too.  Note that the @samp{all} option does enable this option.  This
- option also enables @samp{basic} messages.
- 
-+@item p (@i{print})
-+Prints the recipe to be executed, even when the recipe is normally
-+silent (due to @code{.SILENT} or @samp{@@}).  Also prints the makefile
-+name and line number where the recipe was defined.
-+
-+@item w (@i{why})
-+Explains why each target must be remade by showing which prerequisites
-+are more up to date than the target.
-+
- @item n (@i{none})
- Disable all debugging currently enabled.  If additional debugging
- flags are encountered after this they will still take effect.
-@@ -9119,11 +9211,8 @@ recipes were done, in order to fool future invocations of
- 
- @item --trace
- @cindex @code{--trace}
--Show tracing information for @code{make} execution.  Prints the entire
--recipe to be executed, even for recipes that are normally silent (due
--to @code{.SILENT} or @samp{@@}).  Also prints the makefile name and
--line number where the recipe was defined, and information on why the
--target is being rebuilt.
-+Show tracing information for @code{make} execution.  This is shorthand
-+for @code{--debug=print,why}.
- 
- @item -v
- @cindex @code{-v}
-@@ -10342,9 +10431,11 @@ A pattern rule can be used to build a given file only if there is a
- target pattern that matches the file name, @emph{and} all
- prerequisites in that rule either exist or can be built.  The rules
- you write take precedence over those that are built in. Note however,
--that a rule whose prerequisites actually exist or are mentioned always
--takes priority over a rule with prerequisites that must be made by
--chaining other implicit rules.
-+that a rule which can be satisfied without chaining other implicit
-+rules (for example, one which has no prerequisites or its
-+prerequisites already exist or are mentioned) always takes priority
-+over a rule with prerequisites that must be made by chaining other
-+implicit rules.
- 
- @cindex stem, shortest
- It is possible that more than one pattern rule will meet these
-@@ -11791,7 +11882,7 @@ control characters are not emitted so that they don't corrupt log
- files, etc.
- 
- The @code{--output-sync} (@pxref{Parallel Output, ,Output During
--Parallel Output}) option will defeat the terminal detection.  When
-+Parallel Execution}) option will defeat the terminal detection.  When
- output synchronization is enabled GNU @code{make} arranges for all
- command output to be written to a file, so that its output can be
- written as a block without interference from other commands.  This
-@@ -12393,6 +12484,11 @@ Return a string describing the flavor of the @code{make} variable
- @var{variable}.@*
- @xref{Flavor Function, , The @code{flavor} Function}.
- 
-+@item $(let @var{var} [@var{var} ...],@var{words},@var{text})
-+Evaluate @var{text} with the @var{var}s bound to the words in
-+@var{words}.@*
-+@xref{Let Function, ,The @code{let} Function}.
-+
- @item $(foreach @var{var},@var{words},@var{text})
- Evaluate @var{text} with @var{var} bound to each word in @var{words},
- and concatenate the results.@*
 diff --git a/src/arscan.c b/src/arscan.c
 index 3ce21db..2565fbb 100644
 --- a/src/arscan.c
@@ -499,19 +80,6 @@ index 88c33a3..dd17999 100644
       to suspend the main thread, or else we will have race conditions
       when both threads call reap_children.  */
    if (main_thread)
-diff --git a/src/debug.h b/src/debug.h
-index 514b7e8..4db34b9 100644
---- a/src/debug.h
-+++ b/src/debug.h
-@@ -19,6 +19,8 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
- #define DB_VERBOSE      (0x002)
- #define DB_JOBS         (0x004)
- #define DB_IMPLICIT     (0x008)
-+#define DB_PRINT        (0x010)
-+#define DB_WHY          (0x020)
- #define DB_MAKEFILES    (0x100)
- 
- #define DB_ALL          (0xfff)
 diff --git a/src/default.c b/src/default.c
 index 751ea15..fffff8b 100644
 --- a/src/default.c
@@ -903,70 +471,18 @@ index 862a18e..d237d4b 100644
          return -1;
      }
 diff --git a/src/function.c b/src/function.c
-index 0917e0c..d36b795 100644
+index 0917e0c..87f2a8b 100644
 --- a/src/function.c
 +++ b/src/function.c
-@@ -908,9 +908,58 @@ func_foreach (char *o, char **argv, const char *funcname UNUSED)
-   return o;
- }
+@@ -910,7 +910,6 @@ func_foreach (char *o, char **argv, const char *funcname UNUSED)
  
-+static char *
-+func_let (char *o, char **argv, const char *funcname UNUSED)
-+{
-+  /* expand only the first two.  */
-+  char *varnames = expand_argument (argv[0], NULL);
-+  char *list = expand_argument (argv[1], NULL);
-+  const char *body = argv[2];
-+
-+  const char *vp;
-+  const char *vp_next = varnames;
-+  const char *list_iterator = list;
-+  char *p;
-+  size_t len;
-+  size_t vlen;
-+
-+  push_new_variable_scope ();
-+
-+  /* loop through LIST for all but the last VARNAME */
-+  vp = find_next_token (&vp_next, &vlen);
-+  NEXT_TOKEN (vp_next);
-+  while (*vp_next != '\0')
-+    {
-+      p = find_next_token (&list_iterator, &len);
-+      if (*list_iterator != '\0')
-+        {
-+          ++list_iterator;
-+          p[len] = '\0';
-+        }
-+      define_variable (vp, vlen, p ? p : "", o_automatic, 0);
-+
-+      vp = find_next_token (&vp_next, &vlen);
-+      NEXT_TOKEN (vp_next);
-+    }
-+
-+  /* set the last VARNAME to the remainder of LIST */
-+  if (vp)
-+    define_variable (vp, vlen, next_token (list_iterator), o_automatic, 0);
-+
-+  /* Expand the body in the context of the arguments, adding the result to
-+     the variable buffer.  */
-+
-+  o = variable_expand_string (o, body, SIZE_MAX);
-+
-+  pop_variable_scope ();
-+  free (varnames);
-+  free (list);
-+
-+  return o + strlen (o);
-+}
-+
  struct a_word
  {
 -  struct a_word *next;
    struct a_word *chain;
    char *str;
    size_t length;
-@@ -941,7 +990,6 @@ a_word_hash_cmp (const void *x, const void *y)
+@@ -941,7 +940,6 @@ a_word_hash_cmp (const void *x, const void *y)
  
  struct a_pattern
  {
@@ -974,7 +490,7 @@ index 0917e0c..d36b795 100644
    char *str;
    char *percent;
    size_t length;
-@@ -950,78 +998,84 @@ struct a_pattern
+@@ -950,78 +948,84 @@ struct a_pattern
  static char *
  func_filter_filterout (char *o, char **argv, const char *funcname)
  {
@@ -1101,7 +617,7 @@ index 0917e0c..d36b795 100644
          {
            struct a_word *owp = hash_insert (&a_word_table, wp);
            if (owp)
-@@ -1029,51 +1083,49 @@ func_filter_filterout (char *o, char **argv, const char *funcname)
+@@ -1029,51 +1033,49 @@ func_filter_filterout (char *o, char **argv, const char *funcname)
          }
      }
  
@@ -1185,7 +701,7 @@ index 0917e0c..d36b795 100644
    return o;
  }
  
-@@ -2233,6 +2285,11 @@ func_file (char *o, char **argv, const char *funcname UNUSED)
+@@ -2233,6 +2235,11 @@ func_file (char *o, char **argv, const char *funcname UNUSED)
        if (fp == NULL)
          OSS (fatal, reading_file, _("open: %s: %s"), fn, strerror (errno));
  
@@ -1197,37 +713,10 @@ index 0917e0c..d36b795 100644
        if (argv[1])
          {
            size_t l = strlen (argv[1]);
-@@ -2337,7 +2394,8 @@ func_abspath (char *o, char **argv, const char *funcname UNUSED)
-    comma-separated values are treated as arguments.
- 
-    EXPAND_ARGS means that all arguments should be expanded before invocation.
--   Functions that do namespace tricks (foreach) don't automatically expand.  */
-+   Functions that do namespace tricks (foreach, let) don't automatically
-+   expand.  */
- 
- static char *func_call (char *o, char **argv, const char *funcname);
- 
-@@ -2373,6 +2431,7 @@ static struct function_table_entry function_table_init[] =
-   FT_ENTRY ("words",         0,  1,  1,  func_words),
-   FT_ENTRY ("origin",        0,  1,  1,  func_origin),
-   FT_ENTRY ("foreach",       3,  3,  0,  func_foreach),
-+  FT_ENTRY ("let",           3,  3,  0,  func_let),
-   FT_ENTRY ("call",          1,  0,  1,  func_call),
-   FT_ENTRY ("info",          0,  1,  1,  func_error),
-   FT_ENTRY ("error",         0,  1,  1,  func_error),
 diff --git a/src/job.c b/src/job.c
-index ae1f18b..d6e28d3 100644
+index ae1f18b..28ddacf 100644
 --- a/src/job.c
 +++ b/src/job.c
-@@ -29,7 +29,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.  */
- /* Default shell to use.  */
- #ifdef WINDOWS32
- # ifdef HAVE_STRINGS_H
--#  include <strings.h>	/* for strcasecmp, strncasecmp */
-+#  include <strings.h>  /* for strcasecmp, strncasecmp */
- # endif
- # include <windows.h>
- 
 @@ -504,7 +504,7 @@ block_sigs ()
  static void
  unblock_sigs ()
@@ -1269,41 +758,7 @@ index ae1f18b..d6e28d3 100644
        /* Check if this is the child of the 'shell' function.  */
        if (!remote && pid == shell_function_pid)
          {
-@@ -1340,7 +1341,7 @@ start_job_command (struct child *child)
- #endif
- 
-   /* Print the command if appropriate.  */
--  if (just_print_flag || trace_flag
-+  if (just_print_flag || ISDB (DB_PRINT)
-       || (!(flags & COMMANDS_SILENT) && !run_silent))
-     OS (message, 0, "%s", p);
- 
-@@ -1883,7 +1884,7 @@ new_job (struct file *file)
- 
-   /* Trace the build.
-      Use message here so that changes to working directories are logged.  */
--  if (trace_flag)
-+  if (ISDB (DB_WHY))
-     {
-       char *newer = allocated_variable_expand_for_file ("$?", c->file);
-       const char *nm;
-@@ -1897,12 +1898,9 @@ new_job (struct file *file)
-           nm = n;
-         }
- 
--      if (newer[0] == '\0')
--        OSS (message, 0,
--             _("%s: target '%s' does not exist"), nm, c->file->name);
--      else
--        OSSS (message, 0,
--              _("%s: update target '%s' due to: %s"), nm, c->file->name, newer);
-+      OSSS (message, 0,
-+            _("%s: update target '%s' due to: %s"), nm, c->file->name,
-+              newer[0] == '\0' ? _("target does not exist") : newer);
- 
-       free (newer);
-     }
-@@ -2381,6 +2379,18 @@ child_execute_job (struct childbase *child, int good_stdin, char **argv)
+@@ -2381,6 +2382,18 @@ child_execute_job (struct childbase *child, int good_stdin, char **argv)
            break;
          }
  
@@ -1322,7 +777,7 @@ index ae1f18b..d6e28d3 100644
      cmd = (char *)find_in_given_path (argv[0], p, 0);
    }
  
-@@ -2754,7 +2764,7 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
+@@ -2754,7 +2767,7 @@ construct_command_argv_internal (char *line, char **restp, const char *shell,
    /* We used to have a double quote (") in sh_chars_dos[] below, but
       that caused any command line with quoted file names be run
       through a temporary batch file, which introduces command-line
@@ -1358,7 +813,7 @@ index 27f5899..5d57b68 100644
        strcpy (p, SYMBOL_EXTENSION);
        symname = new;
 diff --git a/src/main.c b/src/main.c
-index 78a27d7..2c20258 100644
+index 78a27d7..9066513 100644
 --- a/src/main.c
 +++ b/src/main.c
 @@ -227,12 +227,9 @@ int check_symlink_flag = 0;
@@ -1390,18 +845,7 @@ index 78a27d7..2c20258 100644
  
  /* The usage output.  We write it this way to make life easier for the
     translators, especially those trying to translate to right-to-left
-@@ -410,6 +413,10 @@ static const char *const usage[] =
-     NULL
-   };
- 
-+/* Nonzero if the "--trace" option was given.  */
-+
-+static int trace_flag = 0;
-+
- /* The table of command switches.
-    Order matters here: this is the order MAKEFLAGS will be constructed.
-    So be sure all simple flags (single char, no argument) come first.  */
-@@ -438,7 +445,8 @@ static const struct command_switch switches[] =
+@@ -438,7 +441,8 @@ static const struct command_switch switches[] =
        "no-keep-going" },
      { 't', flag, &touch_flag, 1, 1, 1, 0, 0, "touch" },
      { 'v', flag, &print_version_flag, 1, 1, 0, 0, 0, "version" },
@@ -1411,7 +855,7 @@ index 78a27d7..2c20258 100644
  
      /* These options take arguments.  */
      { 'C', filename, &directories, 0, 0, 0, 0, 0, "directory" },
-@@ -457,12 +465,13 @@ static const struct command_switch switches[] =
+@@ -457,12 +461,13 @@ static const struct command_switch switches[] =
      { CHAR_MAX+1, strlist, &db_flags, 1, 1, 0, "basic", 0, "debug" },
      { CHAR_MAX+2, string, &jobserver_auth, 1, 1, 0, 0, 0, "jobserver-auth" },
      { CHAR_MAX+3, flag, &trace_flag, 1, 1, 0, 0, 0, "trace" },
@@ -1428,53 +872,7 @@ index 78a27d7..2c20258 100644
      { CHAR_MAX+9, string, &jobserver_auth, 1, 0, 0, 0, 0, "jobserver-fds" },
      { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
    };
-@@ -548,10 +557,6 @@ int one_shell;
- 
- int output_sync = OUTPUT_SYNC_NONE;
- 
--/* Nonzero if the "--trace" option was given.  */
--
--int trace_flag = 0;
--
- /* Nonzero if we have seen the '.NOTPARALLEL' target.
-    This turns off parallel builds for this invocation of make.  */
- 
-@@ -719,6 +724,9 @@ decode_debug_flags (void)
-   if (debug_flag)
-     db_level = DB_ALL;
- 
-+  if (trace_flag)
-+    db_level = DB_PRINT | DB_WHY;
-+
-   if (db_flags)
-     for (pp=db_flags->list; *pp; ++pp)
-       {
-@@ -746,9 +754,15 @@ decode_debug_flags (void)
-               case 'n':
-                 db_level = 0;
-                 break;
-+              case 'p':
-+                db_level |= DB_PRINT;
-+                break;
-               case 'v':
-                 db_level |= DB_BASIC | DB_VERBOSE;
-                 break;
-+              case 'w':
-+                db_level |= DB_WHY;
-+                break;
-               default:
-                 OS (fatal, NILF,
-                     _("unknown debug level specification '%s'"), p);
-@@ -1359,7 +1373,7 @@ main (int argc, char **argv, char **envp)
-         enum variable_export export = v_export;
-         size_t len;
- 
--        while (! STOP_SET (*ep, MAP_EQUALS))
-+        while (! STOP_SET (*ep, MAP_EQUALS|MAP_NUL))
-           ++ep;
- 
-         /* If there's no equals sign it's a malformed environment.  Ignore.  */
-@@ -1523,6 +1537,18 @@ main (int argc, char **argv, char **envp)
+@@ -1523,6 +1528,18 @@ main (int argc, char **argv, char **envp)
    /* Set always_make_flag if -B was given and we've not restarted already.  */
    always_make_flag = always_make_set && (restarts == 0);
  
@@ -1493,7 +891,7 @@ index 78a27d7..2c20258 100644
    /* Print version information, and exit.  */
    if (print_version_flag)
      {
-@@ -1588,6 +1614,68 @@ main (int argc, char **argv, char **envp)
+@@ -1588,6 +1605,68 @@ main (int argc, char **argv, char **envp)
    /* We may move, but until we do, here we are.  */
    starting_directory = current_directory;
  
@@ -1562,7 +960,7 @@ index 78a27d7..2c20258 100644
    /* Validate the arg_job_slots configuration before we define MAKEFLAGS so
       users get an accurate value in their makefiles.
       At this point arg_job_slots is the argv setting, if there is one, else
-@@ -1687,80 +1775,6 @@ main (int argc, char **argv, char **envp)
+@@ -1687,80 +1766,6 @@ main (int argc, char **argv, char **envp)
  #endif
      }
  
@@ -1643,7 +1041,7 @@ index 78a27d7..2c20258 100644
    /* Read any stdin makefiles into temporary files.  */
  
    if (makefiles != 0)
-@@ -2189,11 +2203,20 @@ main (int argc, char **argv, char **envp)
+@@ -2189,11 +2194,20 @@ main (int argc, char **argv, char **envp)
  
        DB (DB_BASIC, (_("Updating makefiles....\n")));
  
@@ -1668,32 +1066,24 @@ index 78a27d7..2c20258 100644
          makefile_mtimes = alloca (num_mkfiles * sizeof (FILE_TIMESTAMP));
        }
 diff --git a/src/makeint.h b/src/makeint.h
-index c428a36..015bf5c 100644
+index c428a36..c4cc4df 100644
 --- a/src/makeint.h
 +++ b/src/makeint.h
-@@ -41,6 +41,21 @@ char *alloca ();
+@@ -41,6 +41,13 @@ char *alloca ();
  # endif
  #endif
  
 +/* Some versions of GCC (e.g., 10.x) set the warn_unused_result attribute on
 +   __builtin_alloca.  This causes alloca(0) to fail and is not easily worked
-+   around so avoid it via the preprocessor.
++   around so make a helper.
 +   See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=98055  */
 +
-+#if defined (__has_builtin)
-+# if __has_builtin (__builtin_alloca)
-+#   define free_alloca()
-+# else
-+#  define free_alloca() alloca (0)
-+# endif
-+#else
-+# define free_alloca() alloca (0)
-+#endif
++#define free_alloca() do{ void *__p = alloca (0); (void)__p; }while(0)
 +
  /* Disable assert() unless we're a maintainer.
     Some asserts are compute-intensive.  */
  #ifndef MAKE_MAINTAINER_MODE
-@@ -115,7 +130,7 @@ extern int errno;
+@@ -115,7 +122,7 @@ extern int errno;
  #endif
  
  /* Some systems define _POSIX_VERSION but are not really POSIX.1.  */
@@ -1702,14 +1092,13 @@ index c428a36..015bf5c 100644
  # undef POSIX
  #endif
  
-@@ -670,10 +685,11 @@ extern unsigned short stopchar_map[];
+@@ -670,10 +677,11 @@ extern unsigned short stopchar_map[];
  extern int just_print_flag, run_silent, ignore_errors_flag, keep_going_flag;
  extern int print_data_base_flag, question_flag, touch_flag, always_make_flag;
  extern int env_overrides, no_builtin_rules_flag, no_builtin_variables_flag;
 -extern int print_version_flag, print_directory_flag, check_symlink_flag;
--extern int warn_undefined_variables_flag, trace_flag, posix_pedantic;
 +extern int print_version_flag, print_directory, check_symlink_flag;
-+extern int warn_undefined_variables_flag, posix_pedantic;
+ extern int warn_undefined_variables_flag, trace_flag, posix_pedantic;
  extern int not_parallel, second_expansion, clock_skew_detected;
  extern int rebuilding_makefiles, one_shell, output_sync, verify_flag;
 +extern unsigned long command_count;
@@ -1844,7 +1233,7 @@ index 525f292..eab175a 100644
  }
  
 diff --git a/src/read.c b/src/read.c
-index fa197fb..545514c 100644
+index fa197fb..b66f3d4 100644
 --- a/src/read.c
 +++ b/src/read.c
 @@ -63,9 +63,9 @@ struct vmodifiers
@@ -1894,19 +1283,7 @@ index fa197fb..545514c 100644
          }
      }
  
-@@ -418,6 +410,11 @@ eval_makefile (const char *filename, unsigned short flags)
-   /* Success; clear errno.  */
-   deps->error = 0;
- 
-+  /* If we tried and failed to read the included file before but this
-+     time we succeeded, reset the last mtime.  */
-+  if (deps->file->last_mtime == NONEXISTENT_MTIME)
-+    deps->file->last_mtime = 0;
-+
-   /* Avoid leaking the makefile to children.  */
-   fd_noinherit (fileno (ebuf.fp));
- 
-@@ -440,7 +437,7 @@ eval_makefile (const char *filename, unsigned short flags)
+@@ -440,7 +432,7 @@ eval_makefile (const char *filename, unsigned short flags)
    fclose (ebuf.fp);
  
    free (ebuf.bufstart);
@@ -1915,7 +1292,7 @@ index fa197fb..545514c 100644
  
    errno = 0;
    return deps;
-@@ -482,7 +479,7 @@ eval_buffer (char *buffer, const floc *flocp)
+@@ -482,7 +474,7 @@ eval_buffer (char *buffer, const floc *flocp)
  
    reading_file = curfile;
  
@@ -1924,7 +1301,7 @@ index fa197fb..545514c 100644
  }
  
  /* Check LINE to see if it's a variable assignment or undefine.
-@@ -525,7 +522,9 @@ parse_var_assignment (const char *line, struct vmodifiers *vmod)
+@@ -525,7 +517,9 @@ parse_var_assignment (const char *line, struct vmodifiers *vmod)
        wlen = p2 - p;
  
        if (word1eq ("export"))
@@ -1935,7 +1312,7 @@ index fa197fb..545514c 100644
        else if (word1eq ("override"))
          vmod->override_v = 1;
        else if (word1eq ("private"))
-@@ -751,8 +750,8 @@ eval (struct ebuffer *ebuf, int set_default)
+@@ -751,8 +745,8 @@ eval (struct ebuffer *ebuf, int set_default)
  
            assert (v != NULL);
  
@@ -1946,7 +1323,7 @@ index fa197fb..545514c 100644
            if (vmod.private_v)
              v->private_var = 1;
  
-@@ -1322,79 +1321,7 @@ eval (struct ebuffer *ebuf, int set_default)
+@@ -1322,79 +1316,7 @@ eval (struct ebuffer *ebuf, int set_default)
              commands[commands_idx++] = '\n';
            }
  
@@ -2027,7 +1404,7 @@ index fa197fb..545514c 100644
        }
      }
  
-@@ -1912,7 +1839,8 @@ record_target_var (struct nameseq *filenames, char *defn,
+@@ -1912,7 +1834,8 @@ record_target_var (struct nameseq *filenames, char *defn,
        /* Set up the variable to be *-specific.  */
        v->per_target = 1;
        v->private_var = vmod->private_v;
@@ -2037,7 +1414,7 @@ index fa197fb..545514c 100644
  
        /* If it's not an override, check to see if there was a command-line
           setting.  If so, reset the value.  */
-@@ -1935,6 +1863,106 @@ record_target_var (struct nameseq *filenames, char *defn,
+@@ -1935,6 +1858,106 @@ record_target_var (struct nameseq *filenames, char *defn,
      }
  }
  
@@ -2144,7 +1521,7 @@ index fa197fb..545514c 100644
  /* Record a description line for files FILENAMES,
     with dependencies DEPS, commands to execute described
     by COMMANDS and COMMANDS_IDX, coming from FILENAME:COMMANDS_STARTED.
-@@ -2076,29 +2104,6 @@ record_files (struct nameseq *filenames, int are_also_makes,
+@@ -2076,29 +2099,6 @@ record_files (struct nameseq *filenames, int are_also_makes,
  
        free_ns (filenames);
  
@@ -2174,7 +1551,7 @@ index fa197fb..545514c 100644
        /* If this is a static pattern rule:
           'targets: target%pattern: prereq%pattern; recipe',
           make sure the pattern matches this target name.  */
-@@ -3215,10 +3220,10 @@ parse_file_seq (char **stringp, size_t size, int stopmap,
+@@ -3215,10 +3215,10 @@ parse_file_seq (char **stringp, size_t size, int stopmap,
        /* Strip leading "this directory" references.  */
        if (NONE_SET (flags, PARSEFS_NOSTRIP))
  #ifdef VMS
@@ -2669,43 +2046,6 @@ index 99b6a3f..b825631 100644
           * a time. Single file pathnames will fail this and fall
           * to the logic below loop.
           */
-diff --git a/tests/scripts/features/dircache b/tests/scripts/features/dircache
-new file mode 100644
-index 0000000..e5e8469
---- /dev/null
-+++ b/tests/scripts/features/dircache
-@@ -0,0 +1,31 @@
-+#                                                               -*-mode: perl-*-
-+
-+$description = "Test the directory cache behavior.";
-+
-+# The first wildcard should bring the entire directory into the cache Then we
-+# create a new file "behind make's back" then see if the next wildcard detects
-+# it.
-+
-+run_make_test(q!
-+_orig := $(wildcard ./*)
-+$(shell echo > anewfile)
-+_new := $(wildcard ./*)
-+$(info diff=$(filter-out $(_orig),$(_new)))
-+all:;@:
-+!,
-+              '', "diff=./anewfile\n");
-+
-+rmfiles('anewfile');
-+
-+run_make_test(q!
-+_orig := $(wildcard ./*)
-+$(file >anewfile)
-+_new := $(wildcard ./*)
-+$(info diff=$(filter-out $(_orig),$(_new)))
-+all:;@:
-+!,
-+              '', "diff=./anewfile\n");
-+
-+rmfiles('anewfile');
-+
-+1;
 diff --git a/tests/scripts/features/export b/tests/scripts/features/export
 index 81bff0c..ad58177 100644
 --- a/tests/scripts/features/export
@@ -2803,7 +2143,7 @@ index 81bff0c..ad58177 100644
  # This tells the test driver that the perl test script executed properly.
  1;
 diff --git a/tests/scripts/features/include b/tests/scripts/features/include
-index 0c63c06..11e3073 100644
+index 0c63c06..7dd17b5 100644
 --- a/tests/scripts/features/include
 +++ b/tests/scripts/features/include
 @@ -157,7 +157,7 @@ include inc1
@@ -2824,17 +2164,7 @@ index 0c63c06..11e3073 100644
  
      rmfiles('inc1');
  
-@@ -237,8 +237,8 @@ inc1: foo; echo > $@
-     rmfiles('inc1');
- }
- 
--# Including files that can't be read should show an error
- if (defined $ERR_unreadable_file) {
-+    # Including files that can't be read should show an error
-     create_file('inc1', 'FOO := foo');
-     chmod 0000, 'inc1';
- 
-@@ -260,4 +260,37 @@ inc1:; @%s $@ && echo FOO := bar > $@
+@@ -260,4 +260,25 @@ inc1:; @%s $@ && echo FOO := bar > $@
      rmfiles('inc1');
  }
  
@@ -2849,19 +2179,7 @@ index 0c63c06..11e3073 100644
 +all:;
 +!,
 +              '', "i1\ni2\ni3\ni4\n#MAKE#: 'all' is up to date.\n");
-+
-+# Check that included files work if created after the first include failed
-+# https://savannah.gnu.org/bugs/?57676
-+
-+run_make_test(q!
-+-include hello.mk
-+$(shell echo hello=world >hello.mk)
-+include hello.mk
-+default:; @echo $(hello)
-+!,
-+              '', "world\n");
-+
-+unlink('hello.mk');
++rmfiles('foo');
 +
 +# Check the default makefiles... this requires us to invoke make with no
 +# arguments.  Also check MAKEFILES
@@ -3270,122 +2588,6 @@ index 9badc52..6a06109 100644
  # TEST 1: Test that foreach variables take precedence over global
  # variables in a global scope (like inside an eval).  Tests bug #11913
  
-diff --git a/tests/scripts/functions/let b/tests/scripts/functions/let
-new file mode 100644
-index 0000000..f1012e5
---- /dev/null
-+++ b/tests/scripts/functions/let
-@@ -0,0 +1,110 @@
-+#                                                                    -*-perl-*-
-+# $Id$
-+
-+$description = "Test the let function.";
-+
-+$details = "This is a test of the let function in gnu make.
-+This function destructures a list of values and binds each
-+value to a variable name in a list of variable names.
-+Superfluous variable names are assigned the empty string and
-+the remaining values are assigned to the last variable name.
-+The binding holds for the duration of the evaluation of the
-+given text and no longer.  The general form of the command
-+is $(let \$vars,\$list,\$text).  Several types of let
-+assignments are tested\n";
-+
-+# check for mismatched var and list word counts
-+run_make_test(q!
-+a = bad
-+b = news
-+x = $(let a b,1 2,$a $b)
-+y = $(let a,1 2,$a)
-+z = $(let a b,1,$a $b)
-+all:;@echo 'a=,$a,' 'b=,$b,' 'x=,$x,' 'y=,$y,' 'z=,$z,'
-+!,
-+    '', "a=,bad, b=,news, x=,1 2, y=,1 2, z=,1 ,\n");
-+
-+# check for whitespace
-+run_make_test(q!
-+a = bad
-+b = news
-+x = $(let a b,   1   2   ,+$a+$b+)
-+y = $(let a,   1  2   ,+$a+)
-+z = $(let a b,  1   ,+$a+$b+)
-+all:;@echo 'a=,$a,' 'b=,$b,' 'x=,$x,' 'y=,$y,' 'z=,$z,'
-+!,
-+    '', "a=,bad, b=,news, x=,+1+2   +, y=,+1  2   +, z=,+1++,\n");
-+
-+# Allow empty variable names and empty value list.
-+# We still expand the list and body.
-+run_make_test('
-+null =
-+x = $(let $(null),$(info side-effect),abc)
-+y = $(let y,,$ydef)
-+
-+all: ; @echo $x$y',
-+              '', "side-effect\nabcdef\n");
-+
-+# The example macro from the manual.
-+run_make_test('
-+reverse = $(let first rest,$1,$(if $(rest),$(call reverse,$(rest)) )$(first))
-+
-+all: ; @echo $(call reverse, \
-+                 moe   miny  meeny eeny \
-+              )',
-+              '', "eeny meeny miny moe\n");
-+
-+
-+# Set an environment variable that we can test in the makefile.
-+$ENV{FOOFOO} = 'foo foo';
-+
-+# Verify masking: expansion outside the scope of let is unaffected.
-+run_make_test('
-+auto_var = \
-+  udef \
-+  CC \
-+  FOOFOO \
-+  MAKE \
-+  foo \
-+  CFLAGS \
-+  WHITE \
-+  @ \
-+  <
-+av = $(foreach var, $(auto_var), $(origin $(var)) )
-+foo = bletch null @ garf
-+override WHITE := BLACK
-+
-+define mktarget
-+target: foo := $(foo)
-+target: ; @echo $(AR)_$(foo)_
-+endef
-+
-+all: auto target
-+auto: ; @echo $(let $(auto_var),,$(av)) $(av)
-+$(let AR foo,bar foo ,$(eval $(value mktarget)))',
-+              '-e WHITE=WHITE CFLAGS=',
-+              "automatic automatic automatic automatic automatic automatic automatic automatic automatic undefined default environment default file command line override automatic automatic
-+ar_foo _
-+");
-+
-+
-+# Check some error conditions.
-+run_make_test('
-+x = $(let )
-+y = $x
-+
-+all: ; @echo $y',
-+              '',
-+              "#MAKEFILE#:2: *** insufficient number of arguments (1) to function 'let'.  Stop.",
-+              512);
-+
-+run_make_test('
-+x = $(let x,y)
-+y := $x
-+
-+all: ; @echo $y',
-+              '',
-+              "#MAKEFILE#:2: *** insufficient number of arguments (2) to function 'let'.  Stop.",
-+              512);
-+
-+1;
 diff --git a/tests/scripts/functions/origin b/tests/scripts/functions/origin
 index f7b7eb8..9b9fd56 100644
 --- a/tests/scripts/functions/origin
@@ -3614,7 +2816,7 @@ index c44cc50..c40b8db 100644
  run_make_test(undef, '', $r);
  
 diff --git a/tests/scripts/variables/GNUMAKEFLAGS b/tests/scripts/variables/GNUMAKEFLAGS
-index 6e50794..30bccf6 100644
+index 6e50794..063c256 100644
 --- a/tests/scripts/variables/GNUMAKEFLAGS
 +++ b/tests/scripts/variables/GNUMAKEFLAGS
 @@ -5,7 +5,7 @@ $description = "Test proper behavior of GNUMAKEFLAGS";
@@ -3626,7 +2828,7 @@ index 6e50794..30bccf6 100644
  
  run_make_test(q!
  all: ; @echo $(MAKEFLAGS)
-@@ -14,12 +14,12 @@ all: ; @echo $(MAKEFLAGS)
+@@ -14,7 +14,7 @@ all: ; @echo $(MAKEFLAGS)
  
  # Long arguments mean everything is prefixed with "-"
  
@@ -3635,12 +2837,6 @@ index 6e50794..30bccf6 100644
  
  run_make_test(q!
  all: ; @echo $(MAKEFLAGS)
- !,
--              '', "#MAKEFILE#:2: target 'all' does not exist
-+              '', "#MAKEFILE#:2: update target 'all' due to: target does not exist
- echo erR --trace --no-print-directory
- erR --trace --no-print-directory");
- 
 @@ -27,7 +27,7 @@ erR --trace --no-print-directory");
  
  unlink('x.mk');
@@ -3659,48 +2855,6 @@ index 6e50794..30bccf6 100644
  
  unlink('x.mk');
  
-diff --git a/tests/scripts/variables/MAKEFLAGS b/tests/scripts/variables/MAKEFLAGS
-index 0fac74a..752bdc3 100644
---- a/tests/scripts/variables/MAKEFLAGS
-+++ b/tests/scripts/variables/MAKEFLAGS
-@@ -14,7 +14,7 @@ all: ; @echo $(MAKEFLAGS)
- run_make_test(q!
- all: ; @echo $(MAKEFLAGS)
- !,
--              '--no-print-directory -e -r -R --trace', "#MAKEFILE#:2: target 'all' does not exist
-+              '--no-print-directory -e -r -R --trace', "#MAKEFILE#:2: update target 'all' due to: target does not exist
- echo erR --trace --no-print-directory
- erR --trace --no-print-directory");
- 
-@@ -23,14 +23,15 @@ erR --trace --no-print-directory");
- # Savannah bug #2216
- run_make_test(q!
- MSG = Fails
-+.RECIPEPREFIX = >
- all:
--	@echo '$@: MAKEFLAGS=$(MAKEFLAGS)'
--	@MSG=Works $(MAKE) -e -f #MAKEFILE# jump
-+> @echo '$@: MAKEFLAGS=$(MAKEFLAGS)'
-+> @MSG=Works $(MAKE) -e -f #MAKEFILE# jump
- jump:
--	@echo '$@ $(MSG): MAKEFLAGS=$(MAKEFLAGS)'
--	@$(MAKE) -f #MAKEFILE# print
-+> @echo '$@ $(MSG): MAKEFLAGS=$(MAKEFLAGS)'
-+> @$(MAKE) -f #MAKEFILE# print
- print:
--	@echo '$@ $(MSG): MAKEFLAGS=$(MAKEFLAGS)'
-+> @echo '$@ $(MSG): MAKEFLAGS=$(MAKEFLAGS)'
- .PHONY: all jump print
- !,
-                   '--no-print-directory',
-@@ -39,7 +40,3 @@ jump Works: MAKEFLAGS=e --no-print-directory
- print Works: MAKEFLAGS=e --no-print-directory');
- 
- 1;
--
--### Local Variables:
--### eval: (setq whitespace-action (delq 'auto-cleanup whitespace-action))
--### End:
 diff --git a/tests/scripts/variables/SHELL b/tests/scripts/variables/SHELL
 index 4ff1ac2..78d887c 100644
 --- a/tests/scripts/variables/SHELL
