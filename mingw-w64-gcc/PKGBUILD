@@ -254,8 +254,8 @@ build() {
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   #LDFLAGS+=" -Wl,--disable-dynamicbase -Wl,--default-image-base-low"
 
-  export CC='ccache gcc'
-  export CXX='ccache g++'
+  #export CC='ccache gcc'
+  #export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
