@@ -169,13 +169,13 @@ gdb = "gdb"
 
 # The node.js executable to use. Note that this is only used for the emscripten
 # target when running tests, otherwise this can be omitted.
-nodejs = "node"
+#nodejs = "node"
 
 # Python interpreter to use for various tasks throughout the build, notably
 # rustdoc tests, the lldb python interpreter, and some dist bits and pieces.
 #
 # Defaults to the Python interpreter used to execute x.py.
-python = "python2"
+python = "python"
 
 # Force Cargo to check that Cargo.lock describes the precise dependency
 # set that all the Cargo.toml files create, instead of updating it.

@@ -13,8 +13,7 @@ pkgdesc="Systems programming language focused on safety, speed and concurrency (
 arch=('any')
 url="https://www.rust-lang.org/ru/"
 license=('MIT' 'Apache')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc"
-	"${MINGW_PACKAGE_PREFIX}-libgit2")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("bison"
              "flex"
              "git"
@@ -25,7 +24,6 @@ makedepends=("bison"
              "${MINGW_PACKAGE_PREFIX}-lldb"
              "${MINGW_PACKAGE_PREFIX}-llvm"
              "${MINGW_PACKAGE_PREFIX}-ninja"
-             "${MINGW_PACKAGE_PREFIX}-libgit2"
              "${MINGW_PACKAGE_PREFIX}-openssl"
              "${MINGW_PACKAGE_PREFIX}-python"
              $([[ "$_bootstrapping" == "no" ]] && echo "${MINGW_PACKAGE_PREFIX}-rust")
@@ -40,16 +38,7 @@ source=("https://static.rust-lang.org/dist/${_realname}c-${pkgver}-src.tar.gz"
         "0004-unbundle-gcc.patch"
         "0005-win32-config.patch"
         "0006-Update-cc.patch"
-        "00-config.patch")
-sha256sums=('0e763e6db47d5d6f91583284d2f989eacc49b84794d1443355b85c58d67ae43b'
-            '500f9bd7452c8d35115ad823d8fcb9bda8b86878c2a0f57f9e6a72fc4ba9a8f5'
-            '20aae51f8fe525d677d81f4075011db4f413420393ccd212ba21d503880ddb61'
-            '13cb1817ef83b396e16fe271172a77648bffe5e90efbbe98eb5fefc5a8d91860'
-            'b16f65dfdc79e7a722b3e2589e90a1431a971038dd5dfa1394ec0427e3c0a2b4'
-            '1a3d00f3bcf5c21beaa20ee729c45b7b3d76cd2a2c6b70562020f11c1e9dcc6d'
-            '061f1cf5374c926bc130a4afbde005dcd09fdbaee079469ad045fd23a7a88a2c'
-            '3c21cc518439f17944d368fcaf00648f048af4bcabc134f63acf47f32d8cc27b')
-#validpgpkeys=('108F66205EAEB0AAA8DD5E1C85AB96E6FA1BE5FE') # Rust Language (Tag and Release Signing Key) <rust-key@rust-lang.org>
+        "01-llvm_X86_only.patch")
 noextract=(${_realname}c-${pkgver}-src.tar.gz)
 
 prepare() {
@@ -64,7 +53,7 @@ prepare() {
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
-  patch -p1 -i "${srcdir}/00-config.patch"
+  patch -p1 -i "${srcdir}/01-llvm_X86_only.patch"
 }
 
 build() {
@@ -93,10 +82,12 @@ build() {
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
+    --enable-lld \
     --disable-codegen-tests \
     --enable-optimize-llvm \
     --enable-optimize \
     --enable-full-bootstrap \
+    --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
 
@@ -104,7 +95,7 @@ build() {
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  RUST_BACKTRACE=full ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
 }
 
 check() {
@@ -122,7 +113,7 @@ package() {
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 RUST_BACKTRACE=full ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
