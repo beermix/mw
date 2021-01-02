@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.35.1
-pkgrel=5
+pkgrel=6
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -73,12 +73,12 @@ prepare() {
   #patch -p1 -i "${srcdir}"/1006-Import-patch-from-mainline-to-fix-decoding-DWARF-inf.patch
 
   # Temporarily revert defaults change while testing.
-  #patch -p1 -i "${srcdir}"/2000-Temporarily-revert-default-dll-characteristics.patch
+  patch -p1 -i "${srcdir}"/2000-Temporarily-revert-default-dll-characteristics.patch
   # Add an option to change default bases back below 4GB to ease transition
-  #patch -p1 -i "${srcdir}"/2001-ld-option-to-move-default-bases-under-4GB.patch
+  patch -p1 -i "${srcdir}"/2001-ld-option-to-move-default-bases-under-4GB.patch
   # https://github.com/msys2/MINGW-packages/issues/7027
   # https://github.com/msys2/MINGW-packages/issues/7023
-  #patch -p1 -i "${srcdir}"/2002-default-to-4GB-image-base-for-now.patch
+  patch -p1 -i "${srcdir}"/2002-default-to-4GB-image-base-for-now.patch
 
   # Turn off development mode (-Werror, gas run-time checks, date in sonames)
   sed -i '/^development=/s/true/false/' bfd/development.sh
