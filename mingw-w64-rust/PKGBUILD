@@ -60,7 +60,9 @@ build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
+  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple 
+  #     --enable-full-bootstrap \
+
   OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
@@ -77,25 +79,24 @@ build() {
     --host=$OSTYPE \
     --target=$OSTYPE \
     --release-channel=stable \
-    --enable-ninja \
+    --disable-ninja \
     --disable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
     --enable-lld \
     --disable-codegen-tests \
-    --enable-optimize-llvm \
     --enable-optimize \
-    --enable-full-bootstrap \
-    --llvm-root=${MINGW_PREFIX} \
+    --enable-optimize-llvm \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
 
+  RUST_BACKTRACE=full \
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
   nice -n19 \
-  RUST_BACKTRACE=full ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
+  ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py build --verbose --stage 2 -j7
 }
 
 check() {
@@ -110,10 +111,11 @@ check() {
 package() {
   cd "${srcdir}/${CARCH}"
 
+  RUST_BACKTRACE=full \
   DEP_NGHTTP_ROOT=${MINGW_PREFIX} \
   DEP_OPENSSL_ROOT=${MINGW_PREFIX} \
   DEP_Z_ROOT=${MINGW_PREFIX} \
-  DESTDIR=${pkgdir} nice -n19 RUST_BACKTRACE=full ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
+  DESTDIR=${pkgdir} nice -n19 ${MINGW_PREFIX}/bin/python ../${_realname}c-${pkgver}-src/x.py install --stage 2 --verbose -j7
 
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libgcc*.dll
   rm -f ${pkgdir}${MINGW_PREFIX}/bin/libstd*.dll
