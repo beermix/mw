@@ -3,7 +3,7 @@
 _realname=libsodium
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=8acd22717f6af798b1ed5fd275e2b4c789425cf5
+pkgver=d1580db1b34b7c73abb960e5f464a87ce8b7ed7d
 pkgrel=1
 pkgdesc="P(ortable|ackageable) NaCl-based crypto library (mingw-w64)"
 arch=("any")
