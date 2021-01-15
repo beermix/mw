@@ -84,7 +84,7 @@ build() {
     --prefix=${MINGW_PREFIX}                      \
     --system-libs                                 \
     --no-qt-gui                                      \
-    --parallel=7
+    --parallel=8
   plain "Start building..."
   make
 }

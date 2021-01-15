@@ -266,7 +266,7 @@ build() {
     --with-native-system-header-dir=${MINGW_PREFIX}/${MINGW_CHOST}/include \
     --libexecdir=${MINGW_PREFIX}/lib \
     --enable-bootstrap \
-    --with-arch=${_arch} \
+    --with-arch=haswell \
     --with-tune=haswell \
     --enable-languages=${_languages} \
     --enable-shared --enable-static \
