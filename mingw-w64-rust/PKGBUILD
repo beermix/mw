@@ -60,9 +60,7 @@ build() {
   [[ -d "${srcdir}/${CARCH}" ]] && rm -rf "${srcdir}/${CARCH}"
   mkdir -p "${srcdir}/${CARCH}" && cd "${srcdir}/${CARCH}"
 
-  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple 
-  #     --enable-full-bootstrap \
-
+  #We have to do the following because rust doesn't count x86_64-w64-mingw32 as a target triple
   OSTYPE="$CARCH-pc-windows-gnu"
 
   local -a _rust_conf=()
@@ -85,6 +83,7 @@ build() {
     --disable-compiler-docs \
     --enable-extended \
     --enable-lld \
+    --enable-full-bootstrap \
     --disable-codegen-tests \
     --enable-optimize \
     --enable-optimize-llvm \
