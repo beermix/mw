@@ -18,7 +18,7 @@ sha256sums=('2892af8f95bf3e1a8457a550018d9e9b7c07934190b73fb650301ae30074b796')
 
 prepare() {
   cd ${srcdir}/UASM-2.50/
-  patch -p1 -i ${srcdir}/clang.patch
+  #patch -p1 -i ${srcdir}/clang.patch
   rm -rf MinGW-w64R
 }
 
