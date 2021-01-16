@@ -693,20 +693,20 @@ package_it() {
 
   find "${pkgdir}${_qt5_prefix}/lib/pkgconfig" -type f -name '*.pc' \
       -exec sed -i -e "s|${QT_PREFIX_WIN}|${_qt5_prefix}|g" {} \;
-      
+
   find "${pkgdir}${_qt5_prefix}/lib/pkgconfig" -type f -name '*.pc' \
       -exec sed -i -e "s|${PKGDIR_QT_PREFIX_WIN}|${_qt5_prefix}|g" {} \;
 
   if [ "${_variant}" = "-static" ]; then
     find "${pkgdir}${_qt5_prefix}/lib" -type f -name '*.cmake' \
       -exec sed -i -e "s|${MINGW_PREFIX_WIN}|${FAKE_PREFIX_FOR_REPLACE}/..|g" {} \;
-    
+
     find "${pkgdir}${_qt5_prefix}/share/qt5" -type f \( -name '*.pri' -o -name '*.prl' \) \
       -exec sed -i -e "s|${MINGW_PREFIX_WIN}|${FAKE_PREFIX_FOR_REPLACE}/..|g" {} \;  
-    
+
     find "${pkgdir}${_qt5_prefix}/lib" -type f \( -name '*.pri' -o -name '*.prl' \) \
       -exec sed -i -e "s|${MINGW_PREFIX_WIN}|${FAKE_PREFIX_FOR_REPLACE}/..|g" {} \;
-    
+
     find "${pkgdir}${_qt5_prefix}/lib/pkgconfig" -type f -name '*.pc' \
       -exec sed -i -e "s|${MINGW_PREFIX_WIN}|${MINGW_PREFIX}|g" {} \;
   fi

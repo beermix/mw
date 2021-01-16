@@ -33,6 +33,7 @@ build() {
     --build=${MINGW_CHOST} \
     --enable-static \
     --disable-shared \
+    --with-gcc-arch=x86-64 \
     --with-gmp-prefix=${MINGW_PREFIX}
 
   make

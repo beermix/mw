@@ -56,9 +56,9 @@ validpgpkeys=('EAF1C276A747E9ED86210CBAC3126D3B4AE55E93'
 prepare() {
   cd ${srcdir}/${_realname}-${pkgver}
 
-  unset CFLAGS
-  unset CXXFLAGS
-  unset LDFLAGS
+  #unset CFLAGS
+  #unset CXXFLAGS
+  #unset LDFLAGS
 
   patch -p1 -i "${srcdir}"/000-binutils35-stable-branch.patch
   patch -p1 -i "${srcdir}"/nodocs.patch
