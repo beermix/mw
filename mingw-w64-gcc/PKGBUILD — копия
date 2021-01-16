@@ -202,7 +202,7 @@ prepare() {
 
   # mmapio.c:69:14: error: implicit declaration of function ‘getpagesize’
   # sed -i 's|\-Werror||g' libbacktrace/configure
-  
+
   # hack! - some configure tests for header files using "$CPP $CPPFLAGS"
   # sed -i "/ac_cpp=/s/\$CPPFLAGS/\$CPPFLAGS -O2/" {libiberty,gcc}/configure
 
