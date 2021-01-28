@@ -19,7 +19,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libgccjit")
         )
-_snapshot=20210109
+_snapshot=20210123
 pkgver=10.2.1
 _majorver=10
 _sourcedir=${_realname}-${_majorver}-${_snapshot}
@@ -259,8 +259,8 @@ build() {
   local _LDFLAGS_FOR_TARGET="$LDFLAGS"
   LDFLAGS+=" -Wl,--disable-dynamicbase"
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
+#  export CC='ccache gcc'
+#  export CXX='ccache g++'
 
   ../${_sourcedir}/configure \
     --prefix=${MINGW_PREFIX} \
