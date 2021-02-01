@@ -2,7 +2,7 @@
 
 pkgname=mc
 pkgver=4.8.26
-pkgrel=1
+pkgrel=2
 pkgdesc="Midnight Commander is a text based filemanager/shell that emulates Norton Commander"
 arch=('i686' 'x86_64')
 url="https://www.midnight-commander.org/"
@@ -49,14 +49,12 @@ prepare() {
 
   ./autogen.sh
 
-  #patch -Np1 -i "${srcdir}/000-git.patch"
-  patch -Np2 -i "${srcdir}/4.7.5.2-ncursesw-term.h.patch"
+  #patch -Np2 -i "${srcdir}/4.7.5.2-ncursesw-term.h.patch"
   patch -Np1 -i "${srcdir}/mc-4.8.19-msys2.patch"
-  patch -Np1 -i "${srcdir}/020-fix-mouse-handling-newer-terminfo.patch"
+  #patch -Np1 -i "${srcdir}/020-fix-mouse-handling-newer-terminfo.patch"
   patch -Np0 -i "${srcdir}/0003-vfs-win32-absolute-paths.patch"
 
   autoreconf -fi
-
 }
 
 build() {
@@ -67,8 +65,18 @@ build() {
     --sysconfdir=/etc \
     --without-libintl-prefix \
     --without-libiconv-prefix \
-    --with-screen=ncursesw \
+    --with-screen=slang \
     --enable-charset \
+    --disable-aspell \
+    --disable-doxygen-doc \
+    --disable-doxygen-rtf \
+    --disable-doxygen-xml \
+    --disable-doxygen-chm \
+    --disable-doxygen-chi \
+    --disable-doxygen-dot \
+    --disable-doxygen-html \
+    --without-x  \
+    --without-internal-edit \
     --libexecdir=/usr/lib
 
   make
