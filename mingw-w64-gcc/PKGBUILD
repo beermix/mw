@@ -19,13 +19,12 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libgccjit")
         )
-_snapshot=20210123
-pkgver=10.2.1
-_majorver=10
-_sourcedir=${_realname}-${_majorver}-${_snapshot}
-#_sourcedir=${_realname}-${pkgver}
-pkgrel=2
-#_islver=0.21
+#_snapshot=20181214
+pkgver=10.2.0
+#_majorver=${pkgver:0:1}
+#_sourcedir=${_realname}-${_majorver}-${_snapshot}
+_sourcedir=${_realname}-${pkgver}
+pkgrel=6
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
 url="https://gcc.gnu.org"
@@ -48,7 +47,8 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-${_realname}"
 #checkdepends=('dejagnu')
 optdepends=()
 options=('staticlibs' '!emptydirs') # '!strip' 'debug')
-source=("https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz"
+source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
+        #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
         #"http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
         0002-Relocate-libintl.patch
@@ -137,7 +137,8 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch
+    010-documentation.patch \
+    000-gcc10-stable-branch.patch
 
 #    ipa-cp.patch \
 #    openmp-vectorize-v2.patch \
@@ -198,7 +199,7 @@ prepare() {
   local MINGW_NATIVE_PREFIX=$(cygpath -am ${MINGW_PREFIX}/${MINGW_CHOST})
   sed -i "s#\\/mingw\\/#${MINGW_NATIVE_PREFIX//\//\\/}\\/#g" gcc/config/i386/mingw32.h
 
-  # echo ${pkgver} > gcc/BASE-VER
+  echo ${pkgver} > gcc/BASE-VER
 
   # mmapio.c:69:14: error: implicit declaration of function ‘getpagesize’
   # sed -i 's|\-Werror||g' libbacktrace/configure
