@@ -92,10 +92,10 @@ build() {
     --with-sysroot=${MINGW_PREFIX} \
     --with-libiconv-prefix=${MINGW_PREFIX} \
     ${_conf} \
-    --disable-nls \
+    --enable-nls \
     --disable-rpath \
     --disable-multilib \
-    --disable-silent-rules \
+    --enable-silent-rules \
     --enable-install-libiberty \
     --enable-plugins \
     --enable-targets=x86_64-*-mingw* \
