@@ -246,9 +246,9 @@ build() {
     _languages+=",jit"
   fi
 
-#  CFLAGS=${CFLAGS/-pipe/}
-#  CXXFLAGS=${CXXFLAGS/-pipe/}
-#  LDFLAGS=${LDFLAGS/-pipe/}
+CFLAGS=${CFLAGS/-pipe/}
+CXXFLAGS=${CXXFLAGS/-pipe/}
+LDFLAGS=${LDFLAGS/-pipe/}
 
 #  unset CFLAGS
 #  unset CXXFLAGS
