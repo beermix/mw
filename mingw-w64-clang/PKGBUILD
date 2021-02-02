@@ -265,7 +265,8 @@ build() {
   ${MINGW_PREFIX}/bin/cmake.exe \
     -G"$_generator" \
     -DLLVM_ENABLE_WERROR=OFF \
-    -DLLVM_CCACHE_BUILD=OFF \
+    -DLLVM_CCACHE_BUILD=ON \
+    -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_ASM_MASM_COMPILER="${ASM_COMPILER}" \
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX} \
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib \
@@ -298,7 +299,7 @@ build() {
   sed -i.orig 's/\/c \/Fo/-c -Fo/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
   sed -i.orig 's/\/safeseh \/coff/-safeseh -coff/' projects/openmp/runtime/src/CMakeFiles/omp.dir/build.make
 
-  /home/User/.bin/noti --time nice -n19 ${_make_cmd} -j7
+  /home/User/.bin/noti --time nice -n19 ${_make_cmd} -j6
 
   # Disable automatic installation of components that go into subpackages
   # -i.orig to check what has been removed in-case it starts dropping more than it should
@@ -316,6 +317,7 @@ build() {
     -DCMAKE_INSTALL_PREFIX=${MINGW_PREFIX}
     -DCMAKE_RANLIB=${srcdir}/build-${CARCH}/bin/llvm-ranlib
     -DCMAKE_SYSTEM_IGNORE_PATH=/usr/lib
+    -DLLVM_TARGETS_TO_BUILD="X86"
     -DLIBCXX_ENABLE_EXPERIMENTAL_LIBRARY=ON
     -DLIBCXX_ENABLE_STATIC_ABI_LIBRARY=ON
     -DLIBCXX_HAS_WIN32_THREAD_API=ON

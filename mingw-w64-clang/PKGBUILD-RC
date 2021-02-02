@@ -179,11 +179,8 @@ prepare() {
   cd "${srcdir}/llvm-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
       "0002-Fix-GetHostTriple-for-mingw-w64-in-msys.patch" \
-      "0005-add-pthread-as-system-lib-for-mingw.patch" \
       "0008-enable-emutls-for-mingw.patch" \
-      "0009-empty-target-prefix-only-msvc.patch" \
-      "0010-mbig-obj-for-all.patch" \
-      "0013-Add-Z3-to-system-libraries-list-if-enabled.patch"
+      "0010-mbig-obj-for-all.patch"
 
   # https://bugs.llvm.org/show_bug.cgi?id=25493
   apply_patch_with_msg \
@@ -194,8 +191,6 @@ prepare() {
 
   cd "${srcdir}/clang-${pkgver}${rc_ver}.src"
   apply_patch_with_msg \
-      "0101-Allow-build-static-clang-library-for-mingw.patch" \
-      "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
       "0105-build-libclang-cpp-fix.patch"
 
