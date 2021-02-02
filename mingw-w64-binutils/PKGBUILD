@@ -6,7 +6,7 @@ _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
 pkgver=2.36
-pkgrel=3
+pkgrel=4
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -23,7 +23,8 @@ source=(https://ftp.gnu.org/gnu/binutils/${_realname}-${pkgver}.tar.xz
         0110-binutils-mingw-gnu-print.patch
         0410-windres-handle-spaces.patch
         nodocs.patch
-        2001-ld-option-to-move-default-bases-under-4GB.patch)
+        2001-ld-option-to-move-default-bases-under-4GB.patch
+        000-binutils36-stable-branch.patch)
 sha256sums=('5788292cc5bbcca0848545af05986f6b17058b105be59e99ba7d0f9eb5336fb8'
             'SKIP'
             '2c99345fc575c3a060d6677537f636c6c4154fac0fde508070f3b6296c1060d4'
@@ -48,7 +49,8 @@ prepare() {
     0002-check-for-unusual-file-harder.patch \
     0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch \
     0110-binutils-mingw-gnu-print.patch \
-    nodocs.patch
+    nodocs.patch \
+    000-binutils36-stable-branch.patch
 
   # https://sourceware.org/bugzilla/show_bug.cgi?id=4356
   apply_patch_with_msg \

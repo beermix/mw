@@ -19,8 +19,8 @@ update:
 	( \
 		cd ~/binutils-gdb ; \
 		git remote update -p > /dev/null 2>&1 ; \
-		git diff binutils-2_35_1..origin/binutils-2_35-branch | filterdiff --exclude="*/bfd/version.h"; \
+		git diff binutils-2_36..origin/binutils-2_36-branch | filterdiff --exclude="*/bfd/version.h"; \
 	) > binutils-stable-branch.patch
 	git diff --exit-code binutils-stable-branch.patch
 	mv binutils-stable-branch.patch 000-binutils35-stable-branch.patch
-	mv -f 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils35-stable-branch.patch
+	mv -f 000-binutils35-stable-branch.patch /home/User/mw-my/mingw-w64-binutils/000-binutils36-stable-branch.patch
