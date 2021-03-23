@@ -19,7 +19,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          $([[ "$_enable_objc" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-${_realname}-objc")
          $([[ "$_enable_jit" == "yes" ]] && echo "${MINGW_PACKAGE_PREFIX}-libgccjit")
         )
-#_snapshot=20210320
+#_snapshot=20181214
 pkgver=10.2.0
 #_majorver=${pkgver:0:1}
 #_sourcedir=${_realname}-${_majorver}-${_snapshot}
@@ -50,7 +50,6 @@ options=('staticlibs' '!emptydirs') # '!strip' 'debug')
 source=("https://ftp.gnu.org/gnu/gcc/${_realname}-${pkgver%%+*}/${_realname}-${pkgver}.tar.xz"{,.sig}
         #https://www.mirrorservice.org/sites/sourceware.org/pub/gcc/snapshots/${_majorver}-${_snapshot}/gcc-${_majorver}-${_snapshot}.tar.xz
         "gdbinit"
-        #"http://isl.gforge.inria.fr/isl-${_islver}.tar.bz2"
         0002-Relocate-libintl.patch
         0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch
         0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch
@@ -137,8 +136,7 @@ prepare() {
 
   # Enable clear linux patches
   apply_patch_with_msg \
-    010-documentation.patch \
-    000-gcc10-stable-branch.patch
+    010-documentation.patch
 
 #    ipa-cp.patch \
 #    openmp-vectorize-v2.patch \
@@ -168,6 +166,7 @@ prepare() {
     0011-Enable-shared-gnat-implib.patch \
     0012-Handle-spaces-in-path-for-default-manifest.patch \
     0014-gcc-9-branch-clone_function_name_1-Retain-any-stdcall-suffix.patch \
+    0015-makedeps-properly-handle-win-paths.patch \
     0020-libgomp-Don-t-hard-code-MS-printf-attributes.patch \
     0021-gcc-config-i386-mingw32.h-Ensure-lmsvcrt-precede-lke.patch \
     0022-jit-port-libgccjit-to-Windows.patch \
