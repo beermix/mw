@@ -32,7 +32,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}"
          "${MINGW_PACKAGE_PREFIX}-llvm"
          "${MINGW_PACKAGE_PREFIX}-openmp"
          "${MINGW_PACKAGE_PREFIX}-polly")
-pkgver=11.0.1
+pkgver=11.1.0
 pkgrel=1
 pkgdesc="C language family frontend for LLVM (mingw-w64)"
 arch=('any')
@@ -53,8 +53,9 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
                "${MINGW_PACKAGE_PREFIX}-libc++")
              $([[ "$_generator" == "Ninja" ]] && echo \
                "${MINGW_PACKAGE_PREFIX}-ninja")
+             $([[ "$_compiler" == "gcc" ]] && echo \
+               "${MINGW_PACKAGE_PREFIX}-gcc")
              )
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('!debug' 'strip')
 _url=https://github.com/llvm/llvm-project/releases/download/llvmorg-${pkgver}
 source=(${_url}/llvm-${pkgver}.src.tar.xz
@@ -166,15 +167,15 @@ apply_patch_with_msg() {
 prepare() {
   plain "Extracting clang-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/clang-${pkgver} ]] && rm -rf ${srcdir}/clang-${pkgver}
-  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJvf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/clang-${pkgver} ]] || tar -xJf ${srcdir}/clang-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting libcxx-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/libcxx-${pkgver} ]] && rm -rf ${srcdir}/libcxx-${pkgver}
-  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJvf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/libcxx-${pkgver} ]] || tar -xJf ${srcdir}/libcxx-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   plain "Extracting lldb-${pkgver}.src.tar.xz due to symlink(s) without pre-existing target(s)"
   [[ -d ${srcdir}/lldb-${pkgver} ]] && rm -rf ${srcdir}/lldb-${pkgver}
-  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJvf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
+  [[ -d ${srcdir}/lldb-${pkgver} ]] || tar -xJf ${srcdir}/lldb-${pkgver}.src.tar.xz -C ${srcdir} || true
 
   cd "${srcdir}/llvm-${pkgver}.src"
   apply_patch_with_msg \
@@ -198,8 +199,7 @@ prepare() {
       "0101-Allow-build-static-clang-library-for-mingw.patch" \
       "0102-fix-libclang-name-for-mingw.patch" \
       "0104-link-pthread-with-mingw.patch" \
-      "0105-build-libclang-cpp-fix.patch" \
-      "0106-cmake-Fix-build-of-attribute-plugin-example-on-Windo.patch"
+      "0105-build-libclang-cpp-fix.patch"
 
   cd "${srcdir}/compiler-rt-${pkgver}.src"
   apply_patch_with_msg \
@@ -453,6 +453,7 @@ package_libc++() {
 package_openmp() {
   pkgdesc="OpenMP library (mingw-w64)"
   url="https://openmp.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 
   cd "${srcdir}/openmp"
   ${_make_cmd} -C ../build-${CARCH}/projects/openmp DESTDIR="${pkgdir}" install
@@ -470,6 +471,7 @@ package_libc++abi() {
 package_libunwind() {
   pkgdesc='A new implementation of a stack unwinder for C++ exceptions (mingw-w64)'
   url='https://llvm.org/'
+  depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 
   cd "${srcdir}/libunwind"
   ${_make_cmd} -C ../build-libcxx-static-${CARCH}/projects/libunwind DESTDIR="${pkgdir}" install
@@ -548,9 +550,13 @@ package_polly() {
     -i "${pkgdir}/${MINGW_PREFIX}/lib/cmake/polly/PollyConfig.cmake"
 }
 
-# Wrappers
+# template start; name=mingw-w64-splitpkg-wrappers; version=1.0;
+# vim: set ft=bash :
+
+# generate wrappers
 for _name in "${pkgname[@]}"; do
   _short="package_${_name#${MINGW_PACKAGE_PREFIX}-}"
   _func="$(declare -f "${_short}")"
   eval "${_func/#${_short}/package_${_name}}"
 done
+# template end;

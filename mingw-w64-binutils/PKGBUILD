@@ -5,8 +5,8 @@
 _realname=binutils
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=2.36
-pkgrel=5
+pkgver=2.36.1
+pkgrel=1
 pkgdesc="A set of programs to assemble and manipulate binary and object files (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/binutils/"
@@ -49,8 +49,7 @@ prepare() {
     0002-check-for-unusual-file-harder.patch \
     0010-bfd-Increase-_bfd_coff_max_nscns-to-65279.patch \
     0110-binutils-mingw-gnu-print.patch \
-    nodocs.patch \
-    000-binutils36-stable-branch.patch
+    nodocs.patch
 
   # https://sourceware.org/bugzilla/show_bug.cgi?id=4356
   apply_patch_with_msg \
