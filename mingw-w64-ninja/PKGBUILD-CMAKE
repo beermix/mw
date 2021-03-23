@@ -3,8 +3,7 @@
 _realname=ninja
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-#pkgver=0b5f5ba91020668856f87f079a61380198540bd7
-pkgver=67f960be1be8099ea1727af8d3361d38274b2bd1
+pkgver=db6c4ac47601c88984822e1e7b5f4b9044dd6d81
 pkgrel=1
 pkgdesc="Ninja is a small build system with a focus on speed (mingw-w64)"
 arch=('any')
