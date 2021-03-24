@@ -5,14 +5,14 @@
 _realname=fdk-aac
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=d387d3b6ed79ff9a82c60440bdd86e6e5e324bec
+pkgver=2.0.1
 pkgrel=1
 pkgdesc="A standalone library of the Fraunhofer FDK AAC code from Android (mingw-w64)"
 arch=('any')
 license=('custom')
 makedepends=('autoconf' 'automake' 'libtool' 'make')
 url="https://github.com/mstorsjo/${_realname}"
-source=(${_realname}-${pkgver}.tar.gz::"${url}/archive/${pkgver}.tar.gz")
+source=(${_realname}-${pkgver}.tar.gz::"${url}/archive/v${pkgver}.tar.gz")
 sha256sums=('a4142815d8d52d0e798212a5adea54ecf42bcd4eec8092b37a8cb615ace91dc6')
 
 prepare() {
@@ -39,4 +39,8 @@ package() {
   cd ${srcdir}/build-${CARCH}
 
   make DESTDIR=${pkgdir} install
+  
+  # Install license
+  install -dm 755 "${pkgdir}${MINGW_PREFIX}"/share/licenses/libfdk-aac
+  install -m 644 "${srcdir}"/${_realname}-${pkgver}/NOTICE "${pkgdir}${MINGW_PREFIX}"/share/licenses/libfdk-aac/
 }
