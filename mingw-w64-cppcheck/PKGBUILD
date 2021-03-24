@@ -3,7 +3,7 @@
 _realname=cppcheck
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=2.1
+pkgver=2.4
 pkgrel=1
 pkgdesc="static analysis of C/C++ code (mingw-w64)"
 arch=('any')
@@ -21,7 +21,7 @@ sha256sums=('c4864d3e09359214efdd503b52e241f4f56ba7ce26f8c11939fd9dcfac1fd105'
 
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
-  patch -p1 -i "${srcdir}/0010-change-language-files-path.patch"
+  #patch -p1 -i "${srcdir}/0010-change-language-files-path.patch"
   patch -p1 -i "${srcdir}/0020-change-cfg-path.patch"
 }
 
