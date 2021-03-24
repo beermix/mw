@@ -125,14 +125,15 @@ source=("https://www.python.org/ftp/python/${pkgver%rc?}/Python-${pkgver}.tar.xz
         1890-_xxsubinterpretersmodule.patch
         2010-configure-have-inet-pton.patch
         2030-fix-msvc9-import.patch
-        2050-undo-venv-redirector.patch
         2051-set-venv-activate-path-unix.patch
-        2052-venv-remove-msys-from-env-and-add-exe-prefix.patch
+        2052-venv-creation-fixes.patch
         2060-pass-gen-profile-ldflags.patch
         2070-distutils-add-windmc-to-cygwinccompiler.patch
         2080-pkg-config-windows-must-link-ext-with-python-lib.patch
         3000-importlib-bootstrap-path-sep.patch
         3001-pathlib-path-sep.patch
+        3011-fix-build-testinternalcapi.patch
+        3020-extend-MS_WINDOWS-flag.patch
         5000-warnings-fixes.patch
         smoketests.py)
 
@@ -286,7 +287,7 @@ prepare() {
   # https://github.com/msys2/MINGW-packages/issues/5001
   apply_patch_with_msg 2050-undo-venv-redirector.patch
   apply_patch_with_msg 2051-set-venv-activate-path-unix.patch
-  apply_patch_with_msg 2052-venv-remove-msys-from-env-and-add-exe-prefix.patch
+  apply_patch_with_msg 2052-venv-creation-fixes.patch
 
   apply_patch_with_msg 2060-pass-gen-profile-ldflags.patch
   

@@ -25,8 +25,6 @@ validpgpkeys=('5A939A71A46792CF57866A51996DDA075594ADB8') # Joel Rosdahl <joel@r
 prepare() {
   cd "${srcdir}/${_realname}-${pkgver}"
   patch -p1 -i "${srcdir}/01-directory-separator.patch"
-
-# autoreconf -ifv
 }
 
 build() {

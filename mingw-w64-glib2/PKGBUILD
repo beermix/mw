@@ -6,13 +6,12 @@
 _realname=glib2
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=2.66.4
+pkgver=2.66.7
 pkgrel=1
 url="https://www.gtk.org/"
 arch=('any')
 pkgdesc="Common C routines used by GTK+ 3 and other libs (mingw-w64)"
 license=(LGPL2)
-install=glib2-${CARCH}.install
 depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
          "${MINGW_PACKAGE_PREFIX}-gettext"
          "${MINGW_PACKAGE_PREFIX}-pcre"
@@ -22,6 +21,7 @@ depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs"
 makedepends=("${MINGW_PACKAGE_PREFIX}-gcc"
              "${MINGW_PACKAGE_PREFIX}-meson"
              "${MINGW_PACKAGE_PREFIX}-python-setuptools")
+options=('strip' '!debug' 'staticlibs')
 source=("https://download.gnome.org/sources/glib/${pkgver%.*}/glib-${pkgver}.tar.xz"
         0001-Update-g_fopen-g_open-and-g_creat-to-open-with-FILE_.patch
         0001-win32-Make-the-static-build-work-with-MinGW-when-pos.patch
@@ -65,37 +65,42 @@ build() {
   fi
 
   MSYS2_ARG_CONV_EXCL="--prefix=" \
-  meson \
+  ${MINGW_PREFIX}/bin/meson.exe \
     --prefix="${MINGW_PREFIX}" \
     "${extra_config[@]}" \
+    --wrap-mode=nodownload \
+    --auto-features=enabled \
     --default-library=static \
     -Dforce_posix_threads=true \
     "../glib-${pkgver}"
-    nice -n19 ninja -j7
+
+  ${MINGW_PREFIX}/bin/meson.exe compile
 
   msg "Build shared version"
   [[ -d "${srcdir}"/build-${CARCH}-shared ]] && rm -rf "${srcdir}"/build-${CARCH}-shared
   mkdir "${srcdir}"/build-${CARCH}-shared && cd "${srcdir}"/build-${CARCH}-shared
 
   MSYS2_ARG_CONV_EXCL="--prefix=" \
-  meson \
+  ${MINGW_PREFIX}/bin/meson.exe \
     --prefix="${MINGW_PREFIX}" \
     "${extra_config[@]}" \
+    --wrap-mode=nodownload \
+    --auto-features=enabled \
     -Ddefault_library=shared \
     -Dman=false \
     -Dforce_posix_threads=true \
     -Dgtk_doc=false \
     "../glib-${pkgver}"
 
-    nice -n19 ninja -j7
+  ${MINGW_PREFIX}/bin/meson.exe compile
 }
 
 package() {
   cd "${srcdir}/build-${CARCH}-static"
-  DESTDIR="${pkgdir}" ninja install
+  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/meson.exe install
 
   cd "${srcdir}/build-${CARCH}-shared"
-  DESTDIR="${pkgdir}" ninja install
+  DESTDIR="${pkgdir}" ${MINGW_PREFIX}/bin/meson.exe install
 
   for hook in glib-compile-schemas gio-querymodules; do
     local hook_path="${srcdir}/${MINGW_PACKAGE_PREFIX}-${hook}.hook";
@@ -107,11 +112,8 @@ package() {
 
   install -Dm644 "${srcdir}/glib-${pkgver}/COPYING" "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/COPYING"
 
-  local _PRE_WIN="$(cygpath -m ${MINGW_PREFIX})"
   for name in glib-mkenums glib-genmarshal gdbus-codegen gtester-report; do
     ${MINGW_PREFIX}/bin/python3 \
       "${srcdir}/pyscript2exe.py" "${pkgdir}${MINGW_PREFIX}/bin/${name}"
-    sed -e "s|${_PRE_WIN}|${MINGW_PREFIX}|g" \
-     -i ${pkgdir}${MINGW_PREFIX}/bin/${name}-script.py
   done
 }

@@ -6,7 +6,7 @@
 _realname=go
 pkgbase=mingw-w64-${_realname}
 pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
-pkgver=1.15.6
+pkgver=1.16
 pkgrel=1
 pkgdesc="Go Lang (mingw-w64)"
 arch=('any')
@@ -76,7 +76,11 @@ package() {
   export GOROOT="${srcdir}/${_realname}-${pkgver}"
   export GOBIN="${GOROOT}/bin"
 
-  mkdir -p "${pkgdir}${MINGW_PREFIX}/"{bin,lib/go,lib/go/src,lib/go/site/src,share/go}
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/"{bin,lib/go,lib/go/doc,lib/go/src,lib/go/site/src,share/licenses/go,share/go}
+
+  mkdir -p "${pkgdir}${MINGW_PREFIX}/share/licenses/go"
+  install -Dm644 "${srcdir}"/${_realname}-${pkgver}/LICENSE \
+    "${pkgdir}${MINGW_PREFIX}/share/licenses/go/LICENSE"
 
   cp -rf bin "${pkgdir}${MINGW_PREFIX}"
   cp -rf bin pkg src lib misc api test "${pkgdir}${MINGW_PREFIX}/lib/go"

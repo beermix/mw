@@ -433,6 +433,7 @@ package_clang-tools-extra() {
 package_compiler-rt() {
   pkgdesc="Runtime libraries for Clang and LLVM (mingw-w64)"
   url="https://compiler-rt.llvm.org/"
+  depends=("${MINGW_PACKAGE_PREFIX}-gcc-libs")
 
   cd "${srcdir}"/compiler-rt
   ${_make_cmd} -C ../build-${CARCH}/projects/compiler-rt DESTDIR="${pkgdir}" install

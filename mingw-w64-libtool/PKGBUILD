@@ -5,12 +5,12 @@ _realname=libtool
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
 pkgver=2.4.6
-pkgrel=17
+pkgrel=18
 pkgdesc="A system independent dlopen wrapper for GNU libtool (mingw-w64)"
 arch=('any')
 url="https://www.gnu.org/software/libtool"
 license=("GPL")
-makedepends=("${MINGW_PACKAGE_PREFIX}-gcc" "help2man" "texinfo")
+makedepends=("${MINGW_PACKAGE_PREFIX}-gcc")
 options=('staticlibs' 'strip')
 source=("https://ftp.gnu.org/pub/gnu/libtool/${_realname}-${pkgver}.tar.xz"{,.sig}
         #https://alpha.gnu.org/gnu/libtool/${_realname}-${pkgver}.tar.xz{,.sig}

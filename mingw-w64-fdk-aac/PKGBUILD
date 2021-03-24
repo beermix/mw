@@ -4,7 +4,7 @@
 _realname=fdk-aac
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=a52114dd6953ec21520cd92fd36739bc8498e86f
+pkgver=0a90c09e00c3f6238efe8c89daf2c7e55ea4f011
 pkgrel=1
 pkgdesc="A standalone library of the Fraunhofer FDK AAC code from Android (mingw-w64)"
 arch=('any')
