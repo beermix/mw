@@ -1,10 +1,11 @@
 # Contributor: Alexander Georgievskiy <galeksandrp@gmail.com>
 # Contributor: Andrew Sun <adsun701@gmail.com>
+# https://github.com/mstorsjo/fdk-aac
 
 _realname=fdk-aac
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-pkgver=0a90c09e00c3f6238efe8c89daf2c7e55ea4f011
+pkgver=d387d3b6ed79ff9a82c60440bdd86e6e5e324bec
 pkgrel=1
 pkgdesc="A standalone library of the Fraunhofer FDK AAC code from Android (mingw-w64)"
 arch=('any')
@@ -38,8 +39,4 @@ package() {
   cd ${srcdir}/build-${CARCH}
 
   make DESTDIR=${pkgdir} install
-  
-  # Install license
-  install -dm 755 "${pkgdir}${MINGW_PREFIX}"/share/licenses/libfdk-aac
-  install -m 644 "${srcdir}"/${_realname}-${pkgver}/NOTICE "${pkgdir}${MINGW_PREFIX}"/share/licenses/libfdk-aac/
 }
