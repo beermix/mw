@@ -144,7 +144,7 @@ prepare() {
 #    gomp-relax.patch \
 #    tune-inline.patch
 
-#     000-gcc10-stable-branch.patch
+#    000-gcc10-stable-branch.patch
 #    optimize.patch \
 #    optimize-at-least-some.patch
 #    ipa-cp.patch \
