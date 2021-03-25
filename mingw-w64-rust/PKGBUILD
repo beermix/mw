@@ -48,9 +48,9 @@ prepare() {
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
   patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
+  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
   #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
-  patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
+  #patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
   patch -p1 -i "${srcdir}/01-llvm_X86_only.patch"
@@ -78,15 +78,12 @@ build() {
     --target=$OSTYPE \
     --release-channel=stable \
     --disable-ninja \
-    --disable-ccache \
+    --enable-ccache \
     --disable-docs \
     --disable-compiler-docs \
     --enable-extended \
-    --enable-lld \
-    --enable-full-bootstrap \
     --disable-codegen-tests \
-    --enable-optimize \
-    --enable-optimize-llvm \
+    --llvm-root=${MINGW_PREFIX} \
     --python=${MINGW_PREFIX}/bin/python \
     ${_rust_conf}
 
