@@ -4,8 +4,8 @@
 _realname=qemu
 pkgbase=mingw-w64-${_realname}
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}"
-_base_ver=5.2.0
-_rc=-rc3
+_base_ver=6.0.0
+_rc=-rc0
 #pkgver=${_base_ver}${_rc//-/.}
 pkgver=${_base_ver}
 pkgrel=2
@@ -38,9 +38,6 @@ depends=("${MINGW_PACKAGE_PREFIX}-capstone"
          "${MINGW_PACKAGE_PREFIX}-usbredir"
          "${MINGW_PACKAGE_PREFIX}-zstd")
 source=(https://download.qemu.org/${_realname}-${pkgver}${_rc}.tar.xz)
-sha256sums=('2f13a92a0fa5c8b69ff0796b59b86b080bbb92ebad5d301a7724dd06b5e78cb6'
-            'SKIP')
-validpgpkeys=('CEACC9E15534EBABB82D3FA03353C9CEF108B584') # Michael Roth <flukshun@gmail.com>
 noextract=(${_realname}-${pkgver}${_rc}.tar.xz)
 
 prepare() {
@@ -61,10 +58,7 @@ build() {
   [[ -d "${srcdir}"/build-${CARCH} ]] && rm -rf "${srcdir}"/build-${CARCH}
   mkdir -p "${srcdir}"/build-${CARCH} && cd "${srcdir}"/build-${CARCH}
 
-  #export CC='ccache gcc'
-  #export CXX='ccache g++'
-
-  ../${_realname}-${pkgver}${_rc}/configure \
+  ../${_realname}-${pkgver}/configure \
       --disable-werror \
       --disable-kvm \
       --disable-spice \
@@ -80,7 +74,7 @@ build() {
       --enable-gtk \
       --enable-sdl \
       --enable-zstd \
-      --ninja=${MINGW_PREFIX}/bin/ninja \
+      --target-list="i386-softmmu x86_64-softmmu" \
       "${_extra_config[@]}" \
       --prefix=${MINGW_PREFIX} \
       --bindir=${MINGW_PREFIX}/bin \
@@ -90,10 +84,10 @@ build() {
       --mandir=${MINGW_PREFIX}/share/qemu \
       --docdir=${MINGW_PREFIX}/share/qemu
 
-  /home/User/.bin/noti.exe --time nice -n19 make -j8
+  make
 }
 
 package() {
   cd "${srcdir}"/build-${CARCH}
-  DESTDIR="${pkgdir}/" ninja install
+  make DESTDIR="${pkgdir}/" install
 }
