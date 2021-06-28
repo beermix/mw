@@ -11,9 +11,9 @@ pkgver=1.51.0
 pkgrel=1
 pkgdesc="Systems programming language focused on safety, speed and concurrency (mingw-w64)"
 arch=('any')
-url="https://www.rust-lang.org/ru/"
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64')
+url="https://www.rust-lang.org/"
 license=('MIT' 'Apache')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("bison"
              "flex"
              "git"
@@ -57,8 +57,6 @@ prepare() {
   cd ${srcdir}/${_realname}c-${pkgver}-src
   patch -p1 -i "${srcdir}/force-curl-rust.patch"
   patch -p1 -i "${srcdir}/0001-add-missing-libs.patch"
-  #patch -p1 -i "${srcdir}/0002-fix-install-msys2.patch"
-  #patch -p1 -i "${srcdir}/0003-link-with-system-curl.patch"
   patch -p1 -i "${srcdir}/0004-unbundle-gcc.patch"
   patch -p1 -i "${srcdir}/0005-win32-config.patch"
   patch -p1 -i "${srcdir}/0006-Update-cc.patch"
